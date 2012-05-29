@@ -1,0 +1,113 @@
+grammar de.msg.xt.mdt.tdsl.TDsl with org.eclipse.xtext.xbase.Xbase
+
+generate tDsl "http://www.msg.de/xt/mdt/tdsl/TDsl"
+
+
+TestModel:
+	(packages+=PackageDeclaration)*
+;
+
+PackageDeclaration:
+    'package' name=QualifiedName '{'
+    	(elements+=Element)*
+    '}';
+    
+Element:
+	Activity | UseCase | Control | DataType | TagsDeclaration
+;
+
+DataType:
+	'datatype' name=ID ('extends' supertype=[DataType|FQN])?  'mappedBy' mappedBy=JvmTypeReference '{'
+		(classes+=EquivalenceClass)+
+	'}'
+;
+
+EquivalenceClass:
+	'class' name=ID 'value' value=STRING (tags+=[Tag|FQN])*
+;
+
+TagsDeclaration:
+	'tags' '{'
+		tags+=Tag (',' tags+=Tag)*
+	'}'
+;
+
+Tag:
+	name=ID
+;
+
+Control:
+	'control' name=ID 'mappedBy' mappedBy=JvmTypeReference '{'
+		(operations+=Operation)+
+	'}'
+;
+
+Operation:
+	'op' name=ID '(' (params+=Parameter (',' params+=Parameter)*)? ')' (':' returnType=[DataType|FQN])?
+;
+
+Parameter:
+	dataType=[DataType|FQN] name=ID
+;
+    
+Activity:
+	'activity' name=ID ('(' inputParameter+=Parameter (',' inputParameter+=Parameter)* ')')? '{'
+		(fields+=Field)*
+	'}'
+;
+
+Field:
+	'field' name=ID 'control' control=[Control|FQN] ('datatype' dataType=[DataType|FQN])? (tags+=TagWithCondition)* 
+	(
+		 '{' 
+		 (operations+=OperationMapping)+	
+		 '}'
+	)?
+;
+
+TagWithCondition:
+	'tag' tag=[Tag|FQN] ('if' condition=XExpression)?
+;
+
+OperationMapping:
+	'op' (name=ID)? operation=[Operation|FQN] ('(' (paramAssignment+=ParameterAssignment) (',' paramAssignment+=ParameterAssignment)* ')')? ('guard' guard=XExpression)?  (nextActivities+=ConditionalNextActivity)*
+;
+
+ConditionalNextActivity:
+	'=>' next=[Activity|FQN] 'if' guard=XExpression
+;
+
+ParameterAssignment:
+	name=[Parameter|FQN] '=' value=XExpression
+;
+
+UseCase:
+	'useCase' name=ID ('(' inputParameter+=Parameter (',' inputParameter+=Parameter)* ')')? 'initial' '=' initialActivity=[Activity|FQN] '{'
+		(statements+=Statement)*
+	'}'
+;
+
+Statement:
+	VariableAssignment | OperationCall | SubUseCaseCall | CompoundStatement
+;
+
+VariableAssignment:
+	declaration=XVariableDeclaration
+;
+
+FQN:
+	ID ('.' ID)*
+;
+
+OperationCall:
+	name=[Operation|FQN] ('(' (paramAssignment+=ParameterAssignment) (',' paramAssignment+=ParameterAssignment)* ')')?
+;
+
+SubUseCaseCall:
+	'call' useCase=[UseCase|FQN] ('(' (paramAssignment+=ParameterAssignment) (',' paramAssignment+=ParameterAssignment)* ')')?
+;
+
+CompoundStatement:
+	'(' statements+=Statement ('|' statements+=Statement)+ ')'
+;
+
