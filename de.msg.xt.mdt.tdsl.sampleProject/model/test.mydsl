@@ -1,0 +1,13 @@
+package de.test {
+	
+	import java.util.*
+	import java.math.*
+	
+	entity TestEntity {
+		
+		op testOp(String abc):MathContext {
+			
+		}
+		
+	}
+}

@@ -1,0 +1,39 @@
+package de.msg.xt.mdt {
+
+	tags { 
+		Pflichtfeld, Test, Super
+	}
+	
+	datatype StringDT mappedBy String {
+		class emptyString value "" Pflichtfeld Test
+		class shortString value "abc"
+		class longString value "Dies ist ein sehr langer String ............................................................." 		
+	}
+	
+	datatype Sachnummer extends StringDT mappedBy String {
+		class snrString value "A0000034555"
+	}	
+	
+	control TextControl mappedBy org.eclipse.swt.SWT {
+		op setText(StringDT str)
+		op getText():StringDT
+		op invokeAction()
+	}
+	
+	activity ECEditor01(Sachnummer snr) {
+		field stichwort control TextControl
+		field beschreibung control TextControl
+		field gremium control TextControl
+	}
+	
+	activity ECEditor03 {
+		field snr control TextControl tag Pflichtfeld
+	}
+	
+//	useCase ECNeuanlage(Sachnummer snr, Sachnummer snr2) initial=ECEditor01 {
+//		call ECNeuanlage(TextControl.setText.snr="abc")
+//		val snrType = "Test"
+//		TextControl.getText
+//		TextControl.setText(TextControl.setText.snr=snrType)
+//	}
+}

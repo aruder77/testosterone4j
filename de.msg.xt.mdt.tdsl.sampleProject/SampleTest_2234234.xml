@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<sampleUseCaseSuite>
+    <testCases>
+        <inputParam1 equivalenceClass="0" value=""/>
+    </testCases>
+    <testCases>
+        <inputParam1 equivalenceClass="1" value="abc"/>
+        <subUseCase>
+            <inputParam1 equivalenceClass="0" value=""/>
+        </subUseCase>
+    </testCases>
+    <testCases>
+        <inputParam1 equivalenceClass="2" value="asdflkjas laskfjöasdlkfjasö dfkljas ölfkjsö fkljsdfk sjdf"/>
+    </testCases>
+    <testCases>
+        <inputParam1 equivalenceClass="0" value=""/>
+    </testCases>
+    <testCases>
+        <inputParam1 equivalenceClass="1" value="abc"/>
+        <subUseCase>
+            <inputParam1 equivalenceClass="1" value="abc"/>
+        </subUseCase>
+    </testCases>
+    <testCases>
+        <inputParam1 equivalenceClass="2" value="asdflkjas laskfjöasdlkfjasö dfkljas ölfkjsö fkljsdfk sjdf"/>
+    </testCases>
+    <testCases>
+        <inputParam1 equivalenceClass="0" value=""/>
+    </testCases>
+    <testCases>
+        <inputParam1 equivalenceClass="1" value="abc"/>
+        <subUseCase>
+            <inputParam1 equivalenceClass="2" value="asdflkjas laskfjöasdlkfjasö dfkljas ölfkjsö fkljsdfk sjdf"/>
+        </subUseCase>
+    </testCases>
+</sampleUseCaseSuite>
