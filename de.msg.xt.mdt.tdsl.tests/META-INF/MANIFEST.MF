@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: de.msg.xt.mdt.tdsl.tests
+Bundle-Vendor: My Company
+Bundle-Version: 1.0.0.qualifier
+Bundle-SymbolicName: de.msg.xt.mdt.tdsl.tests; singleton:=true
+Bundle-ActivationPolicy: lazy
+Require-Bundle: de.msg.xt.mdt.tdsl,
+ de.msg.xt.mdt.tdsl.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.xtext.junit4,
+ org.junit4,
+ org.eclipse.ui.workbench;resolution:=optional
+Import-Package: org.apache.log4j,
+ org.apache.commons.logging
+Bundle-RequiredExecutionEnvironment: J2SE-1.5

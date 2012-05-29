@@ -1,0 +1,425 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+
+<plugin>
+
+    <extension
+            point="org.eclipse.ui.editors">
+        <editor
+            class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.editor.XtextEditor"
+            contributorClass="org.eclipse.ui.editors.text.TextEditorActionContributor"
+            default="true"
+            extensions="tdsl"
+            id="de.msg.xt.mdt.tdsl.TDsl"
+            matchingStrategy="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.xbase.ui.editor.JavaEditorInputMatcher"
+            name="TDsl Editor">
+        </editor>
+    </extension>
+    <extension
+        point="org.eclipse.ui.handlers">
+        <handler
+            class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.editor.hyperlinking.OpenDeclarationHandler"
+            commandId="org.eclipse.xtext.ui.editor.hyperlinking.OpenDeclaration">
+            <activeWhen>
+                <reference
+                    definitionId="de.msg.xt.mdt.tdsl.TDsl.Editor.opened">
+                </reference>
+            </activeWhen>
+        </handler>
+        <handler
+            class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.editor.handler.ValidateActionHandler"
+            commandId="de.msg.xt.mdt.tdsl.TDsl.validate">
+         <activeWhen>
+            <reference
+                    definitionId="de.msg.xt.mdt.tdsl.TDsl.Editor.opened">
+            </reference>
+         </activeWhen>
+      </handler>
+    </extension>
+    <extension point="org.eclipse.core.expressions.definitions">
+        <definition id="de.msg.xt.mdt.tdsl.TDsl.Editor.opened">
+            <and>
+                <reference definitionId="isActiveEditorAnInstanceOfXtextEditor"/>
+                <with variable="activeEditor">
+                    <test property="org.eclipse.xtext.ui.editor.XtextEditor.languageName" 
+                        value="de.msg.xt.mdt.tdsl.TDsl" 
+                        forcePluginActivation="true"/>
+                </with>        
+            </and>
+        </definition>
+    </extension>
+    <extension
+            point="org.eclipse.ui.preferencePages">
+        <page
+            class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.editor.preferences.LanguageRootPreferencePage"
+            id="de.msg.xt.mdt.tdsl.TDsl"
+            name="TDsl">
+            <keywordReference id="de.msg.xt.mdt.tdsl.ui.keyword_TDsl"/>
+        </page>
+        <page
+            category="de.msg.xt.mdt.tdsl.TDsl"
+            class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.editor.syntaxcoloring.SyntaxColoringPreferencePage"
+            id="de.msg.xt.mdt.tdsl.TDsl.coloring"
+            name="Syntax Coloring">
+            <keywordReference id="de.msg.xt.mdt.tdsl.ui.keyword_TDsl"/>
+        </page>
+        <page
+            category="de.msg.xt.mdt.tdsl.TDsl"
+            class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.editor.templates.XtextTemplatePreferencePage"
+            id="de.msg.xt.mdt.tdsl.TDsl.templates"
+            name="Templates">
+            <keywordReference id="de.msg.xt.mdt.tdsl.ui.keyword_TDsl"/>
+        </page>
+    </extension>
+    <extension
+            point="org.eclipse.ui.propertyPages">
+        <page
+            class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.editor.preferences.LanguageRootPreferencePage"
+            id="de.msg.xt.mdt.tdsl.TDsl"
+            name="TDsl">
+            <keywordReference id="de.msg.xt.mdt.tdsl.ui.keyword_TDsl"/>
+            <enabledWhen>
+	            <adapt type="org.eclipse.core.resources.IProject"/>
+			</enabledWhen>
+	        <filter name="projectNature" value="org.eclipse.xtext.ui.shared.xtextNature"/>
+        </page>
+    </extension>
+    <extension
+        point="org.eclipse.ui.keywords">
+        <keyword
+            id="de.msg.xt.mdt.tdsl.ui.keyword_TDsl"
+            label="TDsl"/>
+    </extension>
+    <extension
+         point="org.eclipse.ui.commands">
+      <command
+            description="Trigger expensive validation"
+            id="de.msg.xt.mdt.tdsl.TDsl.validate"
+            name="Validate">
+      </command>
+    </extension>
+    <extension point="org.eclipse.ui.menus">
+        <menuContribution
+            locationURI="popup:#TextEditorContext?after=group.edit">
+             <command
+                 commandId="de.msg.xt.mdt.tdsl.TDsl.validate"
+                 style="push"
+                 tooltip="Trigger expensive validation">
+            <visibleWhen checkEnabled="false">
+                <reference
+                    definitionId="de.msg.xt.mdt.tdsl.TDsl.Editor.opened">
+                </reference>
+            </visibleWhen>
+         </command>  
+         </menuContribution>
+    </extension>
+    <extension point="org.eclipse.ui.menus">
+		<menuContribution locationURI="popup:#TextEditorContext?endof=group.find">
+			<command commandId="org.eclipse.xtext.ui.editor.FindReferences">
+				<visibleWhen checkEnabled="false">
+                	<reference definitionId="de.msg.xt.mdt.tdsl.TDsl.Editor.opened">
+                	</reference>
+            	</visibleWhen>
+			</command>
+		</menuContribution>
+	</extension>
+	<extension point="org.eclipse.ui.handlers">
+	    <handler
+            class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.editor.findrefs.FindReferencesHandler"
+            commandId="org.eclipse.xtext.ui.editor.FindReferences">
+            <activeWhen>
+                <reference
+                    definitionId="de.msg.xt.mdt.tdsl.TDsl.Editor.opened">
+                </reference>
+            </activeWhen>
+        </handler>
+    </extension>   
+
+<!-- adding resource factories -->
+
+	<extension
+		point="org.eclipse.emf.ecore.extension_parser">
+		<parser
+			class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.resource.IResourceFactory"
+			type="tdsl">
+		</parser>
+	</extension>
+	<extension point="org.eclipse.xtext.extension_resourceServiceProvider">
+        <resourceServiceProvider
+            class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.resource.IResourceUIServiceProvider"
+            uriExtension="tdsl">
+        </resourceServiceProvider>
+    </extension>
+
+
+    <!-- marker definitions for de.msg.xt.mdt.tdsl.TDsl -->
+    <extension
+            id="tdsl.check.fast"
+            name="TDsl Problem"
+            point="org.eclipse.core.resources.markers">
+        <super type="org.eclipse.xtext.ui.check.fast"/>
+        <persistent value="true"/>
+    </extension>
+    <extension
+            id="tdsl.check.normal"
+            name="TDsl Problem"
+            point="org.eclipse.core.resources.markers">
+        <super type="org.eclipse.xtext.ui.check.normal"/>
+        <persistent value="true"/>
+    </extension>
+    <extension
+            id="tdsl.check.expensive"
+            name="TDsl Problem"
+            point="org.eclipse.core.resources.markers">
+        <super type="org.eclipse.xtext.ui.check.expensive"/>
+        <persistent value="true"/>
+    </extension>
+
+   <extension
+         point="org.eclipse.xtext.builder.participant">
+      <participant
+            class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.builder.IXtextBuilderParticipant">
+      </participant>
+   </extension>
+   <extension
+            point="org.eclipse.ui.preferencePages">
+        <page
+            category="de.msg.xt.mdt.tdsl.TDsl"
+            class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.builder.preferences.BuilderPreferencePage"
+            id="de.msg.xt.mdt.tdsl.TDsl.compiler.preferencePage"
+            name="Compiler">
+            <keywordReference id="de.msg.xt.mdt.tdsl.ui.keyword_TDsl"/>
+        </page>
+    </extension>
+    <extension
+            point="org.eclipse.ui.propertyPages">
+        <page
+            category="de.msg.xt.mdt.tdsl.TDsl"
+            class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.builder.preferences.BuilderPreferencePage"
+            id="de.msg.xt.mdt.tdsl.TDsl.compiler.propertyPage"
+            name="Compiler">
+            <keywordReference id="de.msg.xt.mdt.tdsl.ui.keyword_TDsl"/>
+            <enabledWhen>
+	            <adapt type="org.eclipse.core.resources.IProject"/>
+			</enabledWhen>
+	        <filter name="projectNature" value="org.eclipse.xtext.ui.shared.xtextNature"/>
+        </page>
+    </extension>
+
+	<!-- Quick Outline -->
+	<extension
+		point="org.eclipse.ui.handlers">
+		<handler 
+			class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.editor.outline.quickoutline.ShowQuickOutlineActionHandler"
+			commandId="org.eclipse.xtext.ui.editor.outline.QuickOutline">
+			<activeWhen>
+				<reference
+					definitionId="de.msg.xt.mdt.tdsl.TDsl.Editor.opened">
+				</reference>
+			</activeWhen>
+		</handler>
+	</extension>
+	<extension
+		point="org.eclipse.ui.commands">
+		<command
+			description="Open the quick outline."
+			id="org.eclipse.xtext.ui.editor.outline.QuickOutline"
+			name="Quick Outline">
+		</command>
+	</extension>
+	<extension point="org.eclipse.ui.menus">
+		<menuContribution
+			locationURI="popup:#TextEditorContext?after=group.open">
+			<command commandId="org.eclipse.xtext.ui.editor.outline.QuickOutline"
+				style="push"
+				tooltip="Open Quick Outline">
+				<visibleWhen checkEnabled="false">
+					<reference definitionId="de.msg.xt.mdt.tdsl.TDsl.Editor.opened"/>
+				</visibleWhen>
+			</command>
+		</menuContribution>
+	</extension>
+    <!-- quickfix marker resolution generator for de.msg.xt.mdt.tdsl.TDsl -->
+    <extension
+            point="org.eclipse.ui.ide.markerResolution">
+        <markerResolutionGenerator
+            class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.editor.quickfix.MarkerResolutionGenerator"
+            markerType="de.msg.xt.mdt.tdsl.ui.tdsl.check.fast">
+            <attribute
+                name="FIXABLE_KEY"
+                value="true">
+            </attribute>
+        </markerResolutionGenerator>
+        <markerResolutionGenerator
+            class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.editor.quickfix.MarkerResolutionGenerator"
+            markerType="de.msg.xt.mdt.tdsl.ui.tdsl.check.normal">
+            <attribute
+                name="FIXABLE_KEY"
+                value="true">
+            </attribute>
+        </markerResolutionGenerator>
+        <markerResolutionGenerator
+            class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.editor.quickfix.MarkerResolutionGenerator"
+            markerType="de.msg.xt.mdt.tdsl.ui.tdsl.check.expensive">
+            <attribute
+                name="FIXABLE_KEY"
+                value="true">
+            </attribute>
+        </markerResolutionGenerator>
+    </extension>
+   	<!-- Rename Refactoring -->
+	<extension point="org.eclipse.ui.handlers">
+		<handler 
+			class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.refactoring.ui.IRenameElementHandler"
+			commandId="org.eclipse.xtext.ui.refactoring.RenameElement">
+			<activeWhen>
+				<reference
+					definitionId="de.msg.xt.mdt.tdsl.TDsl.Editor.opened">
+				</reference>
+			</activeWhen>
+		</handler>
+	</extension>
+    <extension point="org.eclipse.ui.menus">
+         <menuContribution
+            locationURI="popup:#TextEditorContext?after=group.edit">
+         <command commandId="org.eclipse.xtext.ui.refactoring.RenameElement"
+               style="push">
+            <visibleWhen checkEnabled="false">
+               <reference
+                     definitionId="de.msg.xt.mdt.tdsl.TDsl.Editor.opened">
+               </reference>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+   </extension>
+   <extension point="org.eclipse.ui.preferencePages">
+	    <page
+	        category="de.msg.xt.mdt.tdsl.TDsl"
+	        class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.refactoring.ui.RefactoringPreferencePage"
+	        id="de.msg.xt.mdt.tdsl.TDsl.refactoring"
+	        name="Refactoring">
+	        <keywordReference id="de.msg.xt.mdt.tdsl.ui.keyword_TDsl"/>
+	    </page>
+	</extension>
+
+<!-- Type Hierarchy  -->
+	<extension
+		point="org.eclipse.ui.handlers">
+		<handler 
+			class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.xbase.ui.hierarchy.OpenTypeHierarchyHandler"
+			commandId="org.eclipse.xtext.xbase.ui.hierarchy.OpenTypeHierarchy">
+			<activeWhen>
+				<reference
+					definitionId="de.msg.xt.mdt.tdsl.TDsl.Editor.opened">
+				</reference>
+			</activeWhen>
+		</handler>
+		<handler 
+			class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.xbase.ui.hierarchy.QuickTypeHierarchyHandler"
+			commandId="org.eclipse.xtext.xbase.ui.hierarchy.QuickTypeHierarchy">
+			<activeWhen>
+				<reference
+					definitionId="de.msg.xt.mdt.tdsl.TDsl.Editor.opened">
+				</reference>
+			</activeWhen>
+		</handler>
+	</extension>
+	<extension point="org.eclipse.ui.menus">
+		<menuContribution
+			locationURI="popup:#TextEditorContext?after=group.open">
+			<command commandId="org.eclipse.xtext.xbase.ui.hierarchy.OpenTypeHierarchy"
+				style="push"
+				tooltip="Open Type Hierarchy">
+				<visibleWhen checkEnabled="false">
+					<reference definitionId="de.msg.xt.mdt.tdsl.TDsl.Editor.opened"/>
+				</visibleWhen>
+			</command>
+		</menuContribution>
+		<menuContribution
+			locationURI="popup:#TextEditorContext?after=group.open">
+			<command commandId="org.eclipse.xtext.xbase.ui.hierarchy.QuickTypeHierarchy"
+				style="push"
+				tooltip="Quick Type Hierarchy">
+				<visibleWhen checkEnabled="false">
+					<reference definitionId="de.msg.xt.mdt.tdsl.TDsl.Editor.opened"/>
+				</visibleWhen>
+			</command>
+		</menuContribution>
+	</extension>
+	<!-- Call Hierachy -->
+	<extension
+		point="org.eclipse.ui.handlers">
+		<handler 
+			class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.xbase.ui.hierarchy.OpenCallHierachyHandler"
+			commandId="org.eclipse.xtext.xbase.ui.hierarchy.OpenCallHierarchy">
+			<activeWhen>
+				<reference
+					definitionId="de.msg.xt.mdt.tdsl.TDsl.Editor.opened">
+				</reference>
+			</activeWhen>
+		</handler>
+	</extension>
+	
+	<extension point="org.eclipse.ui.menus">
+		<menuContribution
+			locationURI="popup:#TextEditorContext?after=group.open">
+			<command commandId="org.eclipse.xtext.xbase.ui.hierarchy.OpenCallHierarchy"
+				style="push"
+				tooltip="Open Call Hierarchy">
+				<visibleWhen checkEnabled="false">
+					<reference definitionId="de.msg.xt.mdt.tdsl.TDsl.Editor.opened"/>
+				</visibleWhen>
+			</command>
+		</menuContribution>
+	</extension>
+	<extension
+         point="org.eclipse.core.runtime.adapters">
+      <factory class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.builder.smap.StratumBreakpointAdapterFactory"
+         adaptableType="org.eclipse.xtext.ui.editor.XtextEditor">
+         <adapter type="org.eclipse.debug.ui.actions.IToggleBreakpointsTarget"/>
+      </factory> 
+   </extension>
+   <extension point="org.eclipse.ui.editorActions">
+      <editorContribution targetID="de.msg.xt.mdt.tdsl.TDsl" 
+                          id="de.msg.xt.mdt.tdsl.TDsl.ide.rulerActions">
+	     <action
+	             label="Not Used"
+	             class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.debug.ui.actions.RulerToggleBreakpointActionDelegate"
+	             style="push"
+	             actionID="RulerDoubleClick"
+	             id="de.msg.xt.mdt.tdsl.TDsl.doubleClickBreakpointAction"/>
+	  </editorContribution>
+   </extension>
+   <extension point="org.eclipse.ui.popupMenus">
+      <viewerContribution
+         targetID="example.rulerContextMenuId"
+         id="de.msg.xt.mdt.tdsl.TDsl.ide.RulerPopupActions">
+         <action
+            label="Toggle Breakpoint"
+            class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.debug.ui.actions.RulerToggleBreakpointActionDelegate"
+            menubarPath="additions"
+            id="de.msg.xt.mdt.tdsl.TDsl.ide.rulerContextMenu.toggleBreakpointAction">
+         </action>
+      </viewerContribution>
+   </extension>
+
+  <extension point="org.eclipse.compare.contentViewers">
+    <viewer id="de.msg.xt.mdt.tdsl.TDsl.compare.contentViewers"
+            class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.compare.InjectableViewerCreator"
+            extensions="tdsl">
+    </viewer>
+  </extension>
+  <extension point="org.eclipse.compare.contentMergeViewers">
+    <viewer id="de.msg.xt.mdt.tdsl.TDsl.compare.contentMergeViewers"
+            class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.compare.InjectableViewerCreator"
+            extensions="tdsl" label="TDsl Compare">
+     </viewer>
+  </extension>
+  <extension point="org.eclipse.ui.editors.documentProviders">
+    <provider id="de.msg.xt.mdt.tdsl.TDsl.editors.documentProviders"
+            class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.editor.model.XtextDocumentProvider"
+            extensions="tdsl">
+    </provider>
+  </extension>
+
+</plugin>
