@@ -4,5 +4,5 @@ import java.util.Set;
 
 public interface EquivalenceClass {
 
-	Set<EquivalenceClass> values();
+	Object getValue();
 }

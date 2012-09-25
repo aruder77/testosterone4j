@@ -4,19 +4,21 @@ import com.google.inject.Inject
 import de.msg.xt.mdt.tdsl.tDsl.Activity
 import de.msg.xt.mdt.tdsl.tDsl.Control
 import de.msg.xt.mdt.tdsl.tDsl.DataType
+import de.msg.xt.mdt.tdsl.tDsl.TagsDeclaration
+import javax.xml.bind.annotation.XmlRootElement
 import org.eclipse.emf.ecore.EObject
+import org.eclipse.xtext.common.types.JvmConstructor
 import org.eclipse.xtext.common.types.JvmVisibility
+import org.eclipse.xtext.common.types.TypesFactory
 import org.eclipse.xtext.common.types.util.TypeReferences
 import org.eclipse.xtext.naming.IQualifiedNameProvider
+import org.eclipse.xtext.xbase.compiler.output.ITreeAppendable
 import org.eclipse.xtext.xbase.jvmmodel.AbstractModelInferrer
 import org.eclipse.xtext.xbase.jvmmodel.IJvmDeclaredTypeAcceptor
 import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder
 import org.eclipse.xtext.xbase.lib.Procedures$Procedure1
-import org.eclipse.xtext.common.types.JvmConstructor
-import org.eclipse.xtext.xbase.XExpression
-import org.eclipse.xtext.common.types.TypesFactory
-import org.eclipse.xtext.xbase.compiler.output.ITreeAppendable
-import de.msg.xt.mdt.tdsl.tDsl.TagsDeclaration
+import javax.xml.bind.annotation.XmlAttribute
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter
 
 /**
  * <p>Infers a JVM model from the source model.</p> 
@@ -114,7 +116,6 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				} else {
    					it.superTypes += dataType.newTypeRef(dataType.supertype.fullyQualifiedName.toString + "EquivalenceClass")
    				}
-   				
    				members += dataType.toField("EMPTY_ID", dataType.newTypeRef(typeof(short))) [
    					setStatic(true)
    					setFinal(true)
@@ -213,6 +214,12 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 				]			
 				members += constructor
 				
+				members += dataType.toGetter("id", dataType.newTypeRef(typeof(short)))
+
+				members += dataType.toGetter("value", dataType.newTypeRef(typeof(String)))
+
+				members += dataType.toGetter("tags", dataType.newTypeRef(dataType.eContainer.fullyQualifiedName.toString + ".Tags").createArrayType)				
+
 				members += dataType.toMethod("values", dataType.newTypeRef("java.util.Set", dataType.newTypeRef("de.msg.xt.mdt.base.EquivalenceClass"))) [
 					setBody [
 						it.append('''
@@ -228,14 +235,32 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 					]
 				]
 				
-				members += dataType.toGetter("value", dataType.newTypeRef(typeof(String)))
-
-				members += dataType.toGetter("tags", dataType.newTypeRef(dataType.eContainer.fullyQualifiedName.toString + ".Tags").createArrayType)				
+				members += dataType.toMethod("getById", dataType.newTypeRef(it.fullyQualifiedName.toString)) [
+					parameters += dataType.toParameter("id", dataType.newTypeRef(typeof(short)))
+					setBody [
+						it.append('''
+							for (EquivalenceClass value : values()) {
+								StringDTEquivalenceClass strValue = (StringDTEquivalenceClass)value;
+								if (strValue.getId() == id) {
+									return strValue;
+								}
+							}
+							return null;
+						''')
+					]
+				]
    			]  			
    		
    		acceptor.accept(dataType.toClass(dataType.fullyQualifiedName)).initializeLater([
-			members += dataType.toField("value", dataType.mappedBy)
-			members += dataType.toField("equivalenceClass", dataType.newTypeRef(dataType.fullyQualifiedName.toString + "EquivalenceClass"))
+   			annotations += dataType.toAnnotation(typeof(XmlRootElement))
+   			
+			members += dataType.toField("value", dataType.mappedBy) [
+				annotations += dataType.toAnnotation(typeof(XmlAttribute))
+			]
+			members += dataType.toField("equivalenceClass", dataType.newTypeRef(dataType.fullyQualifiedName.toString + "EquivalenceClass")) [
+				annotations += dataType.toAnnotation(typeof(XmlAttribute))
+//				annotations += dataType.toAnnotation(typeof(XmlJavaTypeAdapter), typeof(StringDTEquivalenceClassAdapter))
+			]
 			
 			val	Procedure1<ITreeAppendable> body = [it.append(
 					'''
