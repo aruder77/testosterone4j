@@ -5,6 +5,7 @@ import de.msg.xt.mdt.tdsl.tDsl.Activity
 import de.msg.xt.mdt.tdsl.tDsl.Control
 import de.msg.xt.mdt.tdsl.tDsl.DataType
 import de.msg.xt.mdt.tdsl.tDsl.TagsDeclaration
+import javax.xml.bind.annotation.XmlAttribute
 import javax.xml.bind.annotation.XmlRootElement
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.xtext.common.types.JvmConstructor
@@ -16,9 +17,7 @@ import org.eclipse.xtext.xbase.compiler.output.ITreeAppendable
 import org.eclipse.xtext.xbase.jvmmodel.AbstractModelInferrer
 import org.eclipse.xtext.xbase.jvmmodel.IJvmDeclaredTypeAcceptor
 import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder
-import org.eclipse.xtext.xbase.lib.Procedures$Procedure1
-import javax.xml.bind.annotation.XmlAttribute
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter
+import org.eclipse.xtext.xbase.lib.Procedures$Procedure1
 
 /**
  * <p>Infers a JVM model from the source model.</p> 
@@ -71,7 +70,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    			
    			for (operation : control.operations) {
    				for (opParam : operation.params) {
-   					members += opParam.toField(opParam.name, opParam.newTypeRef(opParam.dataType.fullyQualifiedName.toString))
+   					members += opParam.toField(opParam.name, opParam.type.mappedBy)
    				}
    			}
    			   			
@@ -87,18 +86,18 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    			for (operation : control.operations) {
    				val returnType = 
    					if (operation.returnType != null)
-   						operation.newTypeRef(operation.returnType.fullyQualifiedName.toString)
+   						operation.returnType.mappedBy
    					else
    						references.getTypeForName(typeof(void) as Class<?>, operation)
    				members += operation.toMethod(operation.name, returnType) [
    					for (param : operation.params) {
-   						parameters += param.toParameter(param.name, param.newTypeRef(param.dataType.fullyQualifiedName.toString))
+   						parameters += param.toParameter(param.name, param.type.mappedBy)
    					}
    					
 //   					setBody [
 //   						for (param : operation.params) {
 //   							it.append('''
-//   								this.«param.name» = «param.name»;
+//   								this.Â«param.nameÂ» = Â«param.nameÂ»;
 //   							''')
 //   						}
 //   					]
@@ -111,11 +110,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    	def dispatch void infer(DataType dataType, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
 
    		acceptor.accept(dataType.toClass(dataType.fullyQualifiedName.toString + "EquivalenceClass")).initializeLater [
-   				if (dataType.supertype == null) {
-   					it.superTypes += dataType.newTypeRef("de.msg.xt.mdt.base.EquivalenceClass")
-   				} else {
-   					it.superTypes += dataType.newTypeRef(dataType.supertype.fullyQualifiedName.toString + "EquivalenceClass")
-   				}
+   				it.superTypes += dataType.newTypeRef("de.msg.xt.mdt.base.EquivalenceClass")
    				members += dataType.toField("EMPTY_ID", dataType.newTypeRef(typeof(short))) [
    					setStatic(true)
    					setFinal(true)
@@ -132,7 +127,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    					]
    					val value = i 
    					field.setInitializer[
-   						it.append('''«value»''')
+   						it.append('''Â«valueÂ»''')
    					]
    					members += field
    					i = i + 1
@@ -145,7 +140,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				]
    				singletonField.setInitializer [
    					it.append(
-   					'''new «singletonField.type.simpleName»(EMPTY_ID''')
+   					'''new Â«singletonField.type.simpleNameÂ»(EMPTY_ID''')
    					it.append(''', new Tags[] {})''')
    				]
    				members += singletonField
@@ -159,13 +154,13 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    					val tags = clazz.tags
    					field.setInitializer [
    						it.append(
-   						'''new «field.type.simpleName»(«clazz.name»_ID''')
+   						'''new Â«field.type.simpleNameÂ»(Â«clazz.nameÂ»_ID''')
    						it.append(''', new Tags[] {''')
    						var z = 0
    						for (tag : tags) {
    							if (z != 0)
    								it.append(''', ''')
-   							it.append('''«dataType.eContainer.fullyQualifiedName.toString».Tags.«tag.name.toString»''')
+   							it.append('''Â«dataType.eContainer.fullyQualifiedName.toStringÂ».Tags.Â«tag.name.toStringÂ»''')
    							z = z + 1
    						}
    						it.append('''})''')
@@ -178,11 +173,11 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    					it.setFinal(true)
    				]
    				valuesField.setInitializer[
-   					it.append('''new «valuesField.type.simpleName» {''')
+   					it.append('''new Â«valuesField.type.simpleNameÂ» {''')
    					var j = dataType.classes.size
    					for (clazz : dataType.classes) {
    						val name = clazz.name
-   						it.append('''«name»''')
+   						it.append('''Â«nameÂ»''')
    						if (j > 1) {
    							it.append(''',''')
    						}
@@ -218,7 +213,8 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 
 				members += dataType.toGetter("value", dataType.newTypeRef(typeof(String)))
 
-				members += dataType.toGetter("tags", dataType.newTypeRef(dataType.eContainer.fullyQualifiedName.toString + ".Tags").createArrayType)				
+				packageName = dataType.eContainer.fullyQualifiedName.toString
+				members += dataType.toGetter("tags", dataType.newTypeRef(packageName + ".Tags").createArrayType)				
 
 				members += dataType.toMethod("values", dataType.newTypeRef("java.util.Set", dataType.newTypeRef("de.msg.xt.mdt.base.EquivalenceClass"))) [
 					setBody [
@@ -226,9 +222,6 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 							if(allValues == null) {
 								allValues = new java.util.HashSet<EquivalenceClass>();
 								java.util.Collections.addAll(allValues, VALUES);
-								«IF dataType.supertype != null»
-									allValues.addAll(super.values());
-								«ENDIF»
 							}
 							return allValues;
 						''')
@@ -254,7 +247,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    		acceptor.accept(dataType.toClass(dataType.fullyQualifiedName)).initializeLater([
    			annotations += dataType.toAnnotation(typeof(XmlRootElement))
    			
-			members += dataType.toField("value", dataType.mappedBy) [
+			members += dataType.toField("value", dataType.type.mappedBy) [
 				annotations += dataType.toAnnotation(typeof(XmlAttribute))
 			]
 			members += dataType.toField("equivalenceClass", dataType.newTypeRef(dataType.fullyQualifiedName.toString + "EquivalenceClass")) [
@@ -269,11 +262,11 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 					''')]
 			members += dataType.toConstructor("value", body) [
 				setVisibility(JvmVisibility::PUBLIC)
-				parameters += dataType.toParameter("value", dataType.mappedBy)
+				parameters += dataType.toParameter("value", dataType.type.mappedBy)
 				parameters += dataType.toParameter("equivalenceClass", dataType.newTypeRef(dataType.fullyQualifiedName.toString + "EquivalenceClass"))
 			]
 			
-			members += dataType.toGetter("value", dataType.mappedBy)
+			members += dataType.toGetter("value", dataType.type.mappedBy)
 			members += dataType.toGetter("equivalenceClass", dataType.newTypeRef(dataType.fullyQualifiedName.toString + "EquivalenceClass"))
    		])
    	}

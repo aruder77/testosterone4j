@@ -1,4 +1,4 @@
-package test.activity;
+package de.msg.xt.mdt.tdsl.sampleProject.template.test.activity;
 
 public class AnotherSampleActivity {
 	

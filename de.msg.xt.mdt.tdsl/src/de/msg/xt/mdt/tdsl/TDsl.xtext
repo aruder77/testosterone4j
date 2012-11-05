@@ -13,11 +13,15 @@ PackageDeclaration:
     '}';
     
 Element:
-	Activity | UseCase | Control | DataType | TagsDeclaration
+	Activity | UseCase | Control | Type | DataType | TagsDeclaration
+;
+
+Type:
+	'type' name=ID 'mappedBy' mappedBy=JvmTypeReference
 ;
 
 DataType:
-	'datatype' name=ID ('extends' supertype=[DataType|FQN])?  'mappedBy' mappedBy=JvmTypeReference '{'
+	'datatype' name=ID 'type' type=[Type|FQN] '{'
 		(classes+=EquivalenceClass)+
 	'}'
 ;
@@ -43,11 +47,11 @@ Control:
 ;
 
 Operation:
-	'op' name=ID '(' (params+=Parameter (',' params+=Parameter)*)? ')' (':' returnType=[DataType|FQN])?
+	'op' name=ID '(' (params+=ControlOperationParameter (',' params+=ControlOperationParameter)*)? ')' (':' returnType=[Type|FQN])?
 ;
 
-Parameter:
-	dataType=[DataType|FQN] name=ID
+ControlOperationParameter:
+	type=[Type|FQN] name=ID
 ;
     
 Activity:
@@ -74,7 +78,11 @@ OperationMapping:
 ;
 
 ConditionalNextActivity:
-	'=>' next=[Activity|FQN] 'if' guard=XExpression
+	'=>' next=[Activity|FQN] ('if' guard=XExpression)?
+;
+
+Parameter:
+	dataType=[DataType|FQN] name=ID	
 ;
 
 ParameterAssignment:
@@ -82,7 +90,7 @@ ParameterAssignment:
 ;
 
 UseCase:
-	'useCase' name=ID ('(' inputParameter+=Parameter (',' inputParameter+=Parameter)* ')')? 'initial' '=' initialActivity=[Activity|FQN] '{'
+	(test?='test')? 'useCase' name=ID ('(' inputParameter+=Parameter (',' inputParameter+=Parameter)* ')')? 'initial' '=' initialActivity=[Activity|FQN] '{'
 		(statements+=Statement)*
 	'}'
 ;

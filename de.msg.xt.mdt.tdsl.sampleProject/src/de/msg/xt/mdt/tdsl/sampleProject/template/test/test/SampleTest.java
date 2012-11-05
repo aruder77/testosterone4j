@@ -1,4 +1,4 @@
-package test.test;
+package de.msg.xt.mdt.tdsl.sampleProject.template.test.test;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -17,13 +17,13 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import test.generator.SampleTestGenerator;
-import test.usecase.SampleSubUseCase;
-import test.usecase.SampleUseCase;
 import de.msg.xt.mdt.Sachnummer;
 import de.msg.xt.mdt.SachnummerEquivalenceClass;
 import de.msg.xt.mdt.StringDT;
 import de.msg.xt.mdt.StringDTEquivalenceClass;
+import de.msg.xt.mdt.tdsl.sampleProject.template.test.generator.SampleTestGenerator;
+import de.msg.xt.mdt.tdsl.sampleProject.template.test.usecase.SampleSubUseCase;
+import de.msg.xt.mdt.tdsl.sampleProject.template.test.usecase.SampleUseCase;
 
 @RunWith(Parameterized.class)
 public class SampleTest {

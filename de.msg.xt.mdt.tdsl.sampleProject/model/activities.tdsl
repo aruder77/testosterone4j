@@ -1,27 +1,32 @@
-package de.msg.xt.mdt {
+package de.msg.xt.mdt { 
 
 	tags { 
 		Pflichtfeld, Test, Super
 	}
 	
-	datatype StringDT mappedBy String {
+	type String mappedBy java.lang.String
+	
+	datatype StringDT type String {
 		class emptyString value "" Pflichtfeld Test
 		class shortString value "abc"
-		class longString value "Dies ist ein sehr langer String ............................................................." 		
+		class longString value "Dies ist ein seehr langer String ............................................................." 		
 	}
 	
-	datatype Sachnummer extends StringDT mappedBy String {
+	datatype Sachnummer type String {
 		class snrString value "A0000034555"
 	}	
 	
-	control TextControl mappedBy org.eclipse.swt.SWT {
-		op setText(StringDT str)
-		op getText():StringDT
+	
+	control TextControl mappedBy java.util.List {
+		op setText(String str)
+		op getText():String
 		op invokeAction()
 	}
 	
 	activity ECEditor01(Sachnummer snr) {
-		field stichwort control TextControl
+		field stichwort control TextControl {
+			op TextControl.invokeAction => ECEditor03
+		}
 		field beschreibung control TextControl
 		field gremium control TextControl
 	}
@@ -29,11 +34,17 @@ package de.msg.xt.mdt {
 	activity ECEditor03 {
 		field snr control TextControl tag Pflichtfeld
 	}
-	
-//	useCase ECNeuanlage(Sachnummer snr, Sachnummer snr2) initial=ECEditor01 {
-//		call ECNeuanlage(TextControl.setText.snr="abc")
-//		val snrType = "Test"
-//		TextControl.getText
-//		TextControl.setText(TextControl.setText.snr=snrType)
-//	}
+
+	/*	
+	* useCase ECNeuanlage(Sachnummer snr, Sachnummer snr2) initial=ECEditor01 {
+	*   stichwort setText(str = "abc")
+	*	call ECNeuanlage(snr="abc", snr2="xyz")
+	*	val snrType = "Test"
+	*	val text = stichwort->TextControl.getText
+	*   beschreibung setText(str=text)
+	*   stichwort invokeAction
+	*   
+	*   // ab hier ist dann ECEditor03 die gültige Activity
+	*   snr setText(str="xyz")
+	* } */
 }

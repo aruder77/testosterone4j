@@ -3,7 +3,7 @@ package de.test {
 	import java.util.*
 	import java.math.*
 	
-	entity TestEntity {
+	entity TestEntity  {
 		
 		op testOp(String abc):MathContext {
 			

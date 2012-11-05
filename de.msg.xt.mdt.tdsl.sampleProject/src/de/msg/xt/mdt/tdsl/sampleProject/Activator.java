@@ -1,4 +1,4 @@
-package test;
+package de.msg.xt.mdt.tdsl.sampleProject;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
