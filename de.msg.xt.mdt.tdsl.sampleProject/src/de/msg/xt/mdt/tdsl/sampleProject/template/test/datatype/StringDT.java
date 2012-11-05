@@ -2,16 +2,22 @@ package de.msg.xt.mdt.tdsl.sampleProject.template.test.datatype;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 @XmlRootElement
 public class StringDT {
     @XmlAttribute
-    private final String value;
+    private String value;
 
     @XmlAttribute
-    private final StringDTEquivalenceClass equivalenceClass;
+    @XmlJavaTypeAdapter(StringDTEquivalenceClassAdapter.class)
+    private StringDTEquivalenceClass equivalenceClass;
+
+    public StringDT() {
+    }
 
     public StringDT(final String value, final StringDTEquivalenceClass equivalenceClass) {
+        this();
         this.value = value;
         this.equivalenceClass = equivalenceClass;
 

@@ -79,7 +79,7 @@ public class StringDTEquivalenceClass implements EquivalenceClass {
     public StringDTEquivalenceClass getByValue(final String value) {
         for (EquivalenceClass eqvalue : values()) {
             StringDTEquivalenceClass strValue = (StringDTEquivalenceClass) eqvalue;
-            if (strValue.getValue().equals(value)) {
+            if (strValue.getValue() != null && strValue.getValue().equals(value)) {
                 return strValue;
             }
         }

@@ -3,7 +3,7 @@ package de.msg.xt.mdt.tdsl.sampleProject.template.test.activity;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.msg.xt.mdt.TextControl;
+import de.msg.xt.mdt.tdsl.sampleProject.template.test.control.TextControl;
 import de.msg.xt.mdt.tdsl.sampleProject.template.test.datatype.StringDT;
 import de.msg.xt.mdt.tdsl.sampleProject.template.test.datatype.StringDTEquivalenceClass;
 
