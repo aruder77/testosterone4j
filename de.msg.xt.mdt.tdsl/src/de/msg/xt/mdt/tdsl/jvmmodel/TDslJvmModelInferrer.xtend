@@ -17,7 +17,8 @@ import org.eclipse.xtext.xbase.compiler.output.ITreeAppendable
 import org.eclipse.xtext.xbase.jvmmodel.AbstractModelInferrer
 import org.eclipse.xtext.xbase.jvmmodel.IJvmDeclaredTypeAcceptor
 import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder
-import org.eclipse.xtext.xbase.lib.Procedures$Procedure1
+import org.eclipse.xtext.xbase.lib.Procedures$Procedure1
+import com.google.inject.internal.Initializer$InjectableReference
 
 /**
  * <p>Infers a JVM model from the source model.</p> 
@@ -113,7 +114,41 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    			for (clazz : dataType.classes) {
    				members += clazz.toEnumerationLiteral(clazz.name);
    			}
+   			
+   			members += dataType.toMethod("getValue", dataType.type.mappedBy) [
+   				setBody [
+					it.append('''
+        				«dataType.type.mappedBy.simpleName» value = null;
+        				switch (this) {
+        				«FOR clazz : dataType.classes»
+        					case «clazz.name»:
+            					value = "«clazz.value»";
+            					break;
+            			«ENDFOR»
+        				}
+        				return value;
+					''')
+				]	
+   			]
    		]
+   		/*
+    @Override
+    public String getValue() {
+        String value = null;
+        switch (this) {
+        case EMPTY:
+            value = "";
+            break;
+        case SHORT:
+            value = "shortStr";
+            break;
+        case LONG:
+            value = "longlonglonglonglong long long very long String";
+            break;
+        }
+        return value;
+    }
+   		 */
 
    		acceptor.accept(dataType.toClass(dataType.fullyQualifiedName.toString + "EquivalenceClass")).initializeLater [
    				it.superTypes += dataType.newTypeRef("de.msg.xt.mdt.base.EquivalenceClass")
