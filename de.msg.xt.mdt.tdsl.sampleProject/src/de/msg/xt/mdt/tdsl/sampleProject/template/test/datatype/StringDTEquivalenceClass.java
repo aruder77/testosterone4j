@@ -14,14 +14,16 @@ public class StringDTEquivalenceClass implements EquivalenceClass {
 
     private final static short longString_ID = 2;
 
-    public final static StringDTEquivalenceClass INSTANCE = new StringDTEquivalenceClass(EMPTY_ID, new Tags[] {});
+    public final static StringDTEquivalenceClass INSTANCE = new StringDTEquivalenceClass(EMPTY_ID, new Tags[] {}, null);
 
     public final static StringDTEquivalenceClass emptyString = new StringDTEquivalenceClass(emptyString_ID, new Tags[] {
-            Tags.Pflichtfeld, Tags.Test });
+            Tags.Pflichtfeld, Tags.Test }, "");
 
-    public final static StringDTEquivalenceClass shortString = new StringDTEquivalenceClass(shortString_ID, new Tags[] {});
+    public final static StringDTEquivalenceClass shortString = new StringDTEquivalenceClass(shortString_ID, new Tags[] {},
+            "shortStr");
 
-    public final static StringDTEquivalenceClass longString = new StringDTEquivalenceClass(longString_ID, new Tags[] {});
+    public final static StringDTEquivalenceClass longString = new StringDTEquivalenceClass(longString_ID, new Tags[] {},
+            "longlonglonglonglong long long very long String");
 
     private final static StringDTEquivalenceClass[] VALUES = new StringDTEquivalenceClass[] { emptyString, shortString,
             longString };
@@ -37,10 +39,10 @@ public class StringDTEquivalenceClass implements EquivalenceClass {
     public StringDTEquivalenceClass() {
     }
 
-    StringDTEquivalenceClass(final short id, final Tags[] tags) {
+    StringDTEquivalenceClass(final short id, final Tags[] tags, String value) {
         this.id = id;
         this.tags = tags;
-
+        this.value = value;
     }
 
     public short getId() {

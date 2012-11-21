@@ -1,15 +1,10 @@
 package de.msg.xt.mdt.tdsl.sampleProject.template.test.activity;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import de.msg.xt.mdt.tdsl.sampleProject.template.test.control.TextControl;
 import de.msg.xt.mdt.tdsl.sampleProject.template.test.datatype.StringDT;
 import de.msg.xt.mdt.tdsl.sampleProject.template.test.datatype.StringDTEquivalenceClass;
 
 public class SampleActivity {
-
-    Map<String, Object> valuesMap = new HashMap<String, Object>();
 
     TextControl descriptionTextControl = new TextControl("description");
 
@@ -22,7 +17,6 @@ public class SampleActivity {
     }
 
     public SampleActivity setDescription(StringDT description) {
-        this.valuesMap.put("description", description);
         getDescriptionTextControl().setText(description.getValue());
         return this;
     }
