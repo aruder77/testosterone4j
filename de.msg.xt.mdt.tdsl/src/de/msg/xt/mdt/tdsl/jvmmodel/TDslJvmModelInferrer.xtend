@@ -108,6 +108,12 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 
    		
    	def dispatch void infer(DataType dataType, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
+   		
+   		acceptor.accept(dataType.toEnumerationType(dataType.fullyQualifiedName.toString + "EquivalenceClass2")[]).initializeLater [
+   			for (clazz : dataType.classes) {
+   				members += clazz.toEnumerationLiteral(clazz.name);
+   			}
+   		]
 
    		acceptor.accept(dataType.toClass(dataType.fullyQualifiedName.toString + "EquivalenceClass")).initializeLater [
    				it.superTypes += dataType.newTypeRef("de.msg.xt.mdt.base.EquivalenceClass")

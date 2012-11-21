@@ -5,35 +5,55 @@ import de.msg.xt.mdt.tdsl.sampleProject.template.test.activity.Tags;
 
 public enum StringDTEquivalenceClass implements EquivalenceClass {
 
-    EMPTY(new Tags[] { Tags.Pflichtfeld, Tags.Test }, ""), SHORT(new Tags[] {}, "shortStr"), LONG(new Tags[] {},
-            "longlonglonglonglong long long very long String");
-
-    private String value;
-
-    private Tags[] tags;
-
-    StringDTEquivalenceClass(final Tags[] tags, String value) {
-        this.tags = tags;
-        this.value = value;
-    }
+    EMPTY, SHORT, LONG;
 
     @Override
     public String getValue() {
-        return this.value;
+        String value = null;
+        switch (this) {
+        case EMPTY:
+            value = "";
+            break;
+        case SHORT:
+            value = "shortStr";
+            break;
+        case LONG:
+            value = "longlonglonglonglong long long very long String";
+            break;
+        }
+        return value;
     }
 
     public Tags[] getTags() {
-        return this.tags;
+        Tags[] tags = null;
+        switch (this) {
+        case EMPTY:
+            tags = new Tags[] { Tags.Pflichtfeld, Tags.Test };
+            break;
+        case SHORT:
+            tags = new Tags[] {};
+            break;
+        case LONG:
+            tags = new Tags[] {};
+            break;
+        }
+
+        return tags;
     }
 
     public static StringDTEquivalenceClass getByValue(final String value) {
-        for (EquivalenceClass eqvalue : values()) {
-            StringDTEquivalenceClass strValue = (StringDTEquivalenceClass) eqvalue;
-            if (strValue.getValue() != null && strValue.getValue().equals(value)) {
-                return strValue;
-            }
+        StringDTEquivalenceClass clazz = null;
+        switch (value) {
+        case "":
+            clazz = EMPTY;
+            break;
+        case "shortStr":
+            clazz = SHORT;
+            break;
+        case "longlonglonglonglong long long very long String":
+            clazz = LONG;
+            break;
         }
-        return null;
-
+        return clazz;
     }
 }
