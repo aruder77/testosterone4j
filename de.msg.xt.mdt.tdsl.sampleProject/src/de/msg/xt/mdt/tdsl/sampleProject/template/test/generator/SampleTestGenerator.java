@@ -1,6 +1,7 @@
 package de.msg.xt.mdt.tdsl.sampleProject.template.test.generator;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -34,13 +35,13 @@ public class SampleTestGenerator implements Generator {
         if (remainingValues == null) {
             this.unsatisfiedCoverageIds.add(id);
             remainingValues = new Stack<Object>();
-            remainingValues.addAll(StringDTEquivalenceClass.INSTANCE.values());
+            remainingValues.addAll(Arrays.asList(StringDTEquivalenceClass.values()));
             this.remainingValuesPerId.put(id, remainingValues);
         }
         StringDTEquivalenceClass clazz = (StringDTEquivalenceClass) remainingValues.pop();
         if (remainingValues.isEmpty()) {
             this.unsatisfiedCoverageIds.remove(id);
-            remainingValues.addAll(StringDTEquivalenceClass.INSTANCE.values());
+            remainingValues.addAll(Arrays.asList(StringDTEquivalenceClass.values()));
         }
         return new StringDT(clazz.getValue(), clazz);
     }

@@ -2,14 +2,12 @@ package de.msg.xt.mdt.tdsl.sampleProject.template.test.datatype;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 @XmlRootElement
 public class Sachnummer {
     @XmlAttribute
     private String value;
 
-    @XmlJavaTypeAdapter(SachnummerEquivalenceClassAdapter.class)
     private SachnummerEquivalenceClass equivalenceClass;
 
     public Sachnummer() {

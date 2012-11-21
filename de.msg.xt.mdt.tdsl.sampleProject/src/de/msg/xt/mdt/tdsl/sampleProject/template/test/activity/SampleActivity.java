@@ -23,8 +23,7 @@ public class SampleActivity {
 
     public StringDT getDescription() {
         String currentDescription = this.descriptionTextControl.getText();
-        StringDT descriptionDataType = new StringDT(currentDescription,
-                StringDTEquivalenceClass.INSTANCE.getByValue(currentDescription));
+        StringDT descriptionDataType = new StringDT(currentDescription, StringDTEquivalenceClass.getByValue(currentDescription));
         return descriptionDataType;
     }
 
@@ -34,7 +33,7 @@ public class SampleActivity {
     }
 
     public boolean isEnabledDescriptionInvokeAction_1() {
-        return getDescription().getEquivalenceClass() == StringDTEquivalenceClass.shortString;
+        return getDescription().getEquivalenceClass() == StringDTEquivalenceClass.SHORT;
     }
 
     public AnotherSampleActivity descriptionInvokeAction_2() {
@@ -43,7 +42,7 @@ public class SampleActivity {
     }
 
     public boolean isEnabledDescriptionInvokeAction_2() {
-        return !(getDescription().getEquivalenceClass() == StringDTEquivalenceClass.shortString);
+        return !(getDescription().getEquivalenceClass() == StringDTEquivalenceClass.SHORT);
     }
 
 }

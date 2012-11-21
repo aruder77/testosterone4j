@@ -2,7 +2,6 @@ package de.msg.xt.mdt.tdsl.sampleProject.template.test.datatype;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 @XmlRootElement
 public class StringDT {
@@ -10,7 +9,6 @@ public class StringDT {
     private String value;
 
     @XmlAttribute
-    @XmlJavaTypeAdapter(StringDTEquivalenceClassAdapter.class)
     private StringDTEquivalenceClass equivalenceClass;
 
     public StringDT() {
