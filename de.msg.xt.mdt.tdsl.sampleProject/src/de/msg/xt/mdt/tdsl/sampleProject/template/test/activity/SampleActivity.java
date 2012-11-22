@@ -16,33 +16,33 @@ public class SampleActivity {
         return this.descriptionTextControl;
     }
 
-    public SampleActivity setDescription(StringDT description) {
+    public SampleActivity description_setText(StringDT description) {
         getDescriptionTextControl().setText(description.getValue());
         return this;
     }
 
-    public StringDT getDescription() {
+    public StringDT description_getText() {
         String currentDescription = this.descriptionTextControl.getText();
         StringDT descriptionDataType = new StringDT(currentDescription, StringDTEquivalenceClass.getByValue(currentDescription));
         return descriptionDataType;
     }
 
-    public OtherSampleActivity descriptionInvokeAction_1() {
+    public OtherSampleActivity description_invokeAction_1() {
         getDescriptionTextControl().invokeAction();
         return OtherSampleActivity.find();
     }
 
-    public boolean isEnabledDescriptionInvokeAction_1() {
-        return getDescription().getEquivalenceClass() == StringDTEquivalenceClass.SHORT;
+    public boolean isEnabled_description_invokeAction_1() {
+        return description_getText().getEquivalenceClass() == StringDTEquivalenceClass.SHORT;
     }
 
-    public AnotherSampleActivity descriptionInvokeAction_2() {
+    public AnotherSampleActivity description_invokeAction_2() {
         getDescriptionTextControl().invokeAction();
         return AnotherSampleActivity.find();
     }
 
-    public boolean isEnabledDescriptionInvokeAction_2() {
-        return !(getDescription().getEquivalenceClass() == StringDTEquivalenceClass.SHORT);
+    public boolean isEnabled_description_invokeAction_2() {
+        return !(description_getText().getEquivalenceClass() == StringDTEquivalenceClass.SHORT);
     }
 
 }

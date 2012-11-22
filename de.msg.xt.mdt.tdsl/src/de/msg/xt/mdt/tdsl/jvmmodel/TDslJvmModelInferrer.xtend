@@ -18,7 +18,13 @@ import org.eclipse.xtext.xbase.jvmmodel.AbstractModelInferrer
 import org.eclipse.xtext.xbase.jvmmodel.IJvmDeclaredTypeAcceptor
 import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder
 import org.eclipse.xtext.xbase.lib.Procedures$Procedure1
-import com.google.inject.internal.Initializer$InjectableReference
+import com.google.inject.internal.Initializer$InjectableReference
+import org.eclipse.xtext.common.types.JvmOperation
+import de.msg.xt.mdt.tdsl.tDsl.Field
+import de.msg.xt.mdt.tdsl.tDsl.Operation
+import org.eclipse.xtext.common.types.JvmTypeReference
+import de.msg.xt.mdt.tdsl.jvmmodel.FieldExtensions
+import de.msg.xt.mdt.tdsl.tDsl.OperationMapping
 
 /**
  * <p>Infers a JVM model from the source model.</p> 
@@ -37,10 +43,16 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 	
 	@Inject extension TypeReferences references
 	
+	@Inject extension FieldNaming
+	@Inject extension FieldExtensions
+	
+	@Inject extension ActivityNaming
+	
+	@Inject extension DataTypeNaming
 
    	def dispatch void infer(Activity activity, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
    		
-   		acceptor.accept(activity.toClass(activity.fullyQualifiedName)).initializeLater([
+   		acceptor.accept(activity.toClass(activity.class_FQN)).initializeLater([
    			
   			for (param : activity.inputParameter) {
    				members += param.toField(param.name, param.newTypeRef(param.dataType.fullyQualifiedName.toString))
@@ -54,12 +66,68 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				for (param : activity.inputParameter) {
    					parameters += param.toParameter(param.name, param.newTypeRef(param.dataType.fullyQualifiedName.toString))
    				}
+   				
+   				it.setBody [
+   					for (param : activity.inputParameter) {
+   						it.append("this." + param.name + " = " + param.name + ";")
+   					}
+   				]
    			]
    			
 			for (field : activity.fields) {
 				members += field.toGetter(field.name, field.newTypeRef(field.control.fullyQualifiedName.toString))
 			}
+			
+			for (field : activity.fields) {
+				for (operation : field.control.operations) {
+					members += operation.toActivityDelegationMethod(field)
+				}
+			}
    		])
+   	}
+   	
+   	def JvmOperation toActivityDelegationMethod(Operation operation, Field field) {
+   		operation.toMethod(field.activityControlDelegationMethodName(operation), field.returnTypeFieldOperation(operation)) [
+			val opMapping = field.findOperationMappingForOperation(operation)
+			for (dataTypeMapping : opMapping.dataTypeMappings) {
+				it.parameters += dataTypeMapping.toParameter(dataTypeMapping.name.name, dataTypeMapping.newTypeRef(dataTypeMapping.datatype.class_FQN.toString))
+			}
+   			setBody [
+   				if (operation.returnType == null) {
+	   				it.append(
+   						'''
+   						«field.getterName»().«operation.name»(«mapParameters(field, operation)»);
+        				return this;
+   						'''
+   					)
+   				} else {
+   					
+   				}
+   			]
+   		]
+   	}
+   	
+   	def String mapParameters(Field field, Operation operation) {
+		val opMapping = field.findOperationMappingForOperation(operation)
+		'''«FOR dataTypeMapping : opMapping.dataTypeMappings SEPARATOR ','»«dataTypeMapping.name.name»«ENDFOR»'''
+   	}
+   	
+   	def JvmTypeReference returnTypeFieldOperation(Field field, Operation operation) {
+ 		val opMapping = field.findOperationMappingForOperation(operation)
+ 		val currentActivityType = field.newTypeRef(field.parentActivity.class_FQN.toString) 
+   		if (operation.returnType == null) {
+   			if (opMapping == null) {
+   					currentActivityType
+   			} else {
+   				if (opMapping.nextActivities.empty) {
+   					currentActivityType
+   				} else {
+   					field.newTypeRef((opMapping.nextActivities.get(0) as Activity).class_FQN.toString)
+   				}
+   			}   			
+   		} else {
+   			opMapping.newTypeRef(opMapping.dataType.class_FQN.toString)
+   		}
    	}
 
 
@@ -95,13 +163,19 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    						parameters += param.toParameter(param.name, param.type.mappedBy)
    					}
    					
-//   					setBody [
-//   						for (param : operation.params) {
-//   							it.append('''
-//   								this.«param.name» = «param.name»;
-//   							''')
-//   						}
-//   					]
+   					setBody [
+   						it.append(
+   						'''
+   						System.out.println("«control.name»[" + id + "].«operation.name»("
+   						«FOR param : operation.params SEPARATOR ' + ", " '»
+   							+ "«param.name» = " + «param.name»  
+   						«ENDFOR»
+   						+ ") called.");
+   						''')
+   						if (operation.returnType != null) {
+   							it.append("return null;")
+   						}
+   					]
    				]
    			}
    		])
@@ -110,7 +184,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    		
    	def dispatch void infer(DataType dataType, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
    		
-   		acceptor.accept(dataType.toEnumerationType(dataType.fullyQualifiedName.toString + "EquivalenceClass2")[]).initializeLater [
+   		acceptor.accept(dataType.toEnumerationType(dataType.fullyQualifiedName.toString + "EquivalenceClass")[]).initializeLater [
    			for (clazz : dataType.classes) {
    				members += clazz.toEnumerationLiteral(clazz.name);
    			}
@@ -121,169 +195,52 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
         				«dataType.type.mappedBy.simpleName» value = null;
         				switch (this) {
         				«FOR clazz : dataType.classes»
-        					case «clazz.name»:
-            					value = "«clazz.value»";
-            					break;
+        				case «clazz.name»:
+        				value = "«clazz.value»";
+        				break;
             			«ENDFOR»
         				}
         				return value;
 					''')
 				]	
    			]
+   			
+   			members += dataType.toMethod("getTags", dataType.newTypeRef(dataType.eContainer.fullyQualifiedName.toString + ".Tags").createArrayType) [
+   				setBody [
+					it.append('''
+					    Tags[] tags = null;                                   
+					    switch (this) {            
+    					«FOR clazz : dataType.classes»                           
+    					case «clazz.name»:                                           
+    						tags = new Tags[] { «FOR tag : clazz.tags SEPARATOR ', '»Tags.«tag.name»«ENDFOR» };
+    						break;                       
+        				«ENDFOR»                     
+					    }                                                     
+					    
+					    return tags;                                          
+					''')
+				]	
+   			]
+   			
+   			members += dataType.toMethod("getByValue", dataType.newTypeRef(it.fullyQualifiedName.toString)) [
+   				it.setStatic(true)
+   				it.parameters += it.toParameter("value", dataType.type.mappedBy)
+   				it.setBody [
+   					it.append('''
+				        «dataType.name.toFirstUpper + "EquivalenceClass"» clazz = null;
+				        switch (value) {
+    					«FOR clazz : dataType.classes»                           
+				        case "«clazz.value»":
+				        clazz = «clazz.name»;
+				        break;
+				        «ENDFOR»
+				        }
+				        return clazz;
+   					''')
+   				]
+   			]
    		]
-   		/*
-    @Override
-    public String getValue() {
-        String value = null;
-        switch (this) {
-        case EMPTY:
-            value = "";
-            break;
-        case SHORT:
-            value = "shortStr";
-            break;
-        case LONG:
-            value = "longlonglonglonglong long long very long String";
-            break;
-        }
-        return value;
-    }
-   		 */
 
-   		acceptor.accept(dataType.toClass(dataType.fullyQualifiedName.toString + "EquivalenceClass")).initializeLater [
-   				it.superTypes += dataType.newTypeRef("de.msg.xt.mdt.base.EquivalenceClass")
-   				members += dataType.toField("EMPTY_ID", dataType.newTypeRef(typeof(short))) [
-   					setStatic(true)
-   					setFinal(true)
-   					setInitializer [
-   						it.append('''-1''')
-   					]
-   				]
-   				
-   				var i = 0
-   				for (clazz : dataType.classes) { 
-   					val field = clazz.toField(clazz.name + "_ID", clazz.newTypeRef(typeof(short))) [					
-   						setStatic(true)
-   						final = true
-   					]
-   					val value = i 
-   					field.setInitializer[
-   						it.append('''«value»''')
-   					]
-   					members += field
-   					i = i + 1
-   				}
-
-				val singletonField = dataType.toField("INSTANCE", dataType.newTypeRef(it.fullyQualifiedName.toString)) [
-   					it.setStatic(true)
-   					it.setVisibility(JvmVisibility::PUBLIC)
-   					it.setFinal(true)
-   				]
-   				singletonField.setInitializer [
-   					it.append(
-   					'''new «singletonField.type.simpleName»(EMPTY_ID''')
-   					it.append(''', new Tags[] {})''')
-   				]
-   				members += singletonField
-	
-   				for (clazz : dataType.classes) {
-   					val field = clazz.toField(clazz.name, clazz.newTypeRef(it.fullyQualifiedName.toString)) [
-   						it.setStatic(true)
-   						it.setVisibility(JvmVisibility::PUBLIC)
-   						it.setFinal(true)
-   					]
-   					val tags = clazz.tags
-   					field.setInitializer [
-   						it.append(
-   						'''new «field.type.simpleName»(«clazz.name»_ID''')
-   						it.append(''', new Tags[] {''')
-   						var z = 0
-   						for (tag : tags) {
-   							if (z != 0)
-   								it.append(''', ''')
-   							it.append('''«dataType.eContainer.fullyQualifiedName.toString».Tags.«tag.name.toString»''')
-   							z = z + 1
-   						}
-   						it.append('''})''')
-   					]
-   					members += field
-   				}
-   				
-   				val valuesField = dataType.toField("VALUES", dataType.newTypeRef(it.fullyQualifiedName.toString).createArrayType) [
-   					it.setStatic(true)
-   					it.setFinal(true)
-   				]
-   				valuesField.setInitializer[
-   					it.append('''new «valuesField.type.simpleName» {''')
-   					var j = dataType.classes.size
-   					for (clazz : dataType.classes) {
-   						val name = clazz.name
-   						it.append('''«name»''')
-   						if (j > 1) {
-   							it.append(''',''')
-   						}
-   						j = j - 1
-   					}
-   					it.append('''}''')
-   				]
-   				members += valuesField
-   				
-   				members += dataType.toField("allValues", dataType.newTypeRef("java.util.Set", dataType.newTypeRef("de.msg.xt.mdt.base.EquivalenceClass")))
-   				
-				members += dataType.toField("id", dataType.newTypeRef(typeof(short)))
-
-				members += dataType.toField("value", dataType.newTypeRef(typeof(String)))
-				
-				members += dataType.toField("tags", dataType.newTypeRef(dataType.eContainer.fullyQualifiedName.toString + ".Tags").createArrayType)
-				
-				members += dataType.toConstructor [
-				]   				
-				
-				val	Procedure1<ITreeAppendable> body = [it.append(
-					'''
-						this.id = id;
-						this.tags = tags;
-					''')]
-				val constructor = dataType.toConstructor("id", body) [
-					parameters += dataType.toParameter("id", dataType.newTypeRef(typeof(short)))
-					parameters += dataType.toParameter("tags", dataType.newTypeRef(dataType.eContainer.fullyQualifiedName.toString + ".Tags").createArrayType)
-				]			
-				members += constructor
-				
-				members += dataType.toGetter("id", dataType.newTypeRef(typeof(short)))
-
-				members += dataType.toGetter("value", dataType.newTypeRef(typeof(String)))
-
-				packageName = dataType.eContainer.fullyQualifiedName.toString
-				members += dataType.toGetter("tags", dataType.newTypeRef(packageName + ".Tags").createArrayType)				
-
-				members += dataType.toMethod("values", dataType.newTypeRef("java.util.Set", dataType.newTypeRef("de.msg.xt.mdt.base.EquivalenceClass"))) [
-					setBody [
-						it.append('''
-							if(allValues == null) {
-								allValues = new java.util.HashSet<EquivalenceClass>();
-								java.util.Collections.addAll(allValues, VALUES);
-							}
-							return allValues;
-						''')
-					]
-				]
-				
-				members += dataType.toMethod("getById", dataType.newTypeRef(it.fullyQualifiedName.toString)) [
-					parameters += dataType.toParameter("id", dataType.newTypeRef(typeof(short)))
-					setBody [
-						it.append('''
-							for (EquivalenceClass value : values()) {
-								StringDTEquivalenceClass strValue = (StringDTEquivalenceClass)value;
-								if (strValue.getId() == id) {
-									return strValue;
-								}
-							}
-							return null;
-						''')
-					]
-				]
-   			]  			
    		
    		acceptor.accept(dataType.toClass(dataType.fullyQualifiedName)).initializeLater([
    			annotations += dataType.toAnnotation(typeof(XmlRootElement))
@@ -293,7 +250,6 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 			]
 			members += dataType.toField("equivalenceClass", dataType.newTypeRef(dataType.fullyQualifiedName.toString + "EquivalenceClass")) [
 				annotations += dataType.toAnnotation(typeof(XmlAttribute))
-//				annotations += dataType.toAnnotation(typeof(XmlJavaTypeAdapter), typeof(StringDTEquivalenceClassAdapter))
 			]
 			
 			val	Procedure1<ITreeAppendable> body = [it.append(

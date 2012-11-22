@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<sampleUseCaseSuite>
+    <testCases>
+        <inputParam1 equivalenceClass="LONG" value="longlonglonglonglong long long very long String"/>
+    </testCases>
+    <testCases>
+        <inputParam1 equivalenceClass="SHORT" value="shortStr"/>
+        <subUseCase>
+            <inputParam1 equivalenceClass="LONG" value="longlonglonglonglong long long very long String"/>
+        </subUseCase>
+    </testCases>
+    <testCases>
+        <inputParam1 equivalenceClass="EMPTY" value=""/>
+    </testCases>
+    <testCases>
+        <inputParam1 equivalenceClass="LONG" value="longlonglonglonglong long long very long String"/>
+    </testCases>
+    <testCases>
+        <inputParam1 equivalenceClass="SHORT" value="shortStr"/>
+        <subUseCase>
+            <inputParam1 equivalenceClass="SHORT" value="shortStr"/>
+        </subUseCase>
+    </testCases>
+    <testCases>
+        <inputParam1 equivalenceClass="EMPTY" value=""/>
+    </testCases>
+    <testCases>
+        <inputParam1 equivalenceClass="LONG" value="longlonglonglonglong long long very long String"/>
+    </testCases>
+    <testCases>
+        <inputParam1 equivalenceClass="SHORT" value="shortStr"/>
+        <subUseCase>
+            <inputParam1 equivalenceClass="EMPTY" value=""/>
+        </subUseCase>
+    </testCases>
+</sampleUseCaseSuite>

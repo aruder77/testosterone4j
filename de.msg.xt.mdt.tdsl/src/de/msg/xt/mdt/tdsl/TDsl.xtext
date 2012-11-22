@@ -74,7 +74,11 @@ TagWithCondition:
 ;
 
 OperationMapping:
-	'op' (name=ID)? operation=[Operation|FQN] ('(' (paramAssignment+=ParameterAssignment) (',' paramAssignment+=ParameterAssignment)* ')')? ('guard' guard=XExpression)?  (nextActivities+=ConditionalNextActivity)*
+	'op' (name=ID)? operation=[Operation|FQN] ('(' (dataTypeMappings+=DataTypeMapping) (',' dataTypeMappings+=DataTypeMapping)* ')')? ('as' dataType=[DataType|FQN])? ('guard' guard=XExpression)?  (nextActivities+=ConditionalNextActivity)*
+;
+
+DataTypeMapping:
+	datatype=[DataType|FQN] name=[ControlOperationParameter|FQN] 
 ;
 
 ConditionalNextActivity:

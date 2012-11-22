@@ -9,7 +9,7 @@ package de.msg.xt.mdt {
 	datatype StringDT type String {
 		class emptyString value "" Pflichtfeld Test
 		class shortString value "abc"
-		class longString value "Dies ist ein seehr langer String ............................................................." 		
+		class longString value "Dies ist ein seehr langer String ...................................................................." 		
 	}
 	
 	datatype Sachnummer type String {
@@ -26,6 +26,7 @@ package de.msg.xt.mdt {
 	activity ECEditor01(Sachnummer snr) {
 		field stichwort control TextControl {
 			op TextControl.invokeAction => ECEditor03
+			op TextControl.setText ()
 		}
 		field beschreibung control TextControl
 		field gremium control TextControl

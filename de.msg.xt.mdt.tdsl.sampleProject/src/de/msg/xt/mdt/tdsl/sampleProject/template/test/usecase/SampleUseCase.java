@@ -45,12 +45,12 @@ public class SampleUseCase implements Runnable {
     }
 
     public void execute(SampleActivity activity) {
-        SampleActivity activity1 = activity.setDescription(getInputParam1());
-        if (activity1.isEnabledDescriptionInvokeAction_1()) {
-            OtherSampleActivity activity2 = activity1.descriptionInvokeAction_1();
+        SampleActivity activity1 = activity.description_setText(getInputParam1());
+        if (activity1.isEnabled_description_invokeAction_1()) {
+            OtherSampleActivity activity2 = activity1.description_invokeAction_1();
             getSubUseCase().execute(activity2);
-        } else if (activity1.isEnabledDescriptionInvokeAction_2()) {
-            AnotherSampleActivity activity3 = activity1.descriptionInvokeAction_2();
+        } else if (activity1.isEnabled_description_invokeAction_2()) {
+            AnotherSampleActivity activity3 = activity1.description_invokeAction_2();
             activity3.setAdress("Gunta-Stölzl-Str. 5");
         }
     }
