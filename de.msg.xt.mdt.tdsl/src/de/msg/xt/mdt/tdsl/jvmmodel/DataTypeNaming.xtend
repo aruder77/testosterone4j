@@ -12,4 +12,8 @@ class DataTypeNaming {
 	def QualifiedName class_FQN(DataType dataType) {
 		dataType.fullyQualifiedName
 	}
+	
+	def String equivalenceClass_name(DataType dataType) {
+		dataType.class_FQN.toString + "EquivalenceClass"
+	}
 }

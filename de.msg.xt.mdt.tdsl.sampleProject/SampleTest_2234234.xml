@@ -1,36 +1,36 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <sampleUseCaseSuite>
     <testCases>
-        <inputParam1 equivalenceClass="LONG" value="longlonglonglonglong long long very long String"/>
+        <inputParam1 value="longlonglonglonglong long long very long String" equivalenceClass="LONG"/>
     </testCases>
     <testCases>
-        <inputParam1 equivalenceClass="SHORT" value="shortStr"/>
+        <inputParam1 value="shortStr" equivalenceClass="SHORT"/>
         <subUseCase>
-            <inputParam1 equivalenceClass="LONG" value="longlonglonglonglong long long very long String"/>
+            <inputParam1 value="longlonglonglonglong long long very long String" equivalenceClass="LONG"/>
         </subUseCase>
     </testCases>
     <testCases>
-        <inputParam1 equivalenceClass="EMPTY" value=""/>
+        <inputParam1 value="" equivalenceClass="EMPTY"/>
     </testCases>
     <testCases>
-        <inputParam1 equivalenceClass="LONG" value="longlonglonglonglong long long very long String"/>
+        <inputParam1 value="longlonglonglonglong long long very long String" equivalenceClass="LONG"/>
     </testCases>
     <testCases>
-        <inputParam1 equivalenceClass="SHORT" value="shortStr"/>
+        <inputParam1 value="shortStr" equivalenceClass="SHORT"/>
         <subUseCase>
-            <inputParam1 equivalenceClass="SHORT" value="shortStr"/>
+            <inputParam1 value="shortStr" equivalenceClass="SHORT"/>
         </subUseCase>
     </testCases>
     <testCases>
-        <inputParam1 equivalenceClass="EMPTY" value=""/>
+        <inputParam1 value="" equivalenceClass="EMPTY"/>
     </testCases>
     <testCases>
-        <inputParam1 equivalenceClass="LONG" value="longlonglonglonglong long long very long String"/>
+        <inputParam1 value="longlonglonglonglong long long very long String" equivalenceClass="LONG"/>
     </testCases>
     <testCases>
-        <inputParam1 equivalenceClass="SHORT" value="shortStr"/>
+        <inputParam1 value="shortStr" equivalenceClass="SHORT"/>
         <subUseCase>
-            <inputParam1 equivalenceClass="EMPTY" value=""/>
+            <inputParam1 value="" equivalenceClass="EMPTY"/>
         </subUseCase>
     </testCases>
 </sampleUseCaseSuite>

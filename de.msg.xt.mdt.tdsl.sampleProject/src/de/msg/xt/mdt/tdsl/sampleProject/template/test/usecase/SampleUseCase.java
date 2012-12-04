@@ -1,16 +1,19 @@
 package de.msg.xt.mdt.tdsl.sampleProject.template.test.usecase;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import de.msg.xt.mdt.base.Generator;
 import de.msg.xt.mdt.tdsl.sampleProject.template.test.activity.AnotherSampleActivity;
 import de.msg.xt.mdt.tdsl.sampleProject.template.test.activity.OtherSampleActivity;
 import de.msg.xt.mdt.tdsl.sampleProject.template.test.activity.SampleActivity;
 import de.msg.xt.mdt.tdsl.sampleProject.template.test.datatype.Sachnummer;
 import de.msg.xt.mdt.tdsl.sampleProject.template.test.datatype.StringDT;
-import de.msg.xt.mdt.tdsl.sampleProject.template.test.generator.Generator;
 
+@XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement
 public class SampleUseCase implements Runnable {
 
@@ -57,7 +60,7 @@ public class SampleUseCase implements Runnable {
 
     public StringDT getInputParam1() {
         if (this.inputParam1 == null && this.generator != null) {
-            this.inputParam1 = this.generator.generateStringDT("SampleUseCase_inputParam1");
+            this.inputParam1 = this.generator.generateDataTypeValue(StringDT.class, "SampleUseCase_inputParam1");
         }
         return this.inputParam1;
     }
