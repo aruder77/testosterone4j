@@ -1,6 +1,7 @@
 grammar de.msg.xt.mdt.tdsl.TDsl with org.eclipse.xtext.xbase.Xbase
 
 generate tDsl "http://www.msg.de/xt/mdt/tdsl/TDsl"
+import 'http://www.eclipse.org/xtext/xbase/Xbase' as xbase
 
 
 TestModel:
@@ -74,11 +75,11 @@ TagWithCondition:
 ;
 
 OperationMapping:
-	'op' (name=ID)? operation=[Operation|FQN] ('(' (dataTypeMappings+=DataTypeMapping) (',' dataTypeMappings+=DataTypeMapping)* ')')? ('as' dataType=[DataType|FQN])? ('guard' guard=XExpression)?  (nextActivities+=ConditionalNextActivity)*
+	name=ID operation=[Operation|FQN] ('(' (dataTypeMappings+=DataTypeMapping) (',' dataTypeMappings+=DataTypeMapping)* ')')? ('as' dataType=[DataType|FQN])? ('guard' guard=XExpression)?  (nextActivities+=ConditionalNextActivity)*
 ;
 
 DataTypeMapping:
-	datatype=[DataType|FQN] name=[ControlOperationParameter|FQN] 
+	name=ID datatype=[DataType|FQN] controlOperationParameter=[ControlOperationParameter|FQN] 
 ;
 
 ConditionalNextActivity:
@@ -93,33 +94,46 @@ ParameterAssignment:
 	name=[Parameter|FQN] '=' value=XExpression
 ;
 
+OperationParameterAssignment:
+	name=[DataTypeMapping|FQN] '=' value=XExpression
+;
+
 UseCase:
 	(test?='test')? 'useCase' name=ID ('(' inputParameter+=Parameter (',' inputParameter+=Parameter)* ')')? 'initial' '=' initialActivity=[Activity|FQN] '{'
-		(statements+=Statement)*
+  		(expressions+=Statement)*
 	'}'
 ;
 
-Statement:
-	VariableAssignment | OperationCall | SubUseCaseCall | CompoundStatement
+Statement returns xbase::XExpression:
+	SubUseCaseCall | OperationCall | VariableDeclaration  //| XAssignment //| CompoundStatement
 ;
 
-VariableAssignment:
-	declaration=XVariableDeclaration
+VariableDeclaration returns xbase::XVariableDeclaration:
+	{XVariableDeclaration}
+	(writeable?='var') (=>(type=JvmTypeReference name=ValidID) | name=ValidID) ('=' right=Expression)?
+;
+
+Expression returns xbase::XExpression:
+	OperationCall | XExpression
 ;
 
 FQN:
 	ID ('.' ID)*
 ;
 
-OperationCall:
-	name=[Operation|FQN] ('(' (paramAssignment+=ParameterAssignment) (',' paramAssignment+=ParameterAssignment)* ')')?
+OperationCall returns xbase::XExpression:
+	{OperationCall}
+	operation=[OperationMapping|FQN] ('(' (paramAssignment+=OperationParameterAssignment) (',' paramAssignment+=OperationParameterAssignment)* ')')?
 ;
 
-SubUseCaseCall:
-	'call' useCase=[UseCase|FQN] ('(' (paramAssignment+=ParameterAssignment) (',' paramAssignment+=ParameterAssignment)* ')')?
+SubUseCaseCall returns xbase::XExpression:
+	{SubUseCaseCall}
+	'call' useCase=[UseCase|FQN] ('(' paramAssignment+=ParameterAssignment (',' paramAssignment+=ParameterAssignment)*  ')')?
 ;
 
+/*
 CompoundStatement:
 	'(' statements+=Statement ('|' statements+=Statement)+ ')'
-;
+; */
+
 

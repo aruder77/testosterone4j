@@ -3,9 +3,11 @@
  */
 package de.msg.xt.mdt.tdsl;
 
+import org.eclipse.xtext.xbase.compiler.XbaseCompiler;
 import org.eclipse.xtext.xbase.typing.ITypeProvider;
 
 import de.msg.xt.mdt.tdsl.generator.TDslJvmModelGenerator;
+import de.msg.xt.mdt.tdsl.jvmmodel.TDslCompiler;
 import de.msg.xt.mdt.tdsl.typeprovider.TDslTypeProvider;
 
 /**
@@ -27,4 +29,7 @@ public class TDslRuntimeModule extends
 		return TDslJvmModelGenerator.class;
 	}
 
+	public Class<? extends XbaseCompiler> bindXbaseCompiler() {
+		return TDslCompiler.class;
+	}
 }

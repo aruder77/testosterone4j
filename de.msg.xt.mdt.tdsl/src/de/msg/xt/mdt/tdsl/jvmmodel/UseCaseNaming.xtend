@@ -12,4 +12,11 @@ class UseCaseNaming {
 		useCase.fullyQualifiedName
 	}
 	
+	def String class_SimpleName(UseCase useCase) {
+		useCase.name.toFirstUpper
+	}
+	
+	def String subUseCaseGetter(UseCase useCase) {
+		"get" + useCase.name.toFirstUpper
+	}
 }

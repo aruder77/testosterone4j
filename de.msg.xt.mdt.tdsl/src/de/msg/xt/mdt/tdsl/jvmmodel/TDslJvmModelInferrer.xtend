@@ -25,6 +25,15 @@ import org.eclipse.xtext.xbase.jvmmodel.IJvmDeclaredTypeAcceptor
 import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder
 import org.eclipse.xtext.xbase.lib.Procedures$Procedure1
 import de.msg.xt.mdt.tdsl.tDsl.SubUseCaseCall
+import javax.xml.bind.annotation.XmlAccessorType
+import javax.xml.bind.annotation.XmlAccessType
+import de.msg.xt.mdt.tdsl.tDsl.Parameter
+import de.msg.xt.mdt.tdsl.tDsl.OperationCall
+import java.lang.CharSequence
+import de.msg.xt.mdt.tdsl.tDsl.Activity
+import org.eclipse.xtext.xbase.XExpression
+import org.eclipse.xtext.common.types.JvmEnumerationType
+import org.eclipse.xtext.xbase.compiler.XbaseCompiler
 
 /**
  * <p>Infers a JVM model from the source model.</p> 
@@ -51,10 +60,14 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 	@Inject extension DataTypeNaming
 	
 	@Inject extension UseCaseNaming
+	
+	@Inject
+	XbaseCompiler xbaseCompiler
 
    	def dispatch void infer(Activity activity, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
    		
-   		acceptor.accept(activity.toClass(activity.class_FQN)).initializeLater([
+   		val activityClass = activity.toClass(activity.class_FQN)
+   		acceptor.accept(activityClass).initializeLater([
    			
    			superTypes += activity.newTypeRef("de.msg.xt.mdt.base.AbstractActivity")
    			
@@ -78,7 +91,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				]
    			]
    			
-   			members += activity.toMethod("find", activity.newTypeRef(activity.class_FQN.toString)) [
+   			members += activity.toMethod("find", newTypeRef(activityClass)) [
    				it.setStatic(true)
    				
    				for (param : activity.inputParameter) {
@@ -110,7 +123,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 			val opMapping = field.findOperationMappingForOperation(operation)
 			if (opMapping != null) {
 				for (dataTypeMapping : opMapping.dataTypeMappings) {
-					it.parameters += dataTypeMapping.toParameter(dataTypeMapping.name.name, dataTypeMapping.newTypeRef(dataTypeMapping.datatype.class_FQN.toString))
+					it.parameters += dataTypeMapping.toParameter(dataTypeMapping.controlOperationParameter.name, dataTypeMapping.newTypeRef(dataTypeMapping.datatype.class_FQN.toString))
 				}
 			} else {
 				if (operation.params.size > 0 || operation.returnType != null) {
@@ -139,7 +152,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    	
    	def String mapParameters(Field field, Operation operation) {
 		val opMapping = field.findOperationMappingForOperation(operation)
-		'''«FOR dataTypeMapping : opMapping.dataTypeMappings SEPARATOR ','»«dataTypeMapping?.name?.name».getValue()«ENDFOR»'''
+		'''«FOR dataTypeMapping : opMapping.dataTypeMappings SEPARATOR ','»«dataTypeMapping?.controlOperationParameter?.name».getValue()«ENDFOR»'''
    	}
    	
    	def JvmTypeReference returnTypeFieldOperation(Field field, Operation operation) {
@@ -176,13 +189,14 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				}
    			}
    			   			
-   			val	Procedure1<ITreeAppendable> body = [it.append(
-					'''
-						this.id = id;
-					''')]
-			members += control.toConstructor("id", body) [
+			members += control.toConstructor [
    				parameters += control.toParameter("id", control.newTypeRef(typeof(String)))
    				setVisibility(JvmVisibility::PUBLIC)
+   				it.body = [
+   					it.append(
+						'''
+						this.id = id;''')	
+				]
    			]
    			
    			for (operation : control.operations) {
@@ -217,7 +231,8 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    		
    	def dispatch void infer(DataType dataType, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
    		
-   		acceptor.accept(dataType.toEnumerationType(dataType.equivalenceClass_name)[]).initializeLater [
+   		val JvmEnumerationType equivalenceClass = dataType.toEnumerationType(dataType.equivalenceClass_name)[]
+   		acceptor.accept(equivalenceClass).initializeLater [
    			for (clazz : dataType.classes) {
    				members += clazz.toEnumerationLiteral(clazz.name);
    			}
@@ -276,33 +291,84 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 
    		
    		acceptor.accept(dataType.toClass(dataType.fullyQualifiedName)).initializeLater([
+   			superTypes += dataType.newTypeRef("de.msg.xt.mdt.base.DataType", dataType.newTypeRef(typeof(String)), newTypeRef(equivalenceClass))
+   			
    			annotations += dataType.toAnnotation(typeof(XmlRootElement))
    			
-			members += dataType.toField("value", dataType.type.mappedBy) [
+			members += dataType.toField("_value", dataType.type.mappedBy) [
 				annotations += dataType.toAnnotation(typeof(XmlAttribute))
 			]
-			members += dataType.toField("equivalenceClass", dataType.newTypeRef(dataType.fullyQualifiedName.toString + "EquivalenceClass")) [
+			members += dataType.toField("_equivalenceClass", newTypeRef(equivalenceClass)) [
 				annotations += dataType.toAnnotation(typeof(XmlAttribute))
 			]
 			
-			val	Procedure1<ITreeAppendable> body = [it.append(
-					'''
-						this.value = value;
-						this.equivalenceClass = equivalenceClass;
-					''')]
-			members += dataType.toConstructor("value", body) [
+			members += dataType.toConstructor [
 				setVisibility(JvmVisibility::PUBLIC)
 				parameters += dataType.toParameter("value", dataType.type.mappedBy)
-				parameters += dataType.toParameter("equivalenceClass", dataType.newTypeRef(dataType.fullyQualifiedName.toString + "EquivalenceClass"))
+				parameters += dataType.toParameter("equivalenceClass", newTypeRef(equivalenceClass))
+				
+				it.body = [it.append(
+					'''
+						this._value = value;
+						this._equivalenceClass = equivalenceClass;
+					''')]
 			]
 			
-			members += dataType.toGetter("value", dataType.type.mappedBy)
-			members += dataType.toGetter("equivalenceClass", dataType.newTypeRef(dataType.fullyQualifiedName.toString + "EquivalenceClass"))
+			members += dataType.toMethod("getValue", dataType.type.mappedBy) [
+				it.body = [
+					it.append(
+						'''
+						return this._value;
+						'''
+					)
+				]
+			]
+			members += dataType.toMethod("setValue", null) [
+				it.parameters += dataType.toParameter("value", dataType.type.mappedBy)
+				it.body = [
+					it.append(
+						'''
+						this._value = value;
+						'''
+					)
+				]
+			]
+
+			members += dataType.toMethod("getEquivalenceClass", newTypeRef(equivalenceClass)) [
+				it.body = [
+					it.append(
+						'''
+						return this._equivalenceClass;
+						'''
+					)
+				]
+			]
+			members += dataType.toMethod("setEquivalenceClass", null) [
+				it.parameters += dataType.toParameter("equivalenceClass", newTypeRef(equivalenceClass))
+				it.body = [
+					it.append(
+						'''
+						this._equivalenceClass = equivalenceClass;
+						'''
+					)
+				]
+			]
+			
+			members += dataType.toMethod("getEquivalenceClassEnum", dataType.newTypeRef(typeof(Class), newTypeRef(equivalenceClass))) [
+				it.body = [
+					it.append(
+						'''
+						return «dataType.equivalenceClass_name».class;
+						'''
+					)
+				]
+			]
    		])
    	}
    	
    	def dispatch void infer(UseCase useCase, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
-   		acceptor.accept(useCase.toClass(useCase.class_FQN)).initializeLater [
+   		val useCaseClass = useCase.toClass(useCase.class_FQN)
+   		acceptor.accept(useCaseClass).initializeLater [
    			it.superTypes += useCase.newTypeRef("java.lang.Runnable")
 
    			it.annotations += useCase.toAnnotation("javax.xml.bind.annotation.XmlRootElement")
@@ -313,10 +379,12 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				]
    			}
    			
-   			for (subUseCaseCall : useCase.statements.filter(typeof(SubUseCaseCall))) {
-   				members += subUseCaseCall.toField(subUseCaseCall.useCase.name, subUseCaseCall.newTypeRef(subUseCaseCall.useCase.class_FQN.toString)) [
-   					it.annotations += subUseCaseCall.toAnnotation("javax.xml.bind.annotation.XmlElement")
-   				]
+   			for (subUseCaseCall : useCase.expressions.filter(typeof(SubUseCaseCall))) {
+   				if (subUseCaseCall.useCase != null) {
+   					members += subUseCaseCall.toField(subUseCaseCall.useCase.name, subUseCaseCall.newTypeRef(subUseCaseCall.useCase.class_FQN.toString)) [
+   						it.annotations += subUseCaseCall.toAnnotation("javax.xml.bind.annotation.XmlElement")
+	   				]
+   				}
    			}
    			
    			it.members += useCase.toField("generator", useCase.newTypeRef("de.msg.xt.mdt.base.Generator")) [
@@ -334,8 +402,10 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				for (inputParam : useCase.inputParameter) {
    					it.parameters += useCase.toParameter(inputParam.name, useCase.newTypeRef(inputParam.dataType.class_FQN.toString))	
    				}
-   				for (subUseCaseCall : useCase.statements.filter(typeof(SubUseCaseCall))) {
-   					it.parameters += useCase.toParameter(subUseCaseCall.useCase.name, subUseCaseCall.newTypeRef(subUseCaseCall.useCase.class_FQN.toString))
+   				for (subUseCaseCall : useCase.expressions.filter(typeof(SubUseCaseCall))) {
+   					if (subUseCaseCall.useCase != null) {
+   						it.parameters += useCase.toParameter(subUseCaseCall.useCase.name, newTypeRef(useCaseClass))
+   					}
    				}
    				body = [
 	   				for (inputParam : useCase.inputParameter) {
@@ -344,7 +414,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    							this.«inputParam.name» = «inputParam.name»;
    							''')
    					}
-	   				for (subUseCaseCall : useCase.statements.filter(typeof(SubUseCaseCall))) {
+	   				for (subUseCaseCall : useCase.expressions.filter(typeof(SubUseCaseCall))) {
 	   					it.append(
 	   						'''
 	   						this.«subUseCaseCall.useCase.name» = «subUseCaseCall.useCase.name»;
@@ -366,18 +436,73 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    			]
    			
    			it.members += useCase.toMethod("execute", null) [
-   				it.parameters += useCase.toParameter("activity", useCase.newTypeRef(useCase.initialActivity.class_FQN.toString))
+   				it.parameters += useCase.toParameter("initialActivity", useCase.newTypeRef(useCase.initialActivity.class_FQN.toString))
    				
    				body = [
-   					it.append(
-   						'''
-   						'''
-   					)
+   					var currentActivity = useCase.initialActivity
+   					
+   					it.append('''
+   						de.msg.xt.mdt.base.AbstractActivity activity = initialActivity;
+   						''')
+   					for (statement : useCase.expressions) {
+   						xbaseCompiler.compile(statement, it, "void".getTypeForName(statement), null)
+   					}
    				]
    			]
    			
+   			for (inputParam : useCase.inputParameter) {
+   				it.members += useCase.toMethod("get" + inputParam.name.toFirstUpper, inputParam.newTypeRef(inputParam.dataType.class_FQN.toString)) [
+   					body = [
+   						it.append(
+                            '''
+                            if (this.«inputParam.name» == null && this.generator != null) {
+                                this.«inputParam.name» = this.generator.generateDataTypeValue(«inputParam.dataType.class_FQN.toString».class, "«useCase.inputParamID(inputParam)»");
+                            }
+                            return this.«inputParam.name»;'''
+   						)
+   					]
+   				]   				
+   			}
+   			
+   			for (subUseCaseCall : useCase.expressions.filter(typeof(SubUseCaseCall))) {
+   				if (subUseCaseCall.useCase != null) {
+   					members += subUseCaseCall.toMethod(subUseCaseCall.useCase.subUseCaseGetter, subUseCaseCall.newTypeRef(subUseCaseCall.useCase.class_FQN.toString)) [
+   						body = [
+   							it.append('''
+                                if (this.«subUseCaseCall.useCase.name» == null && this.generator != null) {
+                                    this.«subUseCaseCall.useCase.name» = new «subUseCaseCall.useCase.class_SimpleName»(this.generator);
+                                }
+                                return this.«subUseCaseCall.useCase.name»;
+   							''')
+   						]
+	   				]
+   				}
+   			}
    			
    		]
+   	}
+   	
+   	def dispatch Activity inferStatement(XExpression statement, Activity currentActivity, int activityIndex, ITreeAppendable app) {
+   		currentActivity
+   	}
+   	
+	def dispatch Activity inferStatement(OperationCall opCall, Activity currentActivity, int activityIndex, ITreeAppendable app) {
+		val field = opCall.operation.eContainer as Field
+		app.append(
+			'''
+			«currentActivity.localVariable_name(activityIndex)».«field.activityControlDelegationMethodName(opCall.operation.operation)»();
+			'''
+		)
+		if (!opCall.operation.nextActivities.empty) {
+			opCall.operation.nextActivities.get(0).next
+		} else {
+			currentActivity
+		}
+	}
+
+   	
+   	def inputParamID(UseCase useCase, Parameter inputParam) {
+   		useCase.name + "_" + inputParam.name
    	}
    	
    	def dispatch void infer(TagsDeclaration tags, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {

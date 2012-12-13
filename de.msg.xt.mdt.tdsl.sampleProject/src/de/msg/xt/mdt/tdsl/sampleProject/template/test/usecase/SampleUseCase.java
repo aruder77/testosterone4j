@@ -6,6 +6,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import de.msg.xt.mdt.base.AbstractActivity;
 import de.msg.xt.mdt.base.Generator;
 import de.msg.xt.mdt.tdsl.sampleProject.template.test.activity.AnotherSampleActivity;
 import de.msg.xt.mdt.tdsl.sampleProject.template.test.activity.OtherSampleActivity;
@@ -47,13 +48,14 @@ public class SampleUseCase implements Runnable {
         execute(SampleActivity.find());
     }
 
-    public void execute(SampleActivity activity) {
-        SampleActivity activity1 = activity.description_setText(getInputParam1());
-        if (activity1.isEnabled_description_invokeAction_1()) {
-            OtherSampleActivity activity2 = activity1.description_invokeAction_1();
+    public void execute(SampleActivity initialActivity) {
+        AbstractActivity activity = initialActivity;
+        activity = ((SampleActivity) activity).description_setText(getInputParam1());
+        if (((SampleActivity) activity).isEnabled_description_invokeAction_1()) {
+            OtherSampleActivity activity2 = ((SampleActivity) activity).description_invokeAction_1();
             getSubUseCase().execute(activity2);
-        } else if (activity1.isEnabled_description_invokeAction_2()) {
-            AnotherSampleActivity activity3 = activity1.description_invokeAction_2();
+        } else if (((SampleActivity) activity).isEnabled_description_invokeAction_2()) {
+            AnotherSampleActivity activity3 = ((SampleActivity) activity).description_invokeAction_2();
             activity3.setAdress("Gunta-Stölzl-Str. 5");
         }
     }

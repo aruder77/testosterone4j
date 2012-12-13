@@ -1,49 +1,46 @@
 package de.msg.xt.mdt.tdsl.sampleProject.template.test.datatype;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import de.msg.xt.mdt.base.DataType;
 
-@XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement
 public class StringDT implements DataType<String, StringDTEquivalenceClass> {
     @XmlAttribute
-    private String value;
+    private String _value;
 
     @XmlAttribute
-    private StringDTEquivalenceClass equivalenceClass;
+    private StringDTEquivalenceClass _equivalenceClass;
 
     public StringDT() {
     }
 
     public StringDT(final String value, final StringDTEquivalenceClass equivalenceClass) {
         this();
-        this.value = value;
-        this.equivalenceClass = equivalenceClass;
+        this._value = value;
+        this._equivalenceClass = equivalenceClass;
 
     }
 
     @Override
     public String getValue() {
-        return this.value;
+        return this._value;
     }
 
     @Override
     public StringDTEquivalenceClass getEquivalenceClass() {
-        return this.equivalenceClass;
+        return this._equivalenceClass;
     }
 
     @Override
     public void setValue(String value) {
-        this.value = value;
+        this._value = value;
     }
 
     @Override
     public void setEquivalenceClass(StringDTEquivalenceClass equivalenceClass) {
-        this.equivalenceClass = equivalenceClass;
+        this._equivalenceClass = equivalenceClass;
     }
 
     @Override

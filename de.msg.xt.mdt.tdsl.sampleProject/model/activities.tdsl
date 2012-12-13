@@ -8,15 +8,15 @@ package de.msg.xt.mdt {
 	
 	datatype StringDT type String {
 		class emptyString value "" Pflichtfeld Test
-		class shortString value "abc" 
+		class shortString value "abc"
 		class longString value "Dies ist ein seehr langer String ...................................................................." 		
 	}
 	
 	datatype Sachnummer type String {
 		class snrString value "A0000034555"
-	}	
-	
-	
+	}
+	 
+	 
 	control TextControl mappedBy java.util.List {
 		op setText(String str) 
 		op getText():String
@@ -25,31 +25,37 @@ package de.msg.xt.mdt {
 	
 	activity ECEditor01(Sachnummer snr) {
 		field stichwort control TextControl {
-			op TextControl.invokeAction => ECEditor03
-			op TextControl.setText (StringDT TextControl.setText.str)
-			op TextControl.getText as StringDT
+			invokeAction TextControl.invokeAction => ECEditor03 
+			setText TextControl.setText (str StringDT TextControl.setText.str)
+			getText TextControl.getText as StringDT
 		}
 		field beschreibung control TextControl {
-			op TextControl.getText as StringDT
-			op TextControl.setText (StringDT TextControl.setText.str)
-			op TextControl.invokeAction => ECEditor03
+			getText TextControl.getText as StringDT
+			setText TextControl.setText (str StringDT TextControl.setText.str)
+			invokeAction TextControl.invokeAction => ECEditor03
 		}
 		field gremium control TextControl {
-			op TextControl.getText as StringDT
-			op TextControl.setText (StringDT TextControl.setText.str)
-			op TextControl.invokeAction => ECEditor03
+			getText TextControl.getText as StringDT
+			setText TextControl.setText (str StringDT TextControl.setText.str)
+			invokeAction TextControl.invokeAction => ECEditor03
 		}
 	}
 	
 	activity ECEditor03 {
 		field snr control TextControl tag Pflichtfeld {
-			op TextControl.getText as StringDT
-			op TextControl.setText (StringDT TextControl.setText.str)
-			op TextControl.invokeAction => ECEditor03
+			getText TextControl.getText as StringDT
+			setText TextControl.setText (str StringDT TextControl.setText.str)
+			invokeAction TextControl.invokeAction => ECEditor03
 		}
 	}
 
 	useCase ECNeuanlage(Sachnummer snr, Sachnummer snr2) initial=ECEditor01 {
+		call ECNeuanlage (ECEditor01.snr = "World2", snr2 = "Test")
+		var testVariable = ECEditor01.beschreibung.getText
+		ECEditor01.beschreibung.setText (ECEditor01.beschreibung.setText.str = testVariable)
+		ECEditor01.gremium.setText
+		
+		ECEditor01.gremium.invokeAction
 	}
 
 	/*	

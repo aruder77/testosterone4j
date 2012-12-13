@@ -17,4 +17,8 @@ class ActivityNaming {
 	def String class_SimpleName(Activity activity) {
 		activity.name.toFirstUpper
 	}	
+	
+	def String localVariable_name(Activity activity, int index) {
+		activity.name.toFirstLower + index
+	}
 }

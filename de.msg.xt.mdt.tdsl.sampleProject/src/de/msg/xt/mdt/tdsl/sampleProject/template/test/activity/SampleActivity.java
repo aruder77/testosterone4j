@@ -1,10 +1,11 @@
 package de.msg.xt.mdt.tdsl.sampleProject.template.test.activity;
 
+import de.msg.xt.mdt.base.AbstractActivity;
 import de.msg.xt.mdt.tdsl.sampleProject.template.test.control.TextControl;
 import de.msg.xt.mdt.tdsl.sampleProject.template.test.datatype.StringDT;
 import de.msg.xt.mdt.tdsl.sampleProject.template.test.datatype.StringDTEquivalenceClass;
 
-public class SampleActivity {
+public class SampleActivity extends AbstractActivity {
 
     TextControl descriptionTextControl = new TextControl("description");
 
