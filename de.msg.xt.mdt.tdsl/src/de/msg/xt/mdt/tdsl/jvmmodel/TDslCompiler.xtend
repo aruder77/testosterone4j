@@ -75,7 +75,7 @@ class TDslCompiler extends XbaseCompiler {
 
 	def findAssignment(OperationCall call, ControlOperationParameter param) {
 		for (assignment : call.paramAssignment) {
-			if (assignment.name.controlOperationParameter == param) {
+			if (assignment.name.controlOperationParameter.equals(param)) {
 				return assignment
 			}
 		}

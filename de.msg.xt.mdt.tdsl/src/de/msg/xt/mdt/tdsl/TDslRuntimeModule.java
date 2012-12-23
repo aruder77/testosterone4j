@@ -3,11 +3,13 @@
  */
 package de.msg.xt.mdt.tdsl;
 
+import org.eclipse.xtext.scoping.IScopeProvider;
 import org.eclipse.xtext.xbase.compiler.XbaseCompiler;
 import org.eclipse.xtext.xbase.typing.ITypeProvider;
 
 import de.msg.xt.mdt.tdsl.generator.TDslJvmModelGenerator;
 import de.msg.xt.mdt.tdsl.jvmmodel.TDslCompiler;
+import de.msg.xt.mdt.tdsl.scoping.TDslScopeProvider;
 import de.msg.xt.mdt.tdsl.typeprovider.TDslTypeProvider;
 
 /**
@@ -31,5 +33,10 @@ public class TDslRuntimeModule extends
 
 	public Class<? extends XbaseCompiler> bindXbaseCompiler() {
 		return TDslCompiler.class;
+	}
+
+	@Override
+	public Class<? extends IScopeProvider> bindIScopeProvider() {
+		return TDslScopeProvider.class;
 	}
 }

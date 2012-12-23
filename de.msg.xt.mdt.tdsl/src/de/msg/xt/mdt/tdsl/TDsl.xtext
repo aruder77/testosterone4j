@@ -100,8 +100,13 @@ OperationParameterAssignment:
 
 UseCase:
 	(test?='test')? 'useCase' name=ID ('(' inputParameter+=Parameter (',' inputParameter+=Parameter)* ')')? 'initial' '=' initialActivity=[Activity|FQN] '{'
-  		(expressions+=Statement)*
+		block=UseCaseBlock
 	'}'
+;
+
+UseCaseBlock returns xbase::XBlockExpression:
+	{xbase::XBlockExpression}
+  	(expressions+=Statement)*
 ;
 
 Statement returns xbase::XExpression:
@@ -114,7 +119,7 @@ VariableDeclaration returns xbase::XVariableDeclaration:
 ;
 
 Expression returns xbase::XExpression:
-	OperationCall | XExpression
+	OperationCall | '[' XExpression ']'
 ;
 
 FQN:

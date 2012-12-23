@@ -21,8 +21,6 @@ import org.eclipse.xtext.common.types.util.TypeReferences
 import org.eclipse.xtext.naming.IQualifiedNameProvider
 import org.eclipse.xtext.xbase.compiler.output.ITreeAppendable
 import org.eclipse.xtext.xbase.jvmmodel.AbstractModelInferrer
-import org.eclipse.xtext.xbase.jvmmodel.IJvmDeclaredTypeAcceptor
-import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder
 import org.eclipse.xtext.xbase.lib.Procedures$Procedure1
 import de.msg.xt.mdt.tdsl.tDsl.SubUseCaseCall
 import javax.xml.bind.annotation.XmlAccessorType
@@ -34,6 +32,8 @@ import de.msg.xt.mdt.tdsl.tDsl.Activity
 import org.eclipse.xtext.xbase.XExpression
 import org.eclipse.xtext.common.types.JvmEnumerationType
 import org.eclipse.xtext.xbase.compiler.XbaseCompiler
+import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder
+import org.eclipse.xtext.xbase.jvmmodel.IJvmDeclaredTypeAcceptor
 
 /**
  * <p>Infers a JVM model from the source model.</p> 
@@ -127,7 +127,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 				}
 			} else {
 				if (operation.params.size > 0 || operation.returnType != null) {
-					throw new IllegalArgumentException("An operation with parameters or return value must have an OperationMapping!")
+					//throw new IllegalArgumentException("An operation with parameters or return value must have an OperationMapping!")
 				}
 			}
    			setBody [
@@ -170,9 +170,11 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    			}   			
    		} else {
    			if (opMapping == null || opMapping.dataType == null) {
-   				throw new IllegalArgumentException("For operations with return type a mapping with dataType must be specified!")
+   				System::out.println("For operations with return type a mapping with dataType must be specified!")
+   				//throw new IllegalArgumentException("For operations with return type a mapping with dataType must be specified!")
+   			} else {
+   				opMapping.newTypeRef(opMapping.dataType.class_FQN.toString)
    			}
-   			opMapping.newTypeRef(opMapping.dataType.class_FQN.toString)
    		}
    	}
 
@@ -379,7 +381,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				]
    			}
    			
-   			for (subUseCaseCall : useCase.expressions.filter(typeof(SubUseCaseCall))) {
+   			for (subUseCaseCall : useCase.block.expressions.filter(typeof(SubUseCaseCall))) {
    				if (subUseCaseCall.useCase != null) {
    					members += subUseCaseCall.toField(subUseCaseCall.useCase.name, subUseCaseCall.newTypeRef(subUseCaseCall.useCase.class_FQN.toString)) [
    						it.annotations += subUseCaseCall.toAnnotation("javax.xml.bind.annotation.XmlElement")
@@ -402,7 +404,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				for (inputParam : useCase.inputParameter) {
    					it.parameters += useCase.toParameter(inputParam.name, useCase.newTypeRef(inputParam.dataType.class_FQN.toString))	
    				}
-   				for (subUseCaseCall : useCase.expressions.filter(typeof(SubUseCaseCall))) {
+   				for (subUseCaseCall : useCase.block.expressions.filter(typeof(SubUseCaseCall))) {
    					if (subUseCaseCall.useCase != null) {
    						it.parameters += useCase.toParameter(subUseCaseCall.useCase.name, newTypeRef(useCaseClass))
    					}
@@ -414,7 +416,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    							this.«inputParam.name» = «inputParam.name»;
    							''')
    					}
-	   				for (subUseCaseCall : useCase.expressions.filter(typeof(SubUseCaseCall))) {
+	   				for (subUseCaseCall : useCase.block.expressions.filter(typeof(SubUseCaseCall))) {
 	   					it.append(
 	   						'''
 	   						this.«subUseCaseCall.useCase.name» = «subUseCaseCall.useCase.name»;
@@ -444,7 +446,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    					it.append('''
    						de.msg.xt.mdt.base.AbstractActivity activity = initialActivity;
    						''')
-   					for (statement : useCase.expressions) {
+   					for (statement : useCase.block.expressions) {
    						xbaseCompiler.compile(statement, it, "void".getTypeForName(statement), null)
    					}
    				]
@@ -464,7 +466,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				]   				
    			}
    			
-   			for (subUseCaseCall : useCase.expressions.filter(typeof(SubUseCaseCall))) {
+   			for (subUseCaseCall : useCase.block.expressions.filter(typeof(SubUseCaseCall))) {
    				if (subUseCaseCall.useCase != null) {
    					members += subUseCaseCall.toMethod(subUseCaseCall.useCase.subUseCaseGetter, subUseCaseCall.newTypeRef(subUseCaseCall.useCase.class_FQN.toString)) [
    						body = [

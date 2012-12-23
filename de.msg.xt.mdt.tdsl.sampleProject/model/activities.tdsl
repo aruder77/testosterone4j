@@ -13,7 +13,7 @@ package de.msg.xt.mdt {
 	}
 	
 	datatype Sachnummer type String {
-		class snrString value "A0000034555"
+		class snrString value "A0000034555" 
 	}
 	 
 	 
@@ -47,14 +47,14 @@ package de.msg.xt.mdt {
 			setText TextControl.setText (str StringDT TextControl.setText.str)
 			invokeAction TextControl.invokeAction => ECEditor03
 		}
-	}
+	} 
 
 	useCase ECNeuanlage(Sachnummer snr, Sachnummer snr2) initial=ECEditor01 {
 		call ECNeuanlage (ECEditor01.snr = "World2", snr2 = "Test")
 		var testVariable = ECEditor01.beschreibung.getText
 		ECEditor01.beschreibung.setText (ECEditor01.beschreibung.setText.str = testVariable)
 		ECEditor01.gremium.setText
-		
+		var abc = [ testVariable ]
 		ECEditor01.gremium.invokeAction
 	}
 

@@ -4,8 +4,12 @@ import de.msg.xt.mdt.tdsl.tDsl.Activity
 import de.msg.xt.mdt.tdsl.tDsl.Field
 import org.eclipse.emf.ecore.EObject
 import de.msg.xt.mdt.tdsl.tDsl.Operation
+import org.eclipse.xtext.naming.IQualifiedNameProvider
+import javax.inject.Inject
 
 class FieldExtensions {
+	
+	@Inject extension IQualifiedNameProvider
 		
 	def parentActivity(Field field) {
 		var EObject current = field
