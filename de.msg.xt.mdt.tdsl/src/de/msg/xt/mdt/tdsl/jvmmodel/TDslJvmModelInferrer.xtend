@@ -70,38 +70,21 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    		acceptor.accept(activityClass).initializeLater([
    			
    			superTypes += activity.newTypeRef("de.msg.xt.mdt.base.AbstractActivity")
-   			
-  			for (param : activity.inputParameter) {
-   				members += param.toField(param.name, param.newTypeRef(param.dataType.fullyQualifiedName.toString))
-   			}
-   				
+   			   				
    			for (field : activity.fields) {
    				members += field.toField(field.name, field.newTypeRef(field.control.fullyQualifiedName.toString))
    			}
 
    			members += activity.toConstructor [
-   				for (param : activity.inputParameter) {
-   					parameters += param.toParameter(param.name, param.newTypeRef(param.dataType.fullyQualifiedName.toString))
-   				}
-   				
-   				it.setBody [
-   					for (param : activity.inputParameter) {
-   						it.append("this." + param.name + " = " + param.name + ";")
-   					}
-   				]
    			]
    			
    			members += activity.toMethod("find", newTypeRef(activityClass)) [
    				it.setStatic(true)
    				
-   				for (param : activity.inputParameter) {
-   					parameters += param.toParameter(param.name, param.newTypeRef(param.dataType.fullyQualifiedName.toString))
-   				}
-   				
    				setBody [
    					it.append(
    					'''
-   					return new «activity.class_FQN.toString»(«FOR param : activity.inputParameter SEPARATOR ","»«param.name»«ENDFOR»);
+   					return new «activity.class_FQN.toString»();
    					''')
    				]
    			]

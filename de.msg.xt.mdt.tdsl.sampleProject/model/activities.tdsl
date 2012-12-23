@@ -23,7 +23,7 @@ package de.msg.xt.mdt {
 		op invokeAction()
 	}
 	
-	activity ECEditor01(Sachnummer snr) {
+	activity ECEditor01 {
 		field stichwort control TextControl {
 			invokeAction TextControl.invokeAction => ECEditor03 
 			setText TextControl.setText (str StringDT TextControl.setText.str)
@@ -50,7 +50,7 @@ package de.msg.xt.mdt {
 	} 
 
 	useCase ECNeuanlage(Sachnummer snr, Sachnummer snr2) initial=ECEditor01 {
-		call ECNeuanlage (ECEditor01.snr = "World2", snr2 = "Test")
+		call ECNeuanlage (snr2 = "Test")
 		var testVariable = ECEditor01.beschreibung.getText
 		ECEditor01.beschreibung.setText (ECEditor01.beschreibung.setText.str = testVariable)
 		ECEditor01.gremium.setText

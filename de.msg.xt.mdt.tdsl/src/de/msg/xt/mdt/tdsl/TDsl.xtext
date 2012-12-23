@@ -56,7 +56,7 @@ ControlOperationParameter:
 ;
     
 Activity:
-	'activity' name=ID ('(' inputParameter+=Parameter (',' inputParameter+=Parameter)* ')')? '{'
+	'activity' name=ID '{'
 		(fields+=Field)*
 	'}'
 ;
