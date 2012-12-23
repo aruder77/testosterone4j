@@ -446,7 +446,8 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
                             return this.«inputParam.name»;'''
    						)
    					]
-   				]   				
+   				]  
+   				it.members += useCase.toSetter(inputParam.name, inputParam.newTypeRef(inputParam.dataType.class_FQN.toString))				
    			}
    			
    			for (subUseCaseCall : useCase.block.expressions.filter(typeof(SubUseCaseCall))) {

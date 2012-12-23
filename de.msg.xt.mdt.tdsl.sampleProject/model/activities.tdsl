@@ -50,12 +50,12 @@ package de.msg.xt.mdt {
 	} 
 
 	useCase ECNeuanlage(Sachnummer snr, Sachnummer snr2) initial=ECEditor01 {
-		call ECNeuanlage (snr2 = "Test")
 		var testVariable = ECEditor01.beschreibung.getText
 		ECEditor01.beschreibung.setText (ECEditor01.beschreibung.setText.str = testVariable)
 		ECEditor01.gremium.setText
 		var abc = [ testVariable ]
 		ECEditor01.gremium.invokeAction
+		call ECNeuanlage (snr2 = snr)
 	}
 
 	/*	

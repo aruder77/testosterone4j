@@ -50,6 +50,12 @@ class TDslCompiler extends XbaseCompiler {
     		}
     		SubUseCaseCall: {
     			newLine
+    			for (param : expr.paramAssignment) {
+    				append('''«expr.useCase.subUseCaseGetter»().set«param.name.name.toFirstUpper»(''')
+    				compileAsJavaExpression(param.value, it, typeRefs.getTypeForName(param.name.dataType.class_FQN.toString, param))
+    				append(");")    
+    				newLine				
+    			}
     			append('''«expr.useCase.subUseCaseGetter»().execute((«expr.useCase.initialActivity.name»)activity);''')
     		}
     		default:
