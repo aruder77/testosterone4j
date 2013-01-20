@@ -6,24 +6,26 @@ package de.msg.xt.mdt {
 	
 	type String mappedBy java.lang.String
 	
-	datatype StringDT type String {
+	datatype StringDT type String { 
 		class emptyString value "" Pflichtfeld Test
 		class shortString value "abc"
 		class longString value "Dies ist ein seehr langer String ...................................................................." 		
 	}
 	
 	datatype Sachnummer type String {
-		class snrString value "A0000034555" 
+		class snrString value "A0000034555"
 	}
 	 
 	 
 	control TextControl mappedBy java.util.List {
-		op setText(String str) 
+		op setText(String str)
 		op getText():String
 		op invokeAction()
 	}
 	
-	activity ECEditor01 {
+	activityType Editor
+	
+	activity ECEditor01 type Editor {
 		field stichwort control TextControl {
 			invokeAction TextControl.invokeAction => ECEditor03 
 			setText TextControl.setText (str StringDT TextControl.setText.str)
@@ -41,7 +43,7 @@ package de.msg.xt.mdt {
 		}
 	}
 	
-	activity ECEditor03 {
+	activity ECEditor03 type Editor {
 		field snr control TextControl tag Pflichtfeld {
 			getText TextControl.getText as StringDT
 			setText TextControl.setText (str StringDT TextControl.setText.str)
@@ -55,8 +57,10 @@ package de.msg.xt.mdt {
 		ECEditor01.gremium.setText
 		var abc = [ testVariable ]
 		ECEditor01.gremium.invokeAction
-		call ECNeuanlage (snr2 = snr)
+		call ECNeuanlage (snr2 = snr) 
 	}
+	
+	test NeuanlageTest generator de.msg.xt.mdt.base.SampleTestGenerator useCase ECNeuanlage
 
 	/*	
 	* useCase ECNeuanlage(Sachnummer snr, Sachnummer snr2) initial=ECEditor01 {

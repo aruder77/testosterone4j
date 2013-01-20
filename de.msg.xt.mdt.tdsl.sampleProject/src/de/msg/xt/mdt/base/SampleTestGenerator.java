@@ -22,7 +22,7 @@ public class SampleTestGenerator implements Generator {
     @Override
     public <E extends Runnable> List<E> generate(Class<E> clazz) {
         List<E> testCases = new ArrayList<E>();
-        while (!isFinished()) {
+        while (!this.unsatisfiedCoverageIds.isEmpty() || testCases.isEmpty()) {
             try {
                 Constructor<E> constructor = clazz.getConstructor(Generator.class);
                 E testCase = constructor.newInstance(this);
@@ -71,10 +71,6 @@ public class SampleTestGenerator implements Generator {
             e.printStackTrace();
         }
         return values;
-    }
-
-    public boolean isFinished() {
-        return this.unsatisfiedCoverageIds.isEmpty() && !this.remainingValuesPerId.isEmpty();
     }
 
 }

@@ -12,6 +12,7 @@ import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder
 import org.eclipse.xtext.xbase.typing.XbaseTypeProvider
 import com.google.inject.Singleton
 import de.msg.xt.mdt.tdsl.tDsl.SubUseCaseCall
+import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationCall
 
 @Singleton
 class TDslTypeProvider extends XbaseTypeProvider {
@@ -34,6 +35,17 @@ class TDslTypeProvider extends XbaseTypeProvider {
                     JvmTypeReference typeRef, 
                     boolean isRawTypes) {
    		val typeName = opCall.operation?.dataType?.class_FQN?.toString
+   		
+   		if (typeName == null)
+   			typeReferences.getTypeForName(Void::TYPE, opCall)
+   		else 
+   			typeReferences.getTypeForName(typeName, opCall)   		
+  	}
+  	
+	def dispatch type(ActivityOperationCall opCall, 
+                    JvmTypeReference typeRef, 
+                    boolean isRawTypes) {
+   		val typeName = opCall.operation?.returnType?.class_FQN?.toString
    		
    		if (typeName == null)
    			typeReferences.getTypeForName(Void::TYPE, opCall)

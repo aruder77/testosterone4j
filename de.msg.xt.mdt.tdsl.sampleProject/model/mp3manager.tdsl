@@ -1,0 +1,28 @@
+package mp3manager {
+	
+	activityType WorkbenchWindow
+	
+	activityType View
+	 
+	activityType Editor
+	
+	activityType Popup
+	
+	activity MainWindow type WorkbenchWindow {
+		op openView() => OpenViewDialog 
+	}
+	
+	activity OpenViewDialog type Popup {
+		op selectLogicalView() 
+		op ok() => MainWindow
+		op cancel() => MainWindow
+	}
+	
+	useCase OpenLogicalView initial = MainWindow {
+		activityOperation MainWindow.openView 
+		activityOperation OpenViewDialog.selectLogicalView
+		activityOperation OpenViewDialog.ok
+	}
+	
+	test OpenLogicalViewTest generator de.msg.xt.mdt.base.SampleTestGenerator useCase OpenLogicalView
+}

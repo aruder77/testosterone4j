@@ -43,16 +43,18 @@ public enum StringDTEquivalenceClass implements EquivalenceClass {
 
     public static StringDTEquivalenceClass getByValue(final String value) {
         StringDTEquivalenceClass clazz = null;
-        switch (value) {
-        case "":
-            clazz = EMPTY;
-            break;
-        case "shortStr":
-            clazz = SHORT;
-            break;
-        case "longlonglonglonglong long long very long String":
-            clazz = LONG;
-            break;
+        if (value != null) {
+            switch (value) {
+            case "":
+                clazz = EMPTY;
+                break;
+            case "shortStr":
+                clazz = SHORT;
+                break;
+            case "longlonglonglonglong long long very long String":
+                clazz = LONG;
+                break;
+            }
         }
         return clazz;
     }

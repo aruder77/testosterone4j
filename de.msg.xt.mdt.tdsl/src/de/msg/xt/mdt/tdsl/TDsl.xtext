@@ -14,7 +14,7 @@ PackageDeclaration:
     '}';
     
 Element:
-	Activity | UseCase | Control | Type | DataType | TagsDeclaration
+	Activity | UseCase | Control | Type | DataType | Test | TagsDeclaration | ActivityType
 ;
 
 Type:
@@ -56,13 +56,26 @@ ControlOperationParameter:
 ;
     
 Activity:
-	'activity' name=ID '{'
+	'activity' name=ID ('identifiedBy' uniqueId=STRING)? 'type' type=[ActivityType|FQN] '{'
 		(fields+=Field)*
+		(operations+=ActivityOperation)*
 	'}'
 ;
 
+ActivityType:
+	'activityType' name=ID
+;
+
+ActivityOperationParameter:
+	dataType=[DataType|FQN] name=ID
+;
+
+ActivityOperation:
+	'op' name=ID '(' (params+=ActivityOperationParameter (',' params+=ActivityOperationParameter)*)? ')' (':' returnType=[DataType|FQN])? (nextActivities+=ConditionalNextActivity)*
+;
+
 Field:
-	'field' name=ID 'control' control=[Control|FQN] ('datatype' dataType=[DataType|FQN])? (tags+=TagWithCondition)* 
+	'field' name=ID ('identifiedBy' uniqueId=STRING)? 'control' control=[Control|FQN] ('datatype' dataType=[DataType|FQN])? (tags+=TagWithCondition)* 
 	(
 		 '{' 
 		 (operations+=OperationMapping)+	
@@ -98,8 +111,16 @@ OperationParameterAssignment:
 	name=[DataTypeMapping|FQN] '=' value=XExpression
 ;
 
+ActivityOperationParameterAssignment:
+	name=[ActivityOperationParameter|FQN] '=' value=XExpression
+;
+
+Test:
+	'test' name=ID 'generator' generator=JvmTypeReference 'useCase' useCase=[UseCase|FQN]
+;
+
 UseCase:
-	(test?='test')? 'useCase' name=ID ('(' inputParameter+=Parameter (',' inputParameter+=Parameter)* ')')? 'initial' '=' initialActivity=[Activity|FQN] '{'
+	'useCase' name=ID ('(' inputParameter+=Parameter (',' inputParameter+=Parameter)* ')')? 'initial' '=' initialActivity=[Activity|FQN] '{'
 		block=UseCaseBlock
 	'}'
 ;
@@ -110,7 +131,7 @@ UseCaseBlock returns xbase::XBlockExpression:
 ;
 
 Statement returns xbase::XExpression:
-	SubUseCaseCall | OperationCall | VariableDeclaration  //| XAssignment //| CompoundStatement
+	SubUseCaseCall | OperationCall | ActivityOperationCall | VariableDeclaration  //| XAssignment //| CompoundStatement
 ;
 
 VariableDeclaration returns xbase::XVariableDeclaration:
@@ -129,6 +150,11 @@ FQN:
 OperationCall returns xbase::XExpression:
 	{OperationCall}
 	operation=[OperationMapping|FQN] ('(' (paramAssignment+=OperationParameterAssignment) (',' paramAssignment+=OperationParameterAssignment)* ')')?
+;
+
+ActivityOperationCall returns xbase::XExpression:
+	{ActivityOperationCall}
+	'activityOperation' operation=[ActivityOperation|FQN] ('(' (paramAssignment+=ActivityOperationParameterAssignment) (',' paramAssignment+=ActivityOperationParameterAssignment)* ')')?
 ;
 
 SubUseCaseCall returns xbase::XExpression:

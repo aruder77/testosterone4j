@@ -1,20 +1,41 @@
 package de.msg.xt.mdt.tdsl.sampleProject.template.test.activity;
 
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+
 import de.msg.xt.mdt.base.AbstractActivity;
+import de.msg.xt.mdt.base.ActivityAdapter;
+import de.msg.xt.mdt.base.TDslModule;
 import de.msg.xt.mdt.tdsl.sampleProject.template.test.control.TextControl;
 import de.msg.xt.mdt.tdsl.sampleProject.template.test.datatype.StringDT;
 import de.msg.xt.mdt.tdsl.sampleProject.template.test.datatype.StringDTEquivalenceClass;
 
 public class SampleActivity extends AbstractActivity {
 
-    TextControl descriptionTextControl = new TextControl("description");
+    private static final String ID = "SampleActivity";
+
+    private static final String TYPE = "EditorAcitivity";
+
+    private static final Injector INJECTOR = Guice.createInjector(new TDslModule());
+
+    Object contextObject; // like SWTBot, used to find local widgets
+
+    static ActivityAdapter adapter = INJECTOR.getInstance(ActivityAdapter.class);
 
     public static SampleActivity find() {
-        return new SampleActivity();
+        return new SampleActivity(adapter.findContext(ID, TYPE));
+    }
+
+    public SampleActivity() {
+    }
+
+    public SampleActivity(Object context) {
+        this();
+        this.contextObject = context;
     }
 
     public TextControl getDescriptionTextControl() {
-        return this.descriptionTextControl;
+        return SampleActivity.adapter.getTextControl(this.contextObject, "description");
     }
 
     public SampleActivity description_setText(StringDT description) {
@@ -23,7 +44,7 @@ public class SampleActivity extends AbstractActivity {
     }
 
     public StringDT description_getText() {
-        String currentDescription = this.descriptionTextControl.getText();
+        String currentDescription = getDescriptionTextControl().getText();
         StringDT descriptionDataType = new StringDT(currentDescription, StringDTEquivalenceClass.getByValue(currentDescription));
         return descriptionDataType;
     }

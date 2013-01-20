@@ -16,4 +16,8 @@ class FieldNaming {
 		"get" + field.name.toFirstUpper
 	}
 	
+	def String getFieldGetterName(Field field) {
+		"get" + field.name.toFirstUpper + field.control.name.toFirstUpper
+	}
+	
 }

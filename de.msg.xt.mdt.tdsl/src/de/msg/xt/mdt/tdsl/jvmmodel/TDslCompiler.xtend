@@ -11,6 +11,7 @@ import de.msg.xt.mdt.tdsl.tDsl.Field
 import de.msg.xt.mdt.tdsl.tDsl.ControlOperationParameter
 import org.eclipse.xtext.common.types.util.TypeReferences
 import org.eclipse.xtext.naming.IQualifiedNameProvider
+import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationCall
 
 class TDslCompiler extends XbaseCompiler {
 	
@@ -47,6 +48,13 @@ class TDslCompiler extends XbaseCompiler {
 					appendParameter(expr, it)
 					append(");")
 				}
+    		}
+    		ActivityOperationCall: {
+    			newLine
+				if (!expr.operation.nextActivities.empty) {
+					append('''activity = ''')
+				}	    			
+    			append('''((«(expr.operation.eContainer as Activity).name»)activity).«expr.operation.name»();''')	
     		}
     		SubUseCaseCall: {
     			newLine
