@@ -99,7 +99,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 				}
 			}
    		])
-   	} // dies
+   	} // dies ist
    	
    	def JvmOperation toActivityDelegationMethod(Operation operation, Field field) {
    		operation.toMethod(field.activityControlDelegationMethodName(operation), field.returnTypeFieldOperation(operation)) [
