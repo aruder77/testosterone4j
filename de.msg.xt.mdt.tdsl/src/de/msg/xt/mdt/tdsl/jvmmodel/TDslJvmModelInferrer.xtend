@@ -198,7 +198,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 				members += operation.toActivityOperation()
 			}
    		])
-   	}
+   	} // dies ist ein Test
    	
    	def JvmOperation toActivityOperation(ActivityOperation operation) {
    		var JvmTypeReference returnTypeRef
