@@ -1,5 +1,8 @@
 package de.msg.xt.mdt.base;
 
+import mp3manager.TextControl;
+import mp3manager.TreeControl;
+
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
@@ -67,6 +70,18 @@ public class SWTBotMP3ActivityAdapter implements mp3manager.ActivityAdapter {
     @Override
     public Object beforeTest() {
         TestUtil.resetWorkbench();
+        return null;
+    }
+
+    @Override
+    public TextControl getTextControl(Object contextObject, String controlName) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public TreeControl getTreeControl(Object contextObject, String controlName) {
+        // TODO Auto-generated method stub
         return null;
     }
 

@@ -42,13 +42,13 @@ Tag:
 ;
 
 Control:
-	'control' name=ID 'mappedBy' mappedBy=JvmTypeReference '{'
+	'control' name=ID '{'
 		(operations+=Operation)+
 	'}'
 ;
 
 Operation:
-	'op' name=ID '(' (params+=ControlOperationParameter (',' params+=ControlOperationParameter)*)? ')' (':' returnType=[Type|FQN])?
+	'op' name=ID ('(' params+=ControlOperationParameter (',' params+=ControlOperationParameter)* ')')? (':' returnType=[Type|FQN])?
 ;
 
 ControlOperationParameter:
@@ -71,7 +71,7 @@ ActivityOperationParameter:
 ;
 
 ActivityOperation:
-	'op' name=ID '(' (params+=ActivityOperationParameter (',' params+=ActivityOperationParameter)*)? ')' (':' returnType=[DataType|FQN])? (nextActivities+=ConditionalNextActivity)*
+	'op' name=ID ('(' params+=ActivityOperationParameter (',' params+=ActivityOperationParameter)* ')')? (':' returnType=[DataType|FQN])? (nextActivities+=ConditionalNextActivity)*
 ;
 
 Field:

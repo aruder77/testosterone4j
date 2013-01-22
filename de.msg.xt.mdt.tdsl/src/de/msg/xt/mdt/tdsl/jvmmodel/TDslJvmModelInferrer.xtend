@@ -232,7 +232,9 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 			val opMapping = field.findOperationMappingForOperation(operation)
 			if (opMapping != null) {
 				for (dataTypeMapping : opMapping.dataTypeMappings) {
-					it.parameters += dataTypeMapping.toParameter(dataTypeMapping.controlOperationParameter.name, dataTypeMapping.newTypeRef(dataTypeMapping.datatype.class_FQN.toString))
+					if (dataTypeMapping.controlOperationParameter != null && dataTypeMapping.datatype != null) {
+						it.parameters += dataTypeMapping.toParameter(dataTypeMapping.controlOperationParameter.name, dataTypeMapping.newTypeRef(dataTypeMapping.datatype.class_FQN.toString))
+					}
 				}
 			} else {
 				if (operation.params.size > 0 || operation.returnType != null) {

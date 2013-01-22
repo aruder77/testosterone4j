@@ -1,5 +1,9 @@
 package mp3manager {
 	
+	tags { 
+		Pflichtfeld, Test, Super
+	}
+	
 	activityType WorkbenchWindow
 	
 	activityType View
@@ -8,9 +12,43 @@ package mp3manager {
 	
 	activityType Popup
 	
+	type String mappedBy java.lang.String
+	
+	datatype StringDT type String {
+		class emptyString value ""
+		class shortString value "shortString"
+		class longString value "longlonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglongString" 		
+	} 
+	
+	control TextControl mappedBy java.util.List { 
+		op setText(String str)
+		op getText() : String
+	}
+	
+	control TreeControl mappedBy java.util.List {
+		op doubleClickItem()
+	}
+	
 	activity MainWindow type WorkbenchWindow {
 		op openView() => OpenViewDialog 
+		op findLogicalView() => LogicalView
 	}
+	
+	activity LogicalView type View {
+		field tree control TreeControl {
+			doubleClickItem TreeControl.doubleClickItem => SongEditor
+		}
+	}
+	
+	activity SongEditor type Editor {
+		field name control TextControl {
+			setText TextControl.setText (str StringDT TextControl.setText.str)
+			getText TextControl.getText as StringDT
+		}
+		
+		op saveAndClose()
+	}
+	
 	
 	activity OpenViewDialog type Popup {
 		op selectLogicalView() 
@@ -18,10 +56,15 @@ package mp3manager {
 		op cancel() => MainWindow
 	}
 	
+	
 	useCase OpenLogicalView initial = MainWindow {
 		activityOperation MainWindow.openView 
 		activityOperation OpenViewDialog.selectLogicalView
 		activityOperation OpenViewDialog.ok
+		activityOperation MainWindow.findLogicalView
+		LogicalView.tree.doubleClickItem
+		SongEditor.name.setText
+		activityOperation SongEditor.saveAndClose
 	}
 	
 	test OpenLogicalViewTest generator de.msg.xt.mdt.base.SampleTestGenerator useCase OpenLogicalView
