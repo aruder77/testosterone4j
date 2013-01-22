@@ -20,18 +20,18 @@ package mp3manager {
 		class longString value "longlonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglongString" 		
 	} 
 	
-	control TextControl mappedBy java.util.List { 
+	control TextControl { 
 		op setText(String str)
-		op getText() : String
+		op getText : String
 	}
 	
-	control TreeControl mappedBy java.util.List {
-		op doubleClickItem()
+	control TreeControl {
+		op doubleClickItem
 	}
 	
 	activity MainWindow type WorkbenchWindow {
-		op openView() => OpenViewDialog 
-		op findLogicalView() => LogicalView
+		op openView => OpenViewDialog 
+		op findLogicalView => LogicalView
 	}
 	
 	activity LogicalView type View {
@@ -46,14 +46,14 @@ package mp3manager {
 			getText TextControl.getText as StringDT
 		}
 		
-		op saveAndClose()
+		op saveAndClose
 	}
 	
 	
 	activity OpenViewDialog type Popup {
-		op selectLogicalView() 
-		op ok() => MainWindow
-		op cancel() => MainWindow
+		op selectLogicalView
+		op ok => MainWindow
+		op cancel => MainWindow
 	}
 	
 	
