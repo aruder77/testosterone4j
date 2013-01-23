@@ -1,13 +1,85 @@
 package de.msg.xt.mdt.base;
 
+import mp3manager.Label;
 import mp3manager.TextControl;
 import mp3manager.TreeControl;
 
+import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
+import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
+import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotLabel;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
 public class SWTBotMP3ActivityAdapter implements mp3manager.ActivityAdapter {
+
+    private static final class SWTBotLabelControl implements Label {
+
+        SWTBotLabel swtBotLabel;
+
+        public static SWTBotLabelControl findControl(Object context, String id) {
+            System.out.println("Looking for Label control " + id + " in context " + context);
+            return new SWTBotLabelControl(((SWTBot) context).labelWithId(id));
+        }
+
+        public SWTBotLabelControl(SWTBotLabel swtBotLabel) {
+            this.swtBotLabel = swtBotLabel;
+        }
+
+        @Override
+        public String getText() {
+            return this.swtBotLabel.getText();
+        }
+
+    }
+
+    private static final class SWTBotTextControl implements TextControl {
+
+        SWTBotText swtBotText;
+
+        public static SWTBotTextControl findControl(Object context, String id) {
+            System.out.println("Looking for Text control " + id + " in context " + context);
+            return new SWTBotTextControl(((SWTBot) context).textWithId(id));
+        }
+
+        public SWTBotTextControl(SWTBotText swtBotText) {
+            this.swtBotText = swtBotText;
+        }
+
+        @Override
+        public void setText(String str) {
+            this.swtBotText.setText(str);
+        }
+
+        @Override
+        public String getText() {
+            return this.swtBotText.getText();
+        }
+    }
+
+    public static class SWTBotTreeControl implements TreeControl {
+
+        SWTBotTree swtBotTree;
+
+        public static SWTBotTreeControl findControl(Object context, String id) {
+            return new SWTBotTreeControl(((SWTBot) context).tree());
+        }
+
+        public SWTBotTreeControl(SWTBotTree tree) {
+            this.swtBotTree = tree;
+        }
+
+        @Override
+        public void doubleClickItem() {
+            String nodeText = "Stir It Up";
+            SWTBotTreeItem marleyItem = this.swtBotTree.expandNode("Bob Marley", true);
+            SWTBotTreeItem legendItem = marleyItem.getNode("Legend");
+            legendItem.getNode(nodeText).doubleClick();
+        }
+    }
 
     @Override
     public Object findContext(String id, String type) {
@@ -15,6 +87,11 @@ public class SWTBotMP3ActivityAdapter implements mp3manager.ActivityAdapter {
             SWTBot bot = new SWTBot();
             SWTBotShell shell = bot.shell("Show View");
             return shell;
+        } else if ("Editor".equals(type)) {
+            SWTWorkbenchBot bot = new SWTWorkbenchBot();
+            SWTBotEditor editor = bot.editorById(id);
+            SWTBot editorBot = editor.bot();
+            return editorBot;
         }
         return new SWTBot();
     }
@@ -55,6 +132,10 @@ public class SWTBotMP3ActivityAdapter implements mp3manager.ActivityAdapter {
                 SWTBot bot = new SWTBot();
                 SWTBotShell shell = bot.shell("Show View");
                 returnContext = shell;
+            } else if ("findLogicalView".equals(operationName)) {
+                SWTWorkbenchBot workbenchbot = new SWTWorkbenchBot();
+                SWTBotView viewBot = workbenchbot.viewByTitle("Logical View");
+                returnContext = viewBot.bot();
             }
         } else if ("mp3manager.OpenViewDialog".equals(id)) {
             if ("selectLogicalView".equals(operationName)) {
@@ -75,14 +156,16 @@ public class SWTBotMP3ActivityAdapter implements mp3manager.ActivityAdapter {
 
     @Override
     public TextControl getTextControl(Object contextObject, String controlName) {
-        // TODO Auto-generated method stub
-        return null;
+        return SWTBotTextControl.findControl(contextObject, controlName);
     }
 
     @Override
     public TreeControl getTreeControl(Object contextObject, String controlName) {
-        // TODO Auto-generated method stub
-        return null;
+        return SWTBotTreeControl.findControl(contextObject, controlName);
     }
 
+    @Override
+    public Label getLabel(Object contextObject, String controlName) {
+        return SWTBotLabelControl.findControl(contextObject, controlName);
+    }
 }

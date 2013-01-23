@@ -27,4 +27,8 @@ class FieldExtensions {
 		}
 		return null
 	}
+	
+	def identifier(Field field) {
+		if (field.uniqueId == null) field.fullyQualifiedName else field.uniqueId
+	}
 }

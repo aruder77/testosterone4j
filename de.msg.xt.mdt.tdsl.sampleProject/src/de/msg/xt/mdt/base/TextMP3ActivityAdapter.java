@@ -1,5 +1,6 @@
 package de.msg.xt.mdt.base;
 
+import mp3manager.Label;
 import mp3manager.TextControl;
 import mp3manager.TreeControl;
 
@@ -49,4 +50,15 @@ public class TextMP3ActivityAdapter implements mp3manager.ActivityAdapter {
         };
     }
 
+    @Override
+    public Label getLabel(final Object contextObject, final String controlName) {
+        return new Label() {
+
+            @Override
+            public String getText() {
+                System.out.println(contextObject + ".LabelControl[" + controlName + "].getText");
+                return "foo";
+            }
+        };
+    }
 }

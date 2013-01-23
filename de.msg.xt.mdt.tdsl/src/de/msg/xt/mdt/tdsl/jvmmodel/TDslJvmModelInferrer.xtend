@@ -60,7 +60,8 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 	@Inject extension FieldNaming
 	@Inject extension FieldExtensions
 	
-	@Inject extension ActivityNaming
+	@Inject extension ActivityNaming 
+	@Inject extension ActivityExtensions
 	
 	@Inject extension DataTypeNaming
 	
@@ -124,7 +125,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				it.setStatic(true)
    				it.setFinal(true)
    				it.setInitializer[
-   						it.append('''"«activity.fullyQualifiedName.toString»"''')
+   						it.append('''"«activity.identifier»"''')
    				]
    			]
    			   				
@@ -182,7 +183,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 				members += field.toMethod(field.fieldGetterName, field.newTypeRef(field.control.fullyQualifiedName.toString)) [
 					it.setBody [
 						it.append('''
-						     return «activity.class_SimpleName».adapter.get«field.control.name»(this.contextObject, "«field.name»");
+						     return «activity.class_SimpleName».adapter.get«field.control.name»(this.contextObject, "«field.identifier»");
 						''')
 					]
 				]

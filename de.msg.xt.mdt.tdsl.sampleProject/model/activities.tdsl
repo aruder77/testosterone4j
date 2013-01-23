@@ -17,10 +17,10 @@ package de.msg.xt.mdt {
 	}
 	 
 	 
-	control TextControl mappedBy java.util.List {
+	control TextControl {
 		op setText(String str)
-		op getText():String
-		op invokeAction()
+		op getText:String
+		op invokeAction
 	}
 	
 	activityType Editor

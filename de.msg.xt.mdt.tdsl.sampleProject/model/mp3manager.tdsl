@@ -1,7 +1,7 @@
 package mp3manager {
 	
 	tags { 
-		Pflichtfeld, Test, Super
+		Pflichtfeld, Empty
 	}
 	
 	activityType WorkbenchWindow
@@ -15,10 +15,15 @@ package mp3manager {
 	type String mappedBy java.lang.String
 	
 	datatype StringDT type String {
-		class emptyString value ""
+		class emptyString value "" Empty
 		class shortString value "shortString"
 		class longString value "longlonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglongString" 		
 	} 
+	
+	datatype ErrorStringDT type String {
+		class ok value "OK"
+		class missingValue value "Please enter a value"
+	}
 	
 	control TextControl { 
 		op setText(String str)
@@ -27,6 +32,10 @@ package mp3manager {
 	
 	control TreeControl {
 		op doubleClickItem
+	}
+	
+	control Label {
+		op getText : String
 	}
 	
 	activity MainWindow type WorkbenchWindow {
@@ -40,10 +49,29 @@ package mp3manager {
 		}
 	}
 	
-	activity SongEditor type Editor {
-		field name control TextControl {
+	activity SongEditor identifiedBy "com.siemens.ct.mp3m.ui.editors.ids.Id3DataBindingEditor" type Editor {
+		field title identifiedBy "Id3TagPage.Title_Label" control TextControl tag Pflichtfeld { 
 			setText TextControl.setText (str StringDT TextControl.setText.str)
 			getText TextControl.getText as StringDT
+		}
+		
+		field artist identifiedBy "Id3TagPage.Artist_Label" control TextControl tag Pflichtfeld { 
+			setText TextControl.setText (str StringDT TextControl.setText.str)
+			getText TextControl.getText as StringDT
+		}
+
+		field album identifiedBy "Id3TagPage.Album_Label" control TextControl tag Pflichtfeld { 
+			setText TextControl.setText (str StringDT TextControl.setText.str)
+			getText TextControl.getText as StringDT
+		}
+
+		field track identifiedBy "Id3TagPage.Track_Label" control TextControl { 
+			setText TextControl.setText (str StringDT TextControl.setText.str)
+			getText TextControl.getText as StringDT
+		}
+		
+		field errorMarker identifiedBy "errorMarker" control Label {
+			getText Label.getText as ErrorStringDT
 		}
 		
 		op saveAndClose
@@ -63,7 +91,15 @@ package mp3manager {
 		activityOperation OpenViewDialog.ok
 		activityOperation MainWindow.findLogicalView
 		LogicalView.tree.doubleClickItem
-		SongEditor.name.setText
+		SongEditor.title.setText
+		SongEditor.artist.setText
+		SongEditor.track.setText
+	}
+	
+	useCase testUseCase initial = MainWindow {
+		SongEditor.title.setText
+		SongEditor.album.setText
+		SongEditor.track.setText
 		activityOperation SongEditor.saveAndClose
 	}
 	
