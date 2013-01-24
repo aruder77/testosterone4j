@@ -1,6 +1,5 @@
 package de.msg.xt.mdt.tdsl.typeprovider
 
-import de.msg.xt.mdt.tdsl.jvmmodel.DataTypeNaming
 import de.msg.xt.mdt.tdsl.tDsl.OperationCall
 import de.msg.xt.mdt.tdsl.tDsl.OperationMapping
 import de.msg.xt.mdt.tdsl.tDsl.TDslPackage$Literals
@@ -13,6 +12,7 @@ import org.eclipse.xtext.xbase.typing.XbaseTypeProvider
 import com.google.inject.Singleton
 import de.msg.xt.mdt.tdsl.tDsl.SubUseCaseCall
 import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationCall
+import de.msg.xt.mdt.tdsl.jvmmodel.DataTypeNaming
 
 @Singleton
 class TDslTypeProvider extends XbaseTypeProvider {

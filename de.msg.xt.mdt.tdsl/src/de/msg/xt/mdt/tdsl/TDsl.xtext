@@ -120,28 +120,34 @@ Test:
 ;
 
 UseCase:
-	'useCase' name=ID ('(' inputParameter+=Parameter (',' inputParameter+=Parameter)* ')')? 'initial' '=' initialActivity=[Activity|FQN] '{'
+	'useCase' name=ID ('(' inputParameter+=Parameter (',' inputParameter+=Parameter)* ')')? 'initial' '=' initialActivity=[Activity|FQN]
 		block=UseCaseBlock
-	'}'
 ;
 
 UseCaseBlock returns xbase::XBlockExpression:
 	{xbase::XBlockExpression}
-  	(expressions+=Statement)*
+  	'{' (expressions+=Statement)* '}'
 ;
 
 Statement returns xbase::XExpression:
-	SubUseCaseCall | OperationCall | ActivityOperationCall | VariableDeclaration  //| XAssignment //| CompoundStatement
+	SubUseCaseCall | OperationCall | ActivityOperationCall | VariableDeclaration | =>IfExpression | XAssignment //| CompoundStatement
 ;
 
 VariableDeclaration returns xbase::XVariableDeclaration:
-	{XVariableDeclaration}
+	{xbase::XVariableDeclaration}
 	(writeable?='var') (=>(type=JvmTypeReference name=ValidID) | name=ValidID) ('=' right=Expression)?
 ;
 
 Expression returns xbase::XExpression:
-	OperationCall | '[' XExpression ']'
+	OperationCall | XExpression
 ;
+
+IfExpression returns xbase::XExpression:
+	{xbase::XIfExpression}
+	'if' '(' if=Expression ')'
+	then=UseCaseBlock
+	(=>'else' else=UseCaseBlock)?;
+
 
 FQN:
 	ID ('.' ID)*
@@ -149,17 +155,17 @@ FQN:
 
 OperationCall returns xbase::XExpression:
 	{OperationCall}
-	operation=[OperationMapping|FQN] ('(' (paramAssignment+=OperationParameterAssignment) (',' paramAssignment+=OperationParameterAssignment)* ')')?
+	'op' operation=[OperationMapping|FQN] =>('(' (paramAssignment+=OperationParameterAssignment) (',' paramAssignment+=OperationParameterAssignment)* ')')?
 ;
 
 ActivityOperationCall returns xbase::XExpression:
 	{ActivityOperationCall}
-	'activityOperation' operation=[ActivityOperation|FQN] ('(' (paramAssignment+=ActivityOperationParameterAssignment) (',' paramAssignment+=ActivityOperationParameterAssignment)* ')')?
+	'activityOperation' operation=[ActivityOperation|FQN] =>('(' (paramAssignment+=ActivityOperationParameterAssignment) (',' paramAssignment+=ActivityOperationParameterAssignment)* ')')?
 ;
 
 SubUseCaseCall returns xbase::XExpression:
 	{SubUseCaseCall}
-	'call' useCase=[UseCase|FQN] ('(' paramAssignment+=ParameterAssignment (',' paramAssignment+=ParameterAssignment)*  ')')?
+	'call' useCase=[UseCase|FQN] =>('(' paramAssignment+=ParameterAssignment (',' paramAssignment+=ParameterAssignment)*  ')')?
 ;
 
 /*

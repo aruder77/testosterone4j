@@ -65,10 +65,10 @@ package mp3manager {
 			getText TextControl.getText as StringDT
 		}
 
-		field track identifiedBy "Id3TagPage.Track_Label" control TextControl { 
+		field track identifiedBy "Id3TagPage.Track_Label" control TextControl {
 			setText TextControl.setText (str StringDT TextControl.setText.str)
-			getText TextControl.getText as StringDT
-		}
+			getText TextControl.getText as StringDT 
+		} 
 		
 		field errorMarker identifiedBy "errorMarker" control Label {
 			getText Label.getText as ErrorStringDT
@@ -90,16 +90,24 @@ package mp3manager {
 		activityOperation OpenViewDialog.selectLogicalView
 		activityOperation OpenViewDialog.ok
 		activityOperation MainWindow.findLogicalView
-		LogicalView.tree.doubleClickItem
-		SongEditor.title.setText
-		SongEditor.artist.setText
-		SongEditor.track.setText
+		op LogicalView.tree.doubleClickItem
+		op SongEditor.title.setText
+		op SongEditor.artist.setText
+		op SongEditor.track.setText
+		
+		var strDT = op SongEditor.title.getText 
+		if (strDT.getValue().equals("Hello")) {
+			activityOperation OpenViewDialog.cancel 
+			op SongEditor.title.setText			
+		}
+		
+		junit::framework::Assert::assertEquals("Hello", strDT.getValue())
 	}
 	
 	useCase testUseCase initial = MainWindow {
-		SongEditor.title.setText
-		SongEditor.album.setText
-		SongEditor.track.setText
+		op SongEditor.title.setText
+		op SongEditor.album.setText
+		op SongEditor.track.setText
 		activityOperation SongEditor.saveAndClose
 	}
 	

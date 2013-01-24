@@ -11,7 +11,7 @@ import de.msg.xt.mdt.tdsl.tDsl.OperationCall
 import de.msg.xt.mdt.tdsl.tDsl.PackageDeclaration
 import de.msg.xt.mdt.tdsl.tDsl.Parameter
 import de.msg.xt.mdt.tdsl.tDsl.SubUseCaseCall
-import de.msg.xt.mdt.tdsl.tDsl.TagsDeclaration
+import de.msg.xt.mdt.tdsl.tDsl.TagsDeclaration 
 import de.msg.xt.mdt.tdsl.tDsl.UseCase
 import java.util.Collection
 import javax.xml.bind.annotation.XmlAttribute
@@ -646,8 +646,6 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				it.parameters += useCase.toParameter("initialActivity", useCase.newTypeRef(useCase.initialActivity.class_FQN.toString))
    				
    				body = [
-   					var currentActivity = useCase.initialActivity
-   					
    					it.append('''
    						de.msg.xt.mdt.base.AbstractActivity activity = initialActivity;
    						''')
