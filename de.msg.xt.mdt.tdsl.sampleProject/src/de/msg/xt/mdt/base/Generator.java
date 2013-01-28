@@ -6,5 +6,5 @@ public interface Generator {
 
     <E extends Runnable> List<E> generate(Class<E> clazz);
 
-    <T extends DataType> T generateDataTypeValue(Class<T> clazz, String id);
+    <T extends DataType> T generateDataTypeValue(Class<T> clazz, String id, Tag[] tags);
 }

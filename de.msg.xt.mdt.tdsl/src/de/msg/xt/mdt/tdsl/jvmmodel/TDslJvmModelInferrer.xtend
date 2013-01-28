@@ -101,6 +101,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 				it.parameters += pack.toParameter("activityType", pack.newTypeRef(typeof(String)))
 				it.parameters += pack.toParameter("contextObject", pack.newTypeRef(typeof(Object)))
 				it.parameters += pack.toParameter("operationName", pack.newTypeRef(typeof(String)))
+				it.parameters += pack.toParameter("parameters", pack.newTypeRef(typeof(Object)).createArrayType)
 			]
 			
 			for (Control control : pack.elements.filter(typeof(Control))) {
@@ -220,9 +221,12 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    		val voidReturn = voidReturnType
    		val nextActivityClass = nextActivityClassVar
    		operation.toMethod(operation.name, returnTypeRef) [
+   			for (param : operation.params) {
+   				it.parameters += param.toParameter(param.name, param.newTypeRef(param.dataType.class_FQN.toString))
+   			}
    			it.setBody [
    				it.append('''
-   				   «IF !voidReturn»return new «nextActivityClass»(«ENDIF»adapter.performOperation(ID, ACTIVITY_TYPE, this.contextObject, "«operation.name»")«IF !voidReturn»)«ENDIF»;
+   				   «IF !voidReturn»return new «nextActivityClass»(«ENDIF»adapter.performOperation(ID, ACTIVITY_TYPE, this.contextObject, "«operation.name»", new Object[] {«FOR param : operation.params SEPARATOR ', '»«param.name»«ENDFOR»})«IF !voidReturn»)«ENDIF»;
    				''')
    			]
    		]
@@ -572,6 +576,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    	def dispatch void infer(UseCase useCase, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
    		val useCaseClass = useCase.toClass(useCase.class_FQN)
    		acceptor.accept(useCaseClass).initializeLater [
+   			it.superTypes += useCase.newTypeRef("de.msg.xt.mdt.base.BaseUseCase")
    			it.superTypes += useCase.newTypeRef("java.lang.Runnable")
 
    			it.annotations += useCase.toAnnotation("javax.xml.bind.annotation.XmlRootElement")
@@ -582,14 +587,6 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				]
    			}
    			
-   			for (subUseCaseCall : useCase.block.expressions.filter(typeof(SubUseCaseCall))) {
-   				if (subUseCaseCall.useCase != null) {
-   					members += subUseCaseCall.toField(subUseCaseCall.useCase.name, subUseCaseCall.newTypeRef(subUseCaseCall.useCase.class_FQN.toString)) [
-   						it.annotations += subUseCaseCall.toAnnotation("javax.xml.bind.annotation.XmlElement")
-	   				]
-   				}
-   			}
-   			
    			it.members += useCase.toField("generator", useCase.newTypeRef("de.msg.xt.mdt.base.Generator")) [
    				it.annotations += useCase.toAnnotation("javax.xml.bind.annotation.XmlTransient")
    			]
@@ -598,7 +595,16 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    			it.members += useCase.toConstructor() [
    				it.parameters += useCase.toParameter("generator", useCase.newTypeRef("de.msg.xt.mdt.base.Generator"))
    				body = [
-   					it.append('''this.generator = generator;''')
+   					it.append('''
+   					    this();
+   					    this.generator = generator;''')
+   					for (inputParam : useCase.inputParameter) {
+   						newLine
+   						it.append(
+   							'''
+   							this.«inputParam.name» = this.getOrGenerateValue(«inputParam.dataType.class_FQN.toString».class, "«inputParam.name»");
+   							''')
+	   				}
    				]
    			]
    			
@@ -607,28 +613,22 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    					for (inputParam : useCase.inputParameter) {
    						it.parameters += useCase.toParameter(inputParam.name, useCase.newTypeRef(inputParam.dataType.class_FQN.toString))	
    					}
-	   				for (subUseCaseCall : useCase.block.expressions.filter(typeof(SubUseCaseCall))) {
-   						if (subUseCaseCall.useCase != null) {
-   							it.parameters += useCase.toParameter(subUseCaseCall.useCase.name, newTypeRef(useCaseClass))
-   						}
-   					}
 	   				body = [
+	   					it.append('''this();''')
 		   				for (inputParam : useCase.inputParameter) {
+		   					newLine
    							it.append(
    								'''
    								this.«inputParam.name» = «inputParam.name»;
    								''')
 	   					}
-		   				for (subUseCaseCall : useCase.block.expressions.filter(typeof(SubUseCaseCall))) {
-	   						it.append(
-	   							'''
-	   							this.«subUseCaseCall.useCase.name» = «subUseCaseCall.useCase.name»;
-	   							''')
-	   					}				
    					]
    				]
    			}
    			
+   			for (inputParam : useCase.inputParameter) {
+   				members += inputParam.toSetter(inputParam.name, inputParam.newTypeRef(inputParam.dataType.class_FQN.toString)) 
+   			}
    			
    			it.members += useCase.toMethod("run", null) [
    				it.annotations += useCase.toAnnotation("java.lang.Override")
@@ -653,38 +653,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    						xbaseCompiler.compile(statement, it, "void".getTypeForName(statement), null)
    					}
    				]
-   			]
-   			
-   			for (inputParam : useCase.inputParameter) {
-   				it.members += useCase.toMethod("get" + inputParam.name.toFirstUpper, inputParam.newTypeRef(inputParam.dataType.class_FQN.toString)) [
-   					body = [
-   						it.append(
-                            '''
-                            if (this.«inputParam.name» == null && this.generator != null) {
-                                this.«inputParam.name» = this.generator.generateDataTypeValue(«inputParam.dataType.class_FQN.toString».class, "«useCase.inputParamID(inputParam)»");
-                            }
-                            return this.«inputParam.name»;'''
-   						)
-   					]
-   				]  
-   				it.members += useCase.toSetter(inputParam.name, inputParam.newTypeRef(inputParam.dataType.class_FQN.toString))				
-   			}
-   			
-   			for (subUseCaseCall : useCase.block.expressions.filter(typeof(SubUseCaseCall))) {
-   				if (subUseCaseCall.useCase != null) {
-   					members += subUseCaseCall.toMethod(subUseCaseCall.useCase.subUseCaseGetter, subUseCaseCall.newTypeRef(subUseCaseCall.useCase.class_FQN.toString)) [
-   						body = [
-   							it.append('''
-                                if (this.«subUseCaseCall.useCase.name» == null && this.generator != null) {
-                                    this.«subUseCaseCall.useCase.name» = new «subUseCaseCall.useCase.class_SimpleName»(this.generator);
-                                }
-                                return this.«subUseCaseCall.useCase.name»;
-   							''')
-   						]
-	   				]
-   				}
-   			}
-   			
+   			]   			
    		]
    	}
    	
@@ -713,6 +682,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    	
    	def dispatch void infer(TagsDeclaration tags, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
    		acceptor.accept(tags.toEnumerationType(tags.eContainer.fullyQualifiedName.toString + ".Tags") [
+   			superTypes += tags.newTypeRef("de.msg.xt.mdt.base.Tag")
    			for (tag : tags.tags) {
    				members += toEnumerationLiteral(tag.name)
    			}

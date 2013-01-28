@@ -13,6 +13,9 @@ import com.google.inject.Singleton
 import de.msg.xt.mdt.tdsl.tDsl.SubUseCaseCall
 import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationCall
 import de.msg.xt.mdt.tdsl.jvmmodel.DataTypeNaming
+import de.msg.xt.mdt.tdsl.tDsl.GenerationSelektor
+import de.msg.xt.mdt.tdsl.tDsl.OperationParameterAssignment
+import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationParameterAssignment
 
 @Singleton
 class TDslTypeProvider extends XbaseTypeProvider {
@@ -55,5 +58,15 @@ class TDslTypeProvider extends XbaseTypeProvider {
   	
   	def dispatch type(SubUseCaseCall subUseCaseCall, JvmTypeReference typeRef, boolean isRawTypes) {
   		typeReferences.getTypeForName(Void::TYPE, subUseCaseCall)
+  	}
+  	
+  	def dispatch type(GenerationSelektor generationSelektor, JvmTypeReference typeRef, boolean isRawTypes) {
+  		val container = generationSelektor.eContainer
+  		switch container {
+  			OperationParameterAssignment : 
+  				typeReferences.getTypeForName(container?.name?.datatype?.class_FQN?.toString, generationSelektor)
+  			ActivityOperationParameterAssignment :
+  				typeReferences.getTypeForName(container?.name?.dataType?.class_FQN?.toString, generationSelektor)	
+  		}
   	}
 }

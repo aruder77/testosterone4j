@@ -17,6 +17,6 @@ class UseCaseNaming {
 	}
 	
 	def String subUseCaseGetter(UseCase useCase) {
-		"get" + useCase.name.toFirstUpper
+		"getOrGenerateSubUseCase(" + useCase.fullyQualifiedName.toString + ".class, \"" + useCase.name + "\")"  
 	}
 }

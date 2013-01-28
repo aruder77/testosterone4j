@@ -37,7 +37,7 @@ public class SampleTestGenerator implements Generator {
     }
 
     @Override
-    public <T extends DataType> T generateDataTypeValue(Class<T> clazz, String id) {
+    public <T extends DataType> T generateDataTypeValue(Class<T> clazz, String id, Tag[] tags) {
         Stack<Object> remainingValues = this.remainingValuesPerId.get(id);
         T dataType = null;
         try {
@@ -72,5 +72,4 @@ public class SampleTestGenerator implements Generator {
         }
         return values;
     }
-
 }

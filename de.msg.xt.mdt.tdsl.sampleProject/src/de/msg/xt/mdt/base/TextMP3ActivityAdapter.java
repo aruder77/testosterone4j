@@ -28,8 +28,12 @@ public class TextMP3ActivityAdapter implements mp3manager.ActivityAdapter {
     }
 
     @Override
-    public Object performOperation(String id, String type, Object contextObject, String operationName) {
-        System.out.println(id + "." + operationName);
+    public Object performOperation(String id, String type, Object contextObject, String operationName, final Object[] parameters) {
+        System.out.println(id + "." + operationName + "(");
+        for (Object o : parameters) {
+            System.out.println(o.toString() + ", ");
+        }
+        System.out.println(")");
         return contextObject;
     }
 

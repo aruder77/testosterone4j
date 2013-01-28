@@ -107,12 +107,26 @@ ParameterAssignment:
 	name=[Parameter|FQN] '=' value=XExpression
 ;
 
+ParameterInput returns xbase::XExpression:
+	GenerationSelektor | XExpression
+;
+
+/*
+ * Parameter for a parameter generation. The generator only takes an array of tags.
+ * The takes may be specified directly using 'select(tags TAG_A, TAG_B)' or dynamically
+ * via an expression 'select(someXBaseExpression)'.
+ */
+GenerationSelektor returns xbase::XExpression:
+	{GenerationSelektor}
+	'select' =>('(' (('tags' tags+=[Tag|ID] (',' tags+=[Tag|ID])*) | expression=XExpression) ')' )?
+;
+
 OperationParameterAssignment:
-	name=[DataTypeMapping|FQN] '=' value=XExpression
+	name=[DataTypeMapping|FQN] '=' value=ParameterInput
 ;
 
 ActivityOperationParameterAssignment:
-	name=[ActivityOperationParameter|FQN] '=' value=XExpression
+	name=[ActivityOperationParameter|FQN] '=' value=ParameterInput
 ;
 
 Test:
@@ -139,8 +153,14 @@ VariableDeclaration returns xbase::XVariableDeclaration:
 ;
 
 Expression returns xbase::XExpression:
-	OperationCall | XExpression
+	OperationCall | GeneratedValueExpression | XExpression
 ;
+
+GeneratedValueExpression returns xbase::XExpression:
+	{GeneratedValueExpression}
+	'generatedValue' '(' param=[DataTypeMapping|FQN] ')'
+;
+
 
 IfExpression returns xbase::XExpression:
 	{xbase::XIfExpression}

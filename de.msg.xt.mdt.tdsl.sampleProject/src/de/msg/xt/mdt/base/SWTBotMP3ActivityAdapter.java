@@ -124,7 +124,7 @@ public class SWTBotMP3ActivityAdapter implements mp3manager.ActivityAdapter {
     // }
 
     @Override
-    public Object performOperation(String id, String type, Object contextObject, String operationName) {
+    public Object performOperation(String id, String type, Object contextObject, String operationName, final Object[] parameters) {
         Object returnContext = null;
         if ("mp3manager.MainWindow".equals(id)) {
             if ("openView".equals(operationName)) {

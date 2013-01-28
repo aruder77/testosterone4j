@@ -17,20 +17,17 @@ public class GenerationHelper {
         List<?> testCases = null;
 
         File f = new File(fileName);
-        if (f.exists()) {
-            try {
-                testCases = readXML(testClass, f);
-            } catch (JAXBException e) {
-                throw new RuntimeException("Cannot read test case data from xml!", e);
-            }
-        } else {
-            testCases = generate(generator, testClass);
-            try {
-                writeXML(testCases, testClass, f);
-            } catch (JAXBException e) {
-                throw new RuntimeException("Cannot write generated test data to xml!", e);
-            }
-        }
+        /*
+         * temporarily disabled until UseCases are serializable again... if
+         * (f.exists()) { try { testCases = readXML(testClass, f); } catch
+         * (JAXBException e) { throw new
+         * RuntimeException("Cannot read test case data from xml!", e); } } else
+         * { testCases = generate(generator, testClass); try {
+         * writeXML(testCases, testClass, f); } catch (JAXBException e) { throw
+         * new RuntimeException("Cannot write generated test data to xml!", e);
+         * } }
+         */
+        testCases = generate(generator, testClass);
 
         List<Object[]> testCaseConfig = new ArrayList<Object[]>();
         for (Object testCase : testCases) {
