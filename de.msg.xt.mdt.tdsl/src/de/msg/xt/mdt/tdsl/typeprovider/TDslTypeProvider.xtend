@@ -16,6 +16,7 @@ import de.msg.xt.mdt.tdsl.jvmmodel.DataTypeNaming
 import de.msg.xt.mdt.tdsl.tDsl.GenerationSelektor
 import de.msg.xt.mdt.tdsl.tDsl.OperationParameterAssignment
 import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationParameterAssignment
+import de.msg.xt.mdt.tdsl.tDsl.GeneratedValueExpression
 
 @Singleton
 class TDslTypeProvider extends XbaseTypeProvider {
@@ -43,6 +44,11 @@ class TDslTypeProvider extends XbaseTypeProvider {
    			typeReferences.getTypeForName(Void::TYPE, opCall)
    		else 
    			typeReferences.getTypeForName(typeName, opCall)   		
+  	}
+  	
+  	def dispatch type(GeneratedValueExpression expr, JvmTypeReference typeRef, boolean isRawType) {
+  		val dataTypeName = expr.param.datatype.class_FQN.toString
+  		typeReferences.getTypeForName(dataTypeName, expr)
   	}
   	
 	def dispatch type(ActivityOperationCall opCall, 

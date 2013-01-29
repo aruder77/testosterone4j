@@ -94,8 +94,8 @@ package mp3manager {
 		activityOperation MainWindow.findLogicalView
 		op LogicalView.tree.doubleClickItem
 		op SongEditor.title.setText
-		op SongEditor.artist.setText
-		op SongEditor.track.setText
+		op SongEditor.artist.setText 
+		op SongEditor.track.setText 
 		
 		var strDT = op SongEditor.title.getText 
 		if (strDT.getValue().equals("Hello")) {
@@ -111,9 +111,11 @@ package mp3manager {
 		activityOperation SongEditor.openView(SongEditor.openView.viewId=select)
 		activityOperation SongEditor.openView(SongEditor.openView.viewId=select(tags Empty))
 		
+		var genValue = generatedValue(SongEditor.title.setText.str)
+		
 		junit::framework::Assert::assertEquals("Hello", strDT.getValue())
 	}
-	
+	 
 	useCase testUseCase initial = MainWindow {
 		op SongEditor.title.setText
 		op SongEditor.album.setText

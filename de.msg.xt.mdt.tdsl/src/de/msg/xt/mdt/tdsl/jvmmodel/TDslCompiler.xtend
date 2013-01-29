@@ -18,6 +18,7 @@ import de.msg.xt.mdt.tdsl.tDsl.DataType
 import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationParameterAssignment
 import org.eclipse.xtext.xbase.typing.ITypeProvider
 import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationParameter
+import de.msg.xt.mdt.tdsl.tDsl.GeneratedValueExpression
 
 class TDslCompiler extends XbaseCompiler {
 	
@@ -47,6 +48,7 @@ class TDslCompiler extends XbaseCompiler {
     			if (!isReferenced) {
 	    			val field = expr.operation.eContainer as Field
 	    			newLine
+	    			expr.generateParameters(it)
 					if (!expr.operation.nextActivities.empty) {
 						append('''activity = ''')
 					}	    			
@@ -57,8 +59,14 @@ class TDslCompiler extends XbaseCompiler {
 					append(");")
 				}
     		}
+    		GeneratedValueExpression: {
+    			if (!isReferenced) {
+					append(expr.param.fullyQualifiedName.toString.toFieldName)    				
+    			}
+    		}
     		ActivityOperationCall: {
     			newLine
+    			expr.generateParameters(it)
 				if (!expr.operation.nextActivities.empty) {
 					append('''activity = ''')
 				}	    			
@@ -83,50 +91,63 @@ class TDslCompiler extends XbaseCompiler {
     	}   	
     }
     
-    def appendParameter(ActivityOperationCall call, ITreeAppendable appendable) {
-    	for (parameter : call.operation.params) {
-			var first = true
-			if (!first) {
-				appendable.append(",")
-				first = false
-			}
-			val assignment = findAssignment(call, parameter)
+	def generateParameters(OperationCall call, ITreeAppendable appendable) { 
+		for (mapping : call.operation.dataTypeMappings) {
+			val assignment = findAssignment(call, mapping.controlOperationParameter)
+			val dataTypeName = mapping.datatype.class_FQN.toString
+			appendable.append('''«dataTypeName» «mapping.fullyQualifiedName.toString.toFieldName» = ''')
 			if (assignment == null) {
-				appendable.append('''getOrGenerateValue(«parameter.dataType.class_FQN.toString».class, "«parameter.fullyQualifiedName»")''')
+				appendable.append('''getOrGenerateValue(«dataTypeName».class, "«mapping.fullyQualifiedName»")''')
 			} else {
-				val expectedType = typeRefs.getTypeForName(parameter.dataType.class_FQN.toString, call)
+				val expectedType = typeRefs.getTypeForName(dataTypeName, call)
 				if (!assignment.value.type.type.equals(expectedType.type)) {
-					appendable.append('''new «parameter.dataType.class_FQN.toString»(''')
+					appendable.append('''new «dataTypeName»(''')
+				}
+				compileAsJavaExpression(assignment.value, appendable, expectedType)
+				if (!assignment.value.type.type.equals(expectedType.type)) {
+					appendable.append(''', null)''')
+				}
+			}
+			appendable.append(";")
+			appendable.newLine
+		}		
+	}
+
+    
+	def generateParameters(ActivityOperationCall call, ITreeAppendable appendable) { 
+    	for (parameter : call.operation.params) {
+			val assignment = findAssignment(call, parameter)
+			val dataTypeName = parameter.dataType.class_FQN.toString
+			appendable.append('''«dataTypeName» «parameter.fullyQualifiedName.toString.toFieldName» = ''')
+			if (assignment == null) {
+				appendable.append('''getOrGenerateValue(«dataTypeName».class, "«parameter.fullyQualifiedName»")''')
+			} else {
+				val expectedType = typeRefs.getTypeForName(dataTypeName, call)
+				if (!assignment.value.type.type.equals(expectedType.type)) {
+					appendable.append('''new «dataTypeName»(''')
 				}
 				compileAsJavaExpression(assignment.value, appendable, expectedType)
 				if (!assignment.value.type.type.equals(expectedType.type)) {
 					appendable.append(''', null)''')
 				}
 			}    		
+			appendable.append(";")
+			appendable.newLine
     	} 
+	}
+	
+	def toFieldName(String string) { 
+		string.replace('.', '_')	
+	}
+
+
+    
+    def appendParameter(ActivityOperationCall call, ITreeAppendable appendable) {
+    	appendable.append('''«FOR parameter : call.operation.params SEPARATOR ', '»«parameter.fullyQualifiedName.toString.toFieldName»«ENDFOR»''')
     }
     
 	def appendParameter(OperationCall call, ITreeAppendable appendable) { 
-		for (mapping : call.operation.dataTypeMappings) {
-			var first = true
-			if (!first) {
-				appendable.append(",")
-				first = false
-			}
-			val assignment = findAssignment(call, mapping.controlOperationParameter)
-			if (assignment == null) {
-				appendable.append('''getOrGenerateValue(«mapping.datatype.class_FQN.toString».class, "«mapping.fullyQualifiedName»")''')
-			} else {
-				val expectedType = typeRefs.getTypeForName(assignment.name.datatype.class_FQN.toString, call)
-				if (!assignment.value.type.type.equals(expectedType.type)) {
-					appendable.append('''new «assignment.name.datatype.class_FQN.toString»(''')
-				}
-				compileAsJavaExpression(assignment.value, appendable, expectedType)
-				if (!assignment.value.type.type.equals(expectedType.type)) {
-					appendable.append(''', null)''')
-				}
-			}
-		}
+    	appendable.append('''«FOR parameter : call.operation.dataTypeMappings SEPARATOR ', '»«parameter.fullyQualifiedName.toString.toFieldName»«ENDFOR»''')
 	}
 	
 	def findAssignment(ActivityOperationCall call, ActivityOperationParameter param) {
@@ -172,15 +193,18 @@ class TDslCompiler extends XbaseCompiler {
 						varName = container.name.fullyQualifiedName.toString
 					}
 				}
-					append('''getOrGenerateValue(«dataType.class_FQN.toString».class, "«varName»"''')
-					if (!expr.tags.empty) {
-						append(''', new de.msg.xt.mdt.base.Tag[] {«FOR tag: expr.tags SEPARATOR ","»Tags.«tag.name»«ENDFOR»}''')
-					}
-					if (expr.expression != null) {
-						append(", ")
-						expr.expression.compileAsJavaExpression(it, typeRefs.createArrayType(typeRefs.getTypeForName("Tags", expr)))
-					}
-					append(''')''')
+				append('''getOrGenerateValue(«dataType.class_FQN.toString».class, "«varName»"''')
+				if (!expr.tags.empty) {
+					append(''', new de.msg.xt.mdt.base.Tag[] {«FOR tag: expr.tags SEPARATOR ","»Tags.«tag.name»«ENDFOR»}''')
+				}
+				if (expr.expression != null) {
+					append(", ")
+					expr.expression.compileAsJavaExpression(it, typeRefs.createArrayType(typeRefs.getTypeForName("Tags", expr)))
+				}
+				append(''')''')
+			}
+			GeneratedValueExpression: {
+				append(expr.param.fullyQualifiedName.toString.toFieldName)
 			}
 			default:
 				super.internalToConvertedExpression(expr, it)
