@@ -175,7 +175,7 @@ FQN:
 
 OperationCall returns xbase::XExpression:
 	{OperationCall}
-	'op' operation=[OperationMapping|FQN] =>('(' (paramAssignment+=OperationParameterAssignment) (',' paramAssignment+=OperationParameterAssignment)* ')')?
+	'op' operation=[OperationMapping|FQN] =>('(' 'a' (paramAssignment+=OperationParameterAssignment) (',' paramAssignment+=OperationParameterAssignment)* ')')?
 ;
 
 ActivityOperationCall returns xbase::XExpression:

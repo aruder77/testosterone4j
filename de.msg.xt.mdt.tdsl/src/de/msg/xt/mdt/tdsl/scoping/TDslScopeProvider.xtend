@@ -1,12 +1,16 @@
 package de.msg.xt.mdt.tdsl.scoping
 
-import de.msg.xt.mdt.tdsl.tDsl.UseCase
+import de.msg.xt.mdt.tdsl.tDsl.OperationCall
+import de.msg.xt.mdt.tdsl.tDsl.OperationParameterAssignment
 import javax.inject.Inject
-import org.eclipse.xtext.common.types.JvmType
+import org.eclipse.emf.ecore.EObject
+import org.eclipse.emf.ecore.EReference
+import org.eclipse.xtext.scoping.Scopes
 import org.eclipse.xtext.xbase.jvmmodel.IJvmModelAssociations
 import org.eclipse.xtext.xbase.scoping.XbaseScopeProvider
-import org.eclipse.xtext.scoping.IScope
-import org.eclipse.xtext.common.types.JvmOperation
+import de.msg.xt.mdt.tdsl.tDsl.TDslPackage
+import java.util.List
+import de.msg.xt.mdt.tdsl.tDsl.DataTypeMapping
 
 class TDslScopeProvider extends XbaseScopeProvider {
 	
@@ -34,4 +38,19 @@ class TDslScopeProvider extends XbaseScopeProvider {
     def JvmType getJvmType(UseCase useCase) {
         useCase.jvmElements.filter(typeof(JvmType)).head
     } */    
+    
+	override getScope(EObject context, EReference reference) {
+		if (reference.equals(TDslPackage::eINSTANCE.operationParameterAssignment_Name)) {
+			var List<DataTypeMapping> mappings
+			switch (context) {
+				OperationCall:
+					return Scopes::scopeFor(context.operation.dataTypeMappings)
+				OperationParameterAssignment:
+					return Scopes::scopeFor((context.eContainer as OperationCall).operation.dataTypeMappings)
+			}
+		} else {
+			super.getScope(context, reference)
+		}
+	}
+	
 }

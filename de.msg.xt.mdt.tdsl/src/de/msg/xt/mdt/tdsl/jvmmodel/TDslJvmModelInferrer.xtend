@@ -146,6 +146,9 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				]
    			]
    			
+   			val packageDecl = activity.eContainer as PackageDeclaration
+   			System::out.println("Package: " + packageDecl.fullyQualifiedName.toString)
+   			System::out.println("ActivityAdapter: " + packageDecl.activityAdapter_FQN)
    			members += activity.toField("adapter", activity.newTypeRef((activity.eContainer as PackageDeclaration).activityAdapter_FQN)) [
    				it.setStatic(true)
    				it.setFinal(true)
