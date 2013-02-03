@@ -18,7 +18,7 @@ Element:
 ;
 
 Type:
-	'type' name=ID 'mappedBy' mappedBy=JvmTypeReference
+	'type' name=ID 'mappedBy' mappedBy=JvmTypeReference ';'
 ;
 
 DataType:
@@ -28,7 +28,7 @@ DataType:
 ;
 
 EquivalenceClass:
-	'class' name=ID 'value' value=STRING (tags+=[Tag|FQN])*
+	'class' name=ID 'value' value=STRING (tags+=[Tag|FQN])* ';'
 ;
 
 TagsDeclaration:
@@ -48,7 +48,7 @@ Control:
 ;
 
 Operation:
-	'op' name=ID ('(' params+=ControlOperationParameter (',' params+=ControlOperationParameter)* ')')? (':' returnType=[Type|FQN])?
+	'op' name=ID ('(' params+=ControlOperationParameter (',' params+=ControlOperationParameter)* ')')? (':' returnType=[Type|FQN])? ';'
 ;
 
 ControlOperationParameter:
@@ -63,7 +63,7 @@ Activity:
 ;
 
 ActivityType:
-	'activityType' name=ID
+	'activityType' name=ID ';'
 ;
 
 ActivityOperationParameter:
@@ -71,7 +71,7 @@ ActivityOperationParameter:
 ;
 
 ActivityOperation:
-	'op' name=ID ('(' params+=ActivityOperationParameter (',' params+=ActivityOperationParameter)* ')')? (':' returnType=[DataType|FQN])? (nextActivities+=ConditionalNextActivity)*
+	'op' name=ID ('(' params+=ActivityOperationParameter (',' params+=ActivityOperationParameter)* ')')? (':' returnType=[DataType|FQN])? (nextActivities+=ConditionalNextActivity)* ';'
 ;
 
 Field:
@@ -84,11 +84,12 @@ Field:
 ;
 
 TagWithCondition:
-	'tag' tag=[Tag|FQN] ('if' condition=XExpression)?
+	'tag' tag=[Tag|FQN] ('if' '[' condition=XExpression ']')? 
 ;
 
 OperationMapping:
-	name=ID operation=[Operation|FQN] ('(' (dataTypeMappings+=DataTypeMapping) (',' dataTypeMappings+=DataTypeMapping)* ')')? ('as' dataType=[DataType|FQN])? ('guard' guard=XExpression)?  (nextActivities+=ConditionalNextActivity)*
+	name=ID operation=[Operation|FQN] ('(' (dataTypeMappings+=DataTypeMapping) (',' dataTypeMappings+=DataTypeMapping)* ')')? ('as' dataType=[DataType|FQN])? ('guard' '[' guard=XExpression ']')?  (nextActivities+=ConditionalNextActivity)* ';'
+
 ;
 
 DataTypeMapping:
@@ -96,7 +97,7 @@ DataTypeMapping:
 ;
 
 ConditionalNextActivity:
-	'=>' next=[Activity|FQN] ('if' guard=XExpression)?
+	'=>' next=[Activity|FQN] ('if' '[' guard=XExpression ']')?
 ;
 
 Parameter:
@@ -104,7 +105,7 @@ Parameter:
 ;
 
 ParameterAssignment:
-	name=[Parameter|FQN] '=' value=XExpression
+	name=[Parameter|FQN] '=' '[' value=XExpression ']'
 ;
 
 ParameterInput returns xbase::XExpression:
@@ -118,19 +119,19 @@ ParameterInput returns xbase::XExpression:
  */
 GenerationSelektor returns xbase::XExpression:
 	{GenerationSelektor}
-	'select' =>('(' (('tags' tags+=[Tag|ID] (',' tags+=[Tag|ID])*) | expression=XExpression) ')' )?
+	'select' ('(' (('tags' tags+=[Tag|ID] (',' tags+=[Tag|ID])*) | '[' expression=XExpression ']') ')' )?
 ;
 
 OperationParameterAssignment:
-	name=[DataTypeMapping|FQN] '=' value=ParameterInput
+	name=[DataTypeMapping|FQN] '=' '[' value=ParameterInput ']'
 ;
 
 ActivityOperationParameterAssignment:
-	name=[ActivityOperationParameter|FQN] '=' value=ParameterInput
+	name=[ActivityOperationParameter|FQN] '=' '[' value=ParameterInput ']'
 ;
 
 Test:
-	'test' name=ID 'generator' generator=JvmTypeReference 'useCase' useCase=[UseCase|FQN]
+	'test' name=ID 'generator' generator=JvmTypeReference 'useCase' useCase=[UseCase|FQN] ';'
 ;
 
 UseCase:
@@ -144,16 +145,16 @@ UseCaseBlock returns xbase::XBlockExpression:
 ;
 
 Statement returns xbase::XExpression:
-	SubUseCaseCall | OperationCall | ActivityOperationCall | VariableDeclaration | =>IfExpression | XAssignment //| CompoundStatement
+	SubUseCaseCall ';' | OperationCall ';' | ActivityOperationCall ';' | VariableDeclaration ';' | IfExpression | '[' XAssignment ']' //| CompoundStatement
 ;
 
 VariableDeclaration returns xbase::XVariableDeclaration:
 	{xbase::XVariableDeclaration}
-	(writeable?='var') (=>(type=JvmTypeReference name=ValidID) | name=ValidID) ('=' right=Expression)?
+	(writeable?='var') ((type=JvmTypeReference name=ValidID) | name=ValidID) ('=' right=Expression)?
 ;
 
 Expression returns xbase::XExpression:
-	OperationCall | GeneratedValueExpression | XExpression
+	OperationCall | GeneratedValueExpression | '[' XExpression ']'
 ;
 
 GeneratedValueExpression returns xbase::XExpression:
@@ -166,7 +167,8 @@ IfExpression returns xbase::XExpression:
 	{xbase::XIfExpression}
 	'if' '(' if=Expression ')'
 	then=UseCaseBlock
-	(=>'else' else=UseCaseBlock)?;
+	('else' else=UseCaseBlock)?
+;
 
 
 FQN:
@@ -175,17 +177,17 @@ FQN:
 
 OperationCall returns xbase::XExpression:
 	{OperationCall}
-	'op' operation=[OperationMapping|FQN] =>('(' 'a' (paramAssignment+=OperationParameterAssignment) (',' paramAssignment+=OperationParameterAssignment)* ')')?
+	'op' operation=[OperationMapping|FQN] ('(' (paramAssignment+=OperationParameterAssignment) (',' paramAssignment+=OperationParameterAssignment)* ')')?
 ;
 
 ActivityOperationCall returns xbase::XExpression:
 	{ActivityOperationCall}
-	'activityOperation' operation=[ActivityOperation|FQN] =>('(' (paramAssignment+=ActivityOperationParameterAssignment) (',' paramAssignment+=ActivityOperationParameterAssignment)* ')')?
+	'activityOperation' operation=[ActivityOperation|FQN] ('(' (paramAssignment+=ActivityOperationParameterAssignment) (',' paramAssignment+=ActivityOperationParameterAssignment)* ')')?
 ;
 
 SubUseCaseCall returns xbase::XExpression:
 	{SubUseCaseCall}
-	'call' useCase=[UseCase|FQN] =>('(' paramAssignment+=ParameterAssignment (',' paramAssignment+=ParameterAssignment)*  ')')?
+	'call' useCase=[UseCase|FQN] ('(' paramAssignment+=ParameterAssignment (',' paramAssignment+=ParameterAssignment)*  ')')?
 ;
 
 /*

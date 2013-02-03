@@ -11,6 +11,9 @@ import org.eclipse.xtext.xbase.scoping.XbaseScopeProvider
 import de.msg.xt.mdt.tdsl.tDsl.TDslPackage
 import java.util.List
 import de.msg.xt.mdt.tdsl.tDsl.DataTypeMapping
+import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationCall
+import org.eclipse.xtext.scoping.IScope
+import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationParameterAssignment
 
 class TDslScopeProvider extends XbaseScopeProvider {
 	
@@ -40,13 +43,22 @@ class TDslScopeProvider extends XbaseScopeProvider {
     } */    
     
 	override getScope(EObject context, EReference reference) {
-		if (reference.equals(TDslPackage::eINSTANCE.operationParameterAssignment_Name)) {
+		if (reference == TDslPackage::eINSTANCE.operationParameterAssignment_Name) {
 			var List<DataTypeMapping> mappings
 			switch (context) {
 				OperationCall:
 					return Scopes::scopeFor(context.operation.dataTypeMappings)
 				OperationParameterAssignment:
 					return Scopes::scopeFor((context.eContainer as OperationCall).operation.dataTypeMappings)
+			}
+		} else if (reference == TDslPackage::eINSTANCE.activityOperationParameterAssignment_Name) {
+			switch (context) {
+				ActivityOperationCall:
+					return Scopes::scopeFor(context.operation.params)
+				ActivityOperationParameterAssignment:
+					return Scopes::scopeFor((context.eContainer as ActivityOperationCall).operation.params)
+				default:
+					IScope::NULLSCOPE
 			}
 		} else {
 			super.getScope(context, reference)
