@@ -98,18 +98,18 @@ package mp3manager {
 		op SongEditor.track.setText;
 		
 		var strDT = op SongEditor.title.getText;
-		if ([strDT.getValue().equals("Hello")]) {
+		if (strDT.getValue().equals("Hello")) {
 			activityOperation OpenViewDialog.cancel;
-			op SongEditor.title.setText(str = [select(tags Pflichtfeld,Empty)]);
-			op SongEditor.track.setText(str = [strDT]);
-			op SongEditor.track.setText(str = ["Hello, world!"]);		
-			op SongEditor.track.setText(str = [select(["Hello"])]);	
+			op SongEditor.title.setText(str = select(tags Pflichtfeld,Empty));
+			op SongEditor.track.setText(str = strDT);
+			op SongEditor.track.setText(str = "Hello, world!");		
+			op SongEditor.track.setText(str = select("Hello"));	
 		}
 		
-		activityOperation SongEditor.openView;
-		activityOperation SongEditor.openView(viewId=["Hello, world!"]);
-		activityOperation SongEditor.openView(viewId=[select]);
-		activityOperation SongEditor.openView(viewId=[select(tags Empty)]);
+		activityOperation SongEditor.openView(viewId=false);
+		activityOperation SongEditor.openView(viewId="Hello, world!");
+		activityOperation SongEditor.openView(viewId=select);
+		activityOperation SongEditor.openView(viewId=select(tags Empty));
 		
 		var genValue = generatedValue(SongEditor.title.setText.str);
 		

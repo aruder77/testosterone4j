@@ -84,11 +84,11 @@ Field:
 ;
 
 TagWithCondition:
-	'tag' tag=[Tag|FQN] ('if' '[' condition=XExpression ']')? 
+	'tag' tag=[Tag|FQN] ('if' condition=XExpression)? 
 ;
 
 OperationMapping:
-	name=ID operation=[Operation|FQN] ('(' (dataTypeMappings+=DataTypeMapping) (',' dataTypeMappings+=DataTypeMapping)* ')')? ('as' dataType=[DataType|FQN])? ('guard' '[' guard=XExpression ']')?  (nextActivities+=ConditionalNextActivity)* ';'
+	name=ID operation=[Operation|FQN] ('(' (dataTypeMappings+=DataTypeMapping) (',' dataTypeMappings+=DataTypeMapping)* ')')? ('as' dataType=[DataType|FQN])? ('guard' guard=XExpression)?  (nextActivities+=ConditionalNextActivity)* ';'
 
 ;
 
@@ -97,7 +97,7 @@ DataTypeMapping:
 ;
 
 ConditionalNextActivity:
-	'=>' next=[Activity|FQN] ('if' '[' guard=XExpression ']')?
+	'=>' next=[Activity|FQN] ('if' guard=XExpression)?
 ;
 
 Parameter:
@@ -105,7 +105,7 @@ Parameter:
 ;
 
 ParameterAssignment:
-	name=[Parameter|FQN] '=' '[' value=XExpression ']'
+	name=[Parameter|FQN] '=' value=XExpression
 ;
 
 ParameterInput returns xbase::XExpression:
@@ -119,15 +119,15 @@ ParameterInput returns xbase::XExpression:
  */
 GenerationSelektor returns xbase::XExpression:
 	{GenerationSelektor}
-	'select' ('(' (('tags' tags+=[Tag|ID] (',' tags+=[Tag|ID])*) | '[' expression=XExpression ']') ')' )?
+	'select' ('(' (('tags' tags+=[Tag|ID] (',' tags+=[Tag|ID])*) | expression=XExpression) ')' )?
 ;
 
 OperationParameterAssignment:
-	name=[DataTypeMapping|FQN] '=' '[' value=ParameterInput ']'
+	name=[DataTypeMapping|FQN] '=' value=ParameterInput
 ;
 
 ActivityOperationParameterAssignment:
-	name=[ActivityOperationParameter|FQN] '=' '[' value=ParameterInput ']'
+	name=[ActivityOperationParameter|FQN] '=' value=ParameterInput
 ;
 
 Test:
@@ -154,7 +154,7 @@ VariableDeclaration returns xbase::XVariableDeclaration:
 ;
 
 Expression returns xbase::XExpression:
-	OperationCall | GeneratedValueExpression | '[' XExpression ']'
+	OperationCall | GeneratedValueExpression | XExpression
 ;
 
 GeneratedValueExpression returns xbase::XExpression:
