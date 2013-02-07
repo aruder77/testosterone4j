@@ -4,109 +4,109 @@ package mp3manager {
 		Pflichtfeld, Empty
 	}
 	
-	activityType WorkbenchWindow;
+	activityType WorkbenchWindow
 	
-	activityType View;
+	activityType View
 	 
-	activityType Editor;
+	activityType Editor
 	
-	activityType Popup;
+	activityType Popup
 	
-	type String mappedBy java.lang.String;
+	type String mappedBy java.lang.String
 	
 	datatype StringDT type String {
-		class emptyString value "" Empty;
-		class shortString value "shortString";
-		class longString value "longlonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglongString"; 		
+		class emptyString value "" Empty
+		class shortString value "shortString"
+		class longString value "longlonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglongString" 		
 	} 
 	
 	datatype ErrorStringDT type String {
-		class ok value "OK";
-		class missingValue value "Please enter a value";
+		class ok value "OK"
+		class missingValue value "Please enter a value"
 	}
 	
 	control TextControl { 
-		op setText(String str);
-		op getText : String;
+		op setText(String str)
+		op getText : String
 	}
 	
 	control TreeControl {
-		op doubleClickItem;
+		op doubleClickItem
 	}
 	
 	control Label {
-		op getText : String;
+		op getText : String
 	}
 	
 	activity MainWindow type WorkbenchWindow {
-		op openView => OpenViewDialog; 
-		op findLogicalView => LogicalView;
+		op openView => OpenViewDialog 
+		op findLogicalView => LogicalView
 	}
 	
 	activity LogicalView type View {
 		field tree control TreeControl {
-			doubleClickItem => SongEditor;
+			doubleClickItem => SongEditor
 		}
 	}
 	
 	activity SongEditor identifiedBy "com.siemens.ct.mp3m.ui.editors.ids.Id3DataBindingEditor" type Editor {
 		field title identifiedBy "Id3TagPage.Title_Label" control TextControl tag Pflichtfeld { 
-			setText (str StringDT TextControl.setText.str);
-			getText as StringDT;
+			setText (str StringDT TextControl.setText.str)
+			getText as StringDT
 		}
 		
 		field artist identifiedBy "Id3TagPage.Artist_Label" control TextControl tag Pflichtfeld { 
-			setText (str StringDT TextControl.setText.str);
-			getText as StringDT;
+			setText (str StringDT TextControl.setText.str)
+			getText as StringDT
 		}
 
 		field album identifiedBy "Id3TagPage.Album_Label" control TextControl tag Pflichtfeld { 
-			setText (str StringDT TextControl.setText.str);
-			getText as StringDT;
+			setText (str StringDT TextControl.setText.str)
+			getText as StringDT
 		}
 
 		field track identifiedBy "Id3TagPage.Track_Label" control TextControl {
-			setText (str StringDT TextControl.setText.str);
-			getText as StringDT;
+			setText (str StringDT TextControl.setText.str)
+			getText as StringDT
 		} 
 		
 		field errorMarker identifiedBy "errorMarker" control Label {
-			getText as ErrorStringDT;
+			getText as ErrorStringDT
 		} 
 		
-		op saveAndClose => MainWindow;
+		op saveAndClose => MainWindow
 		
-		op openView(StringDT viewId);
+		op openView(StringDT viewId)
 	}
 	
 	
 	activity OpenViewDialog type Popup {
-		op selectLogicalView;
-		op ok => MainWindow;
-		op cancel => MainWindow;
+		op selectLogicalView
+		op ok => MainWindow
+		op cancel => MainWindow
 	}
 	
 	
 	useCase OpenLogicalView (StringDT param1) initial = MainWindow {
-		activityOperation openView; 
-		activityOperation selectLogicalView;
-		activityOperation ok; 
-		activityOperation findLogicalView;
-		op tree.doubleClickItem;
-		op title.setText;
-		var enteredTitle = generatedValue(SongEditor.title.str);
-		op artist.setText;
-		op track.setText;
+		openView
+		selectLogicalView 
+		ok
+		findLogicalView
+		tree.doubleClickItem
+		title.setText
+		var enteredTitle = generatedValue(SongEditor.title.str)
+		artist.setText
+		track.setText
 
-		var strDT = op title.getText;
-		[junit::framework::Assert::assertEquals(enteredTitle.getValue(), strDT.getValue())]
+		var strDT = op title.getText
+		expr junit::framework::Assert::assertEquals(enteredTitle.getValue(), strDT.getValue())
 		
-		activityOperation saveAndClose;
-		activityOperation findLogicalView;
-		op tree.doubleClickItem;
-		var result = op title.getText;
-		[junit::framework::Assert::assertEquals(enteredTitle.getValue(), result.getValue())]		
+		saveAndClose
+		findLogicalView
+		tree.doubleClickItem
+		var result = op title.getText
+		expr junit::framework::Assert::assertEquals(enteredTitle.getValue(), result.getValue())	
 	}
 	 
-	test OpenLogicalViewTest generator de.msg.xt.mdt.base.SampleTestGenerator useCase OpenLogicalView;
+	test OpenLogicalViewTest generator de.msg.xt.mdt.base.SampleTestGenerator useCase OpenLogicalView
 }
