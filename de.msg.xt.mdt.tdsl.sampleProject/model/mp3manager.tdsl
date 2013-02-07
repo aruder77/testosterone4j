@@ -68,13 +68,13 @@ package mp3manager {
 		field track identifiedBy "Id3TagPage.Track_Label" control TextControl {
 			setText TextControl.setText (str StringDT TextControl.setText.str);
 			getText TextControl.getText as StringDT;
-		}
+		} 
 		
 		field errorMarker identifiedBy "errorMarker" control Label { 
 			getText Label.getText as ErrorStringDT;
 		} 
 		
-		op saveAndClose;
+		op saveAndClose => MainWindow;
 		
 		op openView(StringDT viewId);
 	}
@@ -88,40 +88,25 @@ package mp3manager {
 	
 	
 	useCase OpenLogicalView (StringDT param1) initial = MainWindow {
-		activityOperation MainWindow.openView; 
-		activityOperation OpenViewDialog.selectLogicalView;
-		activityOperation OpenViewDialog.ok;
-		activityOperation MainWindow.findLogicalView;
-		op LogicalView.tree.doubleClickItem;
-		op SongEditor.title.setText;
-		op SongEditor.artist.setText; 
-		op SongEditor.track.setText;
+		activityOperation openView; 
+		activityOperation selectLogicalView;
+		activityOperation ok; 
+		activityOperation findLogicalView;
+		op tree.doubleClickItem;
+		op title.setText;
+		var enteredTitle = generatedValue(SongEditor.title.setText.str);
+		op artist.setText;
+		op track.setText;
+
+		var strDT = op title.getText;
+		[junit::framework::Assert::assertEquals(enteredTitle.getValue(), strDT.getValue())]
 		
-		var strDT = op SongEditor.title.getText;
-		if (strDT.getValue().equals("Hello")) {
-			activityOperation OpenViewDialog.cancel;
-			op SongEditor.title.setText(str = select(tags Pflichtfeld,Empty));
-			op SongEditor.track.setText(str = strDT);
-			op SongEditor.track.setText(str = "Hello, world!");		
-			op SongEditor.track.setText(str = select("Hello"));	
-		}
-		
-		activityOperation SongEditor.openView(viewId=false);
-		activityOperation SongEditor.openView(viewId="Hello, world!");
-		activityOperation SongEditor.openView(viewId=select);
-		activityOperation SongEditor.openView(viewId=select(tags Empty));
-		
-		var genValue = generatedValue(SongEditor.title.setText.str);
-		
-		[junit::framework::Assert::assertEquals("Hello", strDT.getValue())]
+		activityOperation saveAndClose;
+		activityOperation findLogicalView;
+		op tree.doubleClickItem;
+		var result = op title.getText;
+		[junit::framework::Assert::assertEquals(enteredTitle.getValue(), result.getValue())]		
 	}
 	 
-	useCase testUseCase initial = MainWindow {
-		op SongEditor.title.setText;
-		op SongEditor.album.setText;
-		op SongEditor.track.setText;
-		activityOperation SongEditor.saveAndClose;
-	}
-	
 	test OpenLogicalViewTest generator de.msg.xt.mdt.base.SampleTestGenerator useCase OpenLogicalView;
 }

@@ -58,10 +58,9 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 	@Inject extension TypeReferences references
 	
 	@Inject extension FieldNaming
-	@Inject extension FieldExtensions
 	
 	@Inject extension ActivityNaming 
-	@Inject extension ActivityExtensions
+	@Inject extension MetaModelExtensions
 	
 	@Inject extension DataTypeNaming
 	
@@ -499,13 +498,13 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    		acceptor.accept(dataType.toClass(dataType.fullyQualifiedName)).initializeLater([
    			superTypes += dataType.newTypeRef("de.msg.xt.mdt.base.DataType", dataType.newTypeRef(typeof(String)), newTypeRef(equivalenceClass))
    			
-   			annotations += dataType.toAnnotation(typeof(XmlRootElement))
+//   			annotations += dataType.toAnnotation(typeof(XmlRootElement))
    			
 			members += dataType.toField("_value", dataType.type.mappedBy) [
-				annotations += dataType.toAnnotation(typeof(XmlAttribute))
+//				annotations += dataType.toAnnotation(typeof(XmlAttribute))
 			]
 			members += dataType.toField("_equivalenceClass", newTypeRef(equivalenceClass)) [
-				annotations += dataType.toAnnotation(typeof(XmlAttribute))
+//				annotations += dataType.toAnnotation(typeof(XmlAttribute))
 			]
 			
 			members += dataType.toConstructor [
@@ -582,17 +581,13 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    			it.superTypes += useCase.newTypeRef("de.msg.xt.mdt.base.BaseUseCase")
    			it.superTypes += useCase.newTypeRef("java.lang.Runnable")
 
-   			it.annotations += useCase.toAnnotation("javax.xml.bind.annotation.XmlRootElement")
+//   			it.annotations += useCase.toAnnotation("javax.xml.bind.annotation.XmlRootElement")
    			
    			for (inputParam : useCase.inputParameter) {
    				members += inputParam.toField(inputParam.name, inputParam.newTypeRef(inputParam.dataType.class_FQN.toString)) [
-   					it.annotations += inputParam.toAnnotation("javax.xml.bind.annotation.XmlElement")
+//   					it.annotations += inputParam.toAnnotation("javax.xml.bind.annotation.XmlElement")
    				]
    			}
-   			
-   			it.members += useCase.toField("generator", useCase.newTypeRef("de.msg.xt.mdt.base.Generator")) [
-   				it.annotations += useCase.toAnnotation("javax.xml.bind.annotation.XmlTransient")
-   			]
    			
    			it.members += useCase.toConstructor() []
    			it.members += useCase.toConstructor() [

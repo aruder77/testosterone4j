@@ -28,7 +28,7 @@ class TDslCompiler extends XbaseCompiler {
 	
 	@Inject extension DataTypeNaming
 	
-	@Inject extension OperationMappingExtension
+	@Inject extension MetaModelExtensions
 	
 	@Inject extension IQualifiedNameProvider
 	

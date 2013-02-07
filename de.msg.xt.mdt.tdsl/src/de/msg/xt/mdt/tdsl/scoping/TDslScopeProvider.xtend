@@ -14,11 +14,30 @@ import de.msg.xt.mdt.tdsl.tDsl.DataTypeMapping
 import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationCall
 import org.eclipse.xtext.scoping.IScope
 import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationParameterAssignment
+import org.eclipse.xtext.xbase.XBlockExpression
+import de.msg.xt.mdt.tdsl.tDsl.SubUseCaseCall
+import org.eclipse.internal.xtend.expression.ast.IfExpression
+import org.eclipse.xtext.xbase.XIfExpression
+import org.eclipse.xtext.xbase.XVariableDeclaration
+import org.eclipse.xtext.xbase.XExpression
+import java.util.Collections
+import de.msg.xt.mdt.tdsl.tDsl.Activity
+import org.eclipse.xtext.EcoreUtil2
+import de.msg.xt.mdt.tdsl.tDsl.UseCase
+import de.msg.xt.mdt.tdsl.jvmmodel.MetaModelExtensions
+import de.msg.xt.mdt.tdsl.tDsl.OperationMapping
+import java.util.ArrayList
+import org.eclipse.xtext.naming.QualifiedName
+import com.google.common.base.Function
+import de.msg.xt.mdt.tdsl.tDsl.ActivityOperation
+import de.msg.xt.mdt.tdsl.tDsl.GeneratedValueExpression
 
 class TDslScopeProvider extends XbaseScopeProvider {
 	
 	
     @Inject extension IJvmModelAssociations associations
+    
+    @Inject extension MetaModelExtensions
     
 /*    override IScope createLocalVarScopeForJvmOperation(JvmOperation context,
             IScope parentScope) {
@@ -60,9 +79,118 @@ class TDslScopeProvider extends XbaseScopeProvider {
 				default:
 					IScope::NULLSCOPE
 			}
+		} else if (reference == TDslPackage::eINSTANCE.operationCall_Operation || reference == TDslPackage::eINSTANCE.activityOperationCall_Operation) {
+			val XExpression opCall = context as XExpression
+			val lastExpression = opCall.lastExpressionWithNextActivity
+			if (lastExpression == null) {
+				val initialActivity = EcoreUtil2::getContainerOfType(opCall, typeof(UseCase)).initialActivity
+				if (reference == TDslPackage::eINSTANCE.operationCall_Operation) {
+					initialActivity.fieldOperations.calculatesScopes					
+				} else {
+					Scopes::scopeFor(initialActivity.operations)
+				}
+			} else {
+				if (reference == TDslPackage::eINSTANCE.operationCall_Operation) {				
+					val operations = new ArrayList<OperationMapping>
+					for (activity : lastExpression.determineNextActivities) {
+						operations.addAll(activity.fieldOperations)
+					}
+					operations.calculatesScopes
+				} else {
+					val operations = new ArrayList<ActivityOperation>
+					for (activity : lastExpression.determineNextActivities) {
+						operations.addAll(activity.operations)
+					}
+					Scopes::scopeFor(operations)
+					
+				}
+			}
 		} else {
 			super.getScope(context, reference)
 		}
 	}
 	
+	def calculatesScopes(List<OperationMapping> operationMappings) {
+		Scopes::scopeFor(operationMappings, [
+					val OperationMapping opMap = it as OperationMapping
+					QualifiedName::create(opMap.field.name, opMap.name)
+				], IScope::NULLSCOPE) 
+	}
+	
+	def List<OperationMapping> getFieldOperations(Activity activity) {
+		val List<OperationMapping> operations = new ArrayList<OperationMapping>
+		if (activity != null) {
+			for (field : activity.fields) {
+				operations.addAll(field.operations)
+			}		
+		}
+		operations
+	}
+	
+	def XExpression lastExpressionWithNextActivity(XExpression expr) {
+		var XExpression lastStatement
+		val exprBlock = expr.block
+		val index = expr.indexInParentBlock
+		if (index > 0) {
+			lastStatement = exprBlock.expressions.get(index - 1)
+			if (!lastStatement.containsActivitySwitchingOperation) {
+				return lastStatement.lastExpressionWithNextActivity
+			}
+		} else {
+			val parentIndex = exprBlock.indexInParentBlock
+			if (parentIndex == null) {
+				return null
+			}
+			val parentBlock = EcoreUtil2::getContainerOfType(exprBlock.eContainer, typeof(XBlockExpression))
+			return parentBlock?.expressions.get(parentIndex)?.lastExpressionWithNextActivity
+		}
+		return lastStatement	
+	}
+	
+	
+	def Integer getIndexInParentBlock(XExpression expr) {
+		var EObject currentExpr = expr
+		var parent = expr.eContainer
+		while (!(parent instanceof XBlockExpression) && parent != null) {
+			currentExpr = parent
+			parent = parent.eContainer
+		}
+		if (parent == null) {
+			return null
+		}
+		val index = (parent as XBlockExpression).expressions.indexOf(currentExpr)
+		return index
+	}
+	
+	def containsActivitySwitchingOperation(XExpression expr) {
+		if (expr instanceof OperationCall || expr instanceof ActivityOperationCall) {
+			true
+		} else {
+			!(EcoreUtil2::getAllContentsOfType(expr, typeof(OperationCall)).empty && EcoreUtil2::getAllContentsOfType(expr, typeof(ActivityOperationCall)).empty)
+		} 
+	}
+	
+	
+	def List<Activity> determineNextActivities(XExpression expr) {
+		switch (expr) {
+			OperationCall:
+				if (expr.operation.nextActivities.empty) {
+					Collections::singletonList(expr.operation.field.parentActivity)
+				} else { 
+					expr.operation.nextActivities.map[e | e.next]	
+				}
+			ActivityOperationCall:
+				if (expr.operation?.nextActivities.empty) {
+					Collections::singletonList(expr.operation.activity)
+				} else { 
+					expr.operation.nextActivities.map[e | e.next]
+				}
+			SubUseCaseCall:
+				Collections::singletonList(expr.useCase.initialActivity)
+			XIfExpression:
+				expr.then.determineNextActivities
+			XVariableDeclaration:
+				expr.right.determineNextActivities
+		}
+	}
 }
