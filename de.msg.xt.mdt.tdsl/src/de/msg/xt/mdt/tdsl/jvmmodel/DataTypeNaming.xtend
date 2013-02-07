@@ -10,10 +10,10 @@ class DataTypeNaming {
 	@Inject extension IQualifiedNameProvider
 	
 	def QualifiedName class_FQN(DataType dataType) {
-		dataType.fullyQualifiedName
+		dataType?.fullyQualifiedName
 	}
 	
 	def String equivalenceClass_name(DataType dataType) {
-		dataType.class_FQN.toString + "EquivalenceClass"
+		dataType?.class_FQN?.toString + "EquivalenceClass"
 	}
 }

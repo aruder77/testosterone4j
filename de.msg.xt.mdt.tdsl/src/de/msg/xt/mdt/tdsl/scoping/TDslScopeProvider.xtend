@@ -31,6 +31,7 @@ import org.eclipse.xtext.naming.QualifiedName
 import com.google.common.base.Function
 import de.msg.xt.mdt.tdsl.tDsl.ActivityOperation
 import de.msg.xt.mdt.tdsl.tDsl.GeneratedValueExpression
+import de.msg.xt.mdt.tdsl.tDsl.Field
 
 class TDslScopeProvider extends XbaseScopeProvider {
 	
@@ -105,6 +106,14 @@ class TDslScopeProvider extends XbaseScopeProvider {
 					
 				}
 			}
+		} else if (reference == TDslPackage::eINSTANCE.operationMapping_Name) {
+			var Field field 
+			if (context instanceof OperationMapping) {
+				field = (context as OperationMapping).field
+			} else {
+				field = context as Field
+			}
+			Scopes::scopeFor(field.control.operations)
 		} else {
 			super.getScope(context, reference)
 		}
@@ -113,7 +122,11 @@ class TDslScopeProvider extends XbaseScopeProvider {
 	def calculatesScopes(List<OperationMapping> operationMappings) {
 		Scopes::scopeFor(operationMappings, [
 					val OperationMapping opMap = it as OperationMapping
-					QualifiedName::create(opMap.field.name, opMap.name)
+					if (opMap?.name?.name != null) {
+						QualifiedName::create(opMap.field.name, opMap.name.name)
+					} else {
+						QualifiedName::EMPTY
+					}
 				], IScope::NULLSCOPE) 
 	}
 	

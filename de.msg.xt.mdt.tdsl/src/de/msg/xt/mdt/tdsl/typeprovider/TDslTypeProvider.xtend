@@ -47,8 +47,11 @@ class TDslTypeProvider extends XbaseTypeProvider {
   	}
   	
   	def dispatch type(GeneratedValueExpression expr, JvmTypeReference typeRef, boolean isRawType) {
-  		val dataTypeName = expr.param.datatype.class_FQN.toString
-  		typeReferences.getTypeForName(dataTypeName, expr)
+  		val dataTypeName = expr?.param?.datatype?.class_FQN?.toString
+  		if (dataTypeName == null)
+  			typeReferences.getTypeForName(Void::TYPE, expr)
+  		else 
+  			typeReferences.getTypeForName(dataTypeName, expr)
   	}
   	
 	def dispatch type(ActivityOperationCall opCall, 

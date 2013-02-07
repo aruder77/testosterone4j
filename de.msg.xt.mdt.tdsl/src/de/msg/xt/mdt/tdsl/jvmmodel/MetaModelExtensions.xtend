@@ -47,7 +47,7 @@ class MetaModelExtensions {
 	
 	def findOperationMappingForOperation(Field field, Operation operation) {
 		for (op : field.operations) {
-			if (op.operation == operation) {
+			if (op.name == operation) {
 				return op
 			}
 		}

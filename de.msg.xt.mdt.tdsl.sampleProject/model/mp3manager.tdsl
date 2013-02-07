@@ -45,33 +45,33 @@ package mp3manager {
 	
 	activity LogicalView type View {
 		field tree control TreeControl {
-			doubleClickItem TreeControl.doubleClickItem => SongEditor;
+			doubleClickItem => SongEditor;
 		}
 	}
 	
 	activity SongEditor identifiedBy "com.siemens.ct.mp3m.ui.editors.ids.Id3DataBindingEditor" type Editor {
 		field title identifiedBy "Id3TagPage.Title_Label" control TextControl tag Pflichtfeld { 
-			setText TextControl.setText (str StringDT TextControl.setText.str);
-			getText TextControl.getText as StringDT;
+			setText (str StringDT TextControl.setText.str);
+			getText as StringDT;
 		}
 		
 		field artist identifiedBy "Id3TagPage.Artist_Label" control TextControl tag Pflichtfeld { 
-			setText TextControl.setText (str StringDT TextControl.setText.str);
-			getText TextControl.getText as StringDT;
+			setText (str StringDT TextControl.setText.str);
+			getText as StringDT;
 		}
 
 		field album identifiedBy "Id3TagPage.Album_Label" control TextControl tag Pflichtfeld { 
-			setText TextControl.setText (str StringDT TextControl.setText.str);
-			getText TextControl.getText as StringDT;
+			setText (str StringDT TextControl.setText.str);
+			getText as StringDT;
 		}
 
 		field track identifiedBy "Id3TagPage.Track_Label" control TextControl {
-			setText TextControl.setText (str StringDT TextControl.setText.str);
-			getText TextControl.getText as StringDT;
+			setText (str StringDT TextControl.setText.str);
+			getText as StringDT;
 		} 
 		
-		field errorMarker identifiedBy "errorMarker" control Label { 
-			getText Label.getText as ErrorStringDT;
+		field errorMarker identifiedBy "errorMarker" control Label {
+			getText as ErrorStringDT;
 		} 
 		
 		op saveAndClose => MainWindow;
@@ -94,7 +94,7 @@ package mp3manager {
 		activityOperation findLogicalView;
 		op tree.doubleClickItem;
 		op title.setText;
-		var enteredTitle = generatedValue(SongEditor.title.setText.str);
+		var enteredTitle = generatedValue(SongEditor.title.str);
 		op artist.setText;
 		op track.setText;
 

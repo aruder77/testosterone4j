@@ -54,7 +54,7 @@ class TDslCompiler extends XbaseCompiler {
 					}	    			
     				append(
 						'''
-						((«(field.eContainer as Activity).name»)activity).«field.activityControlDelegationMethodName(expr.operation.operation)»(''')
+						((«(field.eContainer as Activity).name»)activity).«field.activityControlDelegationMethodName(expr.operation.name)»(''')
 					appendParameter(expr, it)
 					append(");")
 				}
@@ -174,7 +174,7 @@ class TDslCompiler extends XbaseCompiler {
  		switch (expr) {
  			OperationCall: {
      			val field = expr.operation.eContainer as Field
-    			append('''((«(field.eContainer as Activity).name»)activity).«field.activityControlDelegationMethodName(expr.operation.operation)»()''') 		
+    			append('''((«(field.eContainer as Activity).name»)activity).«field.activityControlDelegationMethodName(expr.operation.name)»()''') 		
 			}
 			SubUseCaseCall: {
 				append("should not be possible!")

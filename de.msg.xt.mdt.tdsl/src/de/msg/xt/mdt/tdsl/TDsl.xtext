@@ -88,7 +88,7 @@ TagWithCondition:
 ;
 
 OperationMapping:
-	name=ID operation=[Operation|FQN] ('(' (dataTypeMappings+=DataTypeMapping) (',' dataTypeMappings+=DataTypeMapping)* ')')? ('as' dataType=[DataType|FQN])? ('guard' guard=XExpression)?  (nextActivities+=ConditionalNextActivity)* ';'
+	name=[Operation|ID] ('(' (dataTypeMappings+=DataTypeMapping) (',' dataTypeMappings+=DataTypeMapping)* ')')? ('as' dataType=[DataType|FQN])? ('guard' guard=XExpression)?  (nextActivities+=ConditionalNextActivity)* ';'
 
 ;
 

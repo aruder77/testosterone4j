@@ -663,7 +663,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 		val field = opCall.operation.eContainer as Field
 		app.append(
 			'''
-			«currentActivity.localVariable_name(activityIndex)».«field.activityControlDelegationMethodName(opCall.operation.operation)»();
+			«currentActivity.localVariable_name(activityIndex)».«field.activityControlDelegationMethodName(opCall.operation.name)»();
 			'''
 		)
 		if (!opCall.operation.nextActivities.empty) {
