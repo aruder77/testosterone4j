@@ -22,13 +22,11 @@ import de.msg.xt.mdt.tdsl.tDsl.GeneratedValueExpression
 
 class TDslCompiler extends XbaseCompiler {
 	
-	@Inject extension FieldNaming
-	
-	@Inject extension UseCaseNaming
-	
-	@Inject extension DataTypeNaming
+	@Inject extension NamingExtensions
 	
 	@Inject extension MetaModelExtensions
+	
+	@Inject extension UtilExtensions
 	
 	@Inject extension IQualifiedNameProvider
 	
@@ -93,9 +91,9 @@ class TDslCompiler extends XbaseCompiler {
     
 	def generateParameters(OperationCall call, ITreeAppendable appendable) { 
 		for (mapping : call.operation.dataTypeMappings) {
-			val assignment = findAssignment(call, mapping.controlOperationParameter)
+			val assignment = findAssignment(call, mapping.name)
 			val dataTypeName = mapping.datatype.class_FQN.toString
-			appendable.append('''«dataTypeName» «mapping.fullyQualifiedName.toString.toFieldName» = ''')
+			appendable.append('''«dataTypeName» «mapping?.fullyQualifiedName.toString.toFieldName» = ''')
 			if (assignment == null) {
 				appendable.append('''getOrGenerateValue(«dataTypeName».class, "«mapping.fullyQualifiedName»")''')
 			} else {
@@ -136,18 +134,13 @@ class TDslCompiler extends XbaseCompiler {
     	} 
 	}
 	
-	def toFieldName(String string) { 
-		string.replace('.', '_')	
-	}
-
-
     
     def appendParameter(ActivityOperationCall call, ITreeAppendable appendable) {
     	appendable.append('''«FOR parameter : call.operation.params SEPARATOR ', '»«parameter.fullyQualifiedName.toString.toFieldName»«ENDFOR»''')
     }
     
 	def appendParameter(OperationCall call, ITreeAppendable appendable) { 
-    	appendable.append('''«FOR parameter : call.operation.dataTypeMappings SEPARATOR ', '»«parameter.fullyQualifiedName.toString.toFieldName»«ENDFOR»''')
+    	appendable.append('''«FOR parameter : call.operation.dataTypeMappings SEPARATOR ', '»«parameter?.fullyQualifiedName?.toString?.toFieldName»«ENDFOR»''')
 	}
 	
 	def findAssignment(ActivityOperationCall call, ActivityOperationParameter param) {
@@ -161,7 +154,7 @@ class TDslCompiler extends XbaseCompiler {
 
 	def findAssignment(OperationCall call, ControlOperationParameter param) {
 		for (assignment : call.paramAssignment) {
-			if (assignment.name.controlOperationParameter.equals(param)) {
+			if (assignment.name.name.equals(param)) {
 				return assignment
 			}
 		}
@@ -204,7 +197,9 @@ class TDslCompiler extends XbaseCompiler {
 				append(''')''')
 			}
 			GeneratedValueExpression: {
-				append(expr.param.fullyQualifiedName.toString.toFieldName)
+				val param = expr.param
+				val fqn = param.fullyQualifiedName
+				append(fqn?.toString?.toFieldName)
 			}
 			default:
 				super.internalToConvertedExpression(expr, it)

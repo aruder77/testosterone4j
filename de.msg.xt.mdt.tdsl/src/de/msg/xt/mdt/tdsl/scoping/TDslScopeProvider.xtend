@@ -114,6 +114,34 @@ class TDslScopeProvider extends XbaseScopeProvider {
 				field = context as Field
 			}
 			Scopes::scopeFor(field.control.operations)
+		} else if (reference == TDslPackage::eINSTANCE.dataTypeMapping_Name) {
+			var OperationMapping opMap
+			if (context instanceof OperationMapping) {
+				opMap = context as OperationMapping
+			} else if (context instanceof DataTypeMapping) {
+				val dataTypeMap = context as DataTypeMapping
+				opMap = dataTypeMap?.operationMapping
+			}
+			val params = opMap?.name?.params
+			if (params != null)
+				Scopes::scopeFor(params)
+			else
+				IScope::NULLSCOPE
+		} else if (reference == TDslPackage::eINSTANCE.generatedValueExpression_Param) {
+			if (context instanceof GeneratedValueExpression) {
+				val lastExpression = (context as XExpression).lastExpressionWithNextActivity
+				if (lastExpression instanceof OperationCall) {
+					val opCall = lastExpression as OperationCall
+					val dataTypeMappings = opCall?.operation?.dataTypeMappings
+					if (dataTypeMappings != null)
+						Scopes::scopeFor(dataTypeMappings, [
+							val DataTypeMapping dtMap = it as DataTypeMapping
+							QualifiedName::create(dtMap.name.name)
+						], IScope::NULLSCOPE)
+					else 
+						IScope::NULLSCOPE
+				}
+			}
 		} else {
 			super.getScope(context, reference)
 		}
@@ -155,7 +183,7 @@ class TDslScopeProvider extends XbaseScopeProvider {
 				return null
 			}
 			val parentBlock = EcoreUtil2::getContainerOfType(exprBlock.eContainer, typeof(XBlockExpression))
-			return parentBlock?.expressions.get(parentIndex)?.lastExpressionWithNextActivity
+			return parentBlock?.expressions?.get(parentIndex)?.lastExpressionWithNextActivity
 		}
 		return lastStatement	
 	}
@@ -169,7 +197,7 @@ class TDslScopeProvider extends XbaseScopeProvider {
 			parent = parent.eContainer
 		}
 		if (parent == null) {
-			return null
+			return -1
 		}
 		val index = (parent as XBlockExpression).expressions.indexOf(currentExpr)
 		return index

@@ -12,6 +12,8 @@ import org.eclipse.xtext.xbase.XBlockExpression
 import org.eclipse.xtext.EcoreUtil2
 import de.msg.xt.mdt.tdsl.tDsl.OperationMapping
 import de.msg.xt.mdt.tdsl.tDsl.ActivityOperation
+import de.msg.xt.mdt.tdsl.tDsl.DataTypeMapping
+import de.msg.xt.mdt.tdsl.tDsl.PackageDeclaration
 
 /**
  * Convenience meta-model extensions. Please order by Metamodel-Class and alphabetically!
@@ -27,11 +29,21 @@ class MetaModelExtensions {
 		if (activity.uniqueId == null) activity.fullyQualifiedName else activity.uniqueId
 	}	
 	
+	def getPackageDeclaration(Activity activity) {
+		activity.eContainer as PackageDeclaration
+	}
+	
 	
 	// ActivityOperation
 	
 	def getActivity(ActivityOperation operation) {
 		operation.eContainer as Activity
+	}
+	
+	
+	// DataTypeMapping
+	def getOperationMapping(DataTypeMapping dataTypeMapping) {
+		dataTypeMapping.eContainer as OperationMapping
 	}
 	
 	

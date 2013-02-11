@@ -57,18 +57,9 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 	
 	@Inject extension TypeReferences references
 	
-	@Inject extension FieldNaming
-	
-	@Inject extension ActivityNaming 
+	@Inject extension NamingExtensions 
 	@Inject extension MetaModelExtensions
 	
-	@Inject extension DataTypeNaming
-	
-	@Inject extension UseCaseNaming
-	
-	@Inject extension PackageDeclarationNaming
-	
-	@Inject extension ControlNaming
 	
 	@Inject
 	XbaseCompiler xbaseCompiler
@@ -239,8 +230,8 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 			val opMapping = field.findOperationMappingForOperation(operation)
 			if (opMapping != null) {
 				for (dataTypeMapping : opMapping.dataTypeMappings) {
-					if (dataTypeMapping.controlOperationParameter != null && dataTypeMapping.datatype != null) {
-						it.parameters += dataTypeMapping.toParameter(dataTypeMapping.controlOperationParameter.name, dataTypeMapping.newTypeRef(dataTypeMapping.datatype.class_FQN.toString))
+					if (dataTypeMapping.name != null && dataTypeMapping.datatype != null) {
+						it.parameters += dataTypeMapping.toParameter(dataTypeMapping.name.name, dataTypeMapping.newTypeRef(dataTypeMapping.datatype.class_FQN.toString))
 					}
 				}
 			} else {
@@ -270,7 +261,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    	
    	def String mapParameters(Field field, Operation operation) {
 		val opMapping = field.findOperationMappingForOperation(operation)
-		'''«FOR dataTypeMapping : opMapping.dataTypeMappings SEPARATOR ','»«dataTypeMapping?.controlOperationParameter?.name».getValue()«ENDFOR»'''
+		'''«FOR dataTypeMapping : opMapping.dataTypeMappings SEPARATOR ','»«dataTypeMapping?.name?.name».getValue()«ENDFOR»'''
    	}
    	
    	def JvmTypeReference returnTypeFieldOperation(Field field, Operation operation) {

@@ -1,7 +1,15 @@
 package de.msg.xt.mdt.tdsl.typeprovider
 
+import com.google.inject.Singleton
+import de.msg.xt.mdt.tdsl.jvmmodel.NamingExtensions
+import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationCall
+import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationParameterAssignment
+import de.msg.xt.mdt.tdsl.tDsl.GeneratedValueExpression
+import de.msg.xt.mdt.tdsl.tDsl.GenerationSelektor
 import de.msg.xt.mdt.tdsl.tDsl.OperationCall
 import de.msg.xt.mdt.tdsl.tDsl.OperationMapping
+import de.msg.xt.mdt.tdsl.tDsl.OperationParameterAssignment
+import de.msg.xt.mdt.tdsl.tDsl.SubUseCaseCall
 import de.msg.xt.mdt.tdsl.tDsl.TDslPackage$Literals
 import javax.inject.Inject
 import org.eclipse.emf.ecore.EReference
@@ -9,21 +17,13 @@ import org.eclipse.xtext.common.types.JvmTypeReference
 import org.eclipse.xtext.common.types.util.TypeReferences
 import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder
 import org.eclipse.xtext.xbase.typing.XbaseTypeProvider
-import com.google.inject.Singleton
-import de.msg.xt.mdt.tdsl.tDsl.SubUseCaseCall
-import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationCall
-import de.msg.xt.mdt.tdsl.jvmmodel.DataTypeNaming
-import de.msg.xt.mdt.tdsl.tDsl.GenerationSelektor
-import de.msg.xt.mdt.tdsl.tDsl.OperationParameterAssignment
-import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationParameterAssignment
-import de.msg.xt.mdt.tdsl.tDsl.GeneratedValueExpression
 
 @Singleton
 class TDslTypeProvider extends XbaseTypeProvider {
 	
 	@Inject TypeReferences typeReferences
 	
-	@Inject extension DataTypeNaming
+	@Inject extension NamingExtensions
 	
 	@Inject JvmTypesBuilder typesBuilder
 
