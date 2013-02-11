@@ -21,8 +21,9 @@ public class SWTBotMP3ActivityAdapter implements mp3manager.ActivityAdapter {
         SWTBotLabel swtBotLabel;
 
         public static SWTBotLabelControl findControl(Object context, String id) {
-            System.out.println("Looking for Label control " + id + " in context " + context);
-            return new SWTBotLabelControl(((SWTBot) context).labelWithId(id));
+            ActivityContext actContext = (ActivityContext) context;
+            System.out.println("Looking for Label control " + id + " in context " + actContext.getContext());
+            return new SWTBotLabelControl(actContext.getBot().labelWithId(id));
         }
 
         public SWTBotLabelControl(SWTBotLabel swtBotLabel) {
@@ -39,23 +40,28 @@ public class SWTBotMP3ActivityAdapter implements mp3manager.ActivityAdapter {
     private static final class SWTBotTextControl implements TextControl {
 
         SWTBotText swtBotText;
+        String id;
 
         public static SWTBotTextControl findControl(Object context, String id) {
-            System.out.println("Looking for Text control " + id + " in context " + context);
-            return new SWTBotTextControl(((SWTBot) context).textWithId(id));
+            ActivityContext actContext = (ActivityContext) context;
+            System.out.println("Looking for Text control " + id + " in context " + actContext.getContext());
+            return new SWTBotTextControl(id, actContext.getBot().textWithId(id));
         }
 
-        public SWTBotTextControl(SWTBotText swtBotText) {
+        public SWTBotTextControl(String id, SWTBotText swtBotText) {
+            this.id = id;
             this.swtBotText = swtBotText;
         }
 
         @Override
         public void setText(String str) {
+            System.out.println("TextControl[" + this.id + "].setText(\"" + str + "\")");
             this.swtBotText.setText(str);
         }
 
         @Override
         public String getText() {
+            System.out.println("TextControl[" + this.id + "].getText()");
             return this.swtBotText.getText();
         }
     }
@@ -65,7 +71,8 @@ public class SWTBotMP3ActivityAdapter implements mp3manager.ActivityAdapter {
         SWTBotTree swtBotTree;
 
         public static SWTBotTreeControl findControl(Object context, String id) {
-            return new SWTBotTreeControl(((SWTBot) context).tree());
+            ActivityContext actContext = (ActivityContext) context;
+            return new SWTBotTreeControl(actContext.getBot().tree());
         }
 
         public SWTBotTreeControl(SWTBotTree tree) {
@@ -86,14 +93,13 @@ public class SWTBotMP3ActivityAdapter implements mp3manager.ActivityAdapter {
         if ("mp3manager.OpenViewDialog".equals(id)) {
             SWTBot bot = new SWTBot();
             SWTBotShell shell = bot.shell("Show View");
-            return shell;
+            return new ActivityContext(shell, id, shell.bot());
         } else if ("Editor".equals(type)) {
             SWTWorkbenchBot bot = new SWTWorkbenchBot();
             SWTBotEditor editor = bot.editorById(id);
-            SWTBot editorBot = editor.bot();
-            return editorBot;
+            return new ActivityContext(editor, id, editor.bot());
         }
-        return new SWTBot();
+        return new ActivityContext(new SWTWorkbenchBot(), id, new SWTBot());
     }
 
     // @Override
@@ -126,23 +132,30 @@ public class SWTBotMP3ActivityAdapter implements mp3manager.ActivityAdapter {
     @Override
     public Object performOperation(String id, String type, Object contextObject, String operationName, final Object[] parameters) {
         Object returnContext = null;
+        ActivityContext actContext = (ActivityContext) contextObject;
+        System.out.println("Performing operation[id='" + id + "', type='" + type + "', operationName='" + operationName + "']");
         if ("mp3manager.MainWindow".equals(id)) {
             if ("openView".equals(operationName)) {
                 MainMenu.window().click().menu("Open View").click().menu("Other...").click();
                 SWTBot bot = new SWTBot();
                 SWTBotShell shell = bot.shell("Show View");
-                returnContext = shell;
+                returnContext = new ActivityContext(shell, shell.getId(), shell.bot());
             } else if ("findLogicalView".equals(operationName)) {
                 SWTWorkbenchBot workbenchbot = new SWTWorkbenchBot();
                 SWTBotView viewBot = workbenchbot.viewByTitle("Logical View");
-                returnContext = viewBot.bot();
+                returnContext = new ActivityContext(viewBot, viewBot.getViewReference().getId(), viewBot.bot());
             }
         } else if ("mp3manager.OpenViewDialog".equals(id)) {
             if ("selectLogicalView".equals(operationName)) {
-                SWTBotTree tree = ((SWTBotShell) contextObject).bot().tree();
+                SWTBotTree tree = (actContext.getBot().tree());
                 tree.expandNode("MP3 Manager (Virtual)", false).getNode("Logical View").select();
             } else if ("ok".equals(operationName)) {
-                ((SWTBotShell) contextObject).bot().button("OK").click();
+                actContext.getBot().button("OK").click();
+            }
+        } else if ("com.siemens.ct.mp3m.ui.editors.ids.Id3DataBindingEditor".equals(id)) {
+            if ("saveAndClose".equals(operationName)) {
+                SWTBotEditor editor = (SWTBotEditor) actContext.getContext();
+                editor.saveAndClose();
             }
         }
         return returnContext;
@@ -167,5 +180,34 @@ public class SWTBotMP3ActivityAdapter implements mp3manager.ActivityAdapter {
     @Override
     public Label getLabel(Object contextObject, String controlName) {
         return SWTBotLabelControl.findControl(contextObject, controlName);
+    }
+
+    public static class ActivityContext {
+
+        Object context;
+        String id;
+        SWTBot bot;
+
+        public ActivityContext(Object context, String id, SWTBot bot) {
+            this.context = context;
+            this.id = id;
+            this.bot = bot;
+        }
+
+        public Object getContext() {
+            return this.context;
+        }
+
+        public SWTBot getBot() {
+            return this.bot;
+        }
+
+        public void setBot(SWTBot bot) {
+            this.bot = bot;
+        }
+
+        public String getId() {
+            return this.id;
+        }
     }
 }

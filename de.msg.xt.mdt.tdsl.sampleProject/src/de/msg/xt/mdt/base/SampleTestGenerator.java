@@ -5,15 +5,20 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.Stack;
+import java.util.logging.Logger;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class SampleTestGenerator implements Generator {
+
+    public static final Logger LOG = Logger.getLogger(SampleTestGenerator.class.getName());
 
     Map<String, Stack<Object>> remainingValuesPerId = new HashMap<String, Stack<Object>>();
 
@@ -45,7 +50,9 @@ public class SampleTestGenerator implements Generator {
             if (remainingValues == null) {
                 this.unsatisfiedCoverageIds.add(id);
                 remainingValues = new Stack<Object>();
-                remainingValues.addAll(Arrays.asList(getEquivalenceClasses(dataType)));
+                List<Object> list = Arrays.asList(getEquivalenceClasses(dataType));
+                Collections.shuffle(list, new Random(System.currentTimeMillis()));
+                remainingValues.addAll(list);
                 this.remainingValuesPerId.put(id, remainingValues);
             }
             EquivalenceClass equivalenceClass = (EquivalenceClass) remainingValues.pop();
@@ -58,6 +65,7 @@ public class SampleTestGenerator implements Generator {
         } catch (InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
         }
+        LOG.fine("generatedValue[id=\"" + id + "\"]:" + dataType.getValue());
         return dataType;
     }
 

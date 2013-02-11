@@ -134,7 +134,7 @@ Test:
 ;
 
 UseCase:
-	'useCase' name=ID ('(' inputParameter+=Parameter (',' inputParameter+=Parameter)* ')')? 'initial' '=' initialActivity=[Activity|FQN]
+	'useCase' name=ID ('(' inputParameter+=Parameter (',' inputParameter+=Parameter)* ')')? 'initial' initialActivity=[Activity|FQN]
 		block=UseCaseBlock
 ;
 
@@ -153,7 +153,7 @@ VariableDeclaration returns xbase::XVariableDeclaration:
 ;
 
 Expression returns xbase::XExpression:
-	'op' OperationCall | GeneratedValueExpression | XExpression
+	OperationCall | GeneratedValueExpression | XExpression
 ;
 
 GeneratedValueExpression returns xbase::XExpression:
@@ -180,12 +180,12 @@ MFQN:
 
 OperationCall returns xbase::XExpression:
 	{OperationCall}
-	operation=[OperationMapping|MFQN] ('(' (paramAssignment+=OperationParameterAssignment) (',' paramAssignment+=OperationParameterAssignment)* ')')?
+	'op' operation=[OperationMapping|MFQN] ('(' (paramAssignment+=OperationParameterAssignment) (',' paramAssignment+=OperationParameterAssignment)* ')')?
 ;
 
 ActivityOperationCall returns xbase::XExpression:
 	{ActivityOperationCall}
-	operation=[ActivityOperation|ID] ('(' (paramAssignment+=ActivityOperationParameterAssignment) (',' paramAssignment+=ActivityOperationParameterAssignment)* ')')?
+	'aop' operation=[ActivityOperation|ID] ('(' (paramAssignment+=ActivityOperationParameterAssignment) (',' paramAssignment+=ActivityOperationParameterAssignment)* ')')?
 ;
 
 SubUseCaseCall returns xbase::XExpression:

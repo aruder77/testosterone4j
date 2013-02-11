@@ -16,7 +16,7 @@ public class TextMP3ActivityAdapter implements mp3manager.ActivityAdapter {
         return new TextControl() {
             @Override
             public void setText(final String str) {
-                System.out.println(contextObject + ".TextControl[" + controlName + "].setText(" + "str = " + str + ")");
+                System.out.println(contextObject + ".TextControl[" + controlName + "].setText(" + "str = \"" + str + "\")");
             }
 
             @Override
@@ -29,9 +29,9 @@ public class TextMP3ActivityAdapter implements mp3manager.ActivityAdapter {
 
     @Override
     public Object performOperation(String id, String type, Object contextObject, String operationName, final Object[] parameters) {
-        System.out.println(id + "." + operationName + "(");
+        System.out.print(id + "." + operationName + "(");
         for (Object o : parameters) {
-            System.out.println(o.toString() + ", ");
+            System.out.print("\"" + o.toString() + "\", ");
         }
         System.out.println(")");
         return contextObject;

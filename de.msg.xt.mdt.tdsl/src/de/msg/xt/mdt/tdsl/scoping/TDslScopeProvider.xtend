@@ -100,7 +100,9 @@ class TDslScopeProvider extends XbaseScopeProvider {
 				} else {
 					val operations = new ArrayList<ActivityOperation>
 					for (activity : lastExpression.determineNextActivities) {
-						operations.addAll(activity.operations)
+						if (activity?.operations != null) {
+							operations.addAll(activity.operations)
+						}
 					}
 					Scopes::scopeFor(operations)
 					

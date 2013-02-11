@@ -74,7 +74,7 @@ class NamingExtensions {
 	}
 	
 	def String getFieldGetterName(Field field) {
-		"get" + field.name.toFirstUpper + field.control.name.toFirstUpper
+		"get" + field?.name?.toFirstUpper + field?.control?.name?.toFirstUpper
 	}
 	
 

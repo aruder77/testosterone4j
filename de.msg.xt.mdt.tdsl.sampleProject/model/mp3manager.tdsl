@@ -25,6 +25,11 @@ package mp3manager {
 		class missingValue value "Please enter a value"
 	}
 	
+	datatype TrackDT type String {
+		class emptyTrack value "" 
+		class realTrack value "5"
+	}
+	
 	control TextControl { 
 		op setText(String str)
 		op String getText
@@ -66,8 +71,8 @@ package mp3manager {
 		}
 
 		field track identifiedBy "Id3TagPage.Track_Label" control TextControl {
-			op setText (StringDT str)
-			op StringDT getText
+			op setText (TrackDT str)
+			op TrackDT getText
 		} 
 		
 		field errorMarker identifiedBy "errorMarker" control Label {
@@ -87,26 +92,21 @@ package mp3manager {
 	}
 	
 	
-	useCase OpenLogicalView (StringDT param1) initial = MainWindow {
-		openView
-		selectLogicalView 
-		ok
-		findLogicalView
-		tree.doubleClickItem
+	useCase OpenLogicalView initial MainWindow {
+		aop openView
+		aop selectLogicalView 
+		aop ok
+		aop findLogicalView
+		op tree.doubleClickItem
 		
-		title.setText
+		op track.setText
 		var enteredTitle = generatedValue(str)
-		artist.setText
-		track.setText
 
-		var strDT = op title.getText
-		expr junit::framework::Assert::assertEquals(enteredTitle.getValue(), strDT.getValue())
-		
-		saveAndClose
-		findLogicalView
-		tree.doubleClickItem
-		var result = op title.getText
-		expr junit::framework::Assert::assertEquals(enteredTitle.getValue(), result.getValue())	
+		aop saveAndClose
+		aop findLogicalView
+		op tree.doubleClickItem
+		var result = op track.getText
+//		expr junit::framework::Assert::assertEquals(enteredTitle.getValue(), result.getValue())	
 	}
 	 
 	test OpenLogicalViewTest generator de.msg.xt.mdt.base.SampleTestGenerator useCase OpenLogicalView
