@@ -1,9 +1,13 @@
 package mp3manager {
 	
-	import controls.*
+	import swtcontrols.*
 	import types.*
 	import mp3manager.datatypes.*
 	import mp3manager.activities.*
+	
+	SUT MP3MangerApp using controls {
+		Label, TextControl, TreeControl
+	}
 	
 	useCase OpenView(StringDT id) initial MainWindow {
 		openView

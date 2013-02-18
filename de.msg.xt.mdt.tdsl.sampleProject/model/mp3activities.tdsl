@@ -1,5 +1,5 @@
-package mp3manager.activities {
-	import controls.*
+package mp3manager.activities for mp3manager.MP3MangerApp {
+	import swtcontrols.*
 	import types.*
 	import mp3manager.datatypes.*
 	

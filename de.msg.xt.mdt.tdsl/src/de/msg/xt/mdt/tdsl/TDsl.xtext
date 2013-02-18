@@ -9,7 +9,7 @@ TestModel:
 ;
 
 PackageDeclaration:
-    'package' name=QualifiedName '{'
+    'package' name=QualifiedName ('for' sutRef=[SUT|FQN])? '{'
     	(imports+=Import)*
     	(elements+=Element)*
     '}';
@@ -23,7 +23,13 @@ FqnWithWildCard:
 ;
     
 Element:
-	Activity | UseCase | Control | Type | DataType | Test | TagsDeclaration | ActivityType
+	Activity | UseCase | Control | Type | DataType | Test | TagsDeclaration | ActivityType | SUT
+;
+
+SUT:
+	'SUT' name=ID 'using' 'controls' '{'
+		control+=[Control|FQN] (',' controls+=[Control|FQN])*
+	'}'
 ;
 
 Type:
