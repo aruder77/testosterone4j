@@ -129,8 +129,7 @@ package mp3manager {
 		var errorLabel = op errorMarker.getText
 		 
 		if (enteredComment.equivalenceClass == StringDTEquivalenceClass::emptyString) { 
-			[ System::out.println("Hello") ]
-//			[ org::junit::Assert::assertEquals("", errorLabel.getValue()) ]
+			[ org::junit::Assert::assertEquals("Please enter a value", enteredTrack.getValue()) ]
 		}
 
 		saveAndClose

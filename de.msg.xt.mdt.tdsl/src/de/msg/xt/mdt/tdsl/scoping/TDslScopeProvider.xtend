@@ -63,7 +63,10 @@ class TDslScopeProvider extends XbaseScopeProvider {
 						}						
 					}
 				}
-				val pScope = new JvmFeatureScope(parentScope, "paramScope" + useCase.name, localParamVars)
+//				val pScope = new JvmFeatureScope(parentScope, "paramScope" + useCase.name, localParamVars)
+				var IScope pScope = parentScope
+				if (scopeContext.canSpawnForContainer())
+					pScope = createLocalVarScope(parentScope, scopeContext.spawnForContainer());
 				
 				val localVars = new ArrayList<XExpression>()
 				val statementLine = EcoreUtil2::getContainerOfType(context, typeof(StatementLine))
@@ -75,6 +78,8 @@ class TDslScopeProvider extends XbaseScopeProvider {
 					}
 				}
 				return Scopes::scopeFor(localVars, pScope)
+			} else if (context instanceof UseCase) {
+				
 			}
 		}
 		
