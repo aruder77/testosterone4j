@@ -1,0 +1,20 @@
+package controls {
+	
+	import types.*
+	
+	control TextControl { 
+		op setText(String str)
+		op String getText
+	}
+	
+	control TreeControl {
+		op selectNode(String nodePath)
+		op doubleClickNode(String nodePath)
+	}
+	
+	control Label {
+		op String getText
+	}
+	
+	
+}

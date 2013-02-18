@@ -1,0 +1,33 @@
+package mp3manager.datatypes {
+	
+	import types.*
+	
+	tags { 
+		Pflichtfeld, Empty
+	}
+		
+	
+	datatype StringDT type String {
+		class emptyString value "" Empty
+		class shortString value "shortString"
+		class longString value "longlonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglongString" 		
+	} 
+	
+	datatype ErrorStringDT type String {
+		class ok value "OK"
+		class missingValue value "Please enter a value"
+	}
+	
+	datatype TrackDT type String {
+		class emptyTrack value "" Empty
+		class realTrack value "5"
+	}
+	
+	datatype YearDT type String {
+		class currentYear value "2013"
+		class futureYear value "2250"
+		class pastYear value "1800"
+		class emptyYear value "" Empty
+	}
+}
+	

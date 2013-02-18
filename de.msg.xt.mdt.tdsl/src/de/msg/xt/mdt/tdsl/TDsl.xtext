@@ -10,8 +10,17 @@ TestModel:
 
 PackageDeclaration:
     'package' name=QualifiedName '{'
+    	(imports+=Import)*
     	(elements+=Element)*
     '}';
+    
+Import: 
+	'import' importedNamespace=FqnWithWildCard
+;
+
+FqnWithWildCard: 
+	FQN('.*')?
+;
     
 Element:
 	Activity | UseCase | Control | Type | DataType | Test | TagsDeclaration | ActivityType

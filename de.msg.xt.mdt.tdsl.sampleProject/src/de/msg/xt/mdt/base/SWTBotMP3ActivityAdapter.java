@@ -25,8 +25,10 @@ public class SWTBotMP3ActivityAdapter implements mp3manager.ActivityAdapter {
 
         public static SWTBotLabelControl findControl(Object context, String id) {
             ActivityContext actContext = (ActivityContext) context;
-            System.out.println("Looking for Label control " + id + " in context " + actContext.getContext());
-            return new SWTBotLabelControl(actContext.getBot().labelWithId(id));
+            System.out.print("Looking for Label control " + id + " in context " + actContext.getContext() + "...");
+            SWTBotLabel label = actContext.getBot().labelWithId(id);
+            System.out.println("found.");
+            return new SWTBotLabelControl(label);
         }
 
         public SWTBotLabelControl(SWTBotLabel swtBotLabel) {

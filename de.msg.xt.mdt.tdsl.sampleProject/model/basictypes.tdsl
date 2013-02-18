@@ -1,0 +1,5 @@
+package types {
+	
+	type String mappedBy java.lang.String	
+	
+}

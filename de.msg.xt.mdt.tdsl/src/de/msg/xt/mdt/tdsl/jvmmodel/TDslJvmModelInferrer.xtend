@@ -595,7 +595,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 //   			it.annotations += useCase.toAnnotation("javax.xml.bind.annotation.XmlRootElement")
    			
    			for (inputParam : useCase.inputParameter) {
-   				if (inputParam.name != null && inputParam.dataType != null) {
+   				if (inputParam.name != null && inputParam?.dataType?.class_FQN?.toString != null) {
    					members += inputParam.toField(inputParam.name, inputParam.newTypeRef(inputParam.dataType.class_FQN.toString)) [
 //   					it.annotations += inputParam.toAnnotation("javax.xml.bind.annotation.XmlElement")
    					]
