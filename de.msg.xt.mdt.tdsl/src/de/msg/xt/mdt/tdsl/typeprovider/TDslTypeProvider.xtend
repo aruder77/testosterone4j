@@ -18,6 +18,8 @@ import org.eclipse.xtext.common.types.util.TypeReferences
 import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder
 import org.eclipse.xtext.xbase.typing.XbaseTypeProvider
 import de.msg.xt.mdt.tdsl.tDsl.StatementLine
+import org.eclipse.xtext.xbase.XFeatureCall
+import org.eclipse.xtext.common.types.JvmEnumerationType
 
 @Singleton
 class TDslTypeProvider extends XbaseTypeProvider {
@@ -34,6 +36,16 @@ class TDslTypeProvider extends XbaseTypeProvider {
 			typesBuilder.newTypeRef(container, typeof(Boolean));
 		}
 	}
+	
+	override dispatch type(XFeatureCall featureCall, 
+                    JvmTypeReference typeRef, 
+                    boolean isRawTypes) {
+        if(featureCall.declaringType instanceof JvmEnumerationType) {
+        	val enumType = featureCall.declaringType as JvmEnumerationType
+        	return enumType.getTypeForIdentifiable(isRawTypes)
+        }
+   		super._type(featureCall, typeRef, isRawTypes)            	
+    }
 	
 	
 	def dispatch type(OperationCall opCall, 

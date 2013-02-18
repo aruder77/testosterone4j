@@ -128,9 +128,10 @@ package mp3manager {
 		var enteredComment = generatedValue(str)
 		var errorLabel = op errorMarker.getText
 		 
-//		if (enteredComment.equivalenceClass == StringDTEquivalenceClass::emptyString) {
-//			expr org::junit::Assert::assertEquals("", errorLabel.getValue())
-//		}
+		if (enteredComment.equivalenceClass == StringDTEquivalenceClass::emptyString) { 
+			[ System::out.println("Hello") ]
+//			[ org::junit::Assert::assertEquals("", errorLabel.getValue()) ]
+		}
 
 		saveAndClose
 		findLogicalView

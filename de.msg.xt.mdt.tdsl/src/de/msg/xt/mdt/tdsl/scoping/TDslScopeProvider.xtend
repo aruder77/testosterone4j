@@ -152,7 +152,8 @@ class TDslScopeProvider extends XbaseScopeProvider {
 					operations.calculatesScopes
 				} else {
 					val operations = new ArrayList<ActivityOperation>
-					for (activity : lastExpression.determineNextActivities) {
+					val nextActivities = lastExpression.determineNextActivities
+					for (activity : nextActivities) {
 						if (activity?.operations != null) {
 							operations.addAll(activity.operations)
 						}
@@ -244,6 +245,13 @@ class TDslScopeProvider extends XbaseScopeProvider {
 				expr.then.determineNextActivities
 			XVariableDeclaration:
 				expr.right.determineNextActivities
+			XBlockExpression:
+				if(expr.expressions.last.containsActivitySwitchingOperation) 
+					expr.expressions.last.activitySwitchingOperation.determineNextActivities
+				else 
+					expr.expressions.last.lastExpressionWithNextActivity.determineNextActivities
+			default:
+				expr.activitySwitchingOperation.determineNextActivities
 		}
 	}
 }
