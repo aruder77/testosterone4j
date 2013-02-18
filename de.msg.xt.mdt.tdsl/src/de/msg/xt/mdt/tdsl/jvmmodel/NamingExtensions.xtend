@@ -11,6 +11,7 @@ import de.msg.xt.mdt.tdsl.tDsl.Field
 import de.msg.xt.mdt.tdsl.tDsl.PackageDeclaration
 import de.msg.xt.mdt.tdsl.tDsl.UseCase
 import de.msg.xt.mdt.tdsl.tDsl.DataTypeMapping
+import de.msg.xt.mdt.tdsl.tDsl.SUT
 
 class NamingExtensions {
 	
@@ -80,10 +81,11 @@ class NamingExtensions {
 
 	// PackageDeclaration
 	
-	def String activityAdapter_FQN(PackageDeclaration pack) {
-		pack?.fullyQualifiedName?.toString + ".ActivityAdapter"
+	// SUT
+	
+	def String activityAdapter_FQN(SUT sut) {
+		sut?.fullyQualifiedName?.toString + "ActivityAdapter"
 	}
-
 
 	// UseCase
 	

@@ -6,7 +6,7 @@ package mp3manager {
 	import mp3manager.activities.*
 	
 	SUT MP3MangerApp using controls {
-		Label, TextControl, TreeControl
+		TextControl, TreeControl, Label
 	}
 	
 	useCase OpenView(StringDT id) initial MainWindow {

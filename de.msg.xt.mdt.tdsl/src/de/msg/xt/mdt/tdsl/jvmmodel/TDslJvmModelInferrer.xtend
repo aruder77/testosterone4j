@@ -40,6 +40,7 @@ import org.eclipse.xtext.xbase.lib.Procedures$Procedure1
 import de.msg.xt.mdt.tdsl.tDsl.Test
 import de.msg.xt.mdt.tdsl.tDsl.ActivityOperation
 import org.eclipse.xtext.common.types.JvmEnumerationLiteral
+import de.msg.xt.mdt.tdsl.tDsl.SUT
 
 /**
  * <p>Infers a JVM model from the source model.</p> 
@@ -73,34 +74,38 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 		for (element : pack.elements) {
 			element.infer(acceptor, isPreIndexingPhase)
 		}
+	}
 
-		acceptor.accept(pack.toInterface(pack.activityAdapter_FQN, [])).initializeLater [
+	def dispatch void infer(SUT sut, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
+		acceptor.accept(sut.toInterface(sut.activityAdapter_FQN, [])).initializeLater [
 			
-			members += pack.toMethod("beforeTest", pack.newTypeRef(typeof(Object))) [
+			members += sut.toMethod("beforeTest", sut.newTypeRef(typeof(Object))) [
 				it.setAbstract(true)
 			]
 			
-			members += pack.toMethod("findContext", pack.newTypeRef(typeof(Object))) [
+			members += sut.toMethod("findContext", sut.newTypeRef(typeof(Object))) [
 				it.setAbstract(true)
-				it.parameters += pack.toParameter("id", pack.newTypeRef(typeof(String)))
-				it.parameters += pack.toParameter("type", pack.newTypeRef(typeof(String)))
+				it.parameters += sut.toParameter("id", sut.newTypeRef(typeof(String)))
+				it.parameters += sut.toParameter("type", sut.newTypeRef(typeof(String)))
 			]
 			
-			members += pack.toMethod("performOperation", pack.newTypeRef(typeof(Object))) [
+			members += sut.toMethod("performOperation", sut.newTypeRef(typeof(Object))) [
 				it.setAbstract(true)
-				it.parameters += pack.toParameter("activityId", pack.newTypeRef(typeof(String)))
-				it.parameters += pack.toParameter("activityType", pack.newTypeRef(typeof(String)))
-				it.parameters += pack.toParameter("contextObject", pack.newTypeRef(typeof(Object)))
-				it.parameters += pack.toParameter("operationName", pack.newTypeRef(typeof(String)))
-				it.parameters += pack.toParameter("parameters", pack.newTypeRef(typeof(Object)).createArrayType)
+				it.parameters += sut.toParameter("activityId", sut.newTypeRef(typeof(String)))
+				it.parameters += sut.toParameter("activityType", sut.newTypeRef(typeof(String)))
+				it.parameters += sut.toParameter("contextObject", sut.newTypeRef(typeof(Object)))
+				it.parameters += sut.toParameter("operationName", sut.newTypeRef(typeof(String)))
+				it.parameters += sut.toParameter("parameters", sut.newTypeRef(typeof(Object)).createArrayType)
 			]
 			
-			for (Control control : pack.elements.filter(typeof(Control))) {
-				members += control.toMethod("get" + control.name.toFirstUpper, control.newTypeRef(control.class_FQN.toString)) [
-					it.setAbstract(true)
-					it.parameters += control.toParameter("contextObject", control.newTypeRef(typeof(Object)))
-					it.parameters += control.toParameter("controlName", control.newTypeRef(typeof(String)))
-				]
+			for (Control control : sut.controls) {
+				if (control?.name != null && control?.class_FQN?.toString != null) {
+					members += control.toMethod("get" + control.name.toFirstUpper, control.newTypeRef(control.class_FQN.toString)) [
+						it.setAbstract(true)
+						it.parameters += control.toParameter("contextObject", control.newTypeRef(typeof(Object)))
+						it.parameters += control.toParameter("controlName", control.newTypeRef(typeof(String)))
+					]
+				}
 			}
 		]
 	}
@@ -138,7 +143,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    			]
    			
    			val packageDecl = activity.eContainer as PackageDeclaration
-   			members += activity.toField("adapter", activity.newTypeRef((activity.eContainer as PackageDeclaration).activityAdapter_FQN)) [
+   			members += activity.toField("adapter", activity.newTypeRef(activity.sut.activityAdapter_FQN)) [
    				it.setStatic(true)
    				it.setFinal(true)
    				it.setInitializer [
@@ -358,7 +363,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				]
    			]
    			
-   			members += test.toField("ADAPTER", test.newTypeRef((test.eContainer as PackageDeclaration).activityAdapter_FQN)) [
+   			members += test.toField("ADAPTER", test.newTypeRef(test.sut.activityAdapter_FQN)) [
    				it.setStatic(true)
    				it.setFinal(true)
    				it.setInitializer [
@@ -622,7 +627,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    			if (!useCase.inputParameter.empty) {
    				it.members += useCase.toConstructor() [
    					for (inputParam : useCase.inputParameter) {
-   						if (inputParam.dataType != null) {
+   						if (inputParam?.dataType?.class_FQN?.toString != null) {
    							it.parameters += useCase.toParameter(inputParam.name, useCase.newTypeRef(inputParam.dataType.class_FQN.toString))
    						}	
    					}
@@ -640,7 +645,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    			}
    			
    			for (inputParam : useCase.inputParameter) {
-   				if (inputParam.dataType != null) {
+   				if (inputParam?.dataType?.class_FQN?.toString != null) {
    					members += inputParam.toSetter(inputParam.name, inputParam.newTypeRef(inputParam.dataType.class_FQN.toString))	
    				} 
    			}

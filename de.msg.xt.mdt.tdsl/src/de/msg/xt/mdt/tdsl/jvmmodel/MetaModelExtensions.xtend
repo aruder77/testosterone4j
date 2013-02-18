@@ -17,6 +17,9 @@ import de.msg.xt.mdt.tdsl.tDsl.PackageDeclaration
 import de.msg.xt.mdt.tdsl.tDsl.OperationParameterAssignment
 import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationCall
 import de.msg.xt.mdt.tdsl.tDsl.StatementLine
+import de.msg.xt.mdt.tdsl.tDsl.SUT
+import de.msg.xt.mdt.tdsl.tDsl.Test
+import de.msg.xt.mdt.tdsl.tDsl.PackageDeclaration
 
 /**
  * Convenience meta-model extensions. Please order by Metamodel-Class and alphabetically!
@@ -34,6 +37,10 @@ class MetaModelExtensions {
 	
 	def getPackageDeclaration(Activity activity) {
 		activity.eContainer as PackageDeclaration
+	}
+	
+	def SUT getSut(Activity activity) {
+		activity?.packageDeclaration?.sut
 	}
 	
 	
@@ -99,6 +106,26 @@ class MetaModelExtensions {
 	
 	def OperationCall operation(OperationParameterAssignment opParamAssignment) {
 		opParamAssignment.eContainer as OperationCall
+	}
+	
+	// PackageDeclaration
+	
+	def SUT getSut(PackageDeclaration pack) {
+		val sut = pack?.elements?.filter(typeof(SUT))?.last
+		if (sut == null)
+			pack.sutRef
+		else 
+			sut
+	}
+	
+	// Test
+	
+	def PackageDeclaration getPackageDeclaration(Test test) {
+		test.eContainer as PackageDeclaration
+	}
+	
+	def SUT getSut(Test test) {
+		test?.packageDeclaration?.sut
 	}
 	
 	// XExpression

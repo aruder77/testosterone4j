@@ -28,7 +28,7 @@ Element:
 
 SUT:
 	'SUT' name=ID 'using' 'controls' '{'
-		control+=[Control|FQN] (',' controls+=[Control|FQN])*
+		controls+=[Control|FQN] (',' controls+=[Control|FQN])*
 	'}'
 ;
 
