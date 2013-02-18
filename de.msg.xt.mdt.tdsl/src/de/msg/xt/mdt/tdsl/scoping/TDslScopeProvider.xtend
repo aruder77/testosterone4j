@@ -52,18 +52,6 @@ class TDslScopeProvider extends XbaseScopeProvider {
 			val context = scopeContext.context
 			if (context instanceof StatementLine) {
 				val useCase = EcoreUtil2::getContainerOfType(context, typeof(UseCase))
-				val localParamVars = new ArrayList<LocalVarDescription>()
-				if (useCase.inputParameter != null) {
-					for (param : useCase.inputParameter) {
-						var fields = param.jvmElements.filter(typeof(JvmField))
-						for (field : fields) {
-							val description = new LocalVarDescription(QualifiedName::create(param.name), field)
-							localParamVars.add(description)
-							
-						}						
-					}
-				}
-//				val pScope = new JvmFeatureScope(parentScope, "paramScope" + useCase.name, localParamVars)
 				var IScope pScope = parentScope
 				if (scopeContext.canSpawnForContainer())
 					pScope = createLocalVarScope(parentScope, scopeContext.spawnForContainer());
