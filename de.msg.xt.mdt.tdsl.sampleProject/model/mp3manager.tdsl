@@ -26,8 +26,15 @@ package mp3manager {
 	}
 	
 	datatype TrackDT type String {
-		class emptyTrack value "" 
+		class emptyTrack value "" Empty
 		class realTrack value "5"
+	}
+	
+	datatype YearDT type String {
+		class currentYear value "2013"
+		class futureYear value "2250"
+		class pastYear value "1800"
+		class emptyYear value "" Empty
 	}
 	
 	control TextControl { 
@@ -36,7 +43,8 @@ package mp3manager {
 	}
 	
 	control TreeControl {
-		op doubleClickItem
+		op selectNode(String nodePath)
+		op doubleClickNode(String nodePath)
 	}
 	
 	control Label {
@@ -50,7 +58,8 @@ package mp3manager {
 	
 	activity LogicalView type View {
 		field tree control TreeControl {
-			op doubleClickItem => SongEditor
+			op selectNode(StringDT nodePath)
+			op doubleClickNode(StringDT nodePath) => SongEditor
 		}
 	}
 	
@@ -75,38 +84,61 @@ package mp3manager {
 			op TrackDT getText
 		} 
 		
+		field year identifiedBy "Id3TagPage.Year_Label" control TextControl {
+			op setText (YearDT str)
+			op YearDT getText
+		} 
+		
+		field comment identifiedBy "Id3TagPage.Comment_Label" control TextControl {
+			op setText (StringDT str)
+			op StringDT getText
+		} 
+		
 		field errorMarker identifiedBy "errorMarker" control Label {
 			op ErrorStringDT getText
 		} 
 		
-		op saveAndClose => MainWindow
-		
-		op openView(StringDT viewId)
+		op saveAndClose => MainWindow 		
 	}
 	
 	
 	activity OpenViewDialog type Popup {
-		op selectLogicalView
-		op ok => MainWindow
+		op selectLogicalView(StringDT viewId)
+		op ok => MainWindow 
 		op cancel => MainWindow
+	}
+	
+	useCase OpenView(StringDT id) initial MainWindow {
+		openView
+		selectLogicalView(viewId=id)
+		ok
 	}
 	
 	
 	useCase OpenLogicalView initial MainWindow {
-		aop openView
-		aop selectLogicalView 
-		aop ok
-		aop findLogicalView
-		op tree.doubleClickItem
+		call OpenView(OpenView.id="Logical View")
+		findLogicalView
+		tree.doubleClickNode(nodePath="Bob Marley/Legend/Stir It Up")
 		
-		op track.setText
-		var enteredTitle = generatedValue(str)
+		track.setText 
+		var enteredTrack = generatedValue(str)
+		year.setText
+		var enteredYear = generatedValue(str)
+		comment.setText
+		var enteredComment = generatedValue(str)
+		var errorLabel = op errorMarker.getText
+		 
+//		if (enteredComment.equivalenceClass == StringDTEquivalenceClass::emptyString) {
+//			expr org::junit::Assert::assertEquals("", errorLabel.getValue())
+//		}
 
-		aop saveAndClose
-		aop findLogicalView
-		op tree.doubleClickItem
-		var result = op track.getText
-//		expr junit::framework::Assert::assertEquals(enteredTitle.getValue(), result.getValue())	
+		saveAndClose
+		findLogicalView
+		tree.doubleClickNode(nodePath="Bob Marley/Legend/Stir It Up")
+		var resultTrack = op track.getText
+		var resultYear = op year.getText
+		var resultComment = op comment.getText 
+		[ junit::framework::Assert::assertEquals(enteredTrack.getValue(), resultTrack.getValue()) ]	
 	}
 	 
 	test OpenLogicalViewTest generator de.msg.xt.mdt.base.SampleTestGenerator useCase OpenLogicalView

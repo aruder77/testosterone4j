@@ -32,6 +32,13 @@ import com.google.common.base.Function
 import de.msg.xt.mdt.tdsl.tDsl.ActivityOperation
 import de.msg.xt.mdt.tdsl.tDsl.GeneratedValueExpression
 import de.msg.xt.mdt.tdsl.tDsl.Field
+import de.msg.xt.mdt.tdsl.tDsl.StatementLine
+import org.eclipse.xtext.common.types.JvmOperation
+import org.eclipse.xtext.common.types.JvmType
+import org.eclipse.xtext.xbase.scoping.LocalVariableScopeContext
+import org.eclipse.xtext.common.types.JvmField
+import org.eclipse.xtext.xbase.scoping.featurecalls.LocalVarDescription
+import org.eclipse.xtext.xbase.scoping.featurecalls.JvmFeatureScope
 
 class TDslScopeProvider extends XbaseScopeProvider {
 	
@@ -40,36 +47,77 @@ class TDslScopeProvider extends XbaseScopeProvider {
     
     @Inject extension MetaModelExtensions
     
-/*    override IScope createLocalVarScopeForJvmOperation(JvmOperation context,
-            IScope parentScope) {
-        val pScope = super.createLocalVarScopeForJvmOperation(context,
-                parentScope);
- 
-        // retrieve the AST element associated to the method
-        // created by our model inferrer
-        val sourceElement = associations.getPrimarySourceElement(context);
-        if (sourceElement instanceof UseCase) {
-            val operation = sourceElement as UseCase;
-            return createLocalScopeForX(operation.getOutput(),
-                    pScope);
-        }
- 
-        return pScope;
-    }
+	override protected createLocalVarScope(IScope parentScope, LocalVariableScopeContext scopeContext) {
+		if (scopeContext != null && scopeContext.context != null) {
+			val context = scopeContext.context
+			if (context instanceof StatementLine) {
+				val useCase = EcoreUtil2::getContainerOfType(context, typeof(UseCase))
+				val localParamVars = new ArrayList<LocalVarDescription>()
+				if (useCase.inputParameter != null) {
+					for (param : useCase.inputParameter) {
+						var fields = param.jvmElements.filter(typeof(JvmField))
+						for (field : fields) {
+							val description = new LocalVarDescription(QualifiedName::create(param.name), field)
+							localParamVars.add(description)
+							
+						}						
+					}
+				}
+				val pScope = new JvmFeatureScope(parentScope, "paramScope" + useCase.name, localParamVars)
+				
+				val localVars = new ArrayList<XExpression>()
+				val statementLine = EcoreUtil2::getContainerOfType(context, typeof(StatementLine))
+				val indexInBlock = statementLine.indexInParentBlock
+				for (expr : useCase.block.expressions.subList(0, indexInBlock)) {
+					val line = expr as StatementLine
+					if (line?.statement instanceof XVariableDeclaration) {
+						localVars.add(line.statement)
+					}
+				}
+				return Scopes::scopeFor(localVars, pScope)
+			}
+		}
+		
+		return super.createLocalVarScope(parentScope, scopeContext)
+	}
     
-    
-    def JvmType getJvmType(UseCase useCase) {
-        useCase.jvmElements.filter(typeof(JvmType)).head
-    } */    
+//    override IScope createLocalVarScope(Object context,
+//            IScope parentScope) {
+//        val pScope = super.createLocalVarScopeForJvmOperation(context,
+//                parentScope);
+// 
+//        // retrieve the AST element associated to the method
+//        // created by our model inferrer
+//        val sourceElement = associations.getPrimarySourceElement(context);
+//        if (sourceElement instanceof UseCase) {
+//            val operation = sourceElement as UseCase;
+//            return createLocalScopeForX(operation.getOutput(),
+//                    pScope);
+//        }
+// 
+//        return pScope;
+//    }
+//    
+//    
+//    def JvmType getJvmType(UseCase useCase) {
+//        useCase.jvmElements.filter(typeof(JvmType)).head
+//    }
     
 	override getScope(EObject context, EReference reference) {
 		if (reference == TDslPackage::eINSTANCE.operationParameterAssignment_Name) {
 			var List<DataTypeMapping> mappings
 			switch (context) {
-				OperationCall:
-					return Scopes::scopeFor(context.operation.dataTypeMappings)
+				OperationCall: {
+					val maps = context.operation.dataTypeMappings
+					val scope = Scopes::scopeFor(maps, [
+						QualifiedName::create(it?.name?.name)
+					], IScope::NULLSCOPE)
+					return scope
+				}
 				OperationParameterAssignment:
-					return Scopes::scopeFor((context.eContainer as OperationCall).operation.dataTypeMappings)
+					return Scopes::scopeFor((context.eContainer as OperationCall).operation.dataTypeMappings, [
+						QualifiedName::create(it?.name?.name)
+					], IScope::NULLSCOPE)
 			}
 		} else if (reference == TDslPackage::eINSTANCE.activityOperationParameterAssignment_Name) {
 			switch (context) {
@@ -82,7 +130,12 @@ class TDslScopeProvider extends XbaseScopeProvider {
 			}
 		} else if (reference == TDslPackage::eINSTANCE.operationCall_Operation || reference == TDslPackage::eINSTANCE.activityOperationCall_Operation) {
 			val XExpression opCall = context as XExpression
-			val lastExpression = opCall.lastExpressionWithNextActivity
+			var XExpression lastExpression = null
+			if (opCall instanceof ActivityOperationCall || opCall instanceof OperationCall) {
+				lastExpression = opCall.lastExpressionWithNextActivity
+			} else {
+				lastExpression = if (opCall.containsActivitySwitchingOperation) opCall.activitySwitchingOperation else opCall.lastExpressionWithNextActivity
+			}
 			if (lastExpression == null) {
 				val initialActivity = EcoreUtil2::getContainerOfType(opCall, typeof(UseCase)).initialActivity
 				if (reference == TDslPackage::eINSTANCE.operationCall_Operation) {
@@ -169,50 +222,7 @@ class TDslScopeProvider extends XbaseScopeProvider {
 		}
 		operations
 	}
-	
-	def XExpression lastExpressionWithNextActivity(XExpression expr) {
-		var XExpression lastStatement
-		val exprBlock = expr.block
-		val index = expr.indexInParentBlock
-		if (index > 0) {
-			lastStatement = exprBlock.expressions.get(index - 1)
-			if (!lastStatement.containsActivitySwitchingOperation) {
-				return lastStatement.lastExpressionWithNextActivity
-			}
-		} else {
-			val parentIndex = exprBlock.indexInParentBlock
-			if (parentIndex == null) {
-				return null
-			}
-			val parentBlock = EcoreUtil2::getContainerOfType(exprBlock.eContainer, typeof(XBlockExpression))
-			return parentBlock?.expressions?.get(parentIndex)?.lastExpressionWithNextActivity
-		}
-		return lastStatement	
-	}
-	
-	
-	def Integer getIndexInParentBlock(XExpression expr) {
-		var EObject currentExpr = expr
-		var parent = expr.eContainer
-		while (!(parent instanceof XBlockExpression) && parent != null) {
-			currentExpr = parent
-			parent = parent.eContainer
-		}
-		if (parent == null) {
-			return -1
-		}
-		val index = (parent as XBlockExpression).expressions.indexOf(currentExpr)
-		return index
-	}
-	
-	def containsActivitySwitchingOperation(XExpression expr) {
-		if (expr instanceof OperationCall || expr instanceof ActivityOperationCall) {
-			true
-		} else {
-			!(EcoreUtil2::getAllContentsOfType(expr, typeof(OperationCall)).empty && EcoreUtil2::getAllContentsOfType(expr, typeof(ActivityOperationCall)).empty)
-		} 
-	}
-	
+		
 	
 	def List<Activity> determineNextActivities(XExpression expr) {
 		switch (expr) {

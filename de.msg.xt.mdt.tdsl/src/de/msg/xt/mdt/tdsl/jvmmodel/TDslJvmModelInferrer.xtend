@@ -39,6 +39,7 @@ import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder
 import org.eclipse.xtext.xbase.lib.Procedures$Procedure1
 import de.msg.xt.mdt.tdsl.tDsl.Test
 import de.msg.xt.mdt.tdsl.tDsl.ActivityOperation
+import org.eclipse.xtext.common.types.JvmEnumerationLiteral
 
 /**
  * <p>Infers a JVM model from the source model.</p> 
@@ -439,14 +440,16 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    		
    	def dispatch void infer(DataType dataType, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
    		
-   		val JvmEnumerationType equivalenceClass = dataType.toEnumerationType(dataType.equivalenceClass_name)[]
-   		acceptor.accept(equivalenceClass).initializeLater [
-   			
+   		val JvmEnumerationType equivalenceClass = dataType.toEnumerationType(dataType.equivalenceClass_name)[
    			superTypes += dataType.newTypeRef("de.msg.xt.mdt.base.EquivalenceClass")
    			
    			for (clazz : dataType.classes) {
-   				members += clazz.toEnumerationLiteral(clazz.name);
+   				val lit = clazz.toEnumerationLiteral(clazz.name);
+   				lit.setStatic(true)
+   				members += lit
    			}
+   		]
+   		acceptor.accept(equivalenceClass).initializeLater [
    			
    			members += dataType.toMethod("getValue", dataType.type?.mappedBy) [
    				setBody [
@@ -698,7 +701,9 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    		acceptor.accept(tags.toEnumerationType(tags.eContainer.fullyQualifiedName.toString + ".Tags") [
    			superTypes += tags.newTypeRef("de.msg.xt.mdt.base.Tag")
    			for (tag : tags.tags) {
-   				members += toEnumerationLiteral(tag.name)
+   				val enumLit = toEnumerationLiteral(tag.name)
+   				enumLit.setStatic(true) 
+   				members += enumLit
    			}
    		])
    	}   		

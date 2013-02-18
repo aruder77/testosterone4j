@@ -1,6 +1,9 @@
 package de.msg.xt.mdt.base;
 
+import java.util.StringTokenizer;
+
 import mp3manager.Label;
+import mp3manager.StringDT;
 import mp3manager.TextControl;
 import mp3manager.TreeControl;
 
@@ -80,11 +83,23 @@ public class SWTBotMP3ActivityAdapter implements mp3manager.ActivityAdapter {
         }
 
         @Override
-        public void doubleClickItem() {
-            String nodeText = "Stir It Up";
-            SWTBotTreeItem marleyItem = this.swtBotTree.expandNode("Bob Marley", true);
-            SWTBotTreeItem legendItem = marleyItem.getNode("Legend");
-            legendItem.getNode(nodeText).doubleClick();
+        public void selectNode(String nodePath) {
+            getItem(nodePath).select();
+        }
+
+        private SWTBotTreeItem getItem(String nodePath) {
+            StringTokenizer st = new StringTokenizer(nodePath, "/");
+            SWTBotTreeItem item = this.swtBotTree.expandNode(st.nextToken(), true);
+            while (st.hasMoreTokens()) {
+                String nodeText = st.nextToken();
+                item = item.getNode(nodeText);
+            }
+            return item;
+        }
+
+        @Override
+        public void doubleClickNode(String nodePath) {
+            getItem(nodePath).doubleClick();
         }
     }
 
@@ -148,7 +163,8 @@ public class SWTBotMP3ActivityAdapter implements mp3manager.ActivityAdapter {
         } else if ("mp3manager.OpenViewDialog".equals(id)) {
             if ("selectLogicalView".equals(operationName)) {
                 SWTBotTree tree = (actContext.getBot().tree());
-                tree.expandNode("MP3 Manager (Virtual)", false).getNode("Logical View").select();
+                StringDT viewIdParam = (StringDT) parameters[0];
+                tree.expandNode("MP3 Manager (Virtual)", false).getNode(viewIdParam.getValue()).select();
             } else if ("ok".equals(operationName)) {
                 actContext.getBot().button("OK").click();
             }

@@ -140,11 +140,16 @@ UseCase:
 
 UseCaseBlock returns xbase::XBlockExpression:
 	{xbase::XBlockExpression}
-  	'{' (expressions+=Statement)* '}'
+  	'{' (expressions+=StatementLine)* '}'
+;
+
+StatementLine returns xbase::XExpression:
+	{StatementLine}
+	statement=Statement
 ;
 
 Statement returns xbase::XExpression:
-	SubUseCaseCall | OperationCall | ActivityOperationCall | VariableDeclaration | IfExpression | 'expr' XAssignment //| CompoundStatement
+	SubUseCaseCall | OperationCall | ActivityOperationCall | VariableDeclaration | IfExpression | '[' XAssignment ']'//| CompoundStatement
 ;
 
 VariableDeclaration returns xbase::XVariableDeclaration:
@@ -153,7 +158,7 @@ VariableDeclaration returns xbase::XVariableDeclaration:
 ;
 
 Expression returns xbase::XExpression:
-	OperationCall | GeneratedValueExpression | XExpression
+	'op' OperationCall | GeneratedValueExpression | XExpression
 ;
 
 GeneratedValueExpression returns xbase::XExpression:
@@ -180,12 +185,12 @@ MFQN:
 
 OperationCall returns xbase::XExpression:
 	{OperationCall}
-	'op' operation=[OperationMapping|MFQN] ('(' (paramAssignment+=OperationParameterAssignment) (',' paramAssignment+=OperationParameterAssignment)* ')')?
+	operation=[OperationMapping|MFQN] ('(' (paramAssignment+=OperationParameterAssignment) (',' paramAssignment+=OperationParameterAssignment)* ')')?
 ;
 
 ActivityOperationCall returns xbase::XExpression:
 	{ActivityOperationCall}
-	'aop' operation=[ActivityOperation|ID] ('(' (paramAssignment+=ActivityOperationParameterAssignment) (',' paramAssignment+=ActivityOperationParameterAssignment)* ')')?
+	operation=[ActivityOperation|ID] ('(' (paramAssignment+=ActivityOperationParameterAssignment) (',' paramAssignment+=ActivityOperationParameterAssignment)* ')')?
 ;
 
 SubUseCaseCall returns xbase::XExpression:

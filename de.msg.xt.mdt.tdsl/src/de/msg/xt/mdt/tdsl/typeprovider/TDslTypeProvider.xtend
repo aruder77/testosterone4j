@@ -17,6 +17,7 @@ import org.eclipse.xtext.common.types.JvmTypeReference
 import org.eclipse.xtext.common.types.util.TypeReferences
 import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder
 import org.eclipse.xtext.xbase.typing.XbaseTypeProvider
+import de.msg.xt.mdt.tdsl.tDsl.StatementLine
 
 @Singleton
 class TDslTypeProvider extends XbaseTypeProvider {
@@ -44,6 +45,15 @@ class TDslTypeProvider extends XbaseTypeProvider {
    			typeReferences.getTypeForName(Void::TYPE, opCall)
    		else 
    			typeReferences.getTypeForName(typeName, opCall)   		
+  	}
+  	
+  	def dispatch type(StatementLine expr, JvmTypeReference typeRef, boolean isRawType) {
+  		val type = expr?.statement?.type(typeRef, isRawType)
+  		if (type == null) {
+   			typeReferences.getTypeForName(Void::TYPE, expr)  			
+  		} else {
+  			type
+  		}
   	}
   	
   	def dispatch type(GeneratedValueExpression expr, JvmTypeReference typeRef, boolean isRawType) {
