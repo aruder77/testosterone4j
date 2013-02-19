@@ -41,6 +41,7 @@ import de.msg.xt.mdt.tdsl.tDsl.Test
 import de.msg.xt.mdt.tdsl.tDsl.ActivityOperation
 import org.eclipse.xtext.common.types.JvmEnumerationLiteral
 import de.msg.xt.mdt.tdsl.tDsl.SUT
+import org.eclipse.xtext.xbase.compiler.ImportManager
 
 /**
  * <p>Infers a JVM model from the source model.</p> 
@@ -61,7 +62,6 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 	
 	@Inject extension NamingExtensions 
 	@Inject extension MetaModelExtensions
-	
 	
 	@Inject
 	XbaseCompiler xbaseCompiler
@@ -143,11 +143,12 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    			]
    			
    			val packageDecl = activity.eContainer as PackageDeclaration
-   			members += activity.toField("adapter", activity.newTypeRef(activity.sut.activityAdapter_FQN)) [
+   			val activityAdapterType = activity.newTypeRef(activity.sut.activityAdapter_FQN)
+   			members += activity.toField("adapter", activityAdapterType) [
    				it.setStatic(true)
    				it.setFinal(true)
    				it.setInitializer [
-   					it.append('''INJECTOR.getInstance(ActivityAdapter.class)''')
+   					it.append('''INJECTOR.getInstance(«activity.sut.activityAdapter_FQN».class)''')
    				]
    			]
    			   				
@@ -367,7 +368,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				it.setStatic(true)
    				it.setFinal(true)
    				it.setInitializer [
-   					it.append('''INJECTOR.getInstance(ActivityAdapter.class)''')
+   					it.append('''INJECTOR.getInstance(«test.sut.activityAdapter_FQN».class)''')
    				]
    			]
    			
