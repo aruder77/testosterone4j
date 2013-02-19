@@ -5,7 +5,7 @@ package mp3manager {
 	import mp3manager.datatypes.*
 	import mp3manager.activities.*
 	
-	SUT MP3MangerApp using controls {
+	SUT MP3MangerApp using controls { 
 		TextControl, TreeControl, Label
 	}
 	

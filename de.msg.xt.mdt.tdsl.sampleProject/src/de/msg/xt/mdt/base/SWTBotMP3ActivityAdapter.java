@@ -2,10 +2,8 @@ package de.msg.xt.mdt.base;
 
 import java.util.StringTokenizer;
 
-import mp3manager.Label;
-import mp3manager.StringDT;
-import mp3manager.TextControl;
-import mp3manager.TreeControl;
+import mp3manager.MP3MangerAppActivityAdapter;
+import mp3manager.datatypes.StringDT;
 
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
@@ -17,9 +15,13 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
-public class SWTBotMP3ActivityAdapter implements mp3manager.ActivityAdapter {
+import swtcontrols.Label;
+import swtcontrols.TextControl;
+import swtcontrols.TreeControl;
 
-    private static final class SWTBotLabelControl implements Label {
+public class SWTBotMP3ActivityAdapter implements MP3MangerAppActivityAdapter {
+
+    private static final class SWTBotLabelControl implements swtcontrols.Label {
 
         SWTBotLabel swtBotLabel;
 
@@ -42,7 +44,7 @@ public class SWTBotMP3ActivityAdapter implements mp3manager.ActivityAdapter {
 
     }
 
-    private static final class SWTBotTextControl implements TextControl {
+    private static final class SWTBotTextControl implements swtcontrols.TextControl {
 
         SWTBotText swtBotText;
         String id;
@@ -71,7 +73,7 @@ public class SWTBotMP3ActivityAdapter implements mp3manager.ActivityAdapter {
         }
     }
 
-    public static class SWTBotTreeControl implements TreeControl {
+    public static class SWTBotTreeControl implements swtcontrols.TreeControl {
 
         SWTBotTree swtBotTree;
 
@@ -107,7 +109,7 @@ public class SWTBotMP3ActivityAdapter implements mp3manager.ActivityAdapter {
 
     @Override
     public Object findContext(String id, String type) {
-        if ("mp3manager.OpenViewDialog".equals(id)) {
+        if ("mp3manager.activities.OpenViewDialog".equals(id)) {
             SWTBot bot = new SWTBot();
             SWTBotShell shell = bot.shell("Show View");
             return new ActivityContext(shell, id, shell.bot());
@@ -151,7 +153,7 @@ public class SWTBotMP3ActivityAdapter implements mp3manager.ActivityAdapter {
         Object returnContext = null;
         ActivityContext actContext = (ActivityContext) contextObject;
         System.out.println("Performing operation[id='" + id + "', type='" + type + "', operationName='" + operationName + "']");
-        if ("mp3manager.MainWindow".equals(id)) {
+        if ("mp3manager.activities.MainWindow".equals(id)) {
             if ("openView".equals(operationName)) {
                 MainMenu.window().click().menu("Open View").click().menu("Other...").click();
                 SWTBot bot = new SWTBot();
@@ -162,7 +164,7 @@ public class SWTBotMP3ActivityAdapter implements mp3manager.ActivityAdapter {
                 SWTBotView viewBot = workbenchbot.viewByTitle("Logical View");
                 returnContext = new ActivityContext(viewBot, viewBot.getViewReference().getId(), viewBot.bot());
             }
-        } else if ("mp3manager.OpenViewDialog".equals(id)) {
+        } else if ("mp3manager.activities.OpenViewDialog".equals(id)) {
             if ("selectLogicalView".equals(operationName)) {
                 SWTBotTree tree = (actContext.getBot().tree());
                 StringDT viewIdParam = (StringDT) parameters[0];
