@@ -223,8 +223,10 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    		val voidReturn = voidReturnType
    		val nextActivityClass = nextActivityClassVar
    		operation.toMethod(operation.name, returnTypeRef) [
-   			for (param : operation.params) {
-   				it.parameters += param.toParameter(param.name, param.newTypeRef(param.dataType.class_FQN.toString))
+  			for (param : operation.params) {
+				if (param?.dataType?.class_FQN?.toString != null) {
+   					it.parameters += param.toParameter(param.name, param.newTypeRef(param.dataType.class_FQN.toString))
+   				}
    			}
    			it.setBody [
    				it.append('''

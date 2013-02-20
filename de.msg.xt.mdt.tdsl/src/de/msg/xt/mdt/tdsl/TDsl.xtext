@@ -27,7 +27,7 @@ Element:
 ;
 
 SUT:
-	'SUT' name=ID 'using' 'controls' '{'
+	'sut' name=ID 'using' 'controls' '{'
 		controls+=[Control|FQN] (',' controls+=[Control|FQN])*
 	'}'
 ;
@@ -164,7 +164,7 @@ StatementLine returns xbase::XExpression:
 ;
 
 Statement returns xbase::XExpression:
-	SubUseCaseCall | OperationCall | ActivityOperationCall | VariableDeclaration | IfExpression | '[' XAssignment ']'//| CompoundStatement
+	SubUseCaseCall | OperationCall | ActivityOperationCall | VariableDeclaration | IfExpression | '[' XAssignment ']' | Assert //| CompoundStatement
 ;
 
 VariableDeclaration returns xbase::XVariableDeclaration:
@@ -173,7 +173,7 @@ VariableDeclaration returns xbase::XVariableDeclaration:
 ;
 
 Expression returns xbase::XExpression:
-	'op' OperationCall | GeneratedValueExpression | XExpression
+	'op' OperationCall | GeneratedValueExpression | XExpression 
 ;
 
 GeneratedValueExpression returns xbase::XExpression:
@@ -211,6 +211,11 @@ ActivityOperationCall returns xbase::XExpression:
 SubUseCaseCall returns xbase::XExpression:
 	{SubUseCaseCall}
 	'call' useCase=[UseCase|FQN] ('(' paramAssignment+=ParameterAssignment (',' paramAssignment+=ParameterAssignment)*  ')')?
+;
+
+Assert returns xbase::XExpression:
+	{Assert}
+	'assert' '[' expression=Expression ']'
 ;
 
 /*

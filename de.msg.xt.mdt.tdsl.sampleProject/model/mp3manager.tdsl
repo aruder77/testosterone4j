@@ -5,9 +5,9 @@ package mp3manager {
 	import mp3manager.datatypes.*
 	import mp3manager.activities.*
 	
-	SUT MP3MangerApp using controls { 
+	sut MP3MangerApp using controls { 
 		TextControl, TreeControl, Label
-	}
+	} 
 	
 	useCase OpenView(StringDT id) initial MainWindow {
 		openView
@@ -30,9 +30,9 @@ package mp3manager {
 		var errorLabel = op errorMarker.getText
 		 
 		if (enteredComment.equivalenceClass == StringDTEquivalenceClass::emptyString) { 
-			[ org::junit::Assert::assertEquals(ErrorStringDTEquivalenceClass::missingValue.getValue(), errorLabel.getValue()) ]
+			assert [ org::junit::Assert::assertEquals(ErrorStringDTEquivalenceClass::missingValue.getValue(), errorLabel.getValue()) ]
 		} else {
-			[ org::junit::Assert::assertEquals(ErrorStringDTEquivalenceClass::ok.getValue(), errorLabel.getValue()) ]
+			assert [ org::junit::Assert::assertEquals(ErrorStringDTEquivalenceClass::ok.getValue(), errorLabel.getValue()) ]
 		}
 
 		saveAndClose
@@ -41,7 +41,7 @@ package mp3manager {
 		var resultTrack = op track.getText
 		var resultYear = op year.getText
 		var resultComment = op comment.getText 
-		[ junit::framework::Assert::assertEquals(enteredTrack.getValue(), resultTrack.getValue()) ]	
+		assert [ junit::framework::Assert::assertEquals(enteredTrack.getValue(), resultTrack.getValue()) ]	
 	}
 	 
 	test OpenLogicalViewTest generator de.msg.xt.mdt.base.SampleTestGenerator useCase OpenLogicalView

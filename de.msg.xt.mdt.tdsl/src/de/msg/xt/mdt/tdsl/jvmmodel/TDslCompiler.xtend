@@ -21,6 +21,7 @@ import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationParameter
 import de.msg.xt.mdt.tdsl.tDsl.GeneratedValueExpression
 import de.msg.xt.mdt.tdsl.tDsl.DataTypeMapping
 import de.msg.xt.mdt.tdsl.tDsl.StatementLine
+import de.msg.xt.mdt.tdsl.tDsl.Assert
 
 class TDslCompiler extends XbaseCompiler {
 	
@@ -89,6 +90,13 @@ class TDslCompiler extends XbaseCompiler {
     		}
     		StatementLine: {
     			expr.statement.doInternalToJavaStatement(it, isReferenced)
+    		}
+    		Assert: {
+    			newLine
+    			append('''if (this.generator == null) {''')
+    			expr.expression.doInternalToJavaStatement(it, isReferenced)
+    			newLine
+    			append("}")
     		}
     		default:
     			super.doInternalToJavaStatement(expr, it, isReferenced)
@@ -218,6 +226,9 @@ class TDslCompiler extends XbaseCompiler {
 			}
 			StatementLine: {
 				expr.statement.internalToJavaExpression(it)
+			}
+			Assert: {
+				expr.expression.internalToJavaExpression(it)
 			}
 			default:
 				super.internalToConvertedExpression(expr, it)

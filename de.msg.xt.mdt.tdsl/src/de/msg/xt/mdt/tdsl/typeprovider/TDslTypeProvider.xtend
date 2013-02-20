@@ -20,6 +20,7 @@ import org.eclipse.xtext.xbase.typing.XbaseTypeProvider
 import de.msg.xt.mdt.tdsl.tDsl.StatementLine
 import org.eclipse.xtext.xbase.XFeatureCall
 import org.eclipse.xtext.common.types.JvmEnumerationType
+import de.msg.xt.mdt.tdsl.tDsl.Assert
 
 @Singleton
 class TDslTypeProvider extends XbaseTypeProvider {
@@ -47,6 +48,13 @@ class TDslTypeProvider extends XbaseTypeProvider {
    		super._type(featureCall, typeRef, isRawTypes)            	
     }
 	
+	def dispatch type(Assert assert, JvmTypeReference typeRef, boolean isRawTypes) {
+		val type = assert?.expression?.type(typeRef, isRawTypes)
+		if (type == null) {
+			typeReferences.getTypeForName(Void::TYPE, assert)
+		} else
+			type
+	}
 	
 	def dispatch type(OperationCall opCall, 
                     JvmTypeReference typeRef, 
