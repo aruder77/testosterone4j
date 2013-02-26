@@ -1,6 +1,8 @@
 package de.msg.xt.mdt.base;
 
-public interface DataType<DT, EC> {
+import java.io.Serializable;
+
+public interface DataType<DT, EC> extends Serializable {
 
     DT getValue();
 

@@ -1,5 +1,6 @@
 package de.msg.xt.mdt.base;
 
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -15,6 +16,8 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.logging.Logger;
 
+import javax.inject.Inject;
+
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class SampleTestGenerator implements Generator {
 
@@ -24,13 +27,23 @@ public class SampleTestGenerator implements Generator {
 
     Set<String> unsatisfiedCoverageIds = new HashSet<String>();
 
+    @Inject
+    ITestProtocol protocol;
+
     @Override
     public <E extends Runnable> List<E> generate(Class<E> clazz) {
         List<E> testCases = new ArrayList<E>();
+        int idx = 1;
+        try {
+            this.protocol.open();
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
         while (!this.unsatisfiedCoverageIds.isEmpty() || testCases.isEmpty()) {
             try {
                 Constructor<E> constructor = clazz.getConstructor(Generator.class);
                 E testCase = constructor.newInstance(this);
+                this.protocol.newTest(String.valueOf(idx++));
                 testCase.run();
                 testCases.add(testCase);
             } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException
@@ -38,6 +51,7 @@ public class SampleTestGenerator implements Generator {
                 e.printStackTrace();
             }
         }
+        this.protocol.close();
         return testCases;
     }
 

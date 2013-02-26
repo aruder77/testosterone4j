@@ -1,10 +1,11 @@
 package de.msg.xt.mdt.base;
 
-import mp3manager.Label;
-import mp3manager.TextControl;
-import mp3manager.TreeControl;
+import mp3manager.MP3MangerAppActivityAdapter;
+import swtcontrols.Label;
+import swtcontrols.TextControl;
+import swtcontrols.TreeControl;
 
-public class TextMP3ActivityAdapter implements mp3manager.ActivityAdapter {
+public class TextMP3ActivityAdapter implements MP3MangerAppActivityAdapter {
 
     @Override
     public Object findContext(String id, String type) {
@@ -48,8 +49,13 @@ public class TextMP3ActivityAdapter implements mp3manager.ActivityAdapter {
         return new TreeControl() {
 
             @Override
-            public void doubleClickItem() {
-                System.out.println(contextObject + ".TreeControl[" + controlName + "].doubleClickItem");
+            public void selectNode(String nodePath) {
+                System.out.println(contextObject + ".TreeControl[" + controlName + "].selectNode()");
+            }
+
+            @Override
+            public void doubleClickNode(String nodePath) {
+                System.out.println(contextObject + ".TreeControl[" + controlName + "].doubleClickNode()");
             }
         };
     }

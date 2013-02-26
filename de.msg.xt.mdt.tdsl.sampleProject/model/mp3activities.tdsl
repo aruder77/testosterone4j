@@ -8,8 +8,8 @@ package mp3manager.activities for mp3manager.MP3MangerApp {
 	
 	activityType View
 	 
-	activityType Editor
-	
+	activityType Editor 
+	 
 	activityType Popup
 	
 	activity MainWindow type WorkbenchWindow {

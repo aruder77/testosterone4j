@@ -1,16 +1,15 @@
 package de.msg.xt.mdt.base;
 
+import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlTransient;
 
-public class BaseUseCase {
+public class BaseUseCase implements Serializable {
 
-    @XmlTransient
-    protected Generator generator;
+    protected transient Generator generator;
 
     @XmlElement
     protected Map<String, DataType> generatedData = new HashMap<String, DataType>();

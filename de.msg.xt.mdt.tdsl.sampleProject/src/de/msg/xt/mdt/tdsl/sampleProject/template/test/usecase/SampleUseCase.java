@@ -1,5 +1,7 @@
 package de.msg.xt.mdt.tdsl.sampleProject.template.test.usecase;
 
+import java.io.Serializable;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -14,7 +16,7 @@ import de.msg.xt.mdt.tdsl.sampleProject.template.test.datatype.StringDT;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement
-public class SampleUseCase extends BaseUseCase implements Runnable {
+public class SampleUseCase extends BaseUseCase implements Runnable, Serializable {
 
     public SampleUseCase() {
         super();

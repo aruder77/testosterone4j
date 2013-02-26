@@ -42,6 +42,9 @@ import de.msg.xt.mdt.tdsl.tDsl.ActivityOperation
 import org.eclipse.xtext.common.types.JvmEnumerationLiteral
 import de.msg.xt.mdt.tdsl.tDsl.SUT
 import org.eclipse.xtext.xbase.compiler.ImportManager
+import de.msg.xt.mdt.tdsl.tDsl.DataTypeMapping
+import java.util.List
+import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationParameter
 
 /**
  * <p>Infers a JVM model from the source model.</p> 
@@ -134,11 +137,10 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				]
    			]
    			
-   			members += activity.toField("INJECTOR", activity.newTypeRef("com.google.inject.Injector")) [
-   				it.setStatic(true)
+   			members += activity.toField("injector", activity.newTypeRef("com.google.inject.Injector")) [
    				it.setFinal(true)
    				it.setInitializer [
-   					it.append('''com.google.inject.Guice.createInjector(new de.msg.xt.mdt.base.TDslModule())''')
+   					it.append('''de.msg.xt.mdt.base.TDslInjector.getInjector()''')
    				]
    			]
    			
@@ -148,7 +150,16 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				it.setStatic(true)
    				it.setFinal(true)
    				it.setInitializer [
-   					it.append('''INJECTOR.getInstance(«activity.sut.activityAdapter_FQN».class)''')
+   					it.append('''de.msg.xt.mdt.base.TDslInjector.getInjector().getInstance(«activity.sut.activityAdapter_FQN».class)''')
+   				]
+   			]
+   			
+   			    //private final ITestProtocol protocol = this.injector.getInstance(ITestProtocol.class);
+   			
+   			members += activity.toField("protocol", activity.newTypeRef("de.msg.xt.mdt.base.ITestProtocol")) [
+   				it.setFinal(true)
+   				it.setInitializer [
+   					it.append('''this.injector.getInstance(de.msg.xt.mdt.base.ITestProtocol.class)''');
    				]
    			]
    			   				
@@ -230,6 +241,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    			}
    			it.setBody [
    				it.append('''
+   				    this.protocol.appendActivityOperationCall(this.getClass().getName(), "«operation.name»", null«appendActivityParameter(operation.params)»);
    				   «IF !voidReturn»return new «nextActivityClass»(«ENDIF»adapter.performOperation(ID, ACTIVITY_TYPE, this.contextObject, "«operation.name»", new Object[] {«FOR param : operation.params SEPARATOR ', '»«param.name»«ENDFOR»})«IF !voidReturn»)«ENDIF»;
    				''')
    			]
@@ -260,8 +272,12 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    							nextActivity = (condNextAct as ConditionalNextActivity).next
    						}
    					}
+   					//         this.protocol.appendControlOperationCall(this.getClass().getName(), "description", TextControl.class.getName(),
+            //    "setText", null, description.getValue());
+   					
 	   				it.append(
    						'''
+   						this.protocol.appendControlOperationCall(this.getClass().getName(), "«field.name»", «field.control.name».class.getName(), "«operation.name»", null«appendParameter(opMapping.dataTypeMappings)»);
    						«field.fieldGetterName»().«operation.name»(«mapParameters(field, operation)»);
    						return «IF nextActivity == null»this«ELSE»«nextActivity.class_SimpleName».find()«ENDIF»;
    						'''
@@ -270,6 +286,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    					it.append(
    						'''
    						«operation.returnType.name» value = «field.fieldGetterName»().«operation.name»(«mapParameters(field, operation)»); 
+   						this.protocol.appendControlOperationCall(this.getClass().getName(), "«field.name»", «field.control.name».class.getName(), "«operation.name»", value«appendParameter(opMapping.dataTypeMappings)»);
    						return new «opMapping.dataType.class_FQN»(value, «opMapping.dataType.equivalenceClass_name».getByValue(value));
    						'''
    					)
@@ -278,10 +295,18 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    		]
    	}
    	
+   	def String appendParameter(List<DataTypeMapping> mappings) {
+   		'''«FOR mapping : mappings», «mapping.name.name».getValue()«ENDFOR»'''
+   	}
+   	
+   	def String appendActivityParameter(List<ActivityOperationParameter> mappings) {
+   		'''«FOR mapping : mappings», «mapping.name».getValue()«ENDFOR»'''
+   	}
+
    	def String mapParameters(Field field, Operation operation) {
 		val opMapping = field.findOperationMappingForOperation(operation)
 		if (opMapping != null)
-			'''«FOR dataTypeMapping : opMapping.dataTypeMappings SEPARATOR ','»«dataTypeMapping?.name?.name».getValue()«ENDFOR»'''
+			'''«FOR dataTypeMapping : opMapping.dataTypeMappings SEPARATOR ", "»«dataTypeMapping?.name?.name».getValue()«ENDFOR»'''
 		else
 			""
    	}
@@ -346,11 +371,12 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    	
    	
    	def dispatch void infer(Test test, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
-   		acceptor.accept(test.toClass(test.fullyQualifiedName)).initializeLater([
+   		val testClass = test.toClass(test.fullyQualifiedName)
+   		acceptor.accept(testClass).initializeLater([
    			
    			annotations += test.toRunWithAnnotation
    			
-   			members += test.toField("TEST_CASES_XML", test.newTypeRef(typeof(String))) [
+   			members += test.toField("TEST_CASES_SERIALIZATION", test.newTypeRef(typeof(String))) [
    				it.setStatic(true)
    				it.setFinal(true)
    				it.setInitializer[
@@ -362,7 +388,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				it.setStatic(true)
    				it.setFinal(true)
    				it.setInitializer [
-   					it.append('''com.google.inject.Guice.createInjector(new de.msg.xt.mdt.base.TDslModule());''')
+   					it.append('''de.msg.xt.mdt.base.TDslInjector.createInjector(TEST_CASES_SERIALIZATION)''')
    				]
    			]
    			
@@ -372,6 +398,16 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				it.setInitializer [
    					it.append('''INJECTOR.getInstance(«test.sut.activityAdapter_FQN».class)''')
    				]
+   			]
+   			
+   			members += test.toField("protocol", test.newTypeRef("de.msg.xt.mdt.base.ITestProtocol")) [
+   				it.setFinal(true)
+   				it.setInitializer [
+   					it.append('''INJECTOR.getInstance(de.msg.xt.mdt.base.ITestProtocol.class)''')
+   				]
+   			]
+   			
+   			members += test.toField("testNumber", test.newTypeRef(typeof(int))) [
    			]
    			
    			
@@ -388,18 +424,19 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    					it.append('''
                         de.msg.xt.mdt.base.GenerationHelper testHelper = INJECTOR.getInstance(de.msg.xt.mdt.base.GenerationHelper.class);
                         de.msg.xt.mdt.base.Generator generator = INJECTOR.getInstance(de.msg.xt.mdt.base.Generator.class);
-                        return testHelper.readOrGenerateTestCases(TEST_CASES_XML, generator, «test.useCase.class_FQN.toString».class); 
+                        return testHelper.readOrGenerateTestCases(TEST_CASES_SERIALIZATION, generator, «test.useCase.class_FQN.toString».class); 
    					''')
    				]
    			]
    			
    			members += test.toConstructor [
 	   			if (test?.useCase?.class_FQN?.toString != null) {
-   					parameters += test.toParameter("useCase", test.newTypeRef(test.useCase.class_FQN.toString))
+   					parameters += test.toParameter("testDescriptor", test.newTypeRef("de.msg.xt.mdt.base.TestDescriptor", test.newTypeRef(test.useCase.class_FQN.toString)))
    				}
    				body = [
    					it.append('''
-                       this.useCase = useCase;
+                       this.testNumber = testDescriptor.getTestNumber();
+                       this.useCase = testDescriptor.getTestCase();
                        INJECTOR.injectMembers(this);
                        ''')
    				]
@@ -417,7 +454,19 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				annotations += test.toAnnotation(typeof(org.junit.Test))
    				
    				body = [
-   					it.append('''this.useCase.run();''')
+   					it.append('''
+                        try {
+                            this.protocol.openLog(this.testNumber);
+                            this.protocol.newTest(String.valueOf(this.testNumber));
+                        } catch (java.io.IOException e) {
+                            e.printStackTrace();
+                        }
+                        try {
+                        	this.useCase.run();
+                        } finally {
+                        	this.protocol.close();
+                        }
+   					''')
    				]
    			]
    		])
@@ -601,7 +650,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    			it.superTypes += useCase.newTypeRef("java.lang.Runnable")
 
    			it.annotations += useCase.toAnnotation("javax.xml.bind.annotation.XmlRootElement")
-   			
+   			   			
    			for (inputParam : useCase.inputParameter) {
    				if (inputParam.name != null && inputParam?.dataType?.class_FQN?.toString != null) {
    					members += inputParam.toField(inputParam.name, inputParam.newTypeRef(inputParam.dataType.class_FQN.toString)) [
@@ -626,6 +675,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 	   				}
    				]
    			]
+   			
    			
    			if (!useCase.inputParameter.empty) {
    				it.members += useCase.toConstructor() [
@@ -678,7 +728,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    						xbaseCompiler.compile(statement, it, "void".getTypeForName(statement), null)
    					}
    				]
-   			]   				
+   			]   			   			
    		]
    	}
    	

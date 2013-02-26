@@ -1,12 +1,14 @@
 package de.msg.xt.mdt.tdsl.sampleProject.template.test.datatype;
 
+import java.io.Serializable;
+
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import de.msg.xt.mdt.base.DataType;
 
 @XmlRootElement
-public class StringDT implements DataType<String, StringDTEquivalenceClass> {
+public class StringDT implements DataType<String, StringDTEquivalenceClass>, Serializable {
     @XmlAttribute
     private String _value;
 

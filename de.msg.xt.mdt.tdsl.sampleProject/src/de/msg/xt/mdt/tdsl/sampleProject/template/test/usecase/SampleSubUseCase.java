@@ -1,5 +1,7 @@
 package de.msg.xt.mdt.tdsl.sampleProject.template.test.usecase;
 
+import java.io.Serializable;
+
 import javax.xml.bind.annotation.XmlRootElement;
 
 import de.msg.xt.mdt.base.BaseUseCase;
@@ -8,7 +10,7 @@ import de.msg.xt.mdt.tdsl.sampleProject.template.test.activity.OtherSampleActivi
 import de.msg.xt.mdt.tdsl.sampleProject.template.test.datatype.StringDT;
 
 @XmlRootElement
-public class SampleSubUseCase extends BaseUseCase {
+public class SampleSubUseCase extends BaseUseCase implements Serializable {
 
     public SampleSubUseCase() {
     }

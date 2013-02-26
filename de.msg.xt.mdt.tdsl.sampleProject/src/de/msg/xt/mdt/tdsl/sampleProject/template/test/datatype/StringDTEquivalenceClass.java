@@ -1,9 +1,11 @@
 package de.msg.xt.mdt.tdsl.sampleProject.template.test.datatype;
 
+import java.io.Serializable;
+
 import de.msg.xt.mdt.base.EquivalenceClass;
 import de.msg.xt.mdt.tdsl.sampleProject.template.test.activity.Tags;
 
-public enum StringDTEquivalenceClass implements EquivalenceClass {
+public enum StringDTEquivalenceClass implements EquivalenceClass, Serializable {
 
     EMPTY, SHORT, LONG;
 
