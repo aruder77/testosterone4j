@@ -107,20 +107,6 @@ public class SWTBotMP3ActivityAdapter implements MP3MangerAppActivityAdapter {
         }
     }
 
-    @Override
-    public Object findContext(String id, String type) {
-        if ("mp3manager.activities.OpenViewDialog".equals(id)) {
-            SWTBot bot = new SWTBot();
-            SWTBotShell shell = bot.shell("Show View");
-            return new ActivityContext(shell, id, shell.bot());
-        } else if ("Editor".equals(type)) {
-            SWTWorkbenchBot bot = new SWTWorkbenchBot();
-            SWTBotEditor editor = bot.editorById(id);
-            return new ActivityContext(editor, id, editor.bot());
-        }
-        return new ActivityContext(new SWTWorkbenchBot(), id, new SWTBot());
-    }
-
     // @Override
     // public TextControl getTextControl(final Object contextObject, final
     // String controlName) {
@@ -182,12 +168,6 @@ public class SWTBotMP3ActivityAdapter implements MP3MangerAppActivityAdapter {
     }
 
     @Override
-    public Object beforeTest() {
-        TestUtil.resetWorkbench();
-        return null;
-    }
-
-    @Override
     public TextControl getTextControl(Object contextObject, String controlName) {
         return SWTBotTextControl.findControl(contextObject, controlName);
     }
@@ -202,32 +182,4 @@ public class SWTBotMP3ActivityAdapter implements MP3MangerAppActivityAdapter {
         return SWTBotLabelControl.findControl(contextObject, controlName);
     }
 
-    public static class ActivityContext {
-
-        Object context;
-        String id;
-        SWTBot bot;
-
-        public ActivityContext(Object context, String id, SWTBot bot) {
-            this.context = context;
-            this.id = id;
-            this.bot = bot;
-        }
-
-        public Object getContext() {
-            return this.context;
-        }
-
-        public SWTBot getBot() {
-            return this.bot;
-        }
-
-        public void setBot(SWTBot bot) {
-            this.bot = bot;
-        }
-
-        public String getId() {
-            return this.id;
-        }
-    }
 }

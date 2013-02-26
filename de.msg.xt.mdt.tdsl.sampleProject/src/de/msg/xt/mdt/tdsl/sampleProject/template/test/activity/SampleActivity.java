@@ -3,7 +3,7 @@ package de.msg.xt.mdt.tdsl.sampleProject.template.test.activity;
 import com.google.inject.Injector;
 
 import de.msg.xt.mdt.base.AbstractActivity;
-import de.msg.xt.mdt.base.ActivityAdapter;
+import de.msg.xt.mdt.base.ActivityLocator;
 import de.msg.xt.mdt.base.ITestProtocol;
 import de.msg.xt.mdt.base.TDslInjector;
 import de.msg.xt.mdt.tdsl.sampleProject.template.test.control.TextControl;
@@ -16,28 +16,32 @@ public class SampleActivity extends AbstractActivity {
 
     private static final String TYPE = "EditorAcitivity";
 
+    private static ActivityLocator activityLocator = TDslInjector.getInjector().getInstance(ActivityLocator.class);
+
     private final Injector injector = TDslInjector.getInjector();
 
     private final ITestProtocol protocol = this.injector.getInstance(ITestProtocol.class);
 
-    Object contextObject; // like SWTBot, used to find local widgets
+    SampleActivityAdapter contextAdapter; // like SWTBot, used to find local
+                                          // widgets
 
-    static ActivityAdapter adapter = TDslInjector.getInjector().getInstance(ActivityAdapter.class);
+    // static ActivityAdapter adapter =
+    // TDslInjector.getInjector().getInstance(ActivityAdapter.class);
 
     public static SampleActivity find() {
-        return new SampleActivity(adapter.findContext(ID, TYPE));
+        return new SampleActivity(activityLocator.find(ID, SampleActivityAdapter.class));
     }
 
     public SampleActivity() {
     }
 
-    public SampleActivity(Object context) {
+    public SampleActivity(SampleActivityAdapter contextAdapter) {
         this();
-        this.contextObject = context;
+        this.contextAdapter = contextAdapter;
     }
 
     public TextControl getDescriptionTextControl() {
-        return SampleActivity.adapter.getTextControl(this.contextObject, "description");
+        return this.contextAdapter.getTextControl("description");
     }
 
     public SampleActivity description_setText(StringDT description) {

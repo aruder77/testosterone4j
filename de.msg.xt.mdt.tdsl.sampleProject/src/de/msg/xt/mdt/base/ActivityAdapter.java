@@ -4,10 +4,9 @@ import de.msg.xt.mdt.tdsl.sampleProject.template.test.control.TextControl;
 
 public interface ActivityAdapter {
 
-    TextControl getTextControl(Object contextObject, String string);
+    String getType();
 
-    Object findContext(String id, String type);
+    void setContext(Object context);
 
-    Object performOperation(Object contextObject, String operationName);
-
+    TextControl getTextControl(String string);
 }

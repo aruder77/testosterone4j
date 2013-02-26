@@ -13,7 +13,7 @@ package mp3manager {
 		openView
 		selectLogicalView(viewId=id)
 		ok
-	}
+	}  
 	
 	
 	useCase OpenLogicalView initial MainWindow {

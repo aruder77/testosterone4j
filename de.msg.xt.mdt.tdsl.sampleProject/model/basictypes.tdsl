@@ -1,5 +1,5 @@
 package types {
 	
-	type String mappedBy java.lang.String	
+	type String mappedBy java.lang.String
 	
 }

@@ -17,7 +17,7 @@ import de.msg.xt.mdt.base.TestUtil;
 public class SWTBotTest {
 
     public SWTBotTest() {
-        Guice.createInjector(new TDslModule()).injectMembers(this);
+        Guice.createInjector(new TDslModule("Test")).injectMembers(this);
     }
 
     @Before

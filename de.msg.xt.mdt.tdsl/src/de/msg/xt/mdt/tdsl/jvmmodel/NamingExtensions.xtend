@@ -35,6 +35,10 @@ class NamingExtensions {
 		activity?.name?.toFirstLower + index
 	}
 	
+	def String adapterInterface_FQN(Activity activity) {
+		activity?.fullyQualifiedName?.toString + "Adapter"
+	}
+	
 	
 	// Control
 	

@@ -11,7 +11,7 @@ import de.msg.xt.mdt.tdsl.tDsl.OperationCall
 import de.msg.xt.mdt.tdsl.tDsl.PackageDeclaration
 import de.msg.xt.mdt.tdsl.tDsl.Parameter
 import de.msg.xt.mdt.tdsl.tDsl.SubUseCaseCall
-import de.msg.xt.mdt.tdsl.tDsl.TagsDeclaration 
+import de.msg.xt.mdt.tdsl.tDsl.TagsDeclaration
 import de.msg.xt.mdt.tdsl.tDsl.UseCase
 import java.util.Collection
 import javax.xml.bind.annotation.XmlAttribute
@@ -82,30 +82,22 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 	def dispatch void infer(SUT sut, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
 		acceptor.accept(sut.toInterface(sut.activityAdapter_FQN, [])).initializeLater [
 			
-			members += sut.toMethod("beforeTest", sut.newTypeRef(typeof(Object))) [
+//			    String getType();
+
+//    void setContext(Object context);
+
+			members += sut.toMethod("getType", sut.newTypeRef(typeof(String))) [
 				it.setAbstract(true)
 			]
 			
-			members += sut.toMethod("findContext", sut.newTypeRef(typeof(Object))) [
+			members += sut.toMethod("setContext", sut.newTypeRef(typeof(void) as Class<?>)) [
 				it.setAbstract(true)
-				it.parameters += sut.toParameter("id", sut.newTypeRef(typeof(String)))
-				it.parameters += sut.toParameter("type", sut.newTypeRef(typeof(String)))
-			]
-			
-			members += sut.toMethod("performOperation", sut.newTypeRef(typeof(Object))) [
-				it.setAbstract(true)
-				it.parameters += sut.toParameter("activityId", sut.newTypeRef(typeof(String)))
-				it.parameters += sut.toParameter("activityType", sut.newTypeRef(typeof(String)))
-				it.parameters += sut.toParameter("contextObject", sut.newTypeRef(typeof(Object)))
-				it.parameters += sut.toParameter("operationName", sut.newTypeRef(typeof(String)))
-				it.parameters += sut.toParameter("parameters", sut.newTypeRef(typeof(Object)).createArrayType)
 			]
 			
 			for (Control control : sut.controls) {
 				if (control?.name != null && control?.class_FQN?.toString != null) {
 					members += control.toMethod("get" + control.name.toFirstUpper, control.newTypeRef(control.class_FQN.toString)) [
 						it.setAbstract(true)
-						it.parameters += control.toParameter("contextObject", control.newTypeRef(typeof(Object)))
 						it.parameters += control.toParameter("controlName", control.newTypeRef(typeof(String)))
 					]
 				}
@@ -115,6 +107,22 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 	
 
    	def dispatch void infer(Activity activity, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
+   		
+   		val activityAdapterClass = activity.toInterface(activity.adapterInterface_FQN) [
+   			it.superTypes += activity.newTypeRef(activity.sut.activityAdapter_FQN)   			
+   			for (activityMethod : activity.operations) {
+   				members += activityMethod.toMethod(activityMethod.name, activityMethod.newTypeRef(typeof(Object))) [
+					it.setAbstract(true)
+   					
+   					for (param : activityMethod.params) {
+   						it.parameters += param.toParameter(param?.name, param?.dataType?.type?.mappedBy)
+   					}
+   					
+   				]
+   			}
+   		]
+   		acceptor.accept(activityAdapterClass)
+   		
    		
    		val activityClass = activity.toClass(activity.class_FQN)
    		acceptor.accept(activityClass).initializeLater([
@@ -145,12 +153,12 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    			]
    			
    			val packageDecl = activity.eContainer as PackageDeclaration
-   			val activityAdapterType = activity.newTypeRef(activity.sut.activityAdapter_FQN)
-   			members += activity.toField("adapter", activityAdapterType) [
+   			val activityLocatorType = activity.newTypeRef("de.msg.xt.mdt.base.ActivityLocator")
+   			members += activity.toField("activityLocator", activityLocatorType) [
    				it.setStatic(true)
    				it.setFinal(true)
    				it.setInitializer [
-   					it.append('''de.msg.xt.mdt.base.TDslInjector.getInjector().getInstance(«activity.sut.activityAdapter_FQN».class)''')
+   					it.append('''de.msg.xt.mdt.base.TDslInjector.getInjector().getInstance(de.msg.xt.mdt.base.ActivityLocator.class)''')
    				]
    			]
    			
@@ -163,7 +171,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				]
    			]
    			   				
-   			members += activity.toField("contextObject", activity.newTypeRef(typeof(Object)))
+   			members += activity.toField("contextAdapter", newTypeRef(activityAdapterClass))
    			
    			members += activity.toMethod("find", newTypeRef(activityClass)) [
    				it.setStatic(true)
@@ -171,7 +179,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				setBody [
    					it.append(
    					'''
-   					return new «activity.class_FQN.toString»(adapter.findContext(ID, ACTIVITY_TYPE));
+   					return new «activity.class_FQN.toString»(activityLocator.find(ID, «activity.adapterInterface_FQN».class));
    					''')
    				]
    			]
@@ -180,11 +188,11 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    			]
    			
    			members += activity.toConstructor [
-   				parameters += activity.toParameter("context", activity.newTypeRef(typeof(Object)))
+   				parameters += activity.toParameter("contextAdapter", newTypeRef(activityAdapterClass))
    				it.setBody [
    					it.append('''
    					    this();
-   					    this.contextObject = context;
+   					    this.contextAdapter = contextAdapter;
    					''')
    				]
    			]
@@ -194,7 +202,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 					members += field.toMethod(field.fieldGetterName, field.newTypeRef(field.control.fullyQualifiedName.toString)) [
 						it.setBody [
 							it.append('''
-						    	 return «activity.class_SimpleName».adapter.get«field.control.name»(this.contextObject, "«field.identifier»");
+						    	 return this.contextAdapter.get«field.control.name»("«field.identifier»");
 							''')
 						]
 					]
@@ -242,7 +250,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    			it.setBody [
    				it.append('''
    				    this.protocol.appendActivityOperationCall(this.getClass().getName(), "«operation.name»", null«appendActivityParameter(operation.params)»);
-   				   «IF !voidReturn»return new «nextActivityClass»(«ENDIF»adapter.performOperation(ID, ACTIVITY_TYPE, this.contextObject, "«operation.name»", new Object[] {«FOR param : operation.params SEPARATOR ', '»«param.name»«ENDFOR»})«IF !voidReturn»)«ENDIF»;
+   				   «IF !voidReturn»return new «nextActivityClass»((«nextActivityClass»Adapter)«ENDIF»contextAdapter.«operation.name»(«FOR param : operation.params SEPARATOR ', '»«param.name».getValue()«ENDFOR»)«IF !voidReturn»)«ENDIF»;
    				''')
    			]
    		]
@@ -392,11 +400,11 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				]
    			]
    			
-   			members += test.toField("ADAPTER", test.newTypeRef(test.sut.activityAdapter_FQN)) [
+   			members += test.toField("LOCATOR", test.newTypeRef("de.msg.xt.mdt.base.ActivityLocator")) [
    				it.setStatic(true)
    				it.setFinal(true)
    				it.setInitializer [
-   					it.append('''INJECTOR.getInstance(«test.sut.activityAdapter_FQN».class)''')
+   					it.append('''INJECTOR.getInstance(de.msg.xt.mdt.base.ActivityLocator.class)''')
    				]
    			]
    			
@@ -446,7 +454,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				annotations += test.toAnnotation(typeof(org.junit.Before))
    				
    				body = [
-   					it.append('''ADAPTER.beforeTest();''')
+   					it.append('''LOCATOR.beforeTest();''')
    				]
    			]
    			

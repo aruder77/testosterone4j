@@ -11,7 +11,7 @@ package swtcontrols {
 		op selectNode(String nodePath)
 		op doubleClickNode(String nodePath)
 	}
-	
+	 
 	control Label {
 		op String getText
 	}

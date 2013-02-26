@@ -1,5 +1,7 @@
 package de.msg.xt.mdt.tdsl.sampleProject.template.test.activity;
 
-public interface SampleActivityAdapter {
+import de.msg.xt.mdt.base.ActivityAdapter;
+
+public interface SampleActivityAdapter extends ActivityAdapter {
 
 }
