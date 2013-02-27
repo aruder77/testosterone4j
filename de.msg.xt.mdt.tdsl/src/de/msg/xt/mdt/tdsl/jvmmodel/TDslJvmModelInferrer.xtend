@@ -82,17 +82,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 	def dispatch void infer(SUT sut, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
 		acceptor.accept(sut.toInterface(sut.activityAdapter_FQN, [])).initializeLater [
 			
-//			    String getType();
-
-//    void setContext(Object context);
-
-			members += sut.toMethod("getType", sut.newTypeRef(typeof(String))) [
-				it.setAbstract(true)
-			]
-			
-			members += sut.toMethod("setContext", sut.newTypeRef(typeof(void) as Class<?>)) [
-				it.setAbstract(true)
-			]
+			superTypes += sut.newTypeRef("de.msg.xt.mdt.base.ActivityAdapter")
 			
 			for (Control control : sut.controls) {
 				if (control?.name != null && control?.class_FQN?.toString != null) {
@@ -247,10 +237,16 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    					it.parameters += param.toParameter(param.name, param.newTypeRef(param.dataType.class_FQN.toString))
    				}
    			}
+   			
    			it.setBody [
    				it.append('''
    				    this.protocol.appendActivityOperationCall(this.getClass().getName(), "«operation.name»", null«appendActivityParameter(operation.params)»);
-   				   «IF !voidReturn»return new «nextActivityClass»((«nextActivityClass»Adapter)«ENDIF»contextAdapter.«operation.name»(«FOR param : operation.params SEPARATOR ', '»«param.name».getValue()«ENDFOR»)«IF !voidReturn»)«ENDIF»;
+   				    Object o = contextAdapter.«operation.name»(«FOR param : operation.params SEPARATOR ', '»«param.name».getValue()«ENDFOR»);
+   				    «IF !voidReturn»
+   				    	«nextActivityClass»Adapter adapter = injector.getInstance(«nextActivityClass»Adapter.class);
+   				    	adapter.setContext(o);
+   				    	return new «nextActivityClass»(adapter);
+   				    «ENDIF»
    				''')
    			]
    		]

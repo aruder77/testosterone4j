@@ -14,7 +14,7 @@ public class SWTBotActivityLocator implements ActivityLocator {
     }
 
     @Override
-    public <T> T find(String id, Class<T> class1) {
+    public <T extends ActivityAdapter> T find(String id, Class<T> class1) {
         T activityAdapter = TDslInjector.getInjector().getInstance(class1);
         String type = activityAdapter.getType();
         if ("mp3manager.activities.OpenViewDialog".equals(id)) {

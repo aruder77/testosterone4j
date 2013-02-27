@@ -5,7 +5,7 @@ package swtcontrols {
 	control TextControl { 
 		op setText(String str)
 		op String getText
-	}
+	} 
 	
 	control TreeControl {
 		op selectNode(String nodePath)
@@ -15,6 +15,6 @@ package swtcontrols {
 	control Label {
 		op String getText
 	}
-	
+
 	
 }

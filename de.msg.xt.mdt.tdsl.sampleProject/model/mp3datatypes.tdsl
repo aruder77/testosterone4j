@@ -13,7 +13,7 @@ package mp3manager.datatypes {
 		class longString value "longlonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglongString" 		
 	}
 	
-	datatype ErrorStringDT type String {
+	datatype ErrorStringDT type String { 
 		class ok value "OK"
 		class missingValue value "Please enter a value"
 	}

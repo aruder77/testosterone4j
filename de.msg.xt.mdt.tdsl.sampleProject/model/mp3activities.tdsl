@@ -15,7 +15,7 @@ package mp3manager.activities for mp3manager.MP3MangerApp {
 	activity MainWindow type WorkbenchWindow {
 		op openView => OpenViewDialog 
 		op findLogicalView => LogicalView
-	}
+	} 
 	
 	activity LogicalView type View {
 		field tree control TreeControl {

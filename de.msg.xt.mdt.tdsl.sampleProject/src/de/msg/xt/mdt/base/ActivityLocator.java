@@ -4,6 +4,6 @@ public interface ActivityLocator {
 
     Object beforeTest();
 
-    <T> T find(String id, Class<T> class1);
+    <T extends ActivityAdapter> T find(String id, Class<T> class1);
 
 }
