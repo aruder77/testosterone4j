@@ -23,7 +23,7 @@ FqnWithWildCard:
 ;
     
 Element:
-	Activity | UseCase | Control | Type | DataType | Test | TagsDeclaration | ActivityType | SUT
+	Activity | UseCase | Control | Type | DataType | Test | TagsDeclaration | SUT
 ;
 
 SUT:
@@ -71,14 +71,10 @@ ControlOperationParameter:
 ;
     
 Activity:
-	'activity' name=ID ('identifiedBy' uniqueId=STRING)? 'type' type=[ActivityType|FQN] '{'
+	'activity' name=ID ('identifiedBy' uniqueId=STRING)? ('extends' parent=[Activity|FQN])? '{'
 		(fields+=Field)*
 		(operations+=ActivityOperation)*
 	'}'
-;
-
-ActivityType:
-	'activityType' name=ID
 ;
 
 ActivityOperationParameter:

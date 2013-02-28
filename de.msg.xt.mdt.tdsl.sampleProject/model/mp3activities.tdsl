@@ -4,27 +4,27 @@ package mp3manager.activities for mp3manager.MP3MangerApp {
 	import mp3manager.datatypes.*
 	
 	
-	activityType WorkbenchWindow
+	activity ViewActivity {
+		op close => MainWindow 
+	}
 	
-	activityType View
-	 
-	activityType Editor 
-	 
-	activityType Popup
+	activity EditorActivity {
+		op saveAndClose => MainWindow 				
+	}
 	
-	activity MainWindow type WorkbenchWindow {
+	activity MainWindow {
 		op openView => OpenViewDialog 
 		op findLogicalView => LogicalView
-	} 
+	}
 	
-	activity LogicalView type View {
+	activity LogicalView extends ViewActivity {
 		field tree control TreeControl {
 			op selectNode(StringDT nodePath)
 			op doubleClickNode(StringDT nodePath) => SongEditor
 		}
 	}
 	
-	activity SongEditor identifiedBy "com.siemens.ct.mp3m.ui.editors.ids.Id3DataBindingEditor" type Editor {
+	activity SongEditor identifiedBy "com.siemens.ct.mp3m.ui.editors.ids.Id3DataBindingEditor" extends EditorActivity {
 		field title identifiedBy "Id3TagPage.Title_Label" control TextControl tag Pflichtfeld {
 			op setText (StringDT str)
 			op StringDT getText
@@ -57,13 +57,11 @@ package mp3manager.activities for mp3manager.MP3MangerApp {
 		
 		field errorMarker identifiedBy "errorMarker" control Label {
 			op ErrorStringDT getText
-		} 
-		
-		op saveAndClose => MainWindow 		
+		} 		
 	}
 	
 	
-	activity OpenViewDialog type Popup {
+	activity OpenViewDialog {
 		op selectLogicalView(StringDT viewId)
 		op ok => MainWindow 
 		op cancel => MainWindow

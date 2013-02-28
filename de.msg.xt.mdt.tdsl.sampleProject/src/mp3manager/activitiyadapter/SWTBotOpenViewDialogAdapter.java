@@ -7,11 +7,6 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 public class SWTBotOpenViewDialogAdapter extends SWTBotBaseAdapter implements OpenViewDialogAdapter {
 
     @Override
-    public String getType() {
-        return "Shell";
-    }
-
-    @Override
     public Object selectLogicalView(String viewId) {
         SWTBotTree tree = this.contextObject.getBot().tree();
         tree.expandNode("MP3 Manager (Virtual)", false).getNode(viewId).select();

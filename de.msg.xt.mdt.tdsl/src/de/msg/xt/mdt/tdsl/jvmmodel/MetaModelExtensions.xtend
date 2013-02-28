@@ -20,6 +20,8 @@ import de.msg.xt.mdt.tdsl.tDsl.StatementLine
 import de.msg.xt.mdt.tdsl.tDsl.SUT
 import de.msg.xt.mdt.tdsl.tDsl.Test
 import de.msg.xt.mdt.tdsl.tDsl.PackageDeclaration
+import java.util.ArrayList
+import java.util.List
 
 /**
  * Convenience meta-model extensions. Please order by Metamodel-Class and alphabetically!
@@ -43,6 +45,14 @@ class MetaModelExtensions {
 		activity?.packageDeclaration?.sut
 	}
 	
+	def List<ActivityOperation> getAllOperations(Activity activity) {
+		val ops = new ArrayList<ActivityOperation>()
+		ops.addAll(activity.operations)
+		if (activity.parent != null) {
+			ops.addAll(activity.parent.allOperations)
+		}
+		ops
+	}	
 	
 	// ActivityOperation
 	

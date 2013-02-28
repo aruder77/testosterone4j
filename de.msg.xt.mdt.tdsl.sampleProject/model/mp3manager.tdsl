@@ -19,6 +19,8 @@ package mp3manager {
 	useCase OpenLogicalView initial MainWindow {
 		call OpenView(OpenView.id="Logical View")
 		findLogicalView
+		close
+		findLogicalView
 		tree.doubleClickNode(nodePath="Bob Marley/Legend/Stir It Up")
 		
 		track.setText 

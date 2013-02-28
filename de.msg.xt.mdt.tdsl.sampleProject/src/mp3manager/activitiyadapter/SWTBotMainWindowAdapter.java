@@ -13,11 +13,6 @@ import de.msg.xt.mdt.base.MainMenu;
 public class SWTBotMainWindowAdapter extends SWTBotBaseAdapter implements MainWindowAdapter {
 
     @Override
-    public String getType() {
-        return "WorkbenchWindow";
-    }
-
-    @Override
     public Object openView() {
         MainMenu.window().click().menu("Open View").click().menu("Other...").click();
         SWTBot bot = new SWTBot();

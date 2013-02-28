@@ -99,7 +99,6 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    	def dispatch void infer(Activity activity, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
    		
    		val activityAdapterClass = activity.toInterface(activity.adapterInterface_FQN) [
-   			it.superTypes += activity.newTypeRef(activity.sut.activityAdapter_FQN)   			
    			for (activityMethod : activity.operations) {
    				members += activityMethod.toMethod(activityMethod.name, activityMethod.newTypeRef(typeof(Object))) [
 					it.setAbstract(true)
@@ -111,13 +110,23 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				]
    			}
    		]
-   		acceptor.accept(activityAdapterClass)
+   		acceptor.accept(activityAdapterClass).initializeLater [
+   			if (activity.parent != null) {
+   				superTypes += activity.newTypeRef(activity.parent.adapterInterface_FQN)
+   			} else {
+   				superTypes += activity.newTypeRef(activity.sut.activityAdapter_FQN)
+   			}
+   		]
    		
    		
    		val activityClass = activity.toClass(activity.class_FQN)
    		acceptor.accept(activityClass).initializeLater([
    			
-   			superTypes += activity.newTypeRef("de.msg.xt.mdt.base.AbstractActivity")
+   			if (activity?.parent?.class_FQN?.toString != null) {
+   				superTypes += activity.newTypeRef(activity.parent.class_FQN.toString)
+   			} else {
+	   			superTypes += activity.newTypeRef("de.msg.xt.mdt.base.AbstractActivity")
+   			}
    			
    			members += activity.toField("ID", activity.newTypeRef(typeof(String))) [
    				it.setStatic(true)
@@ -127,14 +136,6 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				]
    			]
    			   				
-   			members += activity.toField("ACTIVITY_TYPE", activity.newTypeRef(typeof(String))) [
-   				it.setStatic(true)
-   				it.setFinal(true)
-   				it.setInitializer[
-   						it.append('''"«activity.type.name»"''')
-   				]
-   			]
-   			
    			members += activity.toField("injector", activity.newTypeRef("com.google.inject.Injector")) [
    				it.setFinal(true)
    				it.setInitializer [
@@ -175,13 +176,18 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    			]
    			
    			members += activity.toConstructor [
+   				it.setBody [
+   					it.append('''
+   						super();
+   					''')
+   				]
    			]
    			
    			members += activity.toConstructor [
    				parameters += activity.toParameter("contextAdapter", newTypeRef(activityAdapterClass))
    				it.setBody [
    					it.append('''
-   					    this();
+   					    «IF activity.parent != null»super(contextAdapter)«ELSE»this()«ENDIF»;
    					    this.contextAdapter = contextAdapter;
    					''')
    				]

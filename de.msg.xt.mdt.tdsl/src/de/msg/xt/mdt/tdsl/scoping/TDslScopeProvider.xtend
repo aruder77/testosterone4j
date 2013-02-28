@@ -134,7 +134,7 @@ class TDslScopeProvider extends XbaseScopeProvider {
 				if (reference == TDslPackage::eINSTANCE.operationCall_Operation) {
 					initialActivity.fieldOperations.calculatesScopes					
 				} else {
-					Scopes::scopeFor(initialActivity.operations)
+					Scopes::scopeFor(initialActivity.allOperations)
 				}
 			} else {
 				if (reference == TDslPackage::eINSTANCE.operationCall_Operation) {				
@@ -147,8 +147,8 @@ class TDslScopeProvider extends XbaseScopeProvider {
 					val operations = new ArrayList<ActivityOperation>
 					val nextActivities = lastExpression.determineNextActivities
 					for (activity : nextActivities) {
-						if (activity?.operations != null) {
-							operations.addAll(activity.operations)
+						if (activity?.allOperations != null) {
+							operations.addAll(activity.allOperations)
 						}
 					}
 					Scopes::scopeFor(operations)
