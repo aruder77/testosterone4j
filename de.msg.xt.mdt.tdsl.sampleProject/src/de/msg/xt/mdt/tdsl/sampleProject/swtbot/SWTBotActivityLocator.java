@@ -1,4 +1,5 @@
-package de.msg.xt.mdt.base;
+package de.msg.xt.mdt.tdsl.sampleProject.swtbot;
+
 
 import mp3manager.activitiyadapter.SWTBotEditorActivityAdapter;
 
@@ -6,6 +7,12 @@ import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
+
+import de.msg.xt.mdt.base.ActivityAdapter;
+import de.msg.xt.mdt.base.ActivityLocator;
+import de.msg.xt.mdt.base.TDslInjector;
+import de.msg.xt.mdt.tdsl.swtbot.ActivityContext;
+import de.msg.xt.mdt.tdsl.swtbot.TestUtil;
 
 public class SWTBotActivityLocator implements ActivityLocator {
 

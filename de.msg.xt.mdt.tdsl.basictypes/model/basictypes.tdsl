@@ -1,4 +1,4 @@
-package types {
+package de.msg.xt.mdt.tdsl.basictypes {
 	
 	type String mappedBy java.lang.String
 	

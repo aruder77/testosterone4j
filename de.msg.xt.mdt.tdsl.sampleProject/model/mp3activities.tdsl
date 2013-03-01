@@ -1,8 +1,8 @@
-package mp3manager.activities for mp3manager.MP3MangerApp {
-	import swtcontrols.*
+package mp3manager.activities for de.msg.xt.mdt.tdsl.swtbot.Stdtoolkit {
+
 	import types.*
+	import de.msg.xt.mdt.tdsl.swtbot.*
 	import mp3manager.datatypes.*
-	
 	
 	activity ViewActivity {
 		op close => MainWindow 
@@ -11,11 +11,12 @@ package mp3manager.activities for mp3manager.MP3MangerApp {
 	activity EditorActivity {
 		op saveAndClose => MainWindow 				
 	}
-	
+
 	activity MainWindow {
 		op openView => OpenViewDialog 
 		op findLogicalView => LogicalView
 	}
+	
 	
 	activity LogicalView extends ViewActivity {
 		field tree control TreeControl {

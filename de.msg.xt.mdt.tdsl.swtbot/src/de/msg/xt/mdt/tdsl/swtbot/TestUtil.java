@@ -15,7 +15,7 @@
  * copyright: (C) DAIMLER 2010, all rights reserved
  * _____________________________________________________________________________
  */
-package de.msg.xt.mdt.base;
+package de.msg.xt.mdt.tdsl.swtbot;
 
 import java.text.DateFormat;
 import java.util.Date;

@@ -1,13 +1,8 @@
-package mp3manager {
+package mp3manager for de.msg.xt.mdt.tdsl.swtbot.Stdtoolkit {
 	
-	import swtcontrols.*
 	import types.*
 	import mp3manager.datatypes.*
 	import mp3manager.activities.*
-	
-	sut MP3MangerApp using controls { 
-		TextControl, TreeControl, Label
-	} 
 	
 	useCase OpenView(StringDT id) initial MainWindow {
 		openView

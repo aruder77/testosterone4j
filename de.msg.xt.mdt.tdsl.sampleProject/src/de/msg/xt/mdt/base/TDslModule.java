@@ -12,6 +12,8 @@ import mp3manager.activitiyadapter.SWTBotSongEditorAdapter;
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
 
+import de.msg.xt.mdt.tdsl.sampleProject.swtbot.SWTBotActivityLocator;
+
 public class TDslModule extends AbstractModule {
 
     public static final String TEST_ID_KEY = "TestID";

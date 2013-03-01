@@ -2,19 +2,18 @@ package mp3manager.activitiyadapter;
 
 import java.util.StringTokenizer;
 
-import mp3manager.MP3MangerAppActivityAdapter;
-
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotLabel;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
-import swtcontrols.Label;
-import swtcontrols.TextControl;
-import swtcontrols.TreeControl;
-import de.msg.xt.mdt.base.ActivityContext;
+import de.msg.xt.mdt.tdsl.swtbot.ActivityContext;
+import de.msg.xt.mdt.tdsl.swtbot.Label;
+import de.msg.xt.mdt.tdsl.swtbot.StdtoolkitActivityAdapter;
+import de.msg.xt.mdt.tdsl.swtbot.TextControl;
+import de.msg.xt.mdt.tdsl.swtbot.TreeControl;
 
-public abstract class SWTBotBaseAdapter implements MP3MangerAppActivityAdapter {
+public abstract class SWTBotBaseAdapter implements StdtoolkitActivityAdapter {
 
     protected ActivityContext contextObject;
 
@@ -38,7 +37,7 @@ public abstract class SWTBotBaseAdapter implements MP3MangerAppActivityAdapter {
         return SWTBotLabelControl.findControl(this.contextObject, controlName);
     }
 
-    private static final class SWTBotLabelControl implements swtcontrols.Label {
+    private static final class SWTBotLabelControl implements Label {
 
         SWTBotLabel swtBotLabel;
 
@@ -60,7 +59,7 @@ public abstract class SWTBotBaseAdapter implements MP3MangerAppActivityAdapter {
 
     }
 
-    private static final class SWTBotTextControl implements swtcontrols.TextControl {
+    private static final class SWTBotTextControl implements TextControl {
 
         SWTBotText swtBotText;
         String id;
@@ -88,7 +87,7 @@ public abstract class SWTBotBaseAdapter implements MP3MangerAppActivityAdapter {
         }
     }
 
-    public static class SWTBotTreeControl implements swtcontrols.TreeControl {
+    public static class SWTBotTreeControl implements TreeControl {
 
         SWTBotTree swtBotTree;
 

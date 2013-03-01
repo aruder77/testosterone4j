@@ -1,4 +1,4 @@
-package de.msg.xt.mdt.base;
+package de.msg.xt.mdt.tdsl.swtbot;
 
 import org.eclipse.swtbot.swt.finder.SWTBot;
 

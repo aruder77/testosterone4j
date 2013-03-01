@@ -15,7 +15,7 @@
  * Copyright: (C) DAIMLER 2011, all rights reserved
  * _____________________________________________________________________________
  */
-package de.msg.xt.mdt.base;
+package de.msg.xt.mdt.tdsl.swtbot;
 
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 

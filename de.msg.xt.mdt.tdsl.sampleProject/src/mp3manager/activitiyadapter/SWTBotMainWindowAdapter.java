@@ -7,8 +7,8 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 
-import de.msg.xt.mdt.base.ActivityContext;
-import de.msg.xt.mdt.base.MainMenu;
+import de.msg.xt.mdt.tdsl.swtbot.ActivityContext;
+import de.msg.xt.mdt.tdsl.swtbot.MainMenu;
 
 public class SWTBotMainWindowAdapter extends SWTBotBaseAdapter implements MainWindowAdapter {
 

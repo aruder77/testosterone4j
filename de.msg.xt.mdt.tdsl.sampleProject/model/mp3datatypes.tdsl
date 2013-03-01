@@ -1,6 +1,6 @@
 package mp3manager.datatypes {
 	
-	import types.*
+	import de.msg.xt.mdt.tdsl.basictypes.*
 	
 	tags { 
 		Pflichtfeld, Empty

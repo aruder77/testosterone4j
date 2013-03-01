@@ -15,7 +15,7 @@
  * Copyright: (C) DAIMLER 2012, all rights reserved
  * _____________________________________________________________________________
  */
-package de.msg.xt.mdt.base;
+package de.msg.xt.mdt.tdsl.swtbot;
 
 import java.util.ArrayList;
 import java.util.List;

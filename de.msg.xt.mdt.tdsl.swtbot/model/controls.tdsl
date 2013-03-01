@@ -1,8 +1,14 @@
-package swtcontrols {
+package de.msg.xt.mdt.tdsl.swtbot {
 	
-	import types.*
+	import de.msg.xt.mdt.tdsl.basictypes.*
 	
-	control TextControl { 
+	sut Stdtoolkit using controls { 
+		TextControl, TreeControl, Label
+	} 
+	
+	
+	
+	control TextControl {
 		op setText(String str)
 		op String getText
 	}
