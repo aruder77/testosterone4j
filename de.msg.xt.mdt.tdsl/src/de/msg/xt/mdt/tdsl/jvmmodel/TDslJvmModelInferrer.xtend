@@ -98,7 +98,14 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 
    	def dispatch void infer(Activity activity, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
    		
-   		val activityAdapterClass = activity.toInterface(activity.adapterInterface_FQN) [
+   		val activityAdapterClass = activity.toInterface(activity.adapterInterface_FQN) []
+   		acceptor.accept(activityAdapterClass).initializeLater [
+   			if (activity.parent != null) {
+   				superTypes += activity.newTypeRef(activity.parent.adapterInterface_FQN)
+   			} else {
+   				superTypes += activity.newTypeRef(activity.sut.activityAdapter_FQN)
+   			}
+
    			for (activityMethod : activity.operations) {
    				members += activityMethod.toMethod(activityMethod.name, activityMethod.newTypeRef(typeof(Object))) [
 					it.setAbstract(true)
@@ -108,13 +115,6 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    					}
    					
    				]
-   			}
-   		]
-   		acceptor.accept(activityAdapterClass).initializeLater [
-   			if (activity.parent != null) {
-   				superTypes += activity.newTypeRef(activity.parent.adapterInterface_FQN)
-   			} else {
-   				superTypes += activity.newTypeRef(activity.sut.activityAdapter_FQN)
    			}
    		]
    		
