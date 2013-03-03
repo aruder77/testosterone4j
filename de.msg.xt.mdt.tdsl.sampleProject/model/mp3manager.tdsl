@@ -1,6 +1,6 @@
 package mp3manager for de.msg.xt.mdt.tdsl.swtbot.Stdtoolkit {
 	
-	import types.*
+	import de.msg.xt.mdt.tdsl.basictypes.*
 	import mp3manager.datatypes.*
 	import mp3manager.activities.*
 	

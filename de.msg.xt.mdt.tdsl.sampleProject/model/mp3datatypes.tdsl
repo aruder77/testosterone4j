@@ -6,13 +6,6 @@ package mp3manager.datatypes {
 		Pflichtfeld, Empty
 	}
 		
-	
-	datatype StringDT type String {
-		class emptyString value "" Empty
-		class shortString value "shortString"
-		class longString value "longlonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglongString" 		
-	} 
-	
 	datatype ErrorStringDT type String { 
 		class ok value "OK" 
 		class missingValue value "Please enter a value"

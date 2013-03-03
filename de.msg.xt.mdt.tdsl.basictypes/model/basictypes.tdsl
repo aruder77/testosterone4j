@@ -2,4 +2,11 @@ package de.msg.xt.mdt.tdsl.basictypes {
 	
 	type String mappedBy java.lang.String
 	
+	datatype StringDT type String { 
+		class emptyString value ""
+		class shortString value "shortString"
+		class longString value "longlonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglongString" 		
+	}
+	
+	
 } 

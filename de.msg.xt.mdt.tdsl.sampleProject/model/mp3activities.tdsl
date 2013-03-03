@@ -1,6 +1,6 @@
 package mp3manager.activities for de.msg.xt.mdt.tdsl.swtbot.Stdtoolkit {
 
-	import types.*
+	import de.msg.xt.mdt.tdsl.basictypes.*
 	import de.msg.xt.mdt.tdsl.swtbot.*
 	import mp3manager.datatypes.*
 	
@@ -20,7 +20,7 @@ package mp3manager.activities for de.msg.xt.mdt.tdsl.swtbot.Stdtoolkit {
 	
 	activity LogicalView extends ViewActivity {
 		field tree control TreeControl {
-			op selectNode(StringDT nodePath)
+			op selectNode(de.msg.xt.mdt.tdsl.basictypes.StringDT nodePath)
 			op doubleClickNode(StringDT nodePath) => SongEditor
 		}
 	}

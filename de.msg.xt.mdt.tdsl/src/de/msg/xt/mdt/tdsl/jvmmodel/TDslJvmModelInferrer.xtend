@@ -263,7 +263,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 			val opMapping = field.findOperationMappingForOperation(operation)
 			if (opMapping != null) {
 				for (dataTypeMapping : opMapping.dataTypeMappings) {
-					if (dataTypeMapping.name != null && dataTypeMapping.datatype != null) {
+					if (dataTypeMapping?.name?.name != null && dataTypeMapping?.datatype?.class_FQN?.toString != null) {
 						it.parameters += dataTypeMapping.toParameter(dataTypeMapping.name.name, dataTypeMapping.newTypeRef(dataTypeMapping.datatype.class_FQN.toString))
 					}
 				}
@@ -339,7 +339,9 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				System::out.println("For operations with return type a mapping with dataType must be specified!")
    				//throw new IllegalArgumentException("For operations with return type a mapping with dataType must be specified!")
    			} else {
-   				opMapping.newTypeRef(opMapping?.dataType?.class_FQN?.toString)
+   				if (opMapping?.dataType?.class_FQN?.toString != null) {
+   					opMapping.newTypeRef(opMapping?.dataType?.class_FQN?.toString)
+   				}
    			}
    		}
    	}
@@ -534,14 +536,14 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 				]	
    			]
    			
-   			members += dataType.toMethod("getTags", dataType.newTypeRef(dataType.eContainer.fullyQualifiedName.toString + ".Tags").createArrayType) [
+   			members += dataType.toMethod("getTags", dataType.newTypeRef("de.msg.xt.mdt.base.Tag").createArrayType) [
    				setBody [
 					it.append('''
-					    Tags[] tags = null;                                   
+					    de.msg.xt.mdt.base.Tag[] tags = null;                                   
 					    switch (this) {            
     					«FOR clazz : dataType.classes»                           
     					case «clazz.name»:                                           
-    						tags = new Tags[] { «FOR tag : clazz.tags SEPARATOR ', '»Tags.«tag.name»«ENDFOR» };
+    						tags = new de.msg.xt.mdt.base.Tag[] { «FOR tag : clazz.tags SEPARATOR ', '»Tags.«tag.name»«ENDFOR» };
     						break;                       
         				«ENDFOR»                     
 					    }                                                     
