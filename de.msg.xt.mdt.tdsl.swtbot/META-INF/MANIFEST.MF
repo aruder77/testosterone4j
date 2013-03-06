@@ -9,5 +9,7 @@ Require-Bundle: org.eclipse.ui,
  de.msg.xt.mdt.tdsl.basictypes;bundle-version="1.0.0",
  org.eclipse.swtbot.eclipse.finder;bundle-version="2.0.5";visibility:=reexport
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Export-Package: de.msg.xt.mdt.tdsl.swtbot
+Export-Package: de.msg.xt.mdt.tdsl.swtbot,
+ de.msg.xt.mdt.tdsl.swtbot.activityadapter,
+ de.msg.xt.mdt.tdsl.swtbot.control
 

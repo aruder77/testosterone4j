@@ -1,16 +1,20 @@
-package mp3manager.activitiyadapter;
-
-import mp3manager.activities.EditorActivityAdapter;
+package de.msg.xt.mdt.tdsl.swtbot.activityadapter;
 
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 
-public class SWTBotEditorActivityAdapter extends SWTBotBaseAdapter implements EditorActivityAdapter {
+public class SWTBotEditorActivityAdapter extends SWTBotActivityAdapter {
 
-    @Override
     public Object saveAndClose() {
         SWTBotEditor editor = (SWTBotEditor) this.contextObject.getContext();
         editor.saveAndClose();
         return null;
     }
 
+    public void save() {
+
+    }
+
+    public void close() {
+
+    }
 }

@@ -1,8 +1,14 @@
-package mp3manager.activities for de.msg.xt.mdt.tdsl.swtbot.Stdtoolkit {
+package mp3manager.activities {
 
 	import de.msg.xt.mdt.tdsl.basictypes.*
 	import de.msg.xt.mdt.tdsl.swtbot.*
 	import mp3manager.datatypes.*
+	
+	sut Stdtoolkit using controls { 
+		TextControl, TreeControl, Label
+	} 
+	
+	
 	
 	activity ViewActivity {
 		op close => MainWindow 
