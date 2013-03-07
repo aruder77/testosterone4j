@@ -1,17 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<feature id="de.msg.xt.mdt.tdsl.sdk"
-	label="TDsl SDK Feature "
-	version="1.0.0.qualifier">
-	<plugin
-			id="de.msg.xt.mdt.tdsl"
-			download-size="0"
-			install-size="0"
-			version="0.0.0"
-			unpack="false"/>
-	<plugin
-			id="de.msg.xt.mdt.tdsl.ui"
-			download-size="0"
-			install-size="0"
-			version="0.0.0"
-			unpack="false"/>
+<feature
+      id="de.msg.xt.mdt.tdsl.sdk"
+      label="TDsl SDK Feature "
+      version="1.0.0.qualifier">
+
+   <requires>
+      <import feature="org.eclipse.xtext.sdk" version="2.3.1.v201208210947" match="greaterOrEqual"/>
+   </requires>
+
+   <plugin
+         id="de.msg.xt.mdt.tdsl"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="de.msg.xt.mdt.tdsl.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
 </feature>
