@@ -39,4 +39,9 @@ public class SWTBotTreeControl implements TreeControl {
     public void doubleClickNode(String nodePath) {
         getItem(nodePath).doubleClick();
     }
+
+    @Override
+    public Boolean isEnabled() {
+        return this.swtBotTree.isEnabled();
+    }
 }

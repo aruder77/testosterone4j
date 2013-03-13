@@ -1,6 +1,8 @@
 package de.msg.xt.mdt.tdsl.basictypes {
 	
-	type String mappedBy java.lang.String
+	type String mappedBy String
+	
+	type Boolean mappedBy Boolean
 	
 	datatype StringDT type String { 
 		class emptyString value ""

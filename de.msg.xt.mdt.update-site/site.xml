@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/de.msg.xt.mdt.tdsl.sdk_1.0.0.qualifier.jar" id="de.msg.xt.mdt.tdsl.sdk" version="1.0.0.qualifier">
+   <feature url="features/de.msg.xt.mdt.tdsl.sdk_1.0.0.201303112251.jar" id="de.msg.xt.mdt.tdsl.sdk" version="1.0.0.201303112251">
+      <category name="tdsl"/>
+   </feature>
+   <feature url="features/de.msg.xt.mdt.tdsl.swtbot_1.0.0.201303112251.jar" id="de.msg.xt.mdt.tdsl.swtbot" version="1.0.0.201303112251">
       <category name="tdsl"/>
    </feature>
    <category-def name="tdsl" label="TDsl"/>

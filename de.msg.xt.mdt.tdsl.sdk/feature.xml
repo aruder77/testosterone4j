@@ -22,4 +22,24 @@
          version="0.0.0"
          unpack="false"/>
 
+   <plugin
+         id="com.google.guice"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
+
+   <plugin
+         id="de.msg.xt.mdt.tdsl.base"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="de.msg.xt.mdt.tdsl.basictypes"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
 </feature>

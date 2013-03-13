@@ -9,7 +9,6 @@ import de.msg.xt.mdt.base.ActivityAdapter;
 import de.msg.xt.mdt.base.ActivityLocator;
 import de.msg.xt.mdt.base.TDslInjector;
 import de.msg.xt.mdt.tdsl.swtbot.ActivityContext;
-import de.msg.xt.mdt.tdsl.swtbot.TestUtil;
 import de.msg.xt.mdt.tdsl.swtbot.activityadapter.SWTBotEditorActivityAdapter;
 
 public class SWTBotActivityLocator implements ActivityLocator {

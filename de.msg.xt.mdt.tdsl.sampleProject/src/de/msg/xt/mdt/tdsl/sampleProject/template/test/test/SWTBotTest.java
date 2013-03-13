@@ -11,8 +11,8 @@ import org.junit.Test;
 import com.google.inject.Guice;
 
 import de.msg.xt.mdt.base.TDslModule;
+import de.msg.xt.mdt.tdsl.sampleProject.swtbot.TestUtil;
 import de.msg.xt.mdt.tdsl.swtbot.MainMenu;
-import de.msg.xt.mdt.tdsl.swtbot.TestUtil;
 
 public class SWTBotTest {
 

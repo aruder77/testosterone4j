@@ -31,4 +31,9 @@ public class SWTBotTextControl implements TextControl {
         System.out.println("TextControl[" + this.id + "].getText()");
         return this.swtBotText.getText();
     }
+
+    @Override
+    public Boolean isEnabled() {
+        return this.swtBotText.isEnabled();
+    }
 }

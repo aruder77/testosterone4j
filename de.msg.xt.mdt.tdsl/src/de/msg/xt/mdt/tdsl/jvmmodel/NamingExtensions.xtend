@@ -50,6 +50,8 @@ class NamingExtensions {
 	// DataType
 	
 	def QualifiedName class_FQN(DataType dataType) {
+		if (dataType == null)
+			return null
 		dataType?.fullyQualifiedName
 	}
 	

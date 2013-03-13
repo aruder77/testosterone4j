@@ -500,8 +500,9 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    						parameters += param.toParameter(param.name, param.type.mappedBy)
    					}   					
    				]
-   				op.setAbstract(true)
-   				members += op
+   				op?.setAbstract(true)
+   				if (op != null)
+   					members += op
    			}
    		])
    	}
