@@ -39,6 +39,8 @@ package mp3manager for Stdtoolkit {
 		var resultYear = op year.getText
 		var resultComment = op comment.getText 
 		assert [ junit::framework::Assert::assertEquals(enteredTrack.getValue(), resultTrack.getValue()) ]	
+		assert [ junit::framework::Assert::assertEquals(enteredYear.getValue(), resultYear.getValue()) ]	
+		assert [ junit::framework::Assert::assertEquals(enteredComment.getValue(), resultComment.getValue()) ]	
 	}
 	 
 	test OpenLogicalViewTest generator de.msg.xt.mdt.base.SampleTestGenerator useCase OpenLogicalView

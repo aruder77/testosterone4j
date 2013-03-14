@@ -10,5 +10,8 @@ package de.msg.xt.mdt.tdsl.basictypes {
 		class longString value "longlonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglongString" 		
 	}
 	
-	
+	datatype BooleanDT type Boolean {
+		class trueBoolean value true
+		class falseBoolean value false
+	}
 } 

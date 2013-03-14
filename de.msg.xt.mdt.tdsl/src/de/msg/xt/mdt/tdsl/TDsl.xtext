@@ -43,7 +43,7 @@ DataType:
 ;
 
 EquivalenceClass:
-	'class' name=ID 'value' value=STRING (tags+=[Tag|FQN])* 
+	'class' name=ID 'value' value=XLiteral ('tags' (tags+=[Tag|FQN])+)? 
 ;
 
 TagsDeclaration:

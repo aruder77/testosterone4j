@@ -17,4 +17,9 @@ public class SWTBotEditorActivityAdapter extends SWTBotActivityAdapter {
     public void close() {
 
     }
+
+    public Boolean isDirty() {
+        SWTBotEditor editor = (SWTBotEditor) this.contextObject.getContext();
+        return editor.isDirty();
+    }
 }

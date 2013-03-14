@@ -15,7 +15,8 @@ package mp3manager.activities {
 	}
 	
 	activity EditorActivity {
-		op saveAndClose => MainWindow 				
+		op saveAndClose => MainWindow 	
+		op BooleanDT isDirty			
 	}
 
 	activity MainWindow {

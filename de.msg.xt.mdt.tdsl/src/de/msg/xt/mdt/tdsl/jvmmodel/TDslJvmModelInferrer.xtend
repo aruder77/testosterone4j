@@ -293,13 +293,15 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    						'''
    					)
    				} else {
-   					it.append(
-   						'''
-   						«operation.returnType.name» value = «field.fieldGetterName»().«operation.name»(«mapParameters(field, operation)»); 
-   						this.protocol.appendControlOperationCall(this.getClass().getName(), "«field.name»", «field.control.name».class.getName(), "«operation.name»", value«appendParameter(opMapping.dataTypeMappings)»);
-   						return new «opMapping.dataType.class_FQN»(value, «opMapping.dataType.equivalenceClass_name».getByValue(value));
-   						'''
-   					)
+   					if (opMapping != null) {
+   						it.append(
+   							'''
+   							«operation.returnType.name» value = «field.fieldGetterName»().«operation.name»(«mapParameters(field, operation)»); 
+   							this.protocol.appendControlOperationCall(this.getClass().getName(), "«field.name»", «field.control.name».class.getName(), "«operation.name»", value«appendParameter(opMapping.dataTypeMappings)»);
+   							return new «opMapping.dataType.class_FQN»(value, «opMapping.dataType.equivalenceClass_name».getByValue(value));
+   							'''
+   						)
+   					}
    				}
    			]
    		]
@@ -526,11 +528,21 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 					it.append('''
         				«dataType.type.mappedBy.simpleName» value = null;
         				switch (this) {
-        				«FOR clazz : dataType.classes»
-        				case «clazz.name»:
-        				value = "«clazz.value»";
+        				''')
+        				
+        			for (clazz : dataType.classes) {
+        				it.append('''
+        					case «clazz.name»:
+        					value = ''')
+        				val expectedType = dataType.type.mappedBy
+        				xbaseCompiler.compileAsJavaExpression(clazz.value, it, expectedType)
+        				it.append('''
+        				;
         				break;
-            			«ENDFOR»
+        				''')
+        			}
+            			
+            		it.append('''
         				}
         				return value;
 					''')
@@ -561,13 +573,19 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    					it.append('''
 				        «dataType.name.toFirstUpper + "EquivalenceClass"» clazz = null;
 				        if (value != null) {
-				            switch (value) {
-    					    «FOR clazz : dataType.classes»                           
-				                case "«clazz.value»":
-				                    clazz = «clazz.name»;
-				                    break;
-				            «ENDFOR»
-				            }
+				    ''')
+				    for (clazz : dataType.classes) {
+				    	it.append('''
+				    		if(value.equals(
+				        ''')
+				    	xbaseCompiler.compileAsJavaExpression(clazz.value, it, dataType.type.mappedBy)
+				        it.append('''
+				        	)) {
+				        		clazz = «clazz.name»;
+				        	}
+				        	''')
+				        }
+				    it.append('''
 				        }
 				        return clazz;
    					''')
@@ -577,7 +595,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 
    		
    		acceptor.accept(dataType.toClass(dataType.fullyQualifiedName)).initializeLater([
-   			superTypes += dataType.newTypeRef("de.msg.xt.mdt.base.DataType", dataType.newTypeRef(typeof(String)), newTypeRef(equivalenceClass))
+   			superTypes += dataType.newTypeRef("de.msg.xt.mdt.base.DataType", dataType.type.mappedBy, newTypeRef(equivalenceClass))
    			
    			annotations += dataType.toAnnotation(typeof(XmlRootElement))
    			

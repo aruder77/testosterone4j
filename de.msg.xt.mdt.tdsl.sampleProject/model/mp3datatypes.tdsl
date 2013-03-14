@@ -12,7 +12,7 @@ package mp3manager.datatypes {
 	}
 	
 	datatype TrackDT type String {
-		class emptyTrack value "" Empty
+		class emptyTrack value "" tags Empty
 		class realTrack value "5"
 	}
 	
@@ -20,7 +20,7 @@ package mp3manager.datatypes {
 		class currentYear value "2013"
 		class futureYear value "2250"
 		class pastYear value "1800"
-		class emptyYear value "" Empty
+		class emptyYear value "" tags Empty
 	}
 }
 	
