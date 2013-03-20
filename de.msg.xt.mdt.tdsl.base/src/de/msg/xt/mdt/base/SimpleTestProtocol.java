@@ -58,7 +58,7 @@ public class SimpleTestProtocol implements ITestProtocol {
         sb.append(operationName).append("(");
 
         int idx = 0;
-        for (String param : parameter) {
+        for (Object param : parameter) {
             if (idx++ != 0) {
                 sb.append(", ");
             }

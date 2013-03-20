@@ -169,7 +169,7 @@ VariableDeclaration returns xbase::XVariableDeclaration:
 ;
 
 Expression returns xbase::XExpression:
-	'op' OperationCall | GeneratedValueExpression | XExpression 
+	'op' OperationCall | 'aop' ActivityOperationCall | GeneratedValueExpression | XExpression 
 ;
 
 GeneratedValueExpression returns xbase::XExpression:

@@ -27,8 +27,9 @@ package mp3manager.activities {
 	
 	activity LogicalView extends ViewActivity {
 		field tree control TreeControl {
-			op selectNode(de.msg.xt.mdt.tdsl.basictypes.StringDT nodePath)
+			op selectNode(StringDT nodePath)
 			op doubleClickNode(StringDT nodePath) => SongEditor
+			op BooleanDT isEnabled
 		}
 	}
 	

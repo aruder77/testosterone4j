@@ -297,7 +297,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    						it.append(
    							'''
    							«operation.returnType.name» value = «field.fieldGetterName»().«operation.name»(«mapParameters(field, operation)»); 
-   							this.protocol.appendControlOperationCall(this.getClass().getName(), "«field.name»", «field.control.name».class.getName(), "«operation.name»", value«appendParameter(opMapping.dataTypeMappings)»);
+   							this.protocol.appendControlOperationCall(this.getClass().getName(), "«field.name»", «field.control.name».class.getName(), "«operation.name»", value.toString()«appendParameter(opMapping.dataTypeMappings)»);
    							return new «opMapping.dataType.class_FQN»(value, «opMapping.dataType.equivalenceClass_name».getByValue(value));
    							'''
    						)
@@ -308,11 +308,11 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    	}
    	
    	def String appendParameter(List<DataTypeMapping> mappings) {
-   		'''«FOR mapping : mappings», «mapping.name.name».getValue()«ENDFOR»'''
+   		'''«FOR mapping : mappings», «mapping.name.name».getValue().toString()«ENDFOR»'''
    	}
    	
    	def String appendActivityParameter(List<ActivityOperationParameter> mappings) {
-   		'''«FOR mapping : mappings», «mapping.name».getValue()«ENDFOR»'''
+   		'''«FOR mapping : mappings», «mapping.name».getValue().toString()«ENDFOR»'''
    	}
 
    	def String mapParameters(Field field, Operation operation) {
