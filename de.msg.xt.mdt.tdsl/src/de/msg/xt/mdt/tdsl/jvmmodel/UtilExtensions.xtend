@@ -6,7 +6,7 @@ class UtilExtensions {
 	// String
 	
 	def toFieldName(String string) { 
-		string.replace('.', '_').replace('@', '_')
+		string?.replace('.', '_')?.replace('@', '_')
 	}
 
 

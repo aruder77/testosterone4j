@@ -43,15 +43,13 @@ class NamingExtensions {
 	// Control
 	
 	def QualifiedName class_FQN(Control control) {
-		control.fullyQualifiedName
+		control?.fullyQualifiedName
 	}
 	
 	
 	// DataType
 	
 	def QualifiedName class_FQN(DataType dataType) {
-		if (dataType == null)
-			return null
 		dataType?.fullyQualifiedName
 	}
 	
@@ -63,9 +61,9 @@ class NamingExtensions {
 	// DataTypeMapping
 	
 	def String generatedValueLocalVariableName(DataTypeMapping dataTypeMapping) {
-		val fieldName = dataTypeMapping.operationMapping.field.fullyQualifiedName.toString
-		val operationName = dataTypeMapping.operationMapping.name.name
-		val paramName = dataTypeMapping.name.name
+		val fieldName = dataTypeMapping?.operationMapping?.field?.fullyQualifiedName?.toString
+		val operationName = dataTypeMapping?.operationMapping?.name?.name
+		val paramName = dataTypeMapping?.name?.name
 		val variableName = (fieldName + '.' + operationName + '.' + paramName).toFieldName
 		variableName
 	}
@@ -73,11 +71,11 @@ class NamingExtensions {
 	// Field
 		
 	def String activityControlDelegationMethodName(Field field, Operation operation) {
-		field.name + "_" + operation.name
+		field?.name + "_" + operation?.name
 	}
 	
 	def String getterName(Field field) {
-		"get" + field.name.toFirstUpper
+		"get" + field?.name?.toFirstUpper
 	}
 	
 	def String getFieldGetterName(Field field) {
@@ -96,15 +94,15 @@ class NamingExtensions {
 	// UseCase
 	
 	def QualifiedName class_FQN(UseCase useCase) {
-		useCase.fullyQualifiedName
+		useCase?.fullyQualifiedName
 	}
 	
 	def String class_SimpleName(UseCase useCase) {
-		useCase.name.toFirstUpper
+		useCase?.name?.toFirstUpper
 	}
 	
 	def String subUseCaseGetter(UseCase useCase) {
-		"getOrGenerateSubUseCase(" + useCase.fullyQualifiedName.toString + ".class, \"" + useCase.name + "\")"  
+		"getOrGenerateSubUseCase(" + useCase?.fullyQualifiedName?.toString + ".class, \"" + useCase?.name + "\")"  
 	}
 	
 }

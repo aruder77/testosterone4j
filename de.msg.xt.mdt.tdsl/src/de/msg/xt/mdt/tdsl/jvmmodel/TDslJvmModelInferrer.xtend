@@ -45,6 +45,7 @@ import org.eclipse.xtext.xbase.compiler.ImportManager
 import de.msg.xt.mdt.tdsl.tDsl.DataTypeMapping
 import java.util.List
 import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationParameter
+import org.eclipse.xtext.common.types.JvmGenericType
 
 /**
  * <p>Infers a JVM model from the source model.</p> 
@@ -80,45 +81,58 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 	}
 
 	def dispatch void infer(SUT sut, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
-		acceptor.accept(sut.toInterface(sut.activityAdapter_FQN, [])).initializeLater [
+		if (sut.activityAdapter_FQN != null) {
+			acceptor.accept(sut.toInterface(sut.activityAdapter_FQN, [])).initializeLater [
 			
-			superTypes += sut.newTypeRef("de.msg.xt.mdt.base.ActivityAdapter")
+				superTypes += sut.newTypeRef("de.msg.xt.mdt.base.ActivityAdapter")
 			
-			for (Control control : sut.controls) {
-				if (control?.name != null && control?.class_FQN?.toString != null) {
-					members += control.toMethod("get" + control.name.toFirstUpper, control.newTypeRef(control.class_FQN.toString)) [
-						it.setAbstract(true)
-						it.parameters += control.toParameter("controlName", control.newTypeRef(typeof(String)))
-					]
+				for (Control control : sut.controls) {
+					if (control?.name != null && control?.class_FQN?.toString != null) {
+						members += control.toMethod("get" + control.name.toFirstUpper, control.newTypeRef(control.class_FQN.toString)) [
+							it.setAbstract(true)
+							it.parameters += control.toParameter("controlName", control.newTypeRef(typeof(String)))
+						]
+					}
 				}
-			}
-		]
+			]
+		}
 	}
 	
 
    	def dispatch void infer(Activity activity, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
    		
-   		val activityAdapterClass = activity.toInterface(activity.adapterInterface_FQN) []
-   		acceptor.accept(activityAdapterClass).initializeLater [
-   			if (activity.parent != null) {
-   				superTypes += activity.newTypeRef(activity.parent.adapterInterface_FQN)
-   			} else {
-   				superTypes += activity.newTypeRef(activity.sut.activityAdapter_FQN)
-   			}
+   		var JvmGenericType activityAdapterClassVar = null
+   		if (activity.adapterInterface_FQN != null ) {
+	   		activityAdapterClassVar = activity.toInterface(activity.adapterInterface_FQN) []
+   			acceptor.accept(activityAdapterClassVar).initializeLater [
+   				if (activity.parent?.adapterInterface_FQN != null) {
+   					superTypes += activity.newTypeRef(activity.parent.adapterInterface_FQN)
+	   			} else if (activity.sut?.activityAdapter_FQN != null) {
+   					superTypes += activity.newTypeRef(activity.sut.activityAdapter_FQN)
+   				}
 
-   			for (activityMethod : activity.operations) {
-   				members += activityMethod.toMethod(activityMethod.name, activityMethod.newTypeRef(typeof(Object))) [
-					it.setAbstract(true)
+	   			for (activityMethod : activity.operations) {
+	   				if (activityMethod.name != null) {
+   						members += activityMethod.toMethod(activityMethod.name, activityMethod.newTypeRef(typeof(Object))) [
+							it.setAbstract(true)
    					
-   					for (param : activityMethod.params) {
-   						it.parameters += param.toParameter(param?.name, param?.dataType?.type?.mappedBy)
+   							for (param : activityMethod.params) {
+   								if (param?.name != null && param?.dataType?.type?.mappedBy != null) {
+   									it.parameters += param.toParameter(param?.name, param?.dataType?.type?.mappedBy)
+   								}
+   							}
+   					
+   						]
    					}
-   					
-   				]
-   			}
-   		]
+   				}
+   			]
+   		}
+   		val activityAdapterClass = activityAdapterClassVar
    		
    		
+   		if (activity.class_FQN == null)
+   			return
+   			
    		val activityClass = activity.toClass(activity.class_FQN)
    		acceptor.accept(activityClass).initializeLater([
    			
@@ -143,7 +157,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				]
    			]
    			
-   			val packageDecl = activity.eContainer as PackageDeclaration
+   			val packageDecl = activity.packageDeclaration
    			val activityLocatorType = activity.newTypeRef("de.msg.xt.mdt.base.ActivityLocator")
    			members += activity.toField("activityLocator", activityLocatorType) [
    				it.setStatic(true)
@@ -220,6 +234,9 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    	}
    	
    	def JvmOperation toActivityOperation(ActivityOperation operation) {
+   		if (operation?.name == null) {
+   			return null
+   		}
    		var JvmTypeReference returnTypeRef
    		var Boolean voidReturnType = true
    		var String nextActivityClassVar 
@@ -259,60 +276,64 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    	}
    	
    	def JvmOperation toActivityDelegationMethod(Operation operation, Field field) {
-   		operation.toMethod(field.activityControlDelegationMethodName(operation), field.returnTypeFieldOperation(operation)) [
-			val opMapping = field.findOperationMappingForOperation(operation)
-			if (opMapping != null) {
-				for (dataTypeMapping : opMapping.dataTypeMappings) {
-					if (dataTypeMapping?.name?.name != null && dataTypeMapping?.datatype?.class_FQN?.toString != null) {
-						it.parameters += dataTypeMapping.toParameter(dataTypeMapping.name.name, dataTypeMapping.newTypeRef(dataTypeMapping.datatype.class_FQN.toString))
+   		val activityMethodName = field.activityControlDelegationMethodName(operation)
+   		val returnType = field.returnTypeFieldOperation(operation)
+   		if (activityMethodName != null && returnType != null) { 
+   			operation.toMethod(activityMethodName, returnType) [
+				val opMapping = field.findOperationMappingForOperation(operation)
+				if (opMapping != null) {
+					for (dataTypeMapping : opMapping.dataTypeMappings) {
+						if (dataTypeMapping?.name?.name != null && dataTypeMapping?.datatype?.class_FQN?.toString != null) {
+							it.parameters += dataTypeMapping.toParameter(dataTypeMapping.name.name, dataTypeMapping.newTypeRef(dataTypeMapping.datatype.class_FQN.toString))
+						}
+					}
+				} else {
+					if (operation.params.size > 0 || operation.returnType != null) {
+						//throw new IllegalArgumentException("An operation with parameters or return value must have an OperationMapping!")
 					}
 				}
-			} else {
-				if (operation.params.size > 0 || operation.returnType != null) {
-					//throw new IllegalArgumentException("An operation with parameters or return value must have an OperationMapping!")
-				}
-			}
-   			setBody [
-   				if (operation.returnType == null) {
-   					val nextActivities = opMapping?.nextActivities
-   					var Activity nextActivity = null
-   					if (nextActivities != null && !nextActivities.empty) {
-   						val condNextAct = nextActivities.get(0)
-   						if (condNextAct != null) {
-   							nextActivity = (condNextAct as ConditionalNextActivity).next
+   				setBody [
+   					if (operation.returnType == null) {
+   						val nextActivities = opMapping?.nextActivities
+   						var Activity nextActivity = null
+   						if (nextActivities != null && !nextActivities.empty) {
+   							val condNextAct = nextActivities.get(0)
+	   						if (condNextAct != null) {
+   								nextActivity = (condNextAct as ConditionalNextActivity).next
+   							}
    						}
-   					}
-   					//         this.protocol.appendControlOperationCall(this.getClass().getName(), "description", TextControl.class.getName(),
-            //    "setText", null, description.getValue());
+   						//         this.protocol.appendControlOperationCall(this.getClass().getName(), "description", TextControl.class.getName(),
+	            //    "setText", null, description.getValue());
    					
-	   				it.append(
-   						'''
-   						this.protocol.appendControlOperationCall(this.getClass().getName(), "«field.name»", «field.control.name».class.getName(), "«operation.name»", null«appendParameter(opMapping.dataTypeMappings)»);
-   						«field.fieldGetterName»().«operation.name»(«mapParameters(field, operation)»);
-   						return «IF nextActivity == null»this«ELSE»«nextActivity.class_SimpleName».find()«ENDIF»;
-   						'''
-   					)
-   				} else {
-   					if (opMapping != null) {
-   						it.append(
+		   				it.append(
    							'''
-   							«operation.returnType.name» value = «field.fieldGetterName»().«operation.name»(«mapParameters(field, operation)»); 
-   							this.protocol.appendControlOperationCall(this.getClass().getName(), "«field.name»", «field.control.name».class.getName(), "«operation.name»", value.toString()«appendParameter(opMapping.dataTypeMappings)»);
-   							return new «opMapping.dataType.class_FQN»(value, «opMapping.dataType.equivalenceClass_name».getByValue(value));
+   							this.protocol.appendControlOperationCall(this.getClass().getName(), "«field.name»", «field.control?.name».class.getName(), "«operation.name»", null«appendParameter(opMapping.dataTypeMappings)»);
+   							«field.fieldGetterName»().«operation.name»(«mapParameters(field, operation)»);
+   							return «IF nextActivity == null»this«ELSE»«nextActivity.class_SimpleName».find()«ENDIF»;
    							'''
    						)
+   					} else {
+   						if (opMapping != null) {
+   							it.append(
+   								'''
+	   							«operation.returnType?.name» value = «field.fieldGetterName»().«operation.name»(«mapParameters(field, operation)»); 
+   								this.protocol.appendControlOperationCall(this.getClass().getName(), "«field.name»", «field.control?.name».class.getName(), "«operation.name»", value.toString()«appendParameter(opMapping.dataTypeMappings)»);
+   								return new «opMapping.dataType?.class_FQN»(value, «opMapping.dataType?.equivalenceClass_name».getByValue(value));
+   								'''
+   							)
+   						}
    					}
-   				}
-   			]
-   		]
+   				]
+	   		]
+   		}
    	}
    	
    	def String appendParameter(List<DataTypeMapping> mappings) {
-   		'''«FOR mapping : mappings», «mapping.name.name».getValue().toString()«ENDFOR»'''
+   		'''«FOR mapping : mappings», «mapping?.name?.name».getValue().toString()«ENDFOR»'''
    	}
    	
    	def String appendActivityParameter(List<ActivityOperationParameter> mappings) {
-   		'''«FOR mapping : mappings», «mapping.name».getValue().toString()«ENDFOR»'''
+   		'''«FOR mapping : mappings», «mapping?.name».getValue().toString()«ENDFOR»'''
    	}
 
    	def String mapParameters(Field field, Operation operation) {
@@ -324,8 +345,12 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    	}
    	
    	def JvmTypeReference returnTypeFieldOperation(Field field, Operation operation) {
+   		if (field == null || operation == null)
+   			return null
  		val opMapping = field.findOperationMappingForOperation(operation)
- 		val currentActivityType = field.newTypeRef(field.parentActivity.class_FQN.toString) 
+ 		var JvmTypeReference currentActivityType = null
+ 		if (field.parentActivity?.class_FQN?.toString != null)
+ 			currentActivityType = field.newTypeRef(field.parentActivity.class_FQN.toString) 
    		if (operation.returnType == null) {
    			if (opMapping == null) {
    					currentActivityType
@@ -377,7 +402,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 		result.setAnnotation(jvmType as JvmAnnotationType);
 
 		val JvmTypeAnnotationValue annotationValue = typesFactory.createJvmTypeAnnotationValue();
-		annotationValue.getValues().add(value);
+		annotationValue?.getValues().add(value);
 		result.getValues().add(annotationValue);
 
 		return result;
@@ -385,6 +410,10 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    	
    	
    	def dispatch void infer(Test test, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
+   		
+   		if (test.fullyQualifiedName == null)
+   			return
+   		
    		val testClass = test.toClass(test.fullyQualifiedName)
    		acceptor.accept(testClass).initializeLater([
    			
@@ -438,7 +467,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    					it.append('''
                         de.msg.xt.mdt.base.GenerationHelper testHelper = INJECTOR.getInstance(de.msg.xt.mdt.base.GenerationHelper.class);
                         de.msg.xt.mdt.base.Generator generator = INJECTOR.getInstance(de.msg.xt.mdt.base.Generator.class);
-                        return testHelper.readOrGenerateTestCases(TEST_CASES_SERIALIZATION, generator, «test.useCase.class_FQN.toString».class); 
+                        return testHelper.readOrGenerateTestCases(TEST_CASES_SERIALIZATION, generator, «test.useCase?.class_FQN?.toString».class); 
    					''')
    				]
    			]
@@ -489,6 +518,9 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 
    	def dispatch void infer(Control control, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
    		
+   		if (control.fullyQualifiedName?.toString == null)
+   			return;
+   		
    		acceptor.accept(control.toInterface(control.fullyQualifiedName.toString) [
    			
    			for (operation : control.operations) {
@@ -497,14 +529,17 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    						operation.returnType.mappedBy
    					else
    						references.getTypeForName(typeof(void) as Class<?>, operation)
-   				val JvmOperation op = operation.toMethod(operation.name, returnType) [
-   					for (param : operation.params) {
-   						parameters += param.toParameter(param.name, param.type.mappedBy)
-   					}   					
-   				]
-   				op?.setAbstract(true)
-   				if (op != null)
-   					members += op
+   				if (operation.name != null) {
+	   				val JvmOperation op = operation.toMethod(operation.name, returnType) [
+   						for (param : operation.params) {
+   							if (param.name != null && param.type?.mappedBy != null)
+   								parameters += param.toParameter(param.name, param.type.mappedBy)
+   						}   					
+   					]
+	   				op?.setAbstract(true)
+   					if (op != null)
+   						members += op
+   				}
    			}
    		])
    	}
@@ -512,42 +547,49 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    		
    	def dispatch void infer(DataType dataType, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
    		
+   		if (dataType.name == null || dataType.equivalenceClass_name == null || dataType.type.mappedBy == null)
+   			return
+   		
    		val JvmEnumerationType equivalenceClass = dataType.toEnumerationType(dataType.equivalenceClass_name)[
    			superTypes += dataType.newTypeRef("de.msg.xt.mdt.base.EquivalenceClass")
    			
    			for (clazz : dataType.classes) {
-   				val lit = clazz.toEnumerationLiteral(clazz.name);
-   				lit.setStatic(true)
-   				members += lit
+   				if (clazz.name != null) {
+	   				val lit = clazz.toEnumerationLiteral(clazz.name);
+   					lit.setStatic(true)
+   					members += lit
+   				}
    			}
    		]
    		acceptor.accept(equivalenceClass).initializeLater [
    			
-   			members += dataType.toMethod("getValue", dataType.type?.mappedBy) [
-   				setBody [
-					it.append('''
-        				«dataType.type.mappedBy.simpleName» value = null;
-        				switch (this) {
-        				''')
+   			if (dataType.type?.mappedBy != null) {
+   				members += dataType.toMethod("getValue", dataType.type.mappedBy) [
+   					setBody [
+						it.append('''
+        					«dataType.type.mappedBy.simpleName» value = null;
+        					switch (this) {
+        					''')
         				
-        			for (clazz : dataType.classes) {
-        				it.append('''
-        					case «clazz.name»:
-        					value = ''')
-        				val expectedType = dataType.type.mappedBy
-        				xbaseCompiler.compileAsJavaExpression(clazz.value, it, expectedType)
-        				it.append('''
-        				;
-        				break;
-        				''')
-        			}
+        				for (clazz : dataType.classes) {
+    	    				it.append('''
+	        					case «clazz.name»:
+        						value = ''')
+        					val expectedType = dataType.type.mappedBy
+        					xbaseCompiler.compileAsJavaExpression(clazz.value, it, expectedType)
+        					it.append('''
+        					;
+        					break;
+    	    				''')
+	        			}
             			
-            		it.append('''
-        				}
-        				return value;
-					''')
-				]	
-   			]
+            			it.append('''
+        					}
+        					return value;
+						''')
+					]	
+	   			]
+   			}
    			
    			members += dataType.toMethod("getTags", dataType.newTypeRef("de.msg.xt.mdt.base.Tag").createArrayType) [
    				setBody [
@@ -568,28 +610,30 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    			
    			members += dataType.toMethod("getByValue", dataType.newTypeRef(it.fullyQualifiedName.toString)) [
    				it.setStatic(true)
-   				it.parameters += it.toParameter("value", dataType.type.mappedBy)
-   				it.setBody [
-   					it.append('''
-				        «dataType.name.toFirstUpper + "EquivalenceClass"» clazz = null;
-				        if (value != null) {
-				    ''')
-				    for (clazz : dataType.classes) {
-				    	it.append('''
-				    		if(value.equals(
-				        ''')
-				    	xbaseCompiler.compileAsJavaExpression(clazz.value, it, dataType.type.mappedBy)
-				        it.append('''
-				        	)) {
-				        		clazz = «clazz.name»;
-				        	}
-				        	''')
-				        }
-				    it.append('''
-				        }
-				        return clazz;
-   					''')
-   				]
+   				if (dataType.type?.mappedBy != null) {
+	   				it.parameters += it.toParameter("value", dataType.type.mappedBy)
+   					it.setBody [
+   						it.append('''
+					        «dataType.name?.toFirstUpper + "EquivalenceClass"» clazz = null;
+					        if (value != null) {
+				    	''')
+					    for (clazz : dataType.classes) {
+					    	it.append('''
+					    		if(value.equals(
+					        ''')
+					    	xbaseCompiler.compileAsJavaExpression(clazz.value, it, dataType.type.mappedBy)
+				    	    it.append('''
+				        		)) {
+				        			clazz = «clazz.name»;
+					        	}
+					        	''')
+					        }
+					    it.append('''
+					        }
+				    	    return clazz;
+	   					''')
+   					]   				
+   				}
    			]
    		]
 
@@ -675,6 +719,8 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    	}
    	
    	def dispatch void infer(UseCase useCase, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
+   		if (useCase.class_FQN == null)
+   			return
    		val useCaseClass = useCase.toClass(useCase.class_FQN)
    		acceptor.accept(useCaseClass).initializeLater [
    			it.superTypes += useCase.newTypeRef("de.msg.xt.mdt.base.BaseUseCase")
@@ -699,10 +745,12 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    					    this.generator = generator;''')
    					for (inputParam : useCase.inputParameter) {
    						newLine
-   						it.append(
-   							'''
-   							this.«inputParam.name» = this.getOrGenerateValue(«inputParam.dataType.class_FQN.toString».class, "«inputParam.name»");
-   							''')
+   						if (inputParam?.dataType?.class_FQN?.toString != null) {
+	   						it.append(
+   								'''
+   								this.«inputParam.name» = this.getOrGenerateValue(«inputParam.dataType.class_FQN.toString».class, "«inputParam.name»");
+   								''')
+   						}
 	   				}
    				]
    			]
@@ -740,7 +788,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				body = [
    					it.append(
    						'''
-   						execute(«useCase.initialActivity.class_SimpleName».find());
+   						execute(«useCase.initialActivity?.class_SimpleName».find());
    						'''
    					)
    				]
@@ -768,14 +816,18 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    	}
    	
 	def dispatch Activity inferStatement(OperationCall opCall, Activity currentActivity, int activityIndex, ITreeAppendable app) {
-		val field = opCall.operation.eContainer as Field
-		app.append(
-			'''
-			«currentActivity.localVariable_name(activityIndex)».«field.activityControlDelegationMethodName(opCall.operation.name)»();
-			'''
-		)
-		if (!opCall.operation.nextActivities.empty) {
-			opCall.operation.nextActivities.get(0).next
+		val field = opCall?.operation?.eContainer as Field
+		if (field != null) {
+			app.append(
+				'''
+				«currentActivity?.localVariable_name(activityIndex)».«field.activityControlDelegationMethodName(opCall.operation.name)»();
+				'''
+			)
+			if (!opCall.operation.nextActivities.empty) {
+				opCall.operation.nextActivities.get(0).next
+			} else {
+				currentActivity
+			}
 		} else {
 			currentActivity
 		}
@@ -783,18 +835,22 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 
    	
    	def inputParamID(UseCase useCase, Parameter inputParam) {
-   		useCase.name + "_" + inputParam.name
+   		useCase?.name + "_" + inputParam?.name
    	}
    	
    	def dispatch void infer(TagsDeclaration tags, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
-   		acceptor.accept(tags.toEnumerationType(tags.eContainer.fullyQualifiedName.toString + ".Tags") [
-   			superTypes += tags.newTypeRef("de.msg.xt.mdt.base.Tag")
-   			for (tag : tags.tags) {
-   				val enumLit = toEnumerationLiteral(tag.name)
-   				enumLit.setStatic(true) 
-   				members += enumLit
-   			}
-   		])
+   		if (tags?.eContainer?.fullyQualifiedName?.toString != null) {
+   			acceptor.accept(tags.toEnumerationType(tags.eContainer.fullyQualifiedName.toString + ".Tags") [
+   				superTypes += tags.newTypeRef("de.msg.xt.mdt.base.Tag")
+   				for (tag : tags.tags) {
+   					if (tag.name != null) {
+   						val enumLit = toEnumerationLiteral(tag.name)
+   						enumLit.setStatic(true) 
+	   					members += enumLit
+   					}
+   				}
+	   		])
+   		}
    	}   		
 
 

@@ -34,11 +34,11 @@ class MetaModelExtensions {
 	// Activity 
 	
 	def identifier(Activity activity) { 
-		if (activity.uniqueId == null) activity.fullyQualifiedName else activity.uniqueId
+		if (activity?.uniqueId == null) activity?.fullyQualifiedName else activity?.uniqueId
 	}	
 	
 	def getPackageDeclaration(Activity activity) {
-		activity.eContainer as PackageDeclaration
+		activity?.eContainer as PackageDeclaration
 	}
 	
 	def SUT getSut(Activity activity) {
@@ -47,9 +47,11 @@ class MetaModelExtensions {
 	
 	def List<ActivityOperation> getAllOperations(Activity activity) {
 		val ops = new ArrayList<ActivityOperation>()
-		ops.addAll(activity.operations)
-		if (activity.parent != null) {
-			ops.addAll(activity.parent.allOperations)
+		if (activity != null) {
+			ops.addAll(activity.operations)
+			if (activity.parent != null) {
+				ops.addAll(activity.parent.allOperations)
+			}
 		}
 		ops
 	}	
@@ -57,13 +59,13 @@ class MetaModelExtensions {
 	// ActivityOperation
 	
 	def getActivity(ActivityOperation operation) {
-		operation.eContainer as Activity
+		operation?.eContainer as Activity
 	}
 	
 	
 	// DataTypeMapping
 	def getOperationMapping(DataTypeMapping dataTypeMapping) {
-		dataTypeMapping.eContainer as OperationMapping
+		dataTypeMapping?.eContainer as OperationMapping
 	}
 	
 	
@@ -78,16 +80,18 @@ class MetaModelExtensions {
 	}
 	
 	def findOperationMappingForOperation(Field field, Operation operation) {
-		for (op : field.operations) {
-			if (op.name == operation) {
-				return op
+		if (field?.operations != null) {
+			for (op : field.operations) {
+				if (op?.name == operation) {
+					return op
+				}
 			}
 		}
 		return null
 	}
 	
 	def identifier(Field field) {
-		if (field.uniqueId == null) field.fullyQualifiedName else field.uniqueId
+		if (field?.uniqueId == null) field?.fullyQualifiedName else field.uniqueId
 	}
 	
 	
@@ -108,14 +112,14 @@ class MetaModelExtensions {
 	// OperationMapping
 	
 	def field(OperationMapping mapping) {
-		mapping.eContainer as Field
+		mapping?.eContainer as Field
 	}
 
 
 	// OperationParameterAssignment
 	
 	def OperationCall operation(OperationParameterAssignment opParamAssignment) {
-		opParamAssignment.eContainer as OperationCall
+		opParamAssignment?.eContainer as OperationCall
 	}
 	
 	// PackageDeclaration
@@ -123,7 +127,7 @@ class MetaModelExtensions {
 	def SUT getSut(PackageDeclaration pack) {
 		val sut = pack?.elements?.filter(typeof(SUT))?.last
 		if (sut == null)
-			pack.sutRef
+			pack?.sutRef
 		else 
 			sut
 	}
@@ -131,7 +135,7 @@ class MetaModelExtensions {
 	// Test
 	
 	def PackageDeclaration getPackageDeclaration(Test test) {
-		test.eContainer as PackageDeclaration
+		test?.eContainer as PackageDeclaration
 	}
 	
 	def SUT getSut(Test test) {
@@ -147,16 +151,16 @@ class MetaModelExtensions {
 		val exprBlock = expr.block
 		val index = expr.indexInParentBlock
 		if (index > 0) {
-			lastStatement = (exprBlock.expressions.get(index - 1) as StatementLine).statement
-			if (!lastStatement.containsActivitySwitchingOperation) {
-				return lastStatement.lastExpressionWithNextActivity
+			lastStatement = (exprBlock?.expressions?.get(index - 1) as StatementLine)?.statement
+			if (!lastStatement?.containsActivitySwitchingOperation) {
+				return lastStatement?.lastExpressionWithNextActivity
 			}
 		} else {
-			val parentIndex = exprBlock.indexInParentBlock
+			val parentIndex = exprBlock?.indexInParentBlock
 			if (parentIndex == null) {
 				return null
 			}
-			val parentBlock = EcoreUtil2::getContainerOfType(exprBlock.eContainer, typeof(XBlockExpression))
+			val parentBlock = EcoreUtil2::getContainerOfType(exprBlock?.eContainer, typeof(XBlockExpression))
 			return parentBlock?.expressions?.get(parentIndex)?.lastExpressionWithNextActivity
 		}
 		return lastStatement	
