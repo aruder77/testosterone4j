@@ -5,7 +5,7 @@ package mp3manager.datatypes {
 	tags { 
 		Pflichtfeld, Empty
 	}
-		
+	
 	datatype ErrorStringDT type String { 
 		class ok value "OK" 
 		class missingValue value "Please enter a value"
@@ -22,5 +22,11 @@ package mp3manager.datatypes {
 		class pastYear value "1800"
 		class emptyYear value "" tags Empty
 	}
+	
+	datatype TestDT type Boolean {
+		class testBool value true
+		class testBool2 value false
+	}
+	
 }
 	

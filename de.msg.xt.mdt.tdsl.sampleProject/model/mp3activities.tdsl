@@ -4,7 +4,7 @@ package mp3manager.activities {
 	import de.msg.xt.mdt.tdsl.swtbot.*
 	import mp3manager.datatypes.*
 	
-	sut Stdtoolkit using controls { 
+	toolkit Stdtoolkit using controls { 
 		TextControl, TreeControl, Label
 	} 
 	

@@ -579,9 +579,24 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
         				for (clazz : dataType.classes) {
     	    				it.append('''
 	        					case «clazz.name»:
-        						value = ''')
-        					val expectedType = dataType.type.mappedBy
-        					xbaseCompiler.compileAsJavaExpression(clazz.value, it, expectedType)
+        						''')
+        					if (clazz.value != null) {
+        						it.append('''value = ''')	
+        						val expectedType = dataType.type.mappedBy
+        						xbaseCompiler.compileAsJavaExpression(clazz.value, it, expectedType)
+        					} else if (clazz.values != null) {
+        						it.append('''java.lang.Iterable<«dataType.type.mappedBy.qualifiedName»> iterable = ''')
+        						val expectedType = dataType.newTypeRef("java.lang.Iterable", dataType.type.mappedBy)
+        						xbaseCompiler.compileAsJavaExpression(clazz.values, it, expectedType)
+        						it.append(''';
+        							value = iterable.iterator().next();
+        						''')
+        					} else if (clazz.valueGenerator != null) {
+        						it.append('''value = ''')	
+        						val expectedType = dataType.type.mappedBy
+        						xbaseCompiler.compileAsJavaExpression(clazz.valueGenerator, it, expectedType)        						
+        					}
+        					
         					it.append('''
         					;
         					break;
@@ -623,16 +638,43 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 					        if (value != null) {
 				    	''')
 					    for (clazz : dataType.classes) {
-					    	it.append('''
-					    		if(value.equals(
-					        ''')
-					    	xbaseCompiler.compileAsJavaExpression(clazz.value, it, dataType.type.mappedBy)
-				    	    it.append('''
-				        		)) {
-				        			clazz = «clazz.name»;
-					        	}
+					    	if (clazz.value != null) {
+					    		it.append('''
+					    			if(value.equals(
+						        ''')
+						    	xbaseCompiler.compileAsJavaExpression(clazz.value, it, dataType.type.mappedBy)
+					    	    it.append('''
+					        		)) {
+					        			clazz = «clazz.name»;
+						        	}
+					        	''')
+					        } else if (clazz.values != null) {
+        						it.append('''java.lang.Iterable<«dataType.type.mappedBy.qualifiedName»> iterable = ''')
+        						val expectedType = dataType.newTypeRef("java.lang.Iterable", dataType.type.mappedBy)
+        						xbaseCompiler.compileAsJavaExpression(clazz.values, it, expectedType)
+        						it.append('''
+        							;
+        							java.util.Iterator<«dataType.type.mappedBy.qualifiedName»> it = iterable.iterator();
+        							while(it.hasNext()) {
+        								if (value.equals(it.next())) {
+        									clazz = «clazz.name»;
+        									break;
+        								}
+        							}
+        						''')        						
+					        } else if (clazz.valueGenerator != null) {
+					        	it.append('''
+					        		if(
+					        	''')
+					        	val expectedType = dataType.newTypeRef("java.lang.Boolean")
+        						xbaseCompiler.compileAsJavaExpression(clazz.classPredicate, it, expectedType)
+					        	it.append('''
+					        		) {
+					        			clazz = «clazz.name»;
+					        		}
 					        	''')
 					        }
+					    }
 					    it.append('''
 					        }
 				    	    return clazz;

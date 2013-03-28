@@ -18,8 +18,10 @@ package de.msg.xt.mdt.tdsl.basictypes {
 	}
 	
 	datatype IntegerDT type Integer {
+		class minusMinus values newArrayList(-1000, -1500, -100)
+		class minus values -100..-1
 		class zero value 0
-		class small value 5
+		class small valueGenerator {new java.util.Random(System::currentTimeMillis).nextInt(99) + 1} classPredicate 5 < 100 
 		class big value 310052345
 	}
 } 
