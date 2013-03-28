@@ -4,23 +4,20 @@ import com.google.inject.Singleton
 import de.msg.xt.mdt.tdsl.jvmmodel.NamingExtensions
 import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationCall
 import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationParameterAssignment
+import de.msg.xt.mdt.tdsl.tDsl.Assert
 import de.msg.xt.mdt.tdsl.tDsl.GeneratedValueExpression
 import de.msg.xt.mdt.tdsl.tDsl.GenerationSelektor
 import de.msg.xt.mdt.tdsl.tDsl.OperationCall
-import de.msg.xt.mdt.tdsl.tDsl.OperationMapping
 import de.msg.xt.mdt.tdsl.tDsl.OperationParameterAssignment
+import de.msg.xt.mdt.tdsl.tDsl.StatementLine
 import de.msg.xt.mdt.tdsl.tDsl.SubUseCaseCall
-import de.msg.xt.mdt.tdsl.tDsl.TDslPackage$Literals
 import javax.inject.Inject
-import org.eclipse.emf.ecore.EReference
+import org.eclipse.xtext.common.types.JvmEnumerationType
 import org.eclipse.xtext.common.types.JvmTypeReference
 import org.eclipse.xtext.common.types.util.TypeReferences
+import org.eclipse.xtext.xbase.XFeatureCall
 import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder
 import org.eclipse.xtext.xbase.typing.XbaseTypeProvider
-import de.msg.xt.mdt.tdsl.tDsl.StatementLine
-import org.eclipse.xtext.xbase.XFeatureCall
-import org.eclipse.xtext.common.types.JvmEnumerationType
-import de.msg.xt.mdt.tdsl.tDsl.Assert
 
 @Singleton
 class TDslTypeProvider extends XbaseTypeProvider {
@@ -31,13 +28,6 @@ class TDslTypeProvider extends XbaseTypeProvider {
 	
 	@Inject JvmTypesBuilder typesBuilder
 
-	def dispatch expectedType(OperationMapping container,
-			EReference reference, int index, boolean rawType) {
-		if (reference == TDslPackage$Literals::OPERATION_MAPPING__GUARD) {
-			typesBuilder.newTypeRef(container, typeof(Boolean));
-		}
-	}
-	
 	override dispatch type(XFeatureCall featureCall, 
                     JvmTypeReference typeRef, 
                     boolean isRawTypes) {

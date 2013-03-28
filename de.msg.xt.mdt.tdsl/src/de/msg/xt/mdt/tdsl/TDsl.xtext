@@ -95,11 +95,11 @@ Field:
 ;
 
 TagWithCondition:
-	'tag' tag=[Tag|FQN] ('if' condition=XExpression)? 
+	'tag' tag=[Tag|FQN] 
 ;
 
 OperationMapping:
-	'op' (dataType=[DataType|FQN])? name=[Operation|ID] ('(' (dataTypeMappings+=DataTypeMapping) (',' dataTypeMappings+=DataTypeMapping)* ')')? ('guard' guard=XExpression)?  (nextActivities+=ConditionalNextActivity)*
+	'op' (dataType=[DataType|FQN])? name=[Operation|ID] ('(' (dataTypeMappings+=DataTypeMapping) (',' dataTypeMappings+=DataTypeMapping)* ')')? (nextActivities+=ConditionalNextActivity)*
 ;
 
 DataTypeMapping:
@@ -107,7 +107,7 @@ DataTypeMapping:
 ;
 
 ConditionalNextActivity:
-	'=>' next=[Activity|FQN] ('if' guard=XExpression)?
+	'=>' next=[Activity|FQN]
 ;
 
 Parameter:

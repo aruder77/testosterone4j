@@ -17,11 +17,11 @@ import de.msg.xt.mdt.tdsl.tDsl.PackageDeclaration
 import de.msg.xt.mdt.tdsl.tDsl.OperationParameterAssignment
 import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationCall
 import de.msg.xt.mdt.tdsl.tDsl.StatementLine
-import de.msg.xt.mdt.tdsl.tDsl.SUT
 import de.msg.xt.mdt.tdsl.tDsl.Test
 import de.msg.xt.mdt.tdsl.tDsl.PackageDeclaration
 import java.util.ArrayList
 import java.util.List
+import de.msg.xt.mdt.tdsl.tDsl.Toolkit
 
 /**
  * Convenience meta-model extensions. Please order by Metamodel-Class and alphabetically!
@@ -41,8 +41,8 @@ class MetaModelExtensions {
 		activity?.eContainer as PackageDeclaration
 	}
 	
-	def SUT getSut(Activity activity) {
-		activity?.packageDeclaration?.sut
+	def Toolkit getToolkit(Activity activity) {
+		activity?.packageDeclaration?.toolkit
 	}
 	
 	def List<ActivityOperation> getAllOperations(Activity activity) {
@@ -124,8 +124,8 @@ class MetaModelExtensions {
 	
 	// PackageDeclaration
 	
-	def SUT getSut(PackageDeclaration pack) {
-		val sut = pack?.elements?.filter(typeof(SUT))?.last
+	def Toolkit getToolkit(PackageDeclaration pack) {
+		val sut = pack?.elements?.filter(typeof(Toolkit))?.last
 		if (sut == null)
 			pack?.sutRef
 		else 
@@ -138,8 +138,8 @@ class MetaModelExtensions {
 		test?.eContainer as PackageDeclaration
 	}
 	
-	def SUT getSut(Test test) {
-		test?.packageDeclaration?.sut
+	def Toolkit getSut(Test test) {
+		test?.packageDeclaration?.toolkit
 	}
 	
 	// XExpression

@@ -1,17 +1,16 @@
 package de.msg.xt.mdt.tdsl.jvmmodel
 
-import javax.inject.Inject
-import org.eclipse.xtext.naming.IQualifiedNameProvider
-import org.eclipse.xtext.naming.QualifiedName
 import de.msg.xt.mdt.tdsl.tDsl.Activity
 import de.msg.xt.mdt.tdsl.tDsl.Control
 import de.msg.xt.mdt.tdsl.tDsl.DataType
-import de.msg.xt.mdt.tdsl.tDsl.Operation
-import de.msg.xt.mdt.tdsl.tDsl.Field
-import de.msg.xt.mdt.tdsl.tDsl.PackageDeclaration
-import de.msg.xt.mdt.tdsl.tDsl.UseCase
 import de.msg.xt.mdt.tdsl.tDsl.DataTypeMapping
-import de.msg.xt.mdt.tdsl.tDsl.SUT
+import de.msg.xt.mdt.tdsl.tDsl.Field
+import de.msg.xt.mdt.tdsl.tDsl.Operation
+import de.msg.xt.mdt.tdsl.tDsl.Toolkit
+import de.msg.xt.mdt.tdsl.tDsl.UseCase
+import javax.inject.Inject
+import org.eclipse.xtext.naming.IQualifiedNameProvider
+import org.eclipse.xtext.naming.QualifiedName
 
 class NamingExtensions {
 	
@@ -87,8 +86,8 @@ class NamingExtensions {
 	
 	// SUT
 	
-	def String activityAdapter_FQN(SUT sut) {
-		sut?.fullyQualifiedName?.toString + "ActivityAdapter"
+	def String activityAdapter_FQN(Toolkit toolkit) {
+		toolkit?.fullyQualifiedName?.toString + "ActivityAdapter"
 	}
 
 	// UseCase

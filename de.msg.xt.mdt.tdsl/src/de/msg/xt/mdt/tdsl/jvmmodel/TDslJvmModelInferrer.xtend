@@ -40,12 +40,12 @@ import org.eclipse.xtext.xbase.lib.Procedures$Procedure1
 import de.msg.xt.mdt.tdsl.tDsl.Test
 import de.msg.xt.mdt.tdsl.tDsl.ActivityOperation
 import org.eclipse.xtext.common.types.JvmEnumerationLiteral
-import de.msg.xt.mdt.tdsl.tDsl.SUT
 import org.eclipse.xtext.xbase.compiler.ImportManager
 import de.msg.xt.mdt.tdsl.tDsl.DataTypeMapping
 import java.util.List
 import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationParameter
 import org.eclipse.xtext.common.types.JvmGenericType
+import de.msg.xt.mdt.tdsl.tDsl.Toolkit
 
 /**
  * <p>Infers a JVM model from the source model.</p> 
@@ -80,13 +80,13 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 		}
 	}
 
-	def dispatch void infer(SUT sut, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
-		if (sut.activityAdapter_FQN != null) {
-			acceptor.accept(sut.toInterface(sut.activityAdapter_FQN, [])).initializeLater [
+	def dispatch void infer(Toolkit toolkit, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
+		if (toolkit.activityAdapter_FQN != null) {
+			acceptor.accept(toolkit.toInterface(toolkit.activityAdapter_FQN, [])).initializeLater [
 			
-				superTypes += sut.newTypeRef("de.msg.xt.mdt.base.ActivityAdapter")
+				superTypes += toolkit.newTypeRef("de.msg.xt.mdt.base.ActivityAdapter")
 			
-				for (Control control : sut.controls) {
+				for (Control control : toolkit.controls) {
 					if (control?.name != null && control?.class_FQN?.toString != null) {
 						members += control.toMethod("get" + control.name.toFirstUpper, control.newTypeRef(control.class_FQN.toString)) [
 							it.setAbstract(true)
@@ -107,8 +107,8 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    			acceptor.accept(activityAdapterClassVar).initializeLater [
    				if (activity.parent?.adapterInterface_FQN != null) {
    					superTypes += activity.newTypeRef(activity.parent.adapterInterface_FQN)
-	   			} else if (activity.sut?.activityAdapter_FQN != null) {
-   					superTypes += activity.newTypeRef(activity.sut.activityAdapter_FQN)
+	   			} else if (activity.toolkit?.activityAdapter_FQN != null) {
+   					superTypes += activity.newTypeRef(activity.toolkit.activityAdapter_FQN)
    				}
 
 	   			for (activityMethod : activity.operations) {
