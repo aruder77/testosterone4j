@@ -30,6 +30,9 @@ package mp3manager.activities {
 			op selectNode(StringDT nodePath)
 			op doubleClickNode(StringDT nodePath) => SongEditor
 			op BooleanDT isEnabled
+			op invokeContextMenu(StringDT nodePath, StringDT contextMenuEntry)
+			op BooleanDT isContextMenuEnabled(StringDT nodePath, StringDT contextMenuEntry)
+			op BooleanDT hasChildNode(StringDT nodePath, StringDT nodePattern, BooleanDT recursive)
 		}
 	}
 	
@@ -37,31 +40,37 @@ package mp3manager.activities {
 		field title identifiedBy "Id3TagPage.Title_Label" control TextControl tag Pflichtfeld {
 			op setText (StringDT str)
 			op StringDT getText
+			op BooleanDT isEnabled
 		}
 		
 		field artist identifiedBy "Id3TagPage.Artist_Label" control TextControl tag Pflichtfeld { 
 			op setText (StringDT str)
 			op StringDT getText
+			op BooleanDT isEnabled
 		}
 
 		field album identifiedBy "Id3TagPage.Album_Label" control TextControl tag Pflichtfeld { 
 			op setText (StringDT str)
 			op StringDT getText
+			op BooleanDT isEnabled
 		}
 
 		field track identifiedBy "Id3TagPage.Track_Label" control TextControl {
 			op setText (TrackDT str)
 			op TrackDT getText
+			op BooleanDT isEnabled
 		} 
 		
 		field year identifiedBy "Id3TagPage.Year_Label" control TextControl {
 			op setText (YearDT str)
 			op YearDT getText
+			op BooleanDT isEnabled
 		} 
 		
 		field comment identifiedBy "Id3TagPage.Comment_Label" control TextControl {
 			op setText (StringDT str)
 			op StringDT getText
+			op BooleanDT isEnabled
 		} 
 		
 		field errorMarker identifiedBy "errorMarker" control Label {

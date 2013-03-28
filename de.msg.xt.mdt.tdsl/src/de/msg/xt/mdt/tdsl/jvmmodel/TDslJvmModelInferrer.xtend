@@ -307,13 +307,15 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    						//         this.protocol.appendControlOperationCall(this.getClass().getName(), "description", TextControl.class.getName(),
 	            //    "setText", null, description.getValue());
    					
-		   				it.append(
-   							'''
-   							this.protocol.appendControlOperationCall(this.getClass().getName(), "«field.name»", «field.control?.name».class.getName(), "«operation.name»", null«appendParameter(opMapping.dataTypeMappings)»);
-   							«field.fieldGetterName»().«operation.name»(«mapParameters(field, operation)»);
-   							return «IF nextActivity == null»this«ELSE»«nextActivity.class_SimpleName».find()«ENDIF»;
-   							'''
-   						)
+   						if (opMapping != null) {
+		   					it.append(
+   								'''
+   								this.protocol.appendControlOperationCall(this.getClass().getName(), "«field.name»", «field.control?.name».class.getName(), "«operation.name»", null«appendParameter(opMapping.dataTypeMappings)»);
+	   							«field.fieldGetterName»().«operation.name»(«mapParameters(field, operation)»);
+   								return «IF nextActivity == null»this«ELSE»«nextActivity.class_SimpleName».find()«ENDIF»;
+   								'''
+   							)
+   						}
    					} else {
    						if (opMapping != null) {
    							it.append(
