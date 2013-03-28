@@ -276,6 +276,8 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    	}
    	
    	def JvmOperation toActivityDelegationMethod(Operation operation, Field field) {
+   		if (field == null || operation == null)
+   			return null
    		val activityMethodName = field.activityControlDelegationMethodName(operation)
    		val returnType = field.returnTypeFieldOperation(operation)
    		if (activityMethodName != null && returnType != null) { 
@@ -467,6 +469,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    					it.append('''
                         de.msg.xt.mdt.base.GenerationHelper testHelper = INJECTOR.getInstance(de.msg.xt.mdt.base.GenerationHelper.class);
                         de.msg.xt.mdt.base.Generator generator = INJECTOR.getInstance(de.msg.xt.mdt.base.Generator.class);
+                        LOCATOR.beforeTest();
                         return testHelper.readOrGenerateTestCases(TEST_CASES_SERIALIZATION, generator, «test.useCase?.class_FQN?.toString».class); 
    					''')
    				]
@@ -547,7 +550,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    		
    	def dispatch void infer(DataType dataType, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
    		
-   		if (dataType.name == null || dataType.equivalenceClass_name == null || dataType.type.mappedBy == null)
+   		if (dataType.name == null || dataType.equivalenceClass_name == null || dataType.type?.mappedBy == null)
    			return
    		
    		val JvmEnumerationType equivalenceClass = dataType.toEnumerationType(dataType.equivalenceClass_name)[

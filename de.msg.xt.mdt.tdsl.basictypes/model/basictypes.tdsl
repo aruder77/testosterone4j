@@ -4,6 +4,8 @@ package de.msg.xt.mdt.tdsl.basictypes {
 	
 	type Boolean mappedBy Boolean
 	
+	type Integer mappedBy Integer
+	
 	datatype StringDT type String { 
 		class emptyString value ""
 		class shortString value "shortString"
@@ -14,4 +16,11 @@ package de.msg.xt.mdt.tdsl.basictypes {
 		class trueBoolean value true
 		class falseBoolean value false
 	}
+	
+	datatype IntegerDT type Integer {
+		class zero value 0
+		class small value 5
+		class big value 310052345
+	}
 } 
+

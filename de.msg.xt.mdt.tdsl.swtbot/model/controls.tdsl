@@ -43,6 +43,19 @@ package de.msg.xt.mdt.tdsl.swtbot {
 		op selectNode(String nodePath)
 		op doubleClickNode(String nodePath)
 		op Boolean isEnabled
+		op invokeContextMenu(String nodePath, String contextMenuEntry)
+		op Boolean isContextMenuEnabled(String nodePath, String contextMenuEntry)
+		op Boolean hasChildNode(String nodePath, String nodePattern, Boolean recursive)
+	}
+	
+	control TableControl {
+		op invokeContextMenu(String contextMenuEntry)
+		op isContextMenuEnabled(String contextMenuEntry)
+		op String getText(Integer row, Integer column)
+		op String getTextByName(Integer row, String columnName)
+		op setText(Integer row, Integer column, String textValue)
+		op setTextByName(Integer row, String columnName, String textValue)
+		op Integer getRowCount
 	}
 	
 	control TabItem {
