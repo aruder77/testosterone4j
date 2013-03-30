@@ -591,7 +591,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
         						val expectedType = dataType.newTypeRef("java.lang.Iterable", dataType.type.mappedBy)
         						xbaseCompiler.compileAsJavaExpression(clazz.values, it, expectedType)
         						it.append(''';
-        							value = «clazz.name.toFirstLower»Iterable.iterator().next();
+        							value = de.msg.xt.mdt.base.util.TDslHelper.selectRandom(«clazz.name.toFirstLower»Iterable.iterator());
         						''')
         					} else if (clazz.valueGenerator != null) {
         						it.append('''value = ''')	

@@ -16,6 +16,7 @@ public class IntegerDTEquivalenceClassTest {
     public void testMinusMinus() {
         IntegerDTEquivalenceClass clazz = IntegerDTEquivalenceClass.minusMinus;
         Integer i = clazz.getValue();
+        System.out.println("MinusMinus value: " + i);
         assertTrue(i == -1000 || i == -1500 || i == -100);
 
         IntegerDTEquivalenceClass clazz1 = IntegerDTEquivalenceClass.getByValue(-1000);
@@ -30,6 +31,7 @@ public class IntegerDTEquivalenceClassTest {
     public void testMinus() {
         IntegerDTEquivalenceClass clazz = IntegerDTEquivalenceClass.minus;
         Integer i = clazz.getValue();
+        System.out.println("Minus value: " + i);
         assertTrue(i >= -99 && i < -1);
 
         IntegerDTEquivalenceClass clazz1 = IntegerDTEquivalenceClass.getByValue(-99);
@@ -54,6 +56,7 @@ public class IntegerDTEquivalenceClassTest {
     public void testSmall() {
         IntegerDTEquivalenceClass clazz = IntegerDTEquivalenceClass.small;
         Integer i = clazz.getValue();
+        System.out.println("Small value: " + i);
         assertTrue(i > 0 && i < 100);
 
         IntegerDTEquivalenceClass clazz1 = IntegerDTEquivalenceClass.getByValue(1);
