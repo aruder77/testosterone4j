@@ -46,6 +46,8 @@ import java.util.List
 import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationParameter
 import org.eclipse.xtext.common.types.JvmGenericType
 import de.msg.xt.mdt.tdsl.tDsl.Toolkit
+import org.eclipse.xtext.xbase.lib.Functions$Function0
+import org.eclipse.xtext.xbase.lib.Functions$Function1
 
 /**
  * <p>Infers a JVM model from the source model.</p> 
@@ -585,11 +587,11 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
         						val expectedType = dataType.type.mappedBy
         						xbaseCompiler.compileAsJavaExpression(clazz.value, it, expectedType)
         					} else if (clazz.values != null) {
-        						it.append('''java.lang.Iterable<«dataType.type.mappedBy.qualifiedName»> iterable = ''')
+        						it.append('''java.lang.Iterable<«dataType.type.mappedBy.qualifiedName»> «clazz.name.toFirstLower»Iterable = ''')
         						val expectedType = dataType.newTypeRef("java.lang.Iterable", dataType.type.mappedBy)
         						xbaseCompiler.compileAsJavaExpression(clazz.values, it, expectedType)
         						it.append(''';
-        							value = iterable.iterator().next();
+        							value = «clazz.name.toFirstLower»Iterable.iterator().next();
         						''')
         					} else if (clazz.valueGenerator != null) {
         						it.append('''value = ''')	
@@ -645,20 +647,19 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 						    	xbaseCompiler.compileAsJavaExpression(clazz.value, it, dataType.type.mappedBy)
 					    	    it.append('''
 					        		)) {
-					        			clazz = «clazz.name»;
+					        			return «clazz.name»;
 						        	}
 					        	''')
 					        } else if (clazz.values != null) {
-        						it.append('''java.lang.Iterable<«dataType.type.mappedBy.qualifiedName»> iterable = ''')
+        						it.append('''java.lang.Iterable<«dataType.type.mappedBy.qualifiedName»> «clazz.name.toFirstLower»Iterable = ''')
         						val expectedType = dataType.newTypeRef("java.lang.Iterable", dataType.type.mappedBy)
         						xbaseCompiler.compileAsJavaExpression(clazz.values, it, expectedType)
         						it.append('''
         							;
-        							java.util.Iterator<«dataType.type.mappedBy.qualifiedName»> it = iterable.iterator();
-        							while(it.hasNext()) {
-        								if (value.equals(it.next())) {
-        									clazz = «clazz.name»;
-        									break;
+        							java.util.Iterator<«dataType.type.mappedBy.qualifiedName»> «clazz.name.toFirstLower»Iterator = «clazz.name.toFirstLower»Iterable.iterator();
+        							while(«clazz.name.toFirstLower»Iterator.hasNext()) {
+        								if (value.equals(«clazz.name.toFirstLower»Iterator.next())) {
+        									return «clazz.name»;
         								}
         							}
         						''')        						
@@ -666,18 +667,18 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 					        	it.append('''
 					        		if(
 					        	''')
-					        	val expectedType = dataType.newTypeRef("java.lang.Boolean")
+					        	val expectedType = dataType.newTypeRef(typeof(Functions$Function1), dataType.type.mappedBy, dataType.newTypeRef(typeof(Boolean)))
         						xbaseCompiler.compileAsJavaExpression(clazz.classPredicate, it, expectedType)
 					        	it.append('''
-					        		) {
-					        			clazz = «clazz.name»;
+					        		.apply(value)) {
+					        			return «clazz.name»;
 					        		}
 					        	''')
 					        }
 					    }
 					    it.append('''
 					        }
-				    	    return clazz;
+				    	    return null;
 	   					''')
    					]   				
    				}
