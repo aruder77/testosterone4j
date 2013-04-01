@@ -127,14 +127,16 @@ class TDslScopeProvider extends XbaseScopeProvider {
 			if (opCall instanceof ActivityOperationCall || opCall instanceof OperationCall) {
 				lastExpression = opCall.lastExpressionWithNextActivity
 			} else {
-				lastExpression = if (opCall.containsActivitySwitchingOperation) opCall.activitySwitchingOperation else opCall.lastExpressionWithNextActivity
+				if (!(opCall instanceof XBlockExpression)) 
+					lastExpression = if (opCall.containsActivitySwitchingOperation) opCall.activitySwitchingOperation else opCall.lastExpressionWithNextActivity
 			}
 			if (lastExpression == null) {
 				val initialActivity = EcoreUtil2::getContainerOfType(opCall, typeof(UseCase)).initialActivity
 				if (reference == TDslPackage::eINSTANCE.operationCall_Operation) {
 					initialActivity.fieldOperations.calculatesScopes					
 				} else {
-					Scopes::scopeFor(initialActivity.allOperations)
+					val IScope scope = Scopes::scopeFor(initialActivity.allOperations, [QualifiedName::create('#' + it.name)], IScope::NULLSCOPE)
+					scope
 				}
 			} else {
 				if (reference == TDslPackage::eINSTANCE.operationCall_Operation) {				
@@ -151,8 +153,8 @@ class TDslScopeProvider extends XbaseScopeProvider {
 							operations.addAll(activity.allOperations)
 						}
 					}
-					Scopes::scopeFor(operations)
-					
+					Scopes::scopeFor(operations, [QualifiedName::create('#' + it.name)], IScope::NULLSCOPE)
+					//Scopes::scopeFor(operations)
 				}
 			}
 		} else if (reference == TDslPackage::eINSTANCE.operationMapping_Name) {
@@ -182,7 +184,7 @@ class TDslScopeProvider extends XbaseScopeProvider {
 				if (lastExpression instanceof OperationCall) {
 					val opCall = lastExpression as OperationCall
 					val dataTypeMappings = opCall?.operation?.dataTypeMappings
-					if (dataTypeMappings != null)
+					if (dataTypeMappings != null) 
 						Scopes::scopeFor(dataTypeMappings, [
 							val DataTypeMapping dtMap = it as DataTypeMapping
 							QualifiedName::create(dtMap.name.name)
@@ -200,7 +202,7 @@ class TDslScopeProvider extends XbaseScopeProvider {
 		Scopes::scopeFor(operationMappings, [
 					val OperationMapping opMap = it as OperationMapping
 					if (opMap?.name?.name != null) {
-						QualifiedName::create(opMap.field.name, opMap.name.name)
+						QualifiedName::create('#' + opMap.field.name, opMap.name.name)
 					} else {
 						QualifiedName::EMPTY
 					}

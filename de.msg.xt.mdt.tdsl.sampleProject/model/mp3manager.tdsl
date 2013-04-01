@@ -5,26 +5,24 @@ package mp3manager for Stdtoolkit {
 	import mp3manager.activities.*
 	
 	useCase OpenView(StringDT id) initial MainWindow {
-		openView
-		selectLogicalView(viewId=id)
-		ok
+		#openView
+		#selectLogicalView(viewId=id)
+		#ok
 	}  
 	
 	
 	useCase OpenLogicalView initial MainWindow {
-		call OpenView(OpenView.id="Logical View")
-		findLogicalView
-		close
-		findLogicalView
-		tree.doubleClickNode(nodePath="Bob Marley/Legend/Stir It Up")
+		call OpenView(OpenView.id="Logical View")	
+		#findLogicalView	
+		#tree.doubleClickNode(nodePath="Bob Marley/Legend/Stir It Up")
 		
-		track.setText 
+		#track.setText 
 		var enteredTrack = generatedValue(str)
-		year.setText
+		#year.setText
 		var enteredYear = generatedValue(str)
-		comment.setText
+		#comment.setText
 		var enteredComment = generatedValue(str)
-		var errorLabel = op errorMarker.getText
+		var errorLabel = #errorMarker.getText
 		 
 		if (enteredComment.equivalenceClass == StringDTEquivalenceClass::emptyString) { 
 			assert [ org::junit::Assert::assertEquals(ErrorStringDTEquivalenceClass::missingValue.getValue(), errorLabel.getValue()) ]
@@ -32,15 +30,15 @@ package mp3manager for Stdtoolkit {
 			assert [ org::junit::Assert::assertEquals(ErrorStringDTEquivalenceClass::ok.getValue(), errorLabel.getValue()) ]
 		}
 
-		saveAndClose
-		findLogicalView
-		tree.doubleClickNode(nodePath="Bob Marley/Legend/Stir It Up")
-		var resultTrack = op track.getText
-		var resultYear = op year.getText
-		var resultComment = op comment.getText 
+		#saveAndClose
+		#findLogicalView
+		#tree.doubleClickNode(nodePath="Bob Marley/Legend/Stir It Up")
+		var resultTrack = #track.getText
+		var resultYear = #year.getText
+		var resultComment = #comment.getText 
 		assert [ junit::framework::Assert::assertEquals(enteredTrack.getValue(), resultTrack.getValue()) ]	
 		assert [ junit::framework::Assert::assertEquals(enteredYear.getValue(), resultYear.getValue()) ]	
-		assert [ junit::framework::Assert::assertEquals(enteredComment.getValue(), resultComment.getValue()) ]	
+		assert [ junit::framework::Assert::assertEquals(enteredComment.getValue(), resultComment.getValue()) ]
 	}
 	 
 	test OpenLogicalViewTest generator de.msg.xt.mdt.base.SampleTestGenerator useCase OpenLogicalView

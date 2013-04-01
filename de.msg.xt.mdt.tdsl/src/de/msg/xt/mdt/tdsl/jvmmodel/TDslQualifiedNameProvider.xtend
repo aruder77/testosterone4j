@@ -1,16 +1,16 @@
 package de.msg.xt.mdt.tdsl.jvmmodel
 
+import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationParameterAssignment
 import de.msg.xt.mdt.tdsl.tDsl.DataTypeMapping
+import de.msg.xt.mdt.tdsl.tDsl.OperationCall
 import de.msg.xt.mdt.tdsl.tDsl.OperationMapping
+import de.msg.xt.mdt.tdsl.tDsl.OperationParameterAssignment
+import de.msg.xt.mdt.tdsl.tDsl.ParameterAssignment
 import java.util.ArrayList
 import javax.inject.Inject
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.xtext.naming.QualifiedName
 import org.eclipse.xtext.xbase.scoping.XbaseQualifiedNameProvider
-import de.msg.xt.mdt.tdsl.tDsl.OperationParameterAssignment
-import de.msg.xt.mdt.tdsl.tDsl.OperationCall
-import de.msg.xt.mdt.tdsl.tDsl.ParameterAssignment
-import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationParameterAssignment
 
 class TDslQualifiedNameProvider extends XbaseQualifiedNameProvider {
 	

@@ -169,7 +169,7 @@ VariableDeclaration returns xbase::XVariableDeclaration:
 ;
 
 Expression returns xbase::XExpression:
-	'op' OperationCall | 'aop' ActivityOperationCall | GeneratedValueExpression | XExpression 
+	OperationCall | ActivityOperationCall | GeneratedValueExpression | XExpression 
 ;
 
 GeneratedValueExpression returns xbase::XExpression:
@@ -194,14 +194,22 @@ MFQN:
 	ID '.' ID
 ;
 
+OFQN:
+	'#' ID '.' ID
+;
+
+AFQN:
+	'#' ID
+;
+
 OperationCall returns xbase::XExpression:
 	{OperationCall}
-	operation=[OperationMapping|MFQN] ('(' (paramAssignment+=OperationParameterAssignment) (',' paramAssignment+=OperationParameterAssignment)* ')')?
+	operation=[OperationMapping|OFQN] ('(' (paramAssignment+=OperationParameterAssignment) (',' paramAssignment+=OperationParameterAssignment)* ')')?
 ;
 
 ActivityOperationCall returns xbase::XExpression:
 	{ActivityOperationCall}
-	operation=[ActivityOperation|ID] ('(' (paramAssignment+=ActivityOperationParameterAssignment) (',' paramAssignment+=ActivityOperationParameterAssignment)* ')')?
+	operation=[ActivityOperation|AFQN] ('(' (paramAssignment+=ActivityOperationParameterAssignment) (',' paramAssignment+=ActivityOperationParameterAssignment)* ')')?
 ;
 
 SubUseCaseCall returns xbase::XExpression:
@@ -218,5 +226,3 @@ Assert returns xbase::XExpression:
 CompoundStatement:
 	'(' statements+=Statement ('|' statements+=Statement)+ ')'
 ; */
-
-

@@ -157,7 +157,7 @@ class MetaModelExtensions {
 			}
 		} else {
 			val parentIndex = exprBlock?.indexInParentBlock
-			if (parentIndex == null) {
+			if (parentIndex == null || parentIndex == -1) {
 				return null
 			}
 			val parentBlock = EcoreUtil2::getContainerOfType(exprBlock?.eContainer, typeof(XBlockExpression))
