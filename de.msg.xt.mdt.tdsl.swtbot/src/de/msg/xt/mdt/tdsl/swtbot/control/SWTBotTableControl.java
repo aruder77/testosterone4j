@@ -26,6 +26,7 @@ import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 
+import de.msg.xt.mdt.tdsl.swtbot.ActivityContext;
 import de.msg.xt.mdt.tdsl.swtbot.TableControl;
 
 /**
@@ -38,6 +39,14 @@ import de.msg.xt.mdt.tdsl.swtbot.TableControl;
 public class SWTBotTableControl implements TableControl {
 
 	protected transient SWTBotTable table;
+
+	public static SWTBotTableControl findControl(final ActivityContext context, final String id) {
+		return new SWTBotTableControl(context.getBot().tableWithId(id));
+	}
+
+	public SWTBotTableControl(final SWTBotTable table) {
+		this.table = table;
+	}
 
 	@Override
 	public void invokeContextMenu(final String contextMenuEntry) {

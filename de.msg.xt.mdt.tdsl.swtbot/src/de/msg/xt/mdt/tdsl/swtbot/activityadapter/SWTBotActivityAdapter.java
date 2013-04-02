@@ -2,11 +2,17 @@ package de.msg.xt.mdt.tdsl.swtbot.activityadapter;
 
 import de.msg.xt.mdt.tdsl.swtbot.ActivityContext;
 import de.msg.xt.mdt.tdsl.swtbot.Button;
+import de.msg.xt.mdt.tdsl.swtbot.ComboBox;
 import de.msg.xt.mdt.tdsl.swtbot.Label;
+import de.msg.xt.mdt.tdsl.swtbot.RadioButton;
+import de.msg.xt.mdt.tdsl.swtbot.TableControl;
 import de.msg.xt.mdt.tdsl.swtbot.TextControl;
 import de.msg.xt.mdt.tdsl.swtbot.TreeControl;
 import de.msg.xt.mdt.tdsl.swtbot.control.SWTBotButtonControl;
+import de.msg.xt.mdt.tdsl.swtbot.control.SWTBotComboBoxControl;
 import de.msg.xt.mdt.tdsl.swtbot.control.SWTBotLabelControl;
+import de.msg.xt.mdt.tdsl.swtbot.control.SWTBotRadioButtonControl;
+import de.msg.xt.mdt.tdsl.swtbot.control.SWTBotTableControl;
 import de.msg.xt.mdt.tdsl.swtbot.control.SWTBotTextControl;
 import de.msg.xt.mdt.tdsl.swtbot.control.SWTBotTreeControl;
 
@@ -32,5 +38,17 @@ public class SWTBotActivityAdapter {
 
 	public Button getButton(final String buttonName) {
 		return SWTBotButtonControl.findControl(contextObject, buttonName);
+	}
+
+	public TableControl getTableControl(final String controlName) {
+		return SWTBotTableControl.findControl(contextObject, controlName);
+	}
+
+	public ComboBox getComboBox(final String controlName) {
+		return SWTBotComboBoxControl.findControl(contextObject, controlName);
+	}
+
+	public RadioButton getRadioButton(final String buttonId) {
+		return SWTBotRadioButtonControl.findControl(contextObject, buttonId);
 	}
 }
