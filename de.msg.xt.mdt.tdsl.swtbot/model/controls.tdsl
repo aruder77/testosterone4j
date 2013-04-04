@@ -50,11 +50,14 @@ package de.msg.xt.mdt.tdsl.swtbot {
 	
 	control TableControl {
 		op invokeContextMenu(String contextMenuEntry)
+		op invokeContextMenuOnRow(Integer row, String contextMenuEntry)
 		op isContextMenuEnabled(String contextMenuEntry)
 		op String getText(Integer row, Integer column)
 		op String getTextByName(Integer row, String columnName)
 		op setText(Integer row, Integer column, String textValue)
 		op setTextByName(Integer row, String columnName, String textValue)
+		op selectValue(Integer row, Integer column, String textValue)
+		op selectValueByName(Integer row, String columnName, String textValue)
 		op Integer getRowCount
 	}
 	

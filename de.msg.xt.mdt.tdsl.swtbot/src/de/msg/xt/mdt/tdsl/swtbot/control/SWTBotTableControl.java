@@ -19,15 +19,18 @@ package de.msg.xt.mdt.tdsl.swtbot.control;
 
 import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.widgetOfType;
 
-import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swtbot.swt.finder.SWTBot;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotCCombo;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 
 import de.msg.xt.mdt.tdsl.swtbot.ActivityContext;
 import de.msg.xt.mdt.tdsl.swtbot.TableControl;
+import de.msg.xt.mdt.tdsl.swtbot.util.ContextMenuHelper;
 
 /**
  * TODO Replace with class description.
@@ -50,7 +53,9 @@ public class SWTBotTableControl implements TableControl {
 
 	@Override
 	public void invokeContextMenu(final String contextMenuEntry) {
-		table.contextMenu(contextMenuEntry).click();
+		// table.contextMenu(contextMenuEntry).click();
+
+		ContextMenuHelper.clickContextMenu(table, contextMenuEntry);
 	}
 
 	@Override
@@ -70,12 +75,12 @@ public class SWTBotTableControl implements TableControl {
 
 	@Override
 	public void setText(final Integer row, final Integer column, final String textValue) {
-		table.click(row, column);
+		table.doubleClick(row, column);
 		final SWTBot bot = new SWTBot();
 		final Text text = bot.widget(widgetOfType(Text.class), table.widget);
 		final SWTBotText t = new SWTBotText(text);
 		t.setText(textValue);
-		t.pressShortcut(KeyStroke.getInstance(SWT.CR));
+		t.pressShortcut(SWT.None, SWT.CR);
 	}
 
 	@Override
@@ -84,8 +89,29 @@ public class SWTBotTableControl implements TableControl {
 	}
 
 	@Override
+	public void selectValue(final Integer row, final Integer column, final String textValue) {
+		table.doubleClick(row, column);
+		final SWTBot bot = new SWTBot();
+		final CCombo text = bot.widget(widgetOfType(CCombo.class), table.widget);
+		final SWTBotCCombo t = new SWTBotCCombo(text);
+		t.setSelection(textValue);
+		t.pressShortcut(SWT.None, SWT.CR);
+	}
+
+	@Override
+	public void selectValueByName(final Integer row, final String columnName, final String textValue) {
+		selectValue(row, table.indexOfColumn(columnName), textValue);
+	}
+
+	@Override
 	public Integer getRowCount() {
 		return table.rowCount();
 	}
 
+	@Override
+	public void invokeContextMenuOnRow(final Integer row, final String contextMenuEntry) {
+		final SWTBotTableItem item = table.getTableItem(row);
+		item.select();
+		ContextMenuHelper.clickContextMenu(table, contextMenuEntry);
+	}
 }
