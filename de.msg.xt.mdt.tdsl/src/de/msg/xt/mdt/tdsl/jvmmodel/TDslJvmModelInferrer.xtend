@@ -48,6 +48,7 @@ import org.eclipse.xtext.common.types.JvmGenericType
 import de.msg.xt.mdt.tdsl.tDsl.Toolkit
 import org.eclipse.xtext.xbase.lib.Functions$Function0
 import org.eclipse.xtext.xbase.lib.Functions$Function1
+import org.junit.After
 
 /**
  * <p>Infers a JVM model from the source model.</p> 
@@ -389,7 +390,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    			}   			
    		} else {
    			if (opMapping == null || opMapping.dataType == null) {
-   				System::out.println("For operations with return type a mapping with dataType must be specified!")
+   				//System::out.println("For operations with return type a mapping with dataType must be specified! " + field.fullyQualifiedName.toString + ": " + operation.name)
    				//throw new IllegalArgumentException("For operations with return type a mapping with dataType must be specified!")
    			} else {
    				if (opMapping?.dataType?.class_FQN?.toString != null) {
@@ -493,6 +494,8 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    					it.append('''
                         de.msg.xt.mdt.base.GenerationHelper testHelper = INJECTOR.getInstance(de.msg.xt.mdt.base.GenerationHelper.class);
                         de.msg.xt.mdt.base.Generator generator = INJECTOR.getInstance(de.msg.xt.mdt.base.Generator.class);
+                        «IF !test.tags.empty»generator.setTags(new de.msg.xt.mdt.base.Tag[] {«FOR tag : test.tags SEPARATOR ","»«tag.enumLiteral_FQN»«ENDFOR»});«ENDIF»
+                        «IF !test.excludeTags.empty»generator.setExcludeTags(new de.msg.xt.mdt.base.Tag[] {«FOR tag : test.excludeTags SEPARATOR ","»«tag.enumLiteral_FQN»«ENDFOR»});«ENDIF»
                         LOCATOR.beforeTest();
                         return testHelper.readOrGenerateTestCases(TEST_CASES_SERIALIZATION, generator, «test.useCase?.class_FQN?.toString».class); 
    					''')
@@ -517,6 +520,14 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				
    				body = [
    					it.append('''LOCATOR.beforeTest();''')
+   				]
+   			]
+   			
+   			members += test.toMethod("cleanup", "void".getTypeForName(test)) [
+   				annotations += test.toAnnotation(typeof(After))
+   				
+   				body = [
+   					it.append('''LOCATOR.afterTest();''')
    				]
    			]
    			
@@ -640,7 +651,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 					    switch (this) {            
     					«FOR clazz : dataType.classes»                           
     					case «clazz.name»:                                           
-    						tags = new de.msg.xt.mdt.base.Tag[] { «FOR tag : clazz.tags SEPARATOR ', '»Tags.«tag.name»«ENDFOR» };
+    						tags = new de.msg.xt.mdt.base.Tag[] { «FOR tag : clazz.tags SEPARATOR ', '»«tag.enumLiteral_FQN»«ENDFOR» };
     						break;                       
         				«ENDFOR»                     
 					    }                                                     
@@ -907,12 +918,12 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    	}
    	
    	def dispatch void infer(TagsDeclaration tags, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
-   		if (tags?.eContainer?.fullyQualifiedName?.toString != null) {
-   			acceptor.accept(tags.toEnumerationType(tags.eContainer.fullyQualifiedName.toString + ".Tags") [
+   		if (tags?.enumClass_FQN != null) {
+   			acceptor.accept(tags.toEnumerationType(tags.enumClass_FQN) [
    				superTypes += tags.newTypeRef("de.msg.xt.mdt.base.Tag")
    				for (tag : tags.tags) {
    					if (tag.name != null) {
-   						val enumLit = toEnumerationLiteral(tag.name)
+   						val enumLit = toEnumerationLiteral(tag.enumLiteral_SimpleName)
    						enumLit.setStatic(true) 
 	   					members += enumLit
    					}

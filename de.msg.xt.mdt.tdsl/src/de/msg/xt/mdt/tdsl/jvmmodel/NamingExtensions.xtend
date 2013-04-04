@@ -11,6 +11,8 @@ import de.msg.xt.mdt.tdsl.tDsl.UseCase
 import javax.inject.Inject
 import org.eclipse.xtext.naming.IQualifiedNameProvider
 import org.eclipse.xtext.naming.QualifiedName
+import de.msg.xt.mdt.tdsl.tDsl.TagsDeclaration
+import de.msg.xt.mdt.tdsl.tDsl.Tag
 
 class NamingExtensions {
 	
@@ -88,6 +90,22 @@ class NamingExtensions {
 	
 	def String activityAdapter_FQN(Toolkit toolkit) {
 		toolkit?.fullyQualifiedName?.toString + "ActivityAdapter"
+	}
+	
+	// Tag
+	
+	def String enumLiteral_SimpleName(Tag tag) {
+		tag.name
+	}
+	
+	def String enumLiteral_FQN(Tag tag) {
+		(tag?.eContainer as TagsDeclaration)?.enumClass_FQN + "." + tag.enumLiteral_SimpleName
+	}
+	
+	// TagDeclaration
+	
+	def String enumClass_FQN(TagsDeclaration tags) {
+		tags?.eContainer?.fullyQualifiedName?.toString + ".Tags"
 	}
 
 	// UseCase

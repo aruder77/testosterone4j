@@ -141,7 +141,9 @@ ActivityOperationParameterAssignment:
 ;
 
 Test:
-	'test' name=ID 'generator' generator=JvmTypeReference 'useCase' useCase=[UseCase|FQN]
+	'test' name=ID 'generator' generator=JvmTypeReference 'useCase' useCase=[UseCase|FQN] ('{' 
+		(('excludeTags' (excludeTags+=[Tag|FQN])+) | ('tags' tags+=[Tag|FQN]))?	
+	'}')?
 ;
 
 UseCase:

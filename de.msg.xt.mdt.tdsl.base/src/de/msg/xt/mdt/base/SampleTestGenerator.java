@@ -21,77 +21,136 @@ import javax.inject.Inject;
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class SampleTestGenerator implements Generator {
 
-    public static final Logger LOG = Logger.getLogger(SampleTestGenerator.class.getName());
+	public static final Logger LOG = Logger.getLogger(SampleTestGenerator.class.getName());
 
-    Map<String, Stack<Object>> remainingValuesPerId = new HashMap<String, Stack<Object>>();
+	Map<String, Stack<EquivalenceClass>> remainingValuesPerId = new HashMap<String, Stack<EquivalenceClass>>();
 
-    Set<String> unsatisfiedCoverageIds = new HashSet<String>();
+	Set<String> unsatisfiedCoverageIds = new HashSet<String>();
 
-    @Inject
-    ITestProtocol protocol;
+	@Inject
+	ITestProtocol protocol;
 
-    @Override
-    public <E extends Runnable> List<E> generate(Class<E> clazz) {
-        List<E> testCases = new ArrayList<E>();
-        int idx = 1;
-        try {
-            this.protocol.open();
-        } catch (IOException e1) {
-            e1.printStackTrace();
-        }
-        while (!this.unsatisfiedCoverageIds.isEmpty() || testCases.isEmpty()) {
-            try {
-                Constructor<E> constructor = clazz.getConstructor(Generator.class);
-                E testCase = constructor.newInstance(this);
-                this.protocol.newTest(String.valueOf(idx++));
-                testCase.run();
-                testCases.add(testCase);
-            } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException
-                    | IllegalArgumentException | InvocationTargetException e) {
-                e.printStackTrace();
-            }
-        }
-        this.protocol.close();
-        return testCases;
-    }
+	@Inject
+	ActivityLocator locator;
 
-    @Override
-    public <T extends DataType> T generateDataTypeValue(Class<T> clazz, String id, Tag[] tags) {
-        Stack<Object> remainingValues = this.remainingValuesPerId.get(id);
-        T dataType = null;
-        try {
-            dataType = clazz.newInstance();
-            if (remainingValues == null) {
-                this.unsatisfiedCoverageIds.add(id);
-                remainingValues = new Stack<Object>();
-                List<Object> list = Arrays.asList(getEquivalenceClasses(dataType));
-                Collections.shuffle(list, new Random(System.currentTimeMillis()));
-                remainingValues.addAll(list);
-                this.remainingValuesPerId.put(id, remainingValues);
-            }
-            EquivalenceClass equivalenceClass = (EquivalenceClass) remainingValues.pop();
-            dataType.setEquivalenceClass(equivalenceClass);
-            dataType.setValue(equivalenceClass.getValue());
-            if (remainingValues.isEmpty()) {
-                this.unsatisfiedCoverageIds.remove(id);
-                remainingValues.addAll(Arrays.asList(getEquivalenceClasses(dataType)));
-            }
-        } catch (InstantiationException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        LOG.fine("generatedValue[id=\"" + id + "\"]:" + dataType.getValue());
-        return dataType;
-    }
+	private Set<Tag> tags;
 
-    private <T extends DataType> Object[] getEquivalenceClasses(T dataType) {
-        Object[] values = null;
-        try {
-            Method valuesMethod = dataType.getEquivalenceClassEnum().getMethod("values", (Class[]) null);
-            return (Object[]) valuesMethod.invoke(null, (Object[]) null);
-        } catch (IllegalAccessException | NoSuchMethodException | SecurityException | IllegalArgumentException
-                | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return values;
-    }
+	private Set<Tag> excludeTags;
+
+	@Override
+	public <E extends Runnable> List<E> generate(final Class<E> clazz) {
+		final List<E> testCases = new ArrayList<E>();
+		int idx = 1;
+		try {
+			protocol.open();
+		} catch (final IOException e1) {
+			e1.printStackTrace();
+		}
+		while (!unsatisfiedCoverageIds.isEmpty() || testCases.isEmpty()) {
+			try {
+				final Constructor<E> constructor = clazz.getConstructor(Generator.class);
+				final E testCase = constructor.newInstance(this);
+				protocol.newTest(String.valueOf(idx++));
+
+				locator.beforeTest();
+				try {
+					testCase.run();
+				} finally {
+					locator.afterTest();
+				}
+
+				testCases.add(testCase);
+			} catch (InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException
+					| IllegalArgumentException | InvocationTargetException e) {
+				e.printStackTrace();
+			}
+		}
+		protocol.close();
+		return testCases;
+	}
+
+	@Override
+	public <T extends DataType> T generateDataTypeValue(final Class<T> clazz, final String id, final Tag[] tags) {
+		Stack<EquivalenceClass> remainingValues = remainingValuesPerId.get(id);
+		T dataType = null;
+		try {
+			dataType = clazz.newInstance();
+			if (remainingValues == null) {
+				unsatisfiedCoverageIds.add(id);
+				remainingValues = new Stack<EquivalenceClass>();
+				determineEquivalenceClassList(remainingValues, dataType);
+				remainingValuesPerId.put(id, remainingValues);
+			}
+			final EquivalenceClass equivalenceClass = remainingValues.pop();
+			dataType.setEquivalenceClass(equivalenceClass);
+			dataType.setValue(equivalenceClass.getValue());
+			if (remainingValues.isEmpty()) {
+				unsatisfiedCoverageIds.remove(id);
+				determineEquivalenceClassList(remainingValues, dataType);
+			}
+		} catch (InstantiationException | IllegalAccessException e) {
+			e.printStackTrace();
+		}
+		LOG.fine("generatedValue[id=\"" + id + "\"]:" + dataType.getValue());
+		return dataType;
+	}
+
+	private <T extends DataType> void determineEquivalenceClassList(final Stack<EquivalenceClass> remainingValues,
+			final T dataType) {
+		final List<Object> list = Arrays.asList(getEquivalenceClasses(dataType));
+		Collections.shuffle(list, new Random(System.currentTimeMillis()));
+		for (final Object o : list) {
+			final EquivalenceClass ec = (EquivalenceClass) o;
+			if (checkTagCompliance(ec.getTags())) {
+				remainingValues.add(ec);
+			}
+		}
+	}
+
+	private boolean checkTagCompliance(final Tag[] tags) {
+		boolean result = true;
+		if (this.tags != null) {
+			result = false;
+			for (final Tag tag : tags) {
+				if (this.tags.contains(tag)) {
+					result = true;
+					break;
+				}
+			}
+		} else if (excludeTags != null) {
+			for (final Tag tag : tags) {
+				if (excludeTags.contains(tag)) {
+					result = false;
+					break;
+				}
+			}
+		}
+		return result;
+	}
+
+	private <T extends DataType> Object[] getEquivalenceClasses(final T dataType) {
+		final Object[] values = null;
+		try {
+			final Method valuesMethod = dataType.getEquivalenceClassEnum().getMethod("values", (Class[]) null);
+			return (Object[]) valuesMethod.invoke(null, (Object[]) null);
+		} catch (IllegalAccessException | NoSuchMethodException | SecurityException | IllegalArgumentException
+				| InvocationTargetException e) {
+			e.printStackTrace();
+		}
+		return values;
+	}
+
+	@Override
+	public void setTags(final Tag[] tags) {
+		this.tags = new HashSet<Tag>();
+		this.tags.addAll(Arrays.asList(tags));
+		excludeTags = null;
+	}
+
+	@Override
+	public void setExcludeTags(final Tag[] excludeTags) {
+		tags = null;
+		this.excludeTags = new HashSet<Tag>();
+		this.excludeTags.addAll(Arrays.asList(excludeTags));
+	}
 }

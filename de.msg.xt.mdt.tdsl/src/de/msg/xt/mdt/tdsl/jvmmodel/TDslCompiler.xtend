@@ -84,7 +84,7 @@ class TDslCompiler extends XbaseCompiler {
     				append(");")    
     				newLine				
     			}
-    			append('''«expr.useCase.subUseCaseGetter».execute((«expr.useCase.initialActivity.name»)activity);''')
+    			append('''«expr.useCase.subUseCaseGetter».execute((«expr.useCase.initialActivity.class_FQN.toString»)activity);''')
     		}
     		GenerationSelektor: {
     		}
