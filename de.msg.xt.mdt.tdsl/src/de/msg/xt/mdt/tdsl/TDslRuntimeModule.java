@@ -48,8 +48,10 @@ public class TDslRuntimeModule extends
 	public Class<? extends IQualifiedNameProvider> bindIQualifiedNameProvider() {
 		return TDslQualifiedNameProvider.class;
 	}
-
-	public Class<? extends ImplicitlyImportedTypes> bindImplicitlyImportedTypes() {
-		return TDslImplicitlyImportedTypes.class;
+	
+	@Override
+	@org.eclipse.xtext.service.SingletonBinding(eager = true)
+	public Class<? extends de.msg.xt.mdt.tdsl.validation.TDslJavaValidator> bindTDslJavaValidator() {
+		return de.msg.xt.mdt.tdsl.validation.TDslJavaValidator.class;
 	}
 }
