@@ -20,8 +20,16 @@ package mp3manager.activities {
 	}
 
 	activity MainWindow {
+		field testField control TextControl {
+			op setText (StringDT str) => LogicalView
+			op StringDT getText
+			op BooleanDT isEnabled			
+		}
+		
 		op openView => OpenViewDialog 
-		op findLogicalView => LogicalView
+		op findLogicalView(StringDT str) {
+			#testField.setText(str=str)
+		}
 	}
 	
 	

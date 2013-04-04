@@ -2,8 +2,11 @@ package de.msg.xt.mdt.tdsl.validation;
 
 import javax.inject.Inject;
 
+import org.eclipse.xtext.validation.Check;
+import org.eclipse.xtext.xbase.XExpression;
 import org.eclipse.xtext.xbase.typing.XbaseTypeConformanceComputer;
 
+import de.msg.xt.mdt.tdsl.tDsl.ActivityOperation;
 import de.msg.xt.mdt.tdsl.typeprovider.TDslTypeProvider;
 
 public class TDslJavaValidator extends AbstractTDslJavaValidator {
@@ -29,4 +32,13 @@ public class TDslJavaValidator extends AbstractTDslJavaValidator {
 	// TDslPackage.Literals.OPERATION_MAPPING__GUARD);
 	// }
 	// }
+
+	@Override
+	@Check
+	public void checkImplicitReturn(XExpression expr) {
+		if (expr.eContainer() instanceof ActivityOperation) {
+			return;
+		}
+		super.checkImplicitReturn(expr);
+	}
 }

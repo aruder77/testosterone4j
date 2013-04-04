@@ -114,7 +114,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				}
 
 	   			for (activityMethod : activity.operations) {
-	   				if (activityMethod.name != null) {
+	   				if (activityMethod.name != null && activityMethod.body == null) {
    						members += activityMethod.toMethod(activityMethod.name, activityMethod.newTypeRef(typeof(Object))) [
 							it.setAbstract(true)
    					
@@ -260,13 +260,25 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
   			for (param : operation.params) {
 				if (param?.dataType?.class_FQN?.toString != null) {
    					it.parameters += param.toParameter(param.name, param.newTypeRef(param.dataType.class_FQN.toString))
+   					System::out.println("Parameter ("+param.name+"):" + param.dataType.class_FQN.toString)
    				}
    			}
    			
    			it.setBody [
    				it.append('''
    				    this.protocol.appendActivityOperationCall(this.getClass().getName(), "«operation.name»", null«appendActivityParameter(operation.params)»);
-   				    Object o = contextAdapter.«operation.name»(«FOR param : operation.params SEPARATOR ', '»«param.name».getValue()«ENDFOR»);
+				''')
+				if (operation.body != null) {
+					it.append('''
+						AbstractActivity activity = this;
+					''')
+					xbaseCompiler.compile(operation.body, it, operation.newTypeRef(typeof(void) as Class<?>))
+				} else {
+					it.append('''
+   					    Object o = contextAdapter.«operation.name»(«FOR param : operation.params SEPARATOR ', '»«param.name».getValue()«ENDFOR»);
+					''')
+				}
+				it.append('''
    				    «IF !voidReturn»
    				    	«nextActivityClass»Adapter adapter = injector.getInstance(«nextActivityClass»Adapter.class);
    				    	adapter.setContext(o);

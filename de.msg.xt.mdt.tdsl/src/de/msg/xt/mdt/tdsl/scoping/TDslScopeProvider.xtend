@@ -51,7 +51,7 @@ class TDslScopeProvider extends XbaseScopeProvider {
 		if (scopeContext != null && scopeContext.context != null) {
 			val context = scopeContext.context
 			if (context instanceof StatementLine) {
-				val useCase = EcoreUtil2::getContainerOfType(context, typeof(UseCase))
+				val useCaseBlock = EcoreUtil2::getContainerOfType(context, typeof(XBlockExpression))
 				var IScope pScope = parentScope
 				if (scopeContext.canSpawnForContainer())
 					pScope = createLocalVarScope(parentScope, scopeContext.spawnForContainer());
@@ -59,7 +59,7 @@ class TDslScopeProvider extends XbaseScopeProvider {
 				val localVars = new ArrayList<XExpression>()
 				val statementLine = EcoreUtil2::getContainerOfType(context, typeof(StatementLine))
 				val indexInBlock = statementLine.indexInParentBlock
-				for (expr : useCase.block.expressions.subList(0, indexInBlock)) {
+				for (expr : useCaseBlock.expressions.subList(0, indexInBlock)) {
 					val line = expr as StatementLine
 					if (line?.statement instanceof XVariableDeclaration) {
 						localVars.add(line.statement)
@@ -122,39 +122,56 @@ class TDslScopeProvider extends XbaseScopeProvider {
 					IScope::NULLSCOPE
 			}
 		} else if (reference == TDslPackage::eINSTANCE.operationCall_Operation || reference == TDslPackage::eINSTANCE.activityOperationCall_Operation) {
-			val XExpression opCall = context as XExpression
-			var XExpression lastExpression = null
-			if (opCall instanceof ActivityOperationCall || opCall instanceof OperationCall) {
-				lastExpression = opCall.lastExpressionWithNextActivity
-			} else {
-				if (!(opCall instanceof XBlockExpression)) 
-					lastExpression = if (opCall.containsActivitySwitchingOperation) opCall.activitySwitchingOperation else opCall.lastExpressionWithNextActivity
-			}
-			if (lastExpression == null) {
-				val initialActivity = EcoreUtil2::getContainerOfType(opCall, typeof(UseCase)).initialActivity
-				if (reference == TDslPackage::eINSTANCE.operationCall_Operation) {
-					initialActivity.fieldOperations.calculatesScopes					
-				} else {
-					val IScope scope = Scopes::scopeFor(initialActivity.allOperations, [QualifiedName::create('#' + it.name)], IScope::NULLSCOPE)
-					scope
-				}
-			} else {
+			val activityOperation = EcoreUtil2::getContainerOfType(context, typeof(ActivityOperation))
+			if (activityOperation != null) {
+				val activity = activityOperation.activity
 				if (reference == TDslPackage::eINSTANCE.operationCall_Operation) {				
 					val operations = new ArrayList<OperationMapping>
-					for (activity : lastExpression.determineNextActivities) {
-						operations.addAll(activity.fieldOperations)
-					}
+					operations.addAll(activity.fieldOperations)
 					operations.calculatesScopes
 				} else {
 					val operations = new ArrayList<ActivityOperation>
-					val nextActivities = lastExpression.determineNextActivities
-					for (activity : nextActivities) {
-						if (activity?.allOperations != null) {
-							operations.addAll(activity.allOperations)
-						}
+					if (activity?.allOperations != null) {
+						operations.addAll(activity.allOperations)
 					}
 					Scopes::scopeFor(operations, [QualifiedName::create('#' + it.name)], IScope::NULLSCOPE)
 					//Scopes::scopeFor(operations)
+				}		
+			} else {
+				val XExpression opCall = context as XExpression
+				var XExpression lastExpression = null
+				if (opCall instanceof ActivityOperationCall || opCall instanceof OperationCall) {
+					lastExpression = opCall.lastExpressionWithNextActivity
+				} else {
+					if (!(opCall instanceof XBlockExpression)) 
+						lastExpression = if (opCall.containsActivitySwitchingOperation) opCall.activitySwitchingOperation else opCall.lastExpressionWithNextActivity
+				}
+				if (lastExpression == null) {
+					val initialActivity = EcoreUtil2::getContainerOfType(opCall, typeof(UseCase)).initialActivity
+					if (reference == TDslPackage::eINSTANCE.operationCall_Operation) {
+						initialActivity.fieldOperations.calculatesScopes					
+					} else {
+						val IScope scope = Scopes::scopeFor(initialActivity.allOperations, [QualifiedName::create('#' + it.name)], IScope::NULLSCOPE)
+						scope
+					}
+				} else {
+					if (reference == TDslPackage::eINSTANCE.operationCall_Operation) {				
+						val operations = new ArrayList<OperationMapping>
+						for (activity : lastExpression.determineNextActivities) {
+							operations.addAll(activity.fieldOperations)
+						}
+						operations.calculatesScopes
+					} else {
+						val operations = new ArrayList<ActivityOperation>
+						val nextActivities = lastExpression.determineNextActivities
+						for (activity : nextActivities) {
+							if (activity?.allOperations != null) {
+								operations.addAll(activity.allOperations)
+							}
+						}
+						Scopes::scopeFor(operations, [QualifiedName::create('#' + it.name)], IScope::NULLSCOPE)
+						//Scopes::scopeFor(operations)
+					}
 				}
 			}
 		} else if (reference == TDslPackage::eINSTANCE.operationMapping_Name) {

@@ -82,7 +82,7 @@ ActivityOperationParameter:
 ;
 
 ActivityOperation:
-	'op' (returnType=[DataType|FQN])? name=ID ('(' params+=ActivityOperationParameter (',' params+=ActivityOperationParameter)* ')')? (nextActivities+=ConditionalNextActivity)*
+	'op' (returnType=[DataType|FQN])? name=ID ('(' params+=ActivityOperationParameter (',' params+=ActivityOperationParameter)* ')')? (body=UseCaseBlock)? (nextActivities+=ConditionalNextActivity)* 
 ;
 
 Field:

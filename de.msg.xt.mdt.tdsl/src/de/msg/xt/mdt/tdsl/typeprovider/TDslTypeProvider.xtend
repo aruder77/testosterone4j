@@ -18,6 +18,7 @@ import org.eclipse.xtext.common.types.util.TypeReferences
 import org.eclipse.xtext.xbase.XFeatureCall
 import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder
 import org.eclipse.xtext.xbase.typing.XbaseTypeProvider
+import org.eclipse.xtext.xbase.XBlockExpression
 
 @Singleton
 class TDslTypeProvider extends XbaseTypeProvider {

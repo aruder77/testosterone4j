@@ -24,7 +24,7 @@ package mp3manager for Stdtoolkit {
 		var enteredComment = generatedValue(str)
 		var errorLabel = #errorMarker.getText
 		 
-		if (enteredComment.equivalenceClass == StringDTEquivalenceClass::emptyString) { 
+		if (enteredComment.equivalenceClass == StringDTEquivalenceClass::emptyString) {
 			assert [ org::junit::Assert::assertEquals(ErrorStringDTEquivalenceClass::missingValue.getValue(), errorLabel.getValue()) ]
 		} else {
 			assert [ org::junit::Assert::assertEquals(ErrorStringDTEquivalenceClass::ok.getValue(), errorLabel.getValue()) ]
