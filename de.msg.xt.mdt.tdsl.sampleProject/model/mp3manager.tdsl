@@ -12,7 +12,7 @@ package mp3manager for Stdtoolkit {
 	
 	
 	useCase OpenLogicalView initial MainWindow {
-		call OpenView(OpenView.id="Logical View")	
+		call OpenView(OpenView.id="Logical View") 	
 		#findLogicalView	
 		#tree.doubleClickNode(nodePath="Bob Marley/Legend/Stir It Up")
 		

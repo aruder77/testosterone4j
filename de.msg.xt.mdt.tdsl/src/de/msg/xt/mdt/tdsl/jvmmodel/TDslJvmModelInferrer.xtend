@@ -272,19 +272,27 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 					it.append('''
 						AbstractActivity activity = this;
 					''')
-					xbaseCompiler.compile(operation.body, it, operation.newTypeRef(typeof(void) as Class<?>))
+					var expectedReturnType = operation.newTypeRef(typeof(void) as Class<?>)
+					if (!voidReturn) {
+						expectedReturnType = operation.newTypeRef(typeof(Object))
+					}
+					xbaseCompiler.compile(operation.body, it, expectedReturnType)
+
+					if (!voidReturn) {					
+						it.newLine.append('''return («nextActivityClass»)activity;''')
+					}
 				} else {
 					it.append('''
    					    Object o = contextAdapter.«operation.name»(«FOR param : operation.params SEPARATOR ', '»«param.name».getValue()«ENDFOR»);
 					''')
+					it.append('''
+   					    «IF !voidReturn»
+   					    	«nextActivityClass»Adapter adapter = injector.getInstance(«nextActivityClass»Adapter.class);
+   					    	adapter.setContext(o);
+   					    	return new «nextActivityClass»(adapter);
+   				    	«ENDIF»
+   					''')
 				}
-				it.append('''
-   				    «IF !voidReturn»
-   				    	«nextActivityClass»Adapter adapter = injector.getInstance(«nextActivityClass»Adapter.class);
-   				    	adapter.setContext(o);
-   				    	return new «nextActivityClass»(adapter);
-   				    «ENDIF»
-   				''')
    			]
    		]
    	}

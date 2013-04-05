@@ -122,22 +122,13 @@ class TDslScopeProvider extends XbaseScopeProvider {
 					IScope::NULLSCOPE
 			}
 		} else if (reference == TDslPackage::eINSTANCE.operationCall_Operation || reference == TDslPackage::eINSTANCE.activityOperationCall_Operation) {
+			var Activity initialActivity = null
 			val activityOperation = EcoreUtil2::getContainerOfType(context, typeof(ActivityOperation))
 			if (activityOperation != null) {
-				val activity = activityOperation.activity
-				if (reference == TDslPackage::eINSTANCE.operationCall_Operation) {				
-					val operations = new ArrayList<OperationMapping>
-					operations.addAll(activity.fieldOperations)
-					operations.calculatesScopes
-				} else {
-					val operations = new ArrayList<ActivityOperation>
-					if (activity?.allOperations != null) {
-						operations.addAll(activity.allOperations)
-					}
-					Scopes::scopeFor(operations, [QualifiedName::create('#' + it.name)], IScope::NULLSCOPE)
-					//Scopes::scopeFor(operations)
-				}		
+				initialActivity = activityOperation.activity
 			} else {
+				initialActivity = EcoreUtil2::getContainerOfType(context, typeof(UseCase)).initialActivity
+			}
 				val XExpression opCall = context as XExpression
 				var XExpression lastExpression = null
 				if (opCall instanceof ActivityOperationCall || opCall instanceof OperationCall) {
@@ -147,7 +138,6 @@ class TDslScopeProvider extends XbaseScopeProvider {
 						lastExpression = if (opCall.containsActivitySwitchingOperation) opCall.activitySwitchingOperation else opCall.lastExpressionWithNextActivity
 				}
 				if (lastExpression == null) {
-					val initialActivity = EcoreUtil2::getContainerOfType(opCall, typeof(UseCase)).initialActivity
 					if (reference == TDslPackage::eINSTANCE.operationCall_Operation) {
 						initialActivity.fieldOperations.calculatesScopes					
 					} else {
@@ -173,7 +163,6 @@ class TDslScopeProvider extends XbaseScopeProvider {
 						//Scopes::scopeFor(operations)
 					}
 				}
-			}
 		} else if (reference == TDslPackage::eINSTANCE.operationMapping_Name) {
 			var Field field 
 			if (context instanceof OperationMapping) {

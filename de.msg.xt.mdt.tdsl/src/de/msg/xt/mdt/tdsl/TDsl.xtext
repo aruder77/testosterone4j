@@ -146,7 +146,8 @@ Test:
 
 UseCase:
 	'useCase' name=ID ('(' inputParameter+=Parameter (',' inputParameter+=Parameter)* ')')? 'initial' initialActivity=[Activity|FQN]
-		block=UseCaseBlock
+		block=UseCaseBlock 
+		(nextActivity=ConditionalNextActivity)?
 ;
 
 UseCaseBlock returns xbase::XBlockExpression:

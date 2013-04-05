@@ -102,6 +102,58 @@ class TDslCompiler extends XbaseCompiler {
     			super.doInternalToJavaStatement(expr, it, isReferenced)
     	}   	
     }
+
+    override protected internalToConvertedExpression(XExpression expr, 
+                                                 ITreeAppendable it) {
+ 
+ 		switch (expr) {
+ 			OperationCall: {
+     			val field = expr.operation.eContainer as Field
+    			append('''((«(field.eContainer as Activity).class_FQN.toString»)activity).«field.activityControlDelegationMethodName(expr.operation.name)»()''') 		
+			}
+			SubUseCaseCall: {
+				append("should not be possible!")
+			}
+			GenerationSelektor: {
+				val container = expr.eContainer
+				var DataType dataType
+				var String varName
+				switch (container) {
+					OperationParameterAssignment : {
+						dataType = container.name.datatype
+						varName = container.name.fullyQualifiedName.toString
+					}
+					ActivityOperationParameterAssignment : {
+						dataType = container.name.dataType
+						varName = container.name.fullyQualifiedName.toString
+					}
+				}
+				append('''getOrGenerateValue(«dataType.class_FQN.toString».class, "«varName»"''')
+				if (!expr.tags.empty) {
+					append(''', new de.msg.xt.mdt.base.Tag[] {«FOR tag: expr.tags SEPARATOR ","»Tags.«tag.name»«ENDFOR»}''')
+				}
+				if (expr.expression != null) {
+					append(", ")
+					expr.expression.compileAsJavaExpression(it, typeRefs.createArrayType(typeRefs.getTypeForName("Tags", expr)))
+				}
+				append(''')''')
+			}
+			GeneratedValueExpression: {
+				val lastExpression = expr.lastExpressionWithNextActivity
+				val opCall = lastExpression as OperationCall
+				append(opCall.getVariableNameForOperationCallParameter(expr.param))
+			}
+			StatementLine: {
+				expr.statement.internalToJavaExpression(it)
+			}
+			Assert: {
+				expr.expression.internalToJavaExpression(it)
+			}
+			
+			default:
+				super.internalToConvertedExpression(expr, it)
+        }                          	
+	}
     
     def getVariableNameForOperationCallParameter(OperationCall call, DataTypeMapping mapping) {
     	call?.fullyQualifiedName?.toString?.toFieldName + "_" + mapping?.fullyQualifiedName?.toString?.toFieldName
@@ -182,56 +234,5 @@ class TDslCompiler extends XbaseCompiler {
 			}
 		}
 		return null
-	}
-    
-    override protected internalToConvertedExpression(XExpression expr, 
-                                                 ITreeAppendable it) {
- 
- 		switch (expr) {
- 			OperationCall: {
-     			val field = expr.operation.eContainer as Field
-    			append('''((«(field.eContainer as Activity).class_FQN.toString»)activity).«field.activityControlDelegationMethodName(expr.operation.name)»()''') 		
-			}
-			SubUseCaseCall: {
-				append("should not be possible!")
-			}
-			GenerationSelektor: {
-				val container = expr.eContainer
-				var DataType dataType
-				var String varName
-				switch (container) {
-					OperationParameterAssignment : {
-						dataType = container.name.datatype
-						varName = container.name.fullyQualifiedName.toString
-					}
-					ActivityOperationParameterAssignment : {
-						dataType = container.name.dataType
-						varName = container.name.fullyQualifiedName.toString
-					}
-				}
-				append('''getOrGenerateValue(«dataType.class_FQN.toString».class, "«varName»"''')
-				if (!expr.tags.empty) {
-					append(''', new de.msg.xt.mdt.base.Tag[] {«FOR tag: expr.tags SEPARATOR ","»Tags.«tag.name»«ENDFOR»}''')
-				}
-				if (expr.expression != null) {
-					append(", ")
-					expr.expression.compileAsJavaExpression(it, typeRefs.createArrayType(typeRefs.getTypeForName("Tags", expr)))
-				}
-				append(''')''')
-			}
-			GeneratedValueExpression: {
-				val lastExpression = expr.lastExpressionWithNextActivity
-				val opCall = lastExpression as OperationCall
-				append(opCall.getVariableNameForOperationCallParameter(expr.param))
-			}
-			StatementLine: {
-				expr.statement.internalToJavaExpression(it)
-			}
-			Assert: {
-				expr.expression.internalToJavaExpression(it)
-			}
-			default:
-				super.internalToConvertedExpression(expr, it)
-        }                          	
-	}
+	}    
 }

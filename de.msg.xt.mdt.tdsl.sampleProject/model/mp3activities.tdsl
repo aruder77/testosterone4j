@@ -26,10 +26,15 @@ package mp3manager.activities {
 			op BooleanDT isEnabled			
 		}
 		
-		op openView => OpenViewDialog 
-		op findLogicalView(StringDT str) {
-			#testField.setText(str=str)
-		}
+		op openView => OpenViewDialog
+		op findLogicalView => LogicalView
+		
+		op openLogicalView {
+			#openView
+			#selectLogicalView(viewId="Logical View")
+			#ok
+			#findLogicalView
+		} => LogicalView
 	}
 	
 	
