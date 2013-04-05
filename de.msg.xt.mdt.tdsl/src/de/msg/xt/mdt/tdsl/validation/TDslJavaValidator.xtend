@@ -34,10 +34,10 @@ class TDslJavaValidator extends AbstractTDslJavaValidator {
 	}
 	
 	
-//	@Check
-//	def checkControlsInToolkit(Field field) {
-//		if(!field.parentActivity.toolkit.controls.contains(field.control)) {
-//			error ("The control '" + field.control.name + "' is not included in the current toolkit!", TDslPackage$Literals::FIELD__CONTROL)
-//		}
-//	}
+	@Check
+	def checkControlsInToolkit(Field field) {
+		if(!field.parentActivity.toolkit.controls.contains(field.control)) {
+			error ("The control '" + field.control.name + "' is not included in the current toolkit!", TDslPackage$Literals::FIELD__CONTROL)
+		}
+	}
 }

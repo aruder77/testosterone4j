@@ -170,7 +170,10 @@ class TDslScopeProvider extends XbaseScopeProvider {
 			} else {
 				field = context as Field
 			}
-			Scopes::scopeFor(field.control.operations)
+			if (field.control != null) {
+				Scopes::scopeFor(field.control.operations)
+			} else 
+				IScope::NULLSCOPE
 		} else if (reference == TDslPackage::eINSTANCE.dataTypeMapping_Name) {
 			var OperationMapping opMap
 			if (context instanceof OperationMapping) {

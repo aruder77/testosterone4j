@@ -109,7 +109,9 @@ class TDslCompiler extends XbaseCompiler {
  		switch (expr) {
  			OperationCall: {
      			val field = expr.operation.eContainer as Field
-    			append('''((«(field.eContainer as Activity).class_FQN.toString»)activity).«field.activityControlDelegationMethodName(expr.operation.name)»()''') 		
+    			append('''((«(field.eContainer as Activity).class_FQN.toString»)activity).«field.activityControlDelegationMethodName(expr.operation.name)»(''')
+    			appendEmbeddedParameter(expr, it)
+    			append(")") 		
 			}
 			SubUseCaseCall: {
 				append("should not be possible!")
@@ -174,6 +176,21 @@ class TDslCompiler extends XbaseCompiler {
 		}		
 	}
 	
+	def generateEmbeddedParameters(OperationCall call, ITreeAppendable appendable) { 
+		for (mapping : call.operation.dataTypeMappings) {
+			val assignment = findAssignment(call, mapping.name)
+			val dataTypeName = mapping.datatype.class_FQN.toString
+//			appendable.append('''«dataTypeName» «call.getVariableNameForOperationCallParameter(mapping)» = ''')
+			if (assignment == null) {
+				appendable.append('''getOrGenerateValue(«dataTypeName».class, "«call.getVariableNameForOperationCallParameter(mapping)»")''')
+			} else {
+				appendParameterValue(appendable, mapping.datatype, assignment.value)
+			}
+			appendable.append(";")
+			appendable.newLine
+		}		
+	}
+	
 	def appendParameterValue(ITreeAppendable appendable, DataType datatype, XExpression expr) {
 		val dataTypeName = datatype.class_FQN.toString
 		val expectedType = typeRefs.getTypeForName(dataTypeName, datatype)
@@ -214,8 +231,15 @@ class TDslCompiler extends XbaseCompiler {
     	appendable.append('''«FOR parameter : call.operation.params SEPARATOR ', '»«parameter.fullyQualifiedName.toString.toFieldName»«ENDFOR»''')
     }
     
-	def appendParameter(OperationCall call, ITreeAppendable appendable) { 
-    	appendable.append('''«FOR parameter : call.operation.dataTypeMappings SEPARATOR ', '»«call.getVariableNameForOperationCallParameter(parameter)»«ENDFOR»''')
+	def appendParameter(OperationCall call, ITreeAppendable appendable) {
+		val params = '''«FOR parameter : call.operation.dataTypeMappings SEPARATOR ', '»«call.getVariableNameForOperationCallParameter(parameter)»«ENDFOR»''' 
+    	appendable.append(params)
+	}
+	    
+    
+	def appendEmbeddedParameter(OperationCall call, ITreeAppendable appendable) {
+		val params = '''«FOR parameter : call.operation.dataTypeMappings SEPARATOR ', '»«call.getVariableNameForOperationCallParameter(parameter)»«ENDFOR»''' 
+    	appendable.append(params)
 	}
 	
 	def findAssignment(ActivityOperationCall call, ActivityOperationParameter param) {
