@@ -110,7 +110,7 @@ class TDslCompiler extends XbaseCompiler {
  			OperationCall: {
      			val field = expr.operation.eContainer as Field
     			append('''((«(field.eContainer as Activity).class_FQN.toString»)activity).«field.activityControlDelegationMethodName(expr.operation.name)»(''')
-    			appendEmbeddedParameter(expr, it)
+    			expr.generateEmbeddedParameters(it)
     			append(")") 		
 			}
 			SubUseCaseCall: {
@@ -177,17 +177,18 @@ class TDslCompiler extends XbaseCompiler {
 	}
 	
 	def generateEmbeddedParameters(OperationCall call, ITreeAppendable appendable) { 
+		var i = 1
 		for (mapping : call.operation.dataTypeMappings) {
 			val assignment = findAssignment(call, mapping.name)
 			val dataTypeName = mapping.datatype.class_FQN.toString
-//			appendable.append('''«dataTypeName» «call.getVariableNameForOperationCallParameter(mapping)» = ''')
 			if (assignment == null) {
 				appendable.append('''getOrGenerateValue(«dataTypeName».class, "«call.getVariableNameForOperationCallParameter(mapping)»")''')
 			} else {
 				appendParameterValue(appendable, mapping.datatype, assignment.value)
 			}
-			appendable.append(";")
-			appendable.newLine
+			if (i < call.operation.dataTypeMappings.size)
+				appendable.append(", ").newLine
+			i = i + 1
 		}		
 	}
 	
@@ -235,13 +236,7 @@ class TDslCompiler extends XbaseCompiler {
 		val params = '''«FOR parameter : call.operation.dataTypeMappings SEPARATOR ', '»«call.getVariableNameForOperationCallParameter(parameter)»«ENDFOR»''' 
     	appendable.append(params)
 	}
-	    
-    
-	def appendEmbeddedParameter(OperationCall call, ITreeAppendable appendable) {
-		val params = '''«FOR parameter : call.operation.dataTypeMappings SEPARATOR ', '»«call.getVariableNameForOperationCallParameter(parameter)»«ENDFOR»''' 
-    	appendable.append(params)
-	}
-	
+	        
 	def findAssignment(ActivityOperationCall call, ActivityOperationParameter param) {
 		for (assignment : call.paramAssignment) {
 			if (assignment.name.equals(param)) {
