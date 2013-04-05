@@ -7,11 +7,11 @@ import java.util.Random;
 
 public class TDslHelper {
 
-    public static <T> T selectRandom(Iterator<T> iterator) {
-        List<T> list = new ArrayList<T>();
-        while (iterator.hasNext()) {
-            list.add(iterator.next());
-        }
-        return list.get(new Random(System.currentTimeMillis()).nextInt(list.size()));
-    }
+	public static <T> T selectRandom(final Iterator<T> iterator) {
+		final List<T> list = new ArrayList<T>();
+		while (iterator.hasNext()) {
+			list.add(iterator.next());
+		}
+		return list.get(new Random(System.currentTimeMillis()).nextInt(list.size()));
+	}
 }

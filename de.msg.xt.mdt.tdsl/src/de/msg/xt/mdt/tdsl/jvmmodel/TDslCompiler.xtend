@@ -22,6 +22,8 @@ import de.msg.xt.mdt.tdsl.tDsl.GeneratedValueExpression
 import de.msg.xt.mdt.tdsl.tDsl.DataTypeMapping
 import de.msg.xt.mdt.tdsl.tDsl.StatementLine
 import de.msg.xt.mdt.tdsl.tDsl.Assert
+import org.eclipse.xtext.common.types.JvmTypeReference
+import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder
 
 class TDslCompiler extends XbaseCompiler {
 	
@@ -34,6 +36,8 @@ class TDslCompiler extends XbaseCompiler {
 	@Inject extension IQualifiedNameProvider
 	
 	@Inject extension ITypeProvider
+	
+	@Inject extension JvmTypesBuilder
 	
 	
 	@Inject
@@ -194,12 +198,13 @@ class TDslCompiler extends XbaseCompiler {
 	
 	def appendParameterValue(ITreeAppendable appendable, DataType datatype, XExpression expr) {
 		val dataTypeName = datatype.class_FQN.toString
-		val expectedType = typeRefs.getTypeForName(dataTypeName, datatype)
-		if (!expr.type.type.equals(expectedType.type)) {
+		val expectedType = expr.type
+		val typeMatch = expectedType.type.equals(datatype.newTypeRef(datatype.class_FQN.toString).type)
+		if (!typeMatch) {
 			appendable.append('''new «dataTypeName»(''')
 		}
 		compileAsJavaExpression(expr, appendable, expectedType)
-		if (!expr.type.type.equals(expectedType.type)) {
+		if (!typeMatch) {
 			appendable.append(''', null)''')
 		}		
 	}
@@ -217,7 +222,7 @@ class TDslCompiler extends XbaseCompiler {
 				if (!assignment.value.type.type.equals(expectedType.type)) {
 					appendable.append('''new «dataTypeName»(''')
 				}
-				compileAsJavaExpression(assignment.value, appendable, expectedType)
+				compileAsJavaExpression(assignment.value, appendable, assignment.value.type)
 				if (!assignment.value.type.type.equals(expectedType.type)) {
 					appendable.append(''', null)''')
 				}

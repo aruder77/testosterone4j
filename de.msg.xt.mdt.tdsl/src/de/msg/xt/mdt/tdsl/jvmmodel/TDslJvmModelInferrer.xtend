@@ -288,9 +288,15 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 					''')
 					it.append('''
    					    «IF !voidReturn»
-   					    	«nextActivityClass»Adapter adapter = injector.getInstance(«nextActivityClass»Adapter.class);
-   					    	adapter.setContext(o);
-   					    	return new «nextActivityClass»(adapter);
+   					    	«nextActivityClass» nextActivity = null;
+   					    	if (o instanceof «nextActivityClass») {
+   					    		nextActivity = («nextActivityClass»)o;
+   					    	} else {
+   					    		«nextActivityClass»Adapter adapter = injector.getInstance(«nextActivityClass»Adapter.class);
+   					    		adapter.setContext(o);
+   					    		nextActivity = new «nextActivityClass»(adapter);
+   					    	}
+   					    	return nextActivity;
    				    	«ENDIF»
    					''')
 				}

@@ -168,7 +168,7 @@ Statement returns xbase::XExpression:
 
 VariableDeclaration returns xbase::XVariableDeclaration:
 	{xbase::XVariableDeclaration}
-	(writeable?='var') =>(=>(type=JvmTypeReference =>name=ValidID) | name=ValidID) ('=' right=Expression)?
+	(writeable?='var' | 'val') =>(=>(type=JvmTypeReference =>name=ValidID) | name=ValidID) ('=' right=Expression)?
 ;
 
 Expression returns xbase::XExpression:
