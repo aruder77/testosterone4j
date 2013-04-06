@@ -3,6 +3,7 @@ package de.msg.xt.mdt.tdsl.sampleProject.template.test.datatype;
 import java.io.Serializable;
 
 import de.msg.xt.mdt.base.EquivalenceClass;
+import de.msg.xt.mdt.base.Tag;
 import de.msg.xt.mdt.tdsl.sampleProject.template.test.activity.Tags;
 
 public enum StringDTEquivalenceClass implements EquivalenceClass, Serializable {
@@ -26,17 +27,18 @@ public enum StringDTEquivalenceClass implements EquivalenceClass, Serializable {
         return value;
     }
 
-    public Tags[] getTags() {
-        Tags[] tags = null;
+    @Override
+    public Tag[] getTags() {
+        Tag[] tags = null;
         switch (this) {
         case EMPTY:
-            tags = new Tags[] { Tags.Pflichtfeld, Tags.Test };
+            tags = new Tag[] { Tags.Pflichtfeld, Tags.Test };
             break;
         case SHORT:
-            tags = new Tags[] {};
+            tags = new Tag[] {};
             break;
         case LONG:
-            tags = new Tags[] {};
+            tags = new Tag[] {};
             break;
         }
 

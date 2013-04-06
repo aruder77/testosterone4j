@@ -37,4 +37,11 @@ public class SWTBotActivityLocator implements ActivityLocator {
         return activityAdapter;
     }
 
+    @Override
+    public Object afterTest() {
+        SWTWorkbenchBot bot = new SWTWorkbenchBot();
+        bot.closeAllEditors();
+        return null;
+    }
+
 }

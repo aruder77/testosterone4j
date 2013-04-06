@@ -6,6 +6,8 @@ import javax.inject.Inject
 import de.msg.xt.mdt.tdsl.jvmmodel.MetaModelExtensions
 import de.msg.xt.mdt.tdsl.jvmmodel.NamingExtensions
 import de.msg.xt.mdt.tdsl.tDsl.TDslPackage
+import org.eclipse.xtext.xbase.XExpression
+import de.msg.xt.mdt.tdsl.tDsl.ActivityOperation
 
 class TDslJavaValidator extends AbstractTDslJavaValidator {
 	
@@ -39,5 +41,13 @@ class TDslJavaValidator extends AbstractTDslJavaValidator {
 		if(!field.parentActivity.toolkit.controls.contains(field.control)) {
 			error ("The control '" + field.control.name + "' is not included in the current toolkit!", TDslPackage$Literals::FIELD__CONTROL)
 		}
+	}
+	
+	@Check
+	override checkImplicitReturn(XExpression expr) {
+		if (expr.eContainer() instanceof ActivityOperation) {
+			return;
+		}
+		super.checkImplicitReturn(expr);
 	}
 }

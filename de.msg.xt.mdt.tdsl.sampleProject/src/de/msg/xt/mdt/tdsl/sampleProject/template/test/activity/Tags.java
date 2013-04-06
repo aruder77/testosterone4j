@@ -1,9 +1,11 @@
 package de.msg.xt.mdt.tdsl.sampleProject.template.test.activity;
 
-public enum Tags {
-  Pflichtfeld,
+import de.msg.xt.mdt.base.Tag;
 
-  Test,
+public enum Tags implements Tag {
+    Pflichtfeld,
 
-  Super
+    Test,
+
+    Super
 }
