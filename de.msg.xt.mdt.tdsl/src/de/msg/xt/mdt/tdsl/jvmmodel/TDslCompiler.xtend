@@ -1,29 +1,28 @@
 package de.msg.xt.mdt.tdsl.jvmmodel
 
-import org.eclipse.xtext.xbase.compiler.XbaseCompiler
-import org.eclipse.xtext.xbase.XExpression
-import org.eclipse.xtext.xbase.compiler.output.ITreeAppendable
-import de.msg.xt.mdt.tdsl.tDsl.OperationCall
-import de.msg.xt.mdt.tdsl.tDsl.SubUseCaseCall
 import de.msg.xt.mdt.tdsl.tDsl.Activity
-import javax.inject.Inject
-import de.msg.xt.mdt.tdsl.tDsl.Field
+import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationCall
+import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationParameter
+import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationParameterAssignment
+import de.msg.xt.mdt.tdsl.tDsl.Assert
 import de.msg.xt.mdt.tdsl.tDsl.ControlOperationParameter
+import de.msg.xt.mdt.tdsl.tDsl.DataType
+import de.msg.xt.mdt.tdsl.tDsl.DataTypeMapping
+import de.msg.xt.mdt.tdsl.tDsl.Field
+import de.msg.xt.mdt.tdsl.tDsl.GeneratedValueExpression
+import de.msg.xt.mdt.tdsl.tDsl.GenerationSelektor
+import de.msg.xt.mdt.tdsl.tDsl.OperationCall
+import de.msg.xt.mdt.tdsl.tDsl.OperationParameterAssignment
+import de.msg.xt.mdt.tdsl.tDsl.StatementLine
+import de.msg.xt.mdt.tdsl.tDsl.SubUseCaseCall
+import javax.inject.Inject
 import org.eclipse.xtext.common.types.util.TypeReferences
 import org.eclipse.xtext.naming.IQualifiedNameProvider
-import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationCall
-import de.msg.xt.mdt.tdsl.tDsl.GenerationSelektor
-import de.msg.xt.mdt.tdsl.tDsl.OperationParameterAssignment
-import de.msg.xt.mdt.tdsl.tDsl.DataType
-import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationParameterAssignment
-import org.eclipse.xtext.xbase.typing.ITypeProvider
-import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationParameter
-import de.msg.xt.mdt.tdsl.tDsl.GeneratedValueExpression
-import de.msg.xt.mdt.tdsl.tDsl.DataTypeMapping
-import de.msg.xt.mdt.tdsl.tDsl.StatementLine
-import de.msg.xt.mdt.tdsl.tDsl.Assert
-import org.eclipse.xtext.common.types.JvmTypeReference
+import org.eclipse.xtext.xbase.XExpression
+import org.eclipse.xtext.xbase.compiler.XbaseCompiler
+import org.eclipse.xtext.xbase.compiler.output.ITreeAppendable
 import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder
+import org.eclipse.xtext.xbase.typing.ITypeProvider
 
 class TDslCompiler extends XbaseCompiler {
 	

@@ -4,7 +4,6 @@ import org.eclipse.xtext.validation.Check
 import de.msg.xt.mdt.tdsl.tDsl.Field
 import javax.inject.Inject
 import de.msg.xt.mdt.tdsl.jvmmodel.MetaModelExtensions
-import de.msg.xt.mdt.tdsl.jvmmodel.NamingExtensions
 import de.msg.xt.mdt.tdsl.tDsl.TDslPackage
 import org.eclipse.xtext.xbase.XExpression
 import de.msg.xt.mdt.tdsl.tDsl.ActivityOperation
@@ -12,8 +11,6 @@ import de.msg.xt.mdt.tdsl.tDsl.ActivityOperation
 class TDslJavaValidator extends AbstractTDslJavaValidator {
 	
 	@Inject extension MetaModelExtensions
-	
-	@Inject extension NamingExtensions
 	
 	@Check
 	def checkOperationMapping(Field field) {

@@ -10,7 +10,6 @@ import de.msg.xt.mdt.tdsl.tDsl.Operation
 import de.msg.xt.mdt.tdsl.tDsl.OperationCall
 import de.msg.xt.mdt.tdsl.tDsl.PackageDeclaration
 import de.msg.xt.mdt.tdsl.tDsl.Parameter
-import de.msg.xt.mdt.tdsl.tDsl.SubUseCaseCall
 import de.msg.xt.mdt.tdsl.tDsl.TagsDeclaration
 import de.msg.xt.mdt.tdsl.tDsl.UseCase
 import java.util.Collection
@@ -39,14 +38,11 @@ import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder
 import org.eclipse.xtext.xbase.lib.Procedures$Procedure1
 import de.msg.xt.mdt.tdsl.tDsl.Test
 import de.msg.xt.mdt.tdsl.tDsl.ActivityOperation
-import org.eclipse.xtext.common.types.JvmEnumerationLiteral
-import org.eclipse.xtext.xbase.compiler.ImportManager
 import de.msg.xt.mdt.tdsl.tDsl.DataTypeMapping
 import java.util.List
 import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationParameter
 import org.eclipse.xtext.common.types.JvmGenericType
 import de.msg.xt.mdt.tdsl.tDsl.Toolkit
-import org.eclipse.xtext.xbase.lib.Functions$Function0
 import org.eclipse.xtext.xbase.lib.Functions$Function1
 import org.junit.After
 
@@ -160,7 +156,6 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				]
    			]
    			
-   			val packageDecl = activity.packageDeclaration
    			val activityLocatorType = activity.newTypeRef("de.msg.xt.mdt.base.ActivityLocator")
    			members += activity.toField("activityLocator", activityLocatorType) [
    				it.setStatic(true)

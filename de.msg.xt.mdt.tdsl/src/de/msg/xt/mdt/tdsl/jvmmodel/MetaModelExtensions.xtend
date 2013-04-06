@@ -1,29 +1,27 @@
 package de.msg.xt.mdt.tdsl.jvmmodel
 
 import de.msg.xt.mdt.tdsl.tDsl.Activity
-import org.eclipse.xtext.naming.IQualifiedNameProvider
-import javax.inject.Inject
+import de.msg.xt.mdt.tdsl.tDsl.ActivityOperation
+import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationCall
+import de.msg.xt.mdt.tdsl.tDsl.DataTypeMapping
 import de.msg.xt.mdt.tdsl.tDsl.Field
-import org.eclipse.emf.ecore.EObject
 import de.msg.xt.mdt.tdsl.tDsl.Operation
 import de.msg.xt.mdt.tdsl.tDsl.OperationCall
-import org.eclipse.xtext.xbase.XExpression
-import org.eclipse.xtext.xbase.XBlockExpression
-import org.eclipse.xtext.EcoreUtil2
 import de.msg.xt.mdt.tdsl.tDsl.OperationMapping
-import de.msg.xt.mdt.tdsl.tDsl.ActivityOperation
-import de.msg.xt.mdt.tdsl.tDsl.DataTypeMapping
-import de.msg.xt.mdt.tdsl.tDsl.PackageDeclaration
 import de.msg.xt.mdt.tdsl.tDsl.OperationParameterAssignment
-import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationCall
-import de.msg.xt.mdt.tdsl.tDsl.StatementLine
-import de.msg.xt.mdt.tdsl.tDsl.Test
 import de.msg.xt.mdt.tdsl.tDsl.PackageDeclaration
+import de.msg.xt.mdt.tdsl.tDsl.StatementLine
+import de.msg.xt.mdt.tdsl.tDsl.SubUseCaseCall
+import de.msg.xt.mdt.tdsl.tDsl.Test
+import de.msg.xt.mdt.tdsl.tDsl.Toolkit
 import java.util.ArrayList
 import java.util.List
-import de.msg.xt.mdt.tdsl.tDsl.Toolkit
-import de.msg.xt.mdt.tdsl.tDsl.SubUseCaseCall
-import de.msg.xt.mdt.tdsl.tDsl.SubUseCaseCall
+import javax.inject.Inject
+import org.eclipse.emf.ecore.EObject
+import org.eclipse.xtext.EcoreUtil2
+import org.eclipse.xtext.naming.IQualifiedNameProvider
+import org.eclipse.xtext.xbase.XBlockExpression
+import org.eclipse.xtext.xbase.XExpression
 
 /**
  * Convenience meta-model extensions. Please order by Metamodel-Class and alphabetically!

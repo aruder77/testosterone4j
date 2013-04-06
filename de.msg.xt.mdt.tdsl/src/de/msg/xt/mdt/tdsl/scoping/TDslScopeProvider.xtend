@@ -1,50 +1,40 @@
 package de.msg.xt.mdt.tdsl.scoping
 
+import de.msg.xt.mdt.tdsl.jvmmodel.MetaModelExtensions
+import de.msg.xt.mdt.tdsl.tDsl.Activity
+import de.msg.xt.mdt.tdsl.tDsl.ActivityOperation
+import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationCall
+import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationParameterAssignment
+import de.msg.xt.mdt.tdsl.tDsl.DataTypeMapping
+import de.msg.xt.mdt.tdsl.tDsl.Field
+import de.msg.xt.mdt.tdsl.tDsl.GeneratedValueExpression
 import de.msg.xt.mdt.tdsl.tDsl.OperationCall
+import de.msg.xt.mdt.tdsl.tDsl.OperationMapping
 import de.msg.xt.mdt.tdsl.tDsl.OperationParameterAssignment
+import de.msg.xt.mdt.tdsl.tDsl.StatementLine
+import de.msg.xt.mdt.tdsl.tDsl.SubUseCaseCall
+import de.msg.xt.mdt.tdsl.tDsl.TDslPackage
+import de.msg.xt.mdt.tdsl.tDsl.UseCase
+import java.util.ArrayList
+import java.util.Collections
+import java.util.List
 import javax.inject.Inject
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.EReference
-import org.eclipse.xtext.scoping.Scopes
-import org.eclipse.xtext.xbase.jvmmodel.IJvmModelAssociations
-import org.eclipse.xtext.xbase.scoping.XbaseScopeProvider
-import de.msg.xt.mdt.tdsl.tDsl.TDslPackage
-import java.util.List
-import de.msg.xt.mdt.tdsl.tDsl.DataTypeMapping
-import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationCall
+import org.eclipse.xtext.EcoreUtil2
+import org.eclipse.xtext.naming.QualifiedName
 import org.eclipse.xtext.scoping.IScope
-import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationParameterAssignment
+import org.eclipse.xtext.scoping.Scopes
 import org.eclipse.xtext.xbase.XBlockExpression
-import de.msg.xt.mdt.tdsl.tDsl.SubUseCaseCall
-import org.eclipse.internal.xtend.expression.ast.IfExpression
+import org.eclipse.xtext.xbase.XExpression
 import org.eclipse.xtext.xbase.XIfExpression
 import org.eclipse.xtext.xbase.XVariableDeclaration
-import org.eclipse.xtext.xbase.XExpression
-import java.util.Collections
-import de.msg.xt.mdt.tdsl.tDsl.Activity
-import org.eclipse.xtext.EcoreUtil2
-import de.msg.xt.mdt.tdsl.tDsl.UseCase
-import de.msg.xt.mdt.tdsl.jvmmodel.MetaModelExtensions
-import de.msg.xt.mdt.tdsl.tDsl.OperationMapping
-import java.util.ArrayList
-import org.eclipse.xtext.naming.QualifiedName
-import com.google.common.base.Function
-import de.msg.xt.mdt.tdsl.tDsl.ActivityOperation
-import de.msg.xt.mdt.tdsl.tDsl.GeneratedValueExpression
-import de.msg.xt.mdt.tdsl.tDsl.Field
-import de.msg.xt.mdt.tdsl.tDsl.StatementLine
-import org.eclipse.xtext.common.types.JvmOperation
-import org.eclipse.xtext.common.types.JvmType
 import org.eclipse.xtext.xbase.scoping.LocalVariableScopeContext
-import org.eclipse.xtext.common.types.JvmField
-import org.eclipse.xtext.xbase.scoping.featurecalls.LocalVarDescription
-import org.eclipse.xtext.xbase.scoping.featurecalls.JvmFeatureScope
+import org.eclipse.xtext.xbase.scoping.XbaseScopeProvider
 
 class TDslScopeProvider extends XbaseScopeProvider {
 	
 	
-    @Inject extension IJvmModelAssociations associations
-    
     @Inject extension MetaModelExtensions
     
 	override protected createLocalVarScope(IScope parentScope, LocalVariableScopeContext scopeContext) {
@@ -98,7 +88,6 @@ class TDslScopeProvider extends XbaseScopeProvider {
     
 	override getScope(EObject context, EReference reference) {
 		if (reference == TDslPackage::eINSTANCE.operationParameterAssignment_Name) {
-			var List<DataTypeMapping> mappings
 			switch (context) {
 				OperationCall: {
 					val maps = context.operation.dataTypeMappings
