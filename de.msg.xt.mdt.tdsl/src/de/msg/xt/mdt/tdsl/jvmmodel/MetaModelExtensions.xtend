@@ -22,6 +22,8 @@ import de.msg.xt.mdt.tdsl.tDsl.PackageDeclaration
 import java.util.ArrayList
 import java.util.List
 import de.msg.xt.mdt.tdsl.tDsl.Toolkit
+import de.msg.xt.mdt.tdsl.tDsl.SubUseCaseCall
+import de.msg.xt.mdt.tdsl.tDsl.SubUseCaseCall
 
 /**
  * Convenience meta-model extensions. Please order by Metamodel-Class and alphabetically!
@@ -186,10 +188,10 @@ class MetaModelExtensions {
 	def containsActivitySwitchingOperation(XExpression expr) {
 		if (expr == null)
 			return false
-		if (expr instanceof OperationCall || expr instanceof ActivityOperationCall) {
+		if (expr instanceof OperationCall || expr instanceof ActivityOperationCall || expr instanceof SubUseCaseCall) {
 			true
 		} else {
-			!(EcoreUtil2::getAllContentsOfType(expr, typeof(OperationCall)).empty && EcoreUtil2::getAllContentsOfType(expr, typeof(ActivityOperationCall)).empty)
+			!(EcoreUtil2::getAllContentsOfType(expr, typeof(OperationCall)).empty && EcoreUtil2::getAllContentsOfType(expr, typeof(ActivityOperationCall)).empty && EcoreUtil2::getAllContentsOfType(expr, typeof(SubUseCaseCall)).empty )
 		} 
 	}
 	
@@ -203,6 +205,11 @@ class MetaModelExtensions {
 			val aOpCalls = EcoreUtil2::getAllContentsOfType(expr, typeof(ActivityOperationCall))
 			if (!aOpCalls.empty)
 				operation = aOpCalls.get(0)
+		}
+		if (operation == null) {
+			val subUseCaseCalls = EcoreUtil2::getAllContentsOfType(expr, typeof(SubUseCaseCall))	
+			if (!subUseCaseCalls.empty)
+				operation = subUseCaseCalls.get(0)		
 		}
 		operation
 	}

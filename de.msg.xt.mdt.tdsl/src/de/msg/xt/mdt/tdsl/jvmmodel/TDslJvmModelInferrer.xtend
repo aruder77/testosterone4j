@@ -879,8 +879,9 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				]
    			]
    			
-   			it.members += useCase.toMethod("execute", null) [
-   				if (useCase?.initialActivity?.class_FQN != null) {
+   			val returnType = useCase.nextActivity?.next?.class_FQN?.toString
+   			it.members += useCase.toMethod("execute", if (returnType != null) useCase.newTypeRef(returnType) else null) [
+   				if (useCase.initialActivity?.class_FQN != null) {
    					it.parameters += useCase.toParameter("initialActivity", useCase.newTypeRef(useCase.initialActivity.class_FQN.toString))
  	  			}
  	
@@ -890,6 +891,9 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    						''')
    					for (statement : useCase.block.expressions) {
    						xbaseCompiler.compile(statement, it, "void".getTypeForName(statement), null)
+   					}
+   					if (returnType != null) {
+   						it.newLine.append('''return («returnType»)activity;''')
    					}
    				]
    			]   			   			
