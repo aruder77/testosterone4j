@@ -23,7 +23,8 @@ Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Export-Package: de.msg.xt.mdt.tdsl.ui,
  de.msg.xt.mdt.tdsl.ui.contentassist,
  de.msg.xt.mdt.tdsl.ui.contentassist.antlr,
- de.msg.xt.mdt.tdsl.ui.internal
+ de.msg.xt.mdt.tdsl.ui.internal,
+ de.msg.xt.mdt.tdsl.ui.quickfix
 Bundle-Activator: de.msg.xt.mdt.tdsl.ui.internal.TDslActivator
 Eclipse-BuddyPolicy: dependent
 

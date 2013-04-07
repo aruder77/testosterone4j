@@ -9,7 +9,6 @@ import org.eclipse.xtext.scoping.IScopeProvider;
 import org.eclipse.xtext.xbase.compiler.XbaseCompiler;
 import org.eclipse.xtext.xbase.typing.ITypeProvider;
 
-import de.msg.xt.mdt.tdsl.generator.TDslJvmModelGenerator;
 import de.msg.xt.mdt.tdsl.jvmmodel.TDslCompiler;
 import de.msg.xt.mdt.tdsl.jvmmodel.TDslQualifiedNameProvider;
 import de.msg.xt.mdt.tdsl.scoping.TDslDefaultResourceDescriptionStrategy;
@@ -28,12 +27,6 @@ public class TDslRuntimeModule extends
 	@Override
 	public Class<? extends ITypeProvider> bindITypeProvider() {
 		return TDslTypeProvider.class;
-	}
-
-	// contributed by org.eclipse.xtext.generator.xbase.XbaseGeneratorFragment
-	@Override
-	public Class<? extends org.eclipse.xtext.generator.IGenerator> bindIGenerator() {
-		return TDslJvmModelGenerator.class;
 	}
 
 	public Class<? extends XbaseCompiler> bindXbaseCompiler() {
