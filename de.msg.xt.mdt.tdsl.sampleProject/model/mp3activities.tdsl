@@ -1,8 +1,11 @@
 package mp3manager.activities {
 
-	import de.msg.xt.mdt.tdsl.basictypes.*
-	import de.msg.xt.mdt.tdsl.swtbot.*
-	import mp3manager.datatypes.*
+	import de.msg.xt.mdt.tdsl.swtbot.TextControl
+	import de.msg.xt.mdt.tdsl.basictypes.BooleanDT
+	import de.msg.xt.mdt.tdsl.basictypes.StringDT
+	import de.msg.xt.mdt.tdsl.swtbot.TreeControl
+	import de.msg.xt.mdt.tdsl.swtbot.Label
+	
 	
 	toolkit Stdtoolkit using controls { 
 		TextControl, TreeControl, Label
@@ -11,12 +14,12 @@ package mp3manager.activities {
 	
 	
 	activity ViewActivity {
-		op close => MainWindow 
+		op close => MainWindow
 	}
 	
 	activity EditorActivity {
-		op saveAndClose => MainWindow 	
-		op BooleanDT isDirty			
+		op saveAndClose => MainWindow 
+		op BooleanDT isDirty		
 	}
 
 	activity MainWindow {
