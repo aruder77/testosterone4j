@@ -10,7 +10,7 @@ TestModel:
 
 PackageDeclaration:
     'package' name=QualifiedName ('for' sutRef=[Toolkit|FQN])? '{'
-		importSection=XImportSection?
+    	(imports+=Import)*
     	(elements+=Element)*
     '}';
     
