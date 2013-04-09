@@ -107,7 +107,7 @@ DataTypeMapping:
 ;
 
 ConditionalNextActivity:
-	'=>' next=[Activity|FQN]
+	'=>' (next=[Activity|FQN] | returnToLastActivity?='returnToLastActivity')
 ;
 
 Parameter:

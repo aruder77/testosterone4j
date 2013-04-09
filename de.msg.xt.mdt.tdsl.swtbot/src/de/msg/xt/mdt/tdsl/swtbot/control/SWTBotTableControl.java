@@ -114,4 +114,10 @@ public class SWTBotTableControl implements TableControl {
 		item.select();
 		ContextMenuHelper.clickContextMenu(table, contextMenuEntry);
 	}
+
+	@Override
+	public void checkRow(final Integer row) {
+		final SWTBotTableItem item = table.getTableItem(row);
+		item.check();
+	}
 }

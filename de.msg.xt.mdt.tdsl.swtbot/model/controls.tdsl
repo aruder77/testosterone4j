@@ -59,6 +59,7 @@ package de.msg.xt.mdt.tdsl.swtbot {
 		op selectValue(Integer row, Integer column, String textValue)
 		op selectValueByName(Integer row, String columnName, String textValue)
 		op Integer getRowCount
+		op checkRow(Integer row)
 	}
 	
 	control TabItem {

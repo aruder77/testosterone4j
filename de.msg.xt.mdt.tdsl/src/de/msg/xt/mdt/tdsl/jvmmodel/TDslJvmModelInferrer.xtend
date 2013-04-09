@@ -517,7 +517,10 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    			
    			members += test.toConstructor [
 	   			if (test?.useCase?.class_FQN?.toString != null) {
-   					parameters += test.toParameter("testDescriptor", test.newTypeRef("de.msg.xt.mdt.base.TestDescriptor", test.newTypeRef(test.useCase.class_FQN.toString)))
+	   				val useCaseClass = test.newTypeRef(test.useCase.class_FQN.toString)
+	   				if (useCaseClass != null) {
+   						parameters += test.toParameter("testDescriptor", test.newTypeRef("de.msg.xt.mdt.base.TestDescriptor", useCaseClass))
+   					}
    				}
    				body = [
    					it.append('''
@@ -840,7 +843,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    						if (inputParam?.dataType?.class_FQN?.toString != null) {
 	   						it.append(
    								'''
-   								this.«inputParam.name» = this.getOrGenerateValue(«inputParam.dataType.class_FQN.toString».class, "«inputParam.name»");
+   								this.«inputParam.name» = this.getOrGenerateValue(«inputParam.dataType.class_FQN.toString».class, "«inputParam.fullyQualifiedName.toString»");
    								''')
    						}
 	   				}

@@ -10,7 +10,7 @@ package de.msg.xt.mdt.tdsl.basictypes {
 		Empty, Invalid
 	}
 	
-	datatype StringDT type String { 
+	datatype StringDT type String {
 		class emptyString value "" tags Empty
 		class shortString value "shortString"
 		class longString value "longlonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglongString" 		
