@@ -225,28 +225,28 @@
     </extension>
 
 
-    <!-- marker definitions for de.msg.xt.mdt.tdsl.TDsl -->
-    <extension
-            id="tdsl.check.fast"
-            name="TDsl Problem"
-            point="org.eclipse.core.resources.markers">
-        <super type="org.eclipse.xtext.ui.check.fast"/>
-        <persistent value="true"/>
-    </extension>
-    <extension
-            id="tdsl.check.normal"
-            name="TDsl Problem"
-            point="org.eclipse.core.resources.markers">
-        <super type="org.eclipse.xtext.ui.check.normal"/>
-        <persistent value="true"/>
-    </extension>
-    <extension
-            id="tdsl.check.expensive"
-            name="TDsl Problem"
-            point="org.eclipse.core.resources.markers">
-        <super type="org.eclipse.xtext.ui.check.expensive"/>
-        <persistent value="true"/>
-    </extension>
+	<!-- marker definitions for de.msg.xt.mdt.tdsl.TDsl -->
+	<extension
+	        id="tdsl.check.fast"
+	        name="TDsl Problem"
+	        point="org.eclipse.core.resources.markers">
+	    <super type="org.eclipse.xtext.ui.check.fast"/>
+	    <persistent value="true"/>
+	</extension>
+	<extension
+	        id="tdsl.check.normal"
+	        name="TDsl Problem"
+	        point="org.eclipse.core.resources.markers">
+	    <super type="org.eclipse.xtext.ui.check.normal"/>
+	    <persistent value="true"/>
+	</extension>
+	<extension
+	        id="tdsl.check.expensive"
+	        name="TDsl Problem"
+	        point="org.eclipse.core.resources.markers">
+	    <super type="org.eclipse.xtext.ui.check.expensive"/>
+	    <persistent value="true"/>
+	</extension>
 
    <extension
          point="org.eclipse.xtext.builder.participant">
@@ -396,30 +396,8 @@
 				</reference>
 			</activeWhen>
 		</handler>
-		<handler
-            class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.xbase.ui.imports.OrganizeImportsHandler"
-            commandId="org.eclipse.xtext.xbase.ui.organizeImports">
-           	<activeWhen>
-				<reference
-					definitionId="de.msg.xt.mdt.tdsl.TDsl.Editor.opened">
-				</reference>
-			</activeWhen>
-        </handler>
 	</extension>
 	<extension point="org.eclipse.ui.menus">
-	    <menuContribution
-            locationURI="popup:#TextEditorContext?after=group.edit">
-             <command
-                 commandId="org.eclipse.xtext.xbase.ui.organizeImports"
-                 style="push"
-                 tooltip="Organize Imports">
-                <visibleWhen checkEnabled="false">
-                    <reference
-                        definitionId="de.msg.xt.mdt.tdsl.TDsl.Editor.opened">
-                    </reference>
-                </visibleWhen>
-            </command>  
-        </menuContribution>
 		<menuContribution
 			locationURI="popup:#TextEditorContext?after=group.open">
 			<command commandId="org.eclipse.xtext.xbase.ui.hierarchy.OpenTypeHierarchy"
