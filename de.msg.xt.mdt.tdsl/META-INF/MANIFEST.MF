@@ -21,7 +21,8 @@ Require-Bundle: org.eclipse.xtext;visibility:=reexport,
  org.apache.commons.logging;bundle-version="1.0.4",
  de.msg.xt.mdt.tdsl.base;bundle-version="1.0.0";visibility:=reexport,
  org.slf4j.api;bundle-version="1.7.2"
-Import-Package: org.apache.log4j
+Import-Package: org.apache.log4j,
+ org.eclipse.xtext.xbase.lib
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: de.msg.xt.mdt.tdsl,
  de.msg.xt.mdt.tdsl.services,
