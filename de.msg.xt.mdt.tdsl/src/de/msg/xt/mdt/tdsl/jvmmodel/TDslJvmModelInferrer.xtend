@@ -143,7 +143,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    			if (activity?.parent?.class_FQN?.toString != null) {
    				superTypes += activity.newTypeRef(activity.parent.class_FQN.toString)
    			} else {
-	   			superTypes += activity.newTypeRef(fqn.activityAdapter)
+	   			superTypes += activity.newTypeRef(fqn.abstractActivity)
    			}
    			
    			members += activity.toField("ID", activity.newTypeRef(typeof(String))) [

@@ -1,10 +1,8 @@
 package mp3manager.activities {
 
-	import de.msg.xt.mdt.tdsl.swtbot.TextControl
-	import de.msg.xt.mdt.tdsl.basictypes.BooleanDT
-	import de.msg.xt.mdt.tdsl.basictypes.StringDT
-	import de.msg.xt.mdt.tdsl.swtbot.TreeControl
-	import de.msg.xt.mdt.tdsl.swtbot.Label
+	import mp3manager.datatypes.*
+	import de.msg.xt.mdt.tdsl.swtbot.*
+	import de.msg.xt.mdt.tdsl.basictypes.*
 	
 	
 	toolkit Stdtoolkit using controls { 
