@@ -107,8 +107,8 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 				superTypes += toolkit.newTypeRef(typeof(ActivityAdapter))
 			
 				for (Control control : toolkit.controls) {
-					if (control?.name != null && control?.class_FQN?.toString != null) {
-						members += control.toMethod(control.toolkitGetter, control.newTypeRef(control.class_FQN.toString)) [
+					if (control?.name != null && control?.class_fqn != null) {
+						members += control.toMethod(control.toolkitGetter, control.newTypeRef(control.class_fqn)) [
 							it.setAbstract(true)
 							it.parameters += control.toParameter("controlName", control.newTypeRef(typeof(String)))
 						]
@@ -268,7 +268,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    			returnTypeRef = operation.newTypeRef(Void::TYPE)
    		} else {
    			val Activity nextActivity = operation.nextActivities.get(0).next
-   			nextActivityClassVar = nextActivity?.class_FQN?.toString
+   			nextActivityClassVar = nextActivity?.class_fqn
    			if (nextActivityClassVar != null) {
    				returnTypeRef = operation.newTypeRef(nextActivityClassVar)
    				voidReturnType = false
@@ -280,8 +280,8 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    		val nextActivityClass = nextActivityClassVar
    		operation.toMethod(operation.name, returnTypeRef) [
   			for (param : operation.params) {
-				if (param?.dataType?.class_FQN?.toString != null) {
-   					it.parameters += param.toParameter(param.name, param.newTypeRef(param.dataType.class_FQN.toString))
+				if (param?.dataType?.class_fqn != null) {
+   					it.parameters += param.toParameter(param.name, param.newTypeRef(param.dataType.class_fqn))
    				}
    			}
    			
@@ -406,7 +406,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				if (opMapping?.nextActivities?.empty || opMapping?.nextActivities?.get(0)?.next?.class_fqn == null) {
    					currentActivityType
    				} else {
-   					field.newTypeRef(opMapping.nextActivities.get(0).next.class_FQN.toString)
+   					field.newTypeRef(opMapping.nextActivities.get(0).next.class_fqn)
    				}
    			}   			
    		} else {
@@ -414,8 +414,8 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				//System::out.println("For operations with return type a mapping with dataType must be specified! " + field.fullyQualifiedName.toString + ": " + operation.name)
    				//throw new IllegalArgumentException("For operations with return type a mapping with dataType must be specified!")
    			} else {
-   				if (opMapping?.dataType?.class_FQN?.toString != null) {
-   					opMapping.newTypeRef(opMapping?.dataType?.class_FQN?.toString)
+   				if (opMapping?.dataType?.class_fqn != null) {
+   					opMapping.newTypeRef(opMapping?.dataType?.class_fqn)
    				}
    			}
    		}
@@ -505,8 +505,8 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    			]
    			
    			
-   			if (test?.useCase?.class_FQN?.toString != null) {
-   				members += test.toField("useCase", test.newTypeRef(test.useCase.class_FQN.toString)) [
+   			if (test?.useCase?.class_fqn != null) {
+   				members += test.toField("useCase", test.newTypeRef(test.useCase.class_fqn)) [
    					it.setFinal(true)
    				]
    			}
@@ -529,14 +529,14 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
                     }
                     it.append('''
                         LOCATOR.beforeTest();
-                        return testHelper.readOrGenerateTestCases(TEST_CASES_SERIALIZATION, generator, «test.useCase?.class_FQN?.toString».class); 
+                        return testHelper.readOrGenerateTestCases(TEST_CASES_SERIALIZATION, generator, «test.useCase?.class_fqn».class); 
    					''')
    				]
    			]
    			
    			members += test.toConstructor [
-	   			if (test?.useCase?.class_FQN?.toString != null) {
-	   				val useCaseClass = test.newTypeRef(test.useCase.class_FQN.toString)
+	   			if (test?.useCase?.class_fqn != null) {
+	   				val useCaseClass = test.newTypeRef(test.useCase.class_fqn)
 	   				if (useCaseClass != null) {
    						parameters += test.toParameter("testDescriptor", test.newTypeRef(typeof(TestDescriptor), useCaseClass))
    					}
@@ -846,8 +846,8 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    			it.annotations += useCase.toAnnotation(typeof(XmlRootElement))
    			   			
    			for (inputParam : useCase.inputParameter) {
-   				if (inputParam.name != null && inputParam?.dataType?.class_FQN?.toString != null) {
-   					members += inputParam.toField(inputParam.name, inputParam.newTypeRef(inputParam.dataType.class_FQN.toString)) [
+   				if (inputParam.name != null && inputParam?.dataType?.class_fqn != null) {
+   					members += inputParam.toField(inputParam.name, inputParam.newTypeRef(inputParam.dataType.class_fqn)) [
    					it.annotations += inputParam.toAnnotation(typeof(XmlElement))
    					]
    				}
@@ -862,10 +862,10 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    					    this.generator = generator;''')
    					for (inputParam : useCase.inputParameter) {
    						newLine
-   						if (inputParam?.dataType?.class_FQN?.toString != null) {
+   						if (inputParam?.dataType?.class_fqn != null) {
 	   						it.append(
    								'''
-   								this.«inputParam.name» = this.getOrGenerateValue(«inputParam.dataType.class_FQN.toString».class, "«inputParam.fullyQualifiedName.toString»");
+   								this.«inputParam.name» = this.getOrGenerateValue(«inputParam.dataType.class_fqn».class, "«inputParam.fullyQualifiedName.toString»");
    								''')
    						}
 	   				}
@@ -876,8 +876,8 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    			if (!useCase.inputParameter.empty) {
    				it.members += useCase.toConstructor() [
    					for (inputParam : useCase.inputParameter) {
-   						if (inputParam?.dataType?.class_FQN?.toString != null) {
-   							it.parameters += useCase.toParameter(inputParam.name, useCase.newTypeRef(inputParam.dataType.class_FQN.toString))
+   						if (inputParam?.dataType?.class_fqn != null) {
+   							it.parameters += useCase.toParameter(inputParam.name, useCase.newTypeRef(inputParam.dataType.class_fqn))
    						}	
    					}
 	   				body = [
@@ -894,8 +894,8 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    			}
    			
    			for (inputParam : useCase.inputParameter) {
-   				if (inputParam?.dataType?.class_FQN?.toString != null) {
-   					members += inputParam.toSetter(inputParam.name, inputParam.newTypeRef(inputParam.dataType.class_FQN.toString))	
+   				if (inputParam?.dataType?.class_fqn != null) {
+   					members += inputParam.toSetter(inputParam.name, inputParam.newTypeRef(inputParam.dataType.class_fqn))	
    				} 
    			}
    			
@@ -911,10 +911,10 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				]
    			]
    			
-   			val returnType = useCase.nextActivity?.next?.class_FQN?.toString
+   			val returnType = useCase.nextActivity?.next?.class_fqn
    			it.members += useCase.toMethod("execute", if (returnType != null) useCase.newTypeRef(returnType) else useCase.newTypeRef(Void::TYPE)) [
    				if (useCase.initialActivity?.class_FQN != null) {
-   					it.parameters += useCase.toParameter("initialActivity", useCase.newTypeRef(useCase.initialActivity.class_FQN.toString))
+   					it.parameters += useCase.toParameter("initialActivity", useCase.newTypeRef(useCase.initialActivity.class_fqn))
  	  			}
  	
    				body = [

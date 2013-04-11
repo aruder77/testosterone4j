@@ -75,6 +75,10 @@ class NamingExtensions {
 		control?.fullyQualifiedName
 	}
 	
+	def String class_fqn(Control control) {
+		control.class_FQN?.toString
+	}
+	
 	def String activityAdapterGetter(Control control) {
 		"get" + control?.name?.toFirstUpper
 	}
@@ -151,6 +155,10 @@ class NamingExtensions {
 	
 	def QualifiedName class_FQN(UseCase useCase) {
 		useCase?.fullyQualifiedName
+	}
+	
+	def String class_fqn(UseCase useCase) {
+		useCase.class_FQN?.toString
 	}
 	
 	def String class_SimpleName(UseCase useCase) {
