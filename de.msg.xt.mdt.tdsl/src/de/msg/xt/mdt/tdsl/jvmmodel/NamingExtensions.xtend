@@ -22,6 +22,12 @@ class NamingExtensions {
 	
 	@Inject extension UtilExtensions
 	
+	
+	// Other
+	def String tdslInjector() {
+		"de.msg.xt.mdt.base.TDslInjector"
+	}
+	
 	// Activity 
 	
 	def QualifiedName class_FQN(Activity activity) {

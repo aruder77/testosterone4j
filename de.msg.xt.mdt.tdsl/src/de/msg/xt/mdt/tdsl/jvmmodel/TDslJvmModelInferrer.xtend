@@ -57,6 +57,7 @@ import de.msg.xt.mdt.base.EquivalenceClass
 import de.msg.xt.mdt.base.Tag
 import de.msg.xt.mdt.base.BaseUseCase
 import de.msg.xt.mdt.base.Generator
+import de.msg.xt.mdt.base.ActivityAdapter
 
 /**
  * <p>Infers a JVM model from the source model.</p> 
@@ -77,9 +78,8 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 	
 	@Inject extension TypeReferenceSerializer
 	
-	@Inject extension NamingExtensions 
+	@Inject extension NamingExtensions fqn
 	@Inject extension MetaModelExtensions
-	@Inject Fqn fqn
 	
 	
 	@Inject
@@ -99,7 +99,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 		if (toolkit.activityAdapter_FQN != null) {
 			acceptor.accept(toolkit.toInterface(toolkit.activityAdapter_FQN, [])).initializeLater [
 			
-				superTypes += toolkit.newTypeRef(fqn.activityAdapter)
+				superTypes += toolkit.newTypeRef(typeof(ActivityAdapter))
 			
 				for (Control control : toolkit.controls) {
 					if (control?.name != null && control?.class_FQN?.toString != null) {
@@ -154,7 +154,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    			if (activity?.parent?.class_FQN?.toString != null) {
    				superTypes += activity.newTypeRef(activity.parent.class_FQN.toString)
    			} else {
-	   			superTypes += activity.newTypeRef(fqn.abstractActivity)
+	   			superTypes += activity.newTypeRef(typeof(AbstractActivity))
    			}
    			
    			members += activity.toField("ID", activity.newTypeRef(typeof(String))) [
@@ -180,7 +180,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				it.setInitializer [
    					activity.newTypeRef(fqn.tdslInjector).serialize(activity, it)   					
    					it.append(".getInjector().getInstance(")
-   					activity.newTypeRef(fqn.activityLocator).serialize(activity, it)
+   					activity.newTypeRef(typeof(ActivityLocator)).serialize(activity, it)
    					it.append(".class)")
    				]
    			]
