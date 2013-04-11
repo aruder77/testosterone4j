@@ -108,7 +108,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 			
 				for (Control control : toolkit.controls) {
 					if (control?.name != null && control?.class_FQN?.toString != null) {
-						members += control.toMethod("get" + control.name.toFirstUpper, control.newTypeRef(control.class_FQN.toString)) [
+						members += control.toMethod(control.toolkitGetter, control.newTypeRef(control.class_FQN.toString)) [
 							it.setAbstract(true)
 							it.parameters += control.toParameter("controlName", control.newTypeRef(typeof(String)))
 						]
@@ -118,18 +118,20 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 		}
 	}
 	
+	
+	def activityAdapterParentClass(Activity activity) {
+		activity?.parent?.adapterInterface_fqn ?: activity?.toolkit?.activityAdapter_FQN
+	}
+	
 
    	def dispatch void infer(Activity activity, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
    		
    		var JvmGenericType activityAdapterClassVar = null
-   		if (activity.adapterInterface_FQN != null ) {
-	   		activityAdapterClassVar = activity.toInterface(activity.adapterInterface_FQN) []
+   		if (activity.adapterInterface_fqn != null ) {
+	   		activityAdapterClassVar = activity.toInterface(activity.adapterInterface_fqn) []
    			acceptor.accept(activityAdapterClassVar).initializeLater [
-   				if (activity.parent?.adapterInterface_FQN != null) {
-   					superTypes += activity.newTypeRef(activity.parent.adapterInterface_FQN)
-	   			} else if (activity.toolkit?.activityAdapter_FQN != null) {
-   					superTypes += activity.newTypeRef(activity.toolkit.activityAdapter_FQN)
-   				}
+   				if (activity.activityAdapterParentClass != null)
+   					superTypes += activity.newTypeRef(activity.activityAdapterParentClass)
 
 	   			for (activityMethod : activity.operations) {
 	   				if (activityMethod.name != null && activityMethod.body == null) {
@@ -156,11 +158,9 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    		val activityClass = activity.toClass(activity.class_FQN)
    		acceptor.accept(activityClass).initializeLater([
    			
-   			if (activity?.parent?.class_FQN?.toString != null) {
-   				superTypes += activity.newTypeRef(activity.parent.class_FQN.toString)
-   			} else {
-	   			superTypes += activity.newTypeRef(typeof(AbstractActivity))
-   			}
+   			val superClass = activity.superClass_ref
+   			if (superClass != null)
+   				superTypes += superClass
    			
    			members += activity.toField("ID", activity.newTypeRef(typeof(String))) [
    				it.setStatic(true)
@@ -189,9 +189,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    					it.append(".class)")
    				]
    			]
-   			
-   			    //private final ITestProtocol protocol = this.injector.getInstance(ITestProtocol.class);
-   			
+   			   			
    			members += activity.toField("protocol", activity.newTypeRef(typeof(ITestProtocol))) [
    				it.setFinal(true)
    				it.setInitializer [
@@ -208,9 +206,9 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				
    				setBody [
    					it.append("return new ")
-   					activity.newTypeRef(activity.class_FQN.toString).serialize(activity, it)
+   					activity.newTypeRef(activity.class_fqn).serialize(activity, it)
    					it.append("(activityLocator.find(ID, ")
-   					activity.newTypeRef(activity.adapterInterface_FQN).serialize(activity, it)
+   					activity.newTypeRef(activity.adapterInterface_fqn).serialize(activity, it)
    					it.append(".class));")
    				]
    			]
@@ -234,11 +232,11 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    			]
    			
 			for (field : activity.fields) {
-				if (field?.control?.fullyQualifiedName?.toString != null) {
-					members += field.toMethod(field.fieldGetterName, field.newTypeRef(field.control.fullyQualifiedName.toString)) [
+				if (field?.control?.fqn != null) {
+					members += field.toMethod(field.fieldGetterName, field.newTypeRef(field.control.fqn)) [
 						it.setBody [
 							it.append('''
-						    	 return this.contextAdapter.get«field.control.name»("«field.identifier»");
+						    	 return this.contextAdapter.«field.control.activityAdapterGetter»("«field.identifier»");
 							''')
 						]
 					]
@@ -336,8 +334,8 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 				val opMapping = field.findOperationMappingForOperation(operation)
 				if (opMapping != null) {
 					for (dataTypeMapping : opMapping.dataTypeMappings) {
-						if (dataTypeMapping?.name?.name != null && dataTypeMapping?.datatype?.class_FQN?.toString != null) {
-							it.parameters += dataTypeMapping.toParameter(dataTypeMapping.name.name, dataTypeMapping.newTypeRef(dataTypeMapping.datatype.class_FQN.toString))
+						if (dataTypeMapping?.name?.name != null && dataTypeMapping?.datatype?.class_fqn != null) {
+							it.parameters += dataTypeMapping.toParameter(dataTypeMapping.name.name, dataTypeMapping.newTypeRef(dataTypeMapping.datatype.class_fqn))
 						}
 					}
 				} else {
@@ -355,27 +353,21 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    								nextActivity = (condNextAct as ConditionalNextActivity).next
    							}
    						}
-   						//         this.protocol.appendControlOperationCall(this.getClass().getName(), "description", TextControl.class.getName(),
-	            //    "setText", null, description.getValue());
    					
    						if (opMapping != null) {
-		   					it.append(
-   								'''
-   								this.protocol.appendControlOperationCall(this.getClass().getName(), "«field.name»", «field.control?.name».class.getName(), "«operation.name»", null«appendParameter(opMapping.dataTypeMappings)»);
-	   							«field.fieldGetterName»().«operation.name»(«mapParameters(field, operation)»);
-   								return «IF nextActivity == null»this«ELSE»«nextActivity.class_SimpleName».find()«ENDIF»;
-   								'''
-   							)
+		   					it.append('''
+		   						this.protocol.appendControlOperationCall(this.getClass().getName(), "«field.name»", «field.control?.name».class.getName(), "«operation.name»", null«appendParameter(opMapping.dataTypeMappings)»);
+		   						«field.fieldGetterName»().«operation.name»(«mapParameters(field, operation)»);
+		   						return «IF nextActivity == null»this«ELSE»«nextActivity.class_SimpleName».find()«ENDIF»;
+   							''')
    						}
    					} else {
    						if (opMapping != null) {
-   							it.append(
-   								'''
-	   							«operation.returnType?.name» value = «field.fieldGetterName»().«operation.name»(«mapParameters(field, operation)»); 
+   							it.append('''
+   								«operation.returnType?.name» value = «field.fieldGetterName»().«operation.name»(«mapParameters(field, operation)»); 
    								this.protocol.appendControlOperationCall(this.getClass().getName(), "«field.name»", «field.control?.name».class.getName(), "«operation.name»", value.toString()«appendParameter(opMapping.dataTypeMappings)»);
    								return new «opMapping.dataType?.class_FQN»(value, «opMapping.dataType?.equivalenceClass_name».getByValue(value));
-   								'''
-   							)
+   							''')
    						}
    					}
    				]
@@ -383,13 +375,14 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    		}
    	}
    	
-   	def String appendParameter(List<DataTypeMapping> mappings) {
-   		'''«FOR mapping : mappings», «mapping?.name?.name».getValue().toString()«ENDFOR»'''
-   	}
+   	def String appendParameter(List<DataTypeMapping> mappings) '''
+   		«FOR mapping : mappings», «mapping?.name?.name».getValue().toString()«ENDFOR»
+   	'''
    	
-   	def String appendActivityParameter(List<ActivityOperationParameter> mappings) {
-   		'''«FOR mapping : mappings», «mapping?.name».getValue().toString()«ENDFOR»'''
-   	}
+   	def String appendActivityParameter(List<ActivityOperationParameter> mappings) '''
+   		«FOR mapping : mappings», «mapping?.name».getValue().toString()«ENDFOR»
+   	'''
+   	
 
    	def String mapParameters(Field field, Operation operation) {
 		val opMapping = field.findOperationMappingForOperation(operation)
@@ -404,13 +397,13 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    			return null
  		val opMapping = field.findOperationMappingForOperation(operation)
  		var JvmTypeReference currentActivityType = null
- 		if (field.parentActivity?.class_FQN?.toString != null)
- 			currentActivityType = field.newTypeRef(field.parentActivity.class_FQN.toString) 
+ 		if (field.parentActivity?.class_fqn != null)
+ 			currentActivityType = field.newTypeRef(field.parentActivity.class_fqn) 
    		if (operation.returnType == null) {
    			if (opMapping == null) {
    					currentActivityType
    			} else {
-   				if (opMapping?.nextActivities?.empty || opMapping?.nextActivities?.get(0)?.next?.class_FQN?.toString == null) {
+   				if (opMapping?.nextActivities?.empty || opMapping?.nextActivities?.get(0)?.next?.class_fqn == null) {
    					currentActivityType
    				} else {
    					field.newTypeRef(opMapping.nextActivities.get(0).next.class_FQN.toString)

@@ -13,6 +13,10 @@ import org.eclipse.xtext.naming.IQualifiedNameProvider
 import org.eclipse.xtext.naming.QualifiedName
 import de.msg.xt.mdt.tdsl.tDsl.TagsDeclaration
 import de.msg.xt.mdt.tdsl.tDsl.Tag
+import org.eclipse.xtext.common.types.JvmTypeReference
+import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder
+import de.msg.xt.mdt.base.AbstractActivity
+import org.eclipse.emf.ecore.EObject
 
 class NamingExtensions {
 	
@@ -22,16 +26,26 @@ class NamingExtensions {
 	
 	@Inject extension UtilExtensions
 	
+	@Inject extension JvmTypesBuilder
+	
 	
 	// Other
 	def String tdslInjector() {
 		"de.msg.xt.mdt.base.TDslInjector"
 	}
 	
+	def String fqn(EObject o) {
+		o?.fullyQualifiedName?.toString
+	}
+	
 	// Activity 
 	
 	def QualifiedName class_FQN(Activity activity) {
 		activity?.fullyQualifiedName
+	}
+	
+	def String class_fqn(Activity activity) {
+		activity.class_FQN?.toString
 	}
 
 	def String class_SimpleName(Activity activity) {
@@ -42,8 +56,16 @@ class NamingExtensions {
 		activity?.name?.toFirstLower + index
 	}
 	
-	def String adapterInterface_FQN(Activity activity) {
+	def String adapterInterface_fqn(Activity activity) {
 		activity?.fullyQualifiedName?.toString + "Adapter"
+	}
+	
+	def JvmTypeReference superClass_ref(Activity activity) {
+		val parentClassName = activity?.parent?.class_fqn
+		if (parentClassName != null) 
+			activity.newTypeRef(parentClassName)
+		else 
+			activity.newTypeRef(typeof(AbstractActivity))
 	}
 	
 	
@@ -53,11 +75,22 @@ class NamingExtensions {
 		control?.fullyQualifiedName
 	}
 	
+	def String activityAdapterGetter(Control control) {
+		"get" + control?.name?.toFirstUpper
+	}
+	
+	def String toolkitGetter(Control control) {
+		control?.name ?: "get" + control.name.toFirstUpper
+	}
 	
 	// DataType
 	
 	def QualifiedName class_FQN(DataType dataType) {
 		dataType?.fullyQualifiedName
+	}
+	
+	def String class_fqn(DataType dataType) {
+		dataType.class_FQN?.toString
 	}
 	
 	def String equivalenceClass_name(DataType dataType) {
