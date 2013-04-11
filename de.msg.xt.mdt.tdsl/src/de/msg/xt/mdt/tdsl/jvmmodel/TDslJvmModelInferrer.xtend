@@ -58,6 +58,11 @@ import de.msg.xt.mdt.base.Tag
 import de.msg.xt.mdt.base.BaseUseCase
 import de.msg.xt.mdt.base.Generator
 import de.msg.xt.mdt.base.ActivityAdapter
+import de.msg.xt.mdt.base.Parameters
+import de.msg.xt.mdt.base.GenerationHelper
+import de.msg.xt.mdt.base.util.TDslHelper
+import java.util.Iterator
+import javax.xml.bind.annotation.XmlElement
 
 /**
  * <p>Infers a JVM model from the source model.</p> 
@@ -301,9 +306,8 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 						it.append(")activity;")
 					}
 				} else {
-					it.append('''
-   					    Object o = contextAdapter.«operation.name»(«FOR param : operation.params SEPARATOR ', '»«param.name».getValue()«ENDFOR»);
-					''')
+					operation.newTypeRef(typeof(Object)).serialize(operation, it)
+					it.append(''' o = contextAdapter.«operation.name»(«FOR param : operation.params SEPARATOR ', '»«param.name».getValue()«ENDFOR»);''')
 					it.append('''
    					    «IF !voidReturn»
    					    	«nextActivityClass» nextActivity = null;
@@ -478,22 +482,29 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				it.setStatic(true)
    				it.setFinal(true)
    				it.setInitializer [
-   					it.append('''de.msg.xt.mdt.base.TDslInjector.createInjector(TEST_CASES_SERIALIZATION)''')
+   					test.newTypeRef(fqn.tdslInjector).serialize(test, it)
+   					it.append(".createInjector(TEST_CASES_SERIALIZATION)")
    				]
    			]
    			
-   			members += test.toField("LOCATOR", test.newTypeRef(typeof(ActivityLocator))) [
+   			val activityLocator = test.newTypeRef(typeof(ActivityLocator))
+   			members += test.toField("LOCATOR", activityLocator) [
    				it.setStatic(true)
    				it.setFinal(true)
    				it.setInitializer [
-   					it.append('''INJECTOR.getInstance(de.msg.xt.mdt.base.ActivityLocator.class)''')
+   					it.append("INJECTOR.getInstance(")
+   					activityLocator.serialize(test, it)
+   					it.append(".class)")
    				]
    			]
    			
-   			members += test.toField("protocol", test.newTypeRef(typeof(ITestProtocol))) [
+   			val iTestProtocol = test.newTypeRef(typeof(ITestProtocol))
+   			members += test.toField("protocol", iTestProtocol) [
    				it.setFinal(true)
    				it.setInitializer [
-   					it.append('''INJECTOR.getInstance(de.msg.xt.mdt.base.ITestProtocol.class)''')
+   					it.append("INJECTOR.getInstance(")
+   					iTestProtocol.serialize(test, it)
+   					it.append(".class)")
    				]
    			]
    			
@@ -509,13 +520,21 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    			
    			members += test.toMethod("config", test.newTypeRef(typeof(Collection), test.newTypeRef(typeof(Object)).createArrayType)) [
    				it.setStatic(true)
-   				annotations += test.toAnnotation("de.msg.xt.mdt.base.Parameters")
+   				annotations += test.toAnnotation(typeof(Parameters))
    				it.setBody [
-   					it.append('''
-                        de.msg.xt.mdt.base.GenerationHelper testHelper = INJECTOR.getInstance(de.msg.xt.mdt.base.GenerationHelper.class);
-                        de.msg.xt.mdt.base.Generator generator = INJECTOR.getInstance(de.msg.xt.mdt.base.Generator.class);
-                        «IF !test.tags.empty»generator.setTags(new de.msg.xt.mdt.base.Tag[] {«FOR tag : test.tags SEPARATOR ","»«tag.enumLiteral_FQN»«ENDFOR»});«ENDIF»
-                        «IF !test.excludeTags.empty»generator.setExcludeTags(new de.msg.xt.mdt.base.Tag[] {«FOR tag : test.excludeTags SEPARATOR ","»«tag.enumLiteral_FQN»«ENDFOR»});«ENDIF»
+   					test.newTypeRef(typeof(GenerationHelper)).serialize(test, it)
+                   	it.append(" testHelper = INJECTOR.getInstance(GenerationHelper.class);")
+   					test.newTypeRef(typeof(Generator)).serialize(test, it)
+                   	it.append(" generator = INJECTOR.getInstance(Generator.class);")
+                   	if (!test.tags.empty) {
+                   		it.append("generator.setTags(new ")
+                   		test.newTypeRef(typeof(Tag)).createArrayType.serialize(test, it)
+                   		it.append(''' {«FOR tag : test.tags SEPARATOR ","»«tag.enumLiteral_FQN»«ENDFOR»});''')
+                   	}
+                   	if (!test.excludeTags.empty) {
+                        it.append('''generator.setExcludeTags(new Tag[] {«FOR tag : test.excludeTags SEPARATOR ","»«tag.enumLiteral_FQN»«ENDFOR»});''')
+                    }
+                    it.append('''
                         LOCATOR.beforeTest();
                         return testHelper.readOrGenerateTestCases(TEST_CASES_SERIALIZATION, generator, «test.useCase?.class_FQN?.toString».class); 
    					''')
@@ -641,12 +660,13 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
         						val expectedType = dataType.type.mappedBy
         						xbaseCompiler.compileAsJavaExpression(clazz.value, it, expectedType)
         					} else if (clazz.values != null) {
-        						it.append('''java.lang.Iterable<«dataType.type.mappedBy.qualifiedName»> «clazz.name.toFirstLower»Iterable = ''')
+        						dataType.newTypeRef(typeof(Iterable), dataType.type.mappedBy).serialize(dataType, it)
+        						it.append(''' «clazz.name.toFirstLower»Iterable = ''')
         						val expectedType = dataType.newTypeRef(typeof(Iterable), dataType.type.mappedBy)
         						xbaseCompiler.compileAsJavaExpression(clazz.values, it, expectedType)
-        						it.append(''';
-        							value = de.msg.xt.mdt.base.util.TDslHelper.selectRandom(«clazz.name.toFirstLower»Iterable.iterator());
-        						''')
+        						it.append(";").newLine.append("value = ")
+        						dataType.newTypeRef(typeof(TDslHelper)).serialize(dataType, it)
+        						it.append('''.selectRandom(«clazz.name.toFirstLower»Iterable.iterator());''')
         					} else if (clazz.valueGenerator != null) {
         						it.append('''value = ''')	
         						val expectedType = dataType.type.mappedBy
@@ -667,14 +687,15 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 	   			]
    			}
    			
-   			members += dataType.toMethod("getTags", dataType.newTypeRef(typeof(Tag)).createArrayType) [
+   			val tagArrayRef = dataType.newTypeRef(typeof(Tag)).createArrayType
+   			members += dataType.toMethod("getTags", tagArrayRef) [
    				setBody [
-					it.append('''
-					    de.msg.xt.mdt.base.Tag[] tags = null;                                   
+   					tagArrayRef.serialize(dataType, it)
+					it.append(''' tags = null;                                   
 					    switch (this) {            
     					«FOR clazz : dataType.classes»                           
     					case «clazz.name»:                                           
-    						tags = new de.msg.xt.mdt.base.Tag[] { «FOR tag : clazz.tags SEPARATOR ', '»«tag.enumLiteral_FQN»«ENDFOR» };
+    						tags = new Tag[] { «FOR tag : clazz.tags SEPARATOR ', '»«tag.enumLiteral_FQN»«ENDFOR» };
     						break;                       
         				«ENDFOR»                     
 					    }                                                     
@@ -705,12 +726,13 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 						        	}
 					        	''')
 					        } else if (clazz.values != null) {
-        						it.append('''java.lang.Iterable<«dataType.type.mappedBy.qualifiedName»> «clazz.name.toFirstLower»Iterable = ''')
-        						val expectedType = dataType.newTypeRef("java.lang.Iterable", dataType.type.mappedBy)
+        						val expectedType = dataType.newTypeRef(typeof(Iterable), dataType.type.mappedBy)
+					        	expectedType.serialize(dataType, it)
+        						it.append(''' «clazz.name.toFirstLower»Iterable = ''')
         						xbaseCompiler.compileAsJavaExpression(clazz.values, it, expectedType)
-        						it.append('''
-        							;
-        							java.util.Iterator<«dataType.type.mappedBy.qualifiedName»> «clazz.name.toFirstLower»Iterator = «clazz.name.toFirstLower»Iterable.iterator();
+        						it.append(";").newLine
+        						dataType.newTypeRef(typeof(Iterator), dataType.type.mappedBy).serialize(dataType, it)
+        						it.append(''' «clazz.name.toFirstLower»Iterator = «clazz.name.toFirstLower»Iterable.iterator();
         							while(«clazz.name.toFirstLower»Iterator.hasNext()) {
         								if (value.equals(«clazz.name.toFirstLower»Iterator.next())) {
         									return «clazz.name»;
@@ -828,12 +850,12 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    			it.superTypes += useCase.newTypeRef(typeof(BaseUseCase))
    			it.superTypes += useCase.newTypeRef(typeof(Runnable))
 
-   			it.annotations += useCase.toAnnotation("javax.xml.bind.annotation.XmlRootElement")
+   			it.annotations += useCase.toAnnotation(typeof(XmlRootElement))
    			   			
    			for (inputParam : useCase.inputParameter) {
    				if (inputParam.name != null && inputParam?.dataType?.class_FQN?.toString != null) {
    					members += inputParam.toField(inputParam.name, inputParam.newTypeRef(inputParam.dataType.class_FQN.toString)) [
-   					it.annotations += inputParam.toAnnotation("javax.xml.bind.annotation.XmlElement")
+   					it.annotations += inputParam.toAnnotation(typeof(XmlElement))
    					]
    				}
    			}
@@ -885,7 +907,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    			}
    			
    			it.members += useCase.toMethod("run", useCase.newTypeRef(Void::TYPE)) [
-   				it.annotations += useCase.toAnnotation("java.lang.Override")
+   				it.annotations += useCase.toAnnotation(typeof(Override))
    				
    				body = [
    					it.append(
@@ -903,9 +925,8 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
  	  			}
  	
    				body = [
-   					it.append('''
-   						de.msg.xt.mdt.base.AbstractActivity activity = initialActivity;
-   						''')
+   					useCase.newTypeRef(typeof(AbstractActivity)).serialize(useCase, it)
+   					it.append(''' activity = initialActivity;''')
    					for (statement : useCase.block.expressions) {
    						xbaseCompiler.compile(statement, it, statement.newTypeRef(Void::TYPE), null)
    					}
