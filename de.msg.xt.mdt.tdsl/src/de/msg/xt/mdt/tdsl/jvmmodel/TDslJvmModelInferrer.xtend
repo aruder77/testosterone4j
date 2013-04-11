@@ -46,6 +46,17 @@ import de.msg.xt.mdt.tdsl.tDsl.Toolkit
 import org.eclipse.xtext.xbase.lib.Functions$Function1
 import org.junit.After
 import org.eclipse.xtext.xbase.compiler.TypeReferenceSerializer
+import com.google.inject.Injector
+import de.msg.xt.mdt.base.ActivityLocator
+import de.msg.xt.mdt.base.ITestProtocol
+import de.msg.xt.mdt.base.AbstractActivity
+import de.msg.xt.mdt.base.TDslParameterized
+import org.junit.runner.RunWith
+import de.msg.xt.mdt.base.TestDescriptor
+import de.msg.xt.mdt.base.EquivalenceClass
+import de.msg.xt.mdt.base.Tag
+import de.msg.xt.mdt.base.BaseUseCase
+import de.msg.xt.mdt.base.Generator
 
 /**
  * <p>Infers a JVM model from the source model.</p> 
@@ -154,7 +165,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				]
    			]
    			   				
-   			members += activity.toField("injector", activity.newTypeRef(fqn.googleInjector)) [
+   			members += activity.toField("injector", activity.newTypeRef(typeof(Injector))) [
    				it.setFinal(true)
    				it.setInitializer [
    					activity.newTypeRef(fqn.tdslInjector).serialize(activity, it)
@@ -162,7 +173,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				]
    			]
    			
-   			val activityLocatorType = activity.newTypeRef(fqn.activityLocator)
+   			val activityLocatorType = activity.newTypeRef(typeof(ActivityLocator))
    			members += activity.toField("activityLocator", activityLocatorType) [
    				it.setStatic(true)
    				it.setFinal(true)
@@ -176,11 +187,11 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    			
    			    //private final ITestProtocol protocol = this.injector.getInstance(ITestProtocol.class);
    			
-   			members += activity.toField("protocol", activity.newTypeRef(fqn.iTestProtocol)) [
+   			members += activity.toField("protocol", activity.newTypeRef(typeof(ITestProtocol))) [
    				it.setFinal(true)
    				it.setInitializer [
    					it.append("this.injector.getInstance(")
-   					activity.newTypeRef(fqn.iTestProtocol).serialize(activity, it)
+   					activity.newTypeRef(typeof(ITestProtocol)).serialize(activity, it)
    					it.append(".class)");
    				]
    			]
@@ -251,7 +262,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    		var Boolean voidReturnType = true
    		var String nextActivityClassVar 
    		if (operation.nextActivities.empty) {
-   			returnTypeRef = operation.newTypeRef(typeof(void) as Class<?>)
+   			returnTypeRef = operation.newTypeRef(Void::TYPE)
    		} else {
    			val Activity nextActivity = operation.nextActivities.get(0).next
    			nextActivityClassVar = nextActivity?.class_FQN?.toString
@@ -259,7 +270,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				returnTypeRef = operation.newTypeRef(nextActivityClassVar)
    				voidReturnType = false
    			} else {
-   				returnTypeRef = operation.newTypeRef(typeof(void) as Class<?>)
+   				returnTypeRef = operation.newTypeRef(Void::TYPE)
    			}
    		}
    		val voidReturn = voidReturnType
@@ -276,9 +287,9 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				    this.protocol.appendActivityOperationCall(this.getClass().getName(), "«operation.name»", null«appendActivityParameter(operation.params)»);
 				''')
 				if (operation.body != null) {
-					operation.newTypeRef(fqn.abstractActivity).serialize(operation, it)
+					operation.newTypeRef(typeof(AbstractActivity)).serialize(operation, it)
 					it.append(" activity = this;")
-					var expectedReturnType = operation.newTypeRef(typeof(void) as Class<?>)
+					var expectedReturnType = operation.newTypeRef(Void::TYPE)
 					if (!voidReturn) {
 						expectedReturnType = operation.newTypeRef(typeof(Object))
 					}
@@ -430,14 +441,10 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 	@Nullable 
 	def JvmAnnotationReference toRunWithAnnotation(@Nullable EObject sourceElement) {
 		var JvmAnnotationReference result = typesFactory.createJvmAnnotationReference();
-		val annotationTypeName = "org.junit.runner.RunWith"
-		val value = sourceElement.newTypeRef("de.msg.xt.mdt.base.TDslParameterized")
-		val JvmType jvmType = references.findDeclaredType(annotationTypeName, sourceElement);
+		val value = sourceElement.newTypeRef(typeof(TDslParameterized))
+		val JvmType jvmType = references.findDeclaredType(typeof(RunWith), sourceElement);
 		if (jvmType == null) {
-			throw new IllegalArgumentException("The type "+annotationTypeName +" is not on the classpath.");
-		}
-		if (!(jvmType instanceof JvmAnnotationType)) {
-			throw new IllegalArgumentException("The given class " + annotationTypeName + " is not an annotation type.");
+			throw new IllegalArgumentException("The type org.junit.RunWith is not on the classpath.");
 		}
 		result.setAnnotation(jvmType as JvmAnnotationType);
 
@@ -467,7 +474,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				]
    			]
    			
-   			members += test.toField("INJECTOR", test.newTypeRef("com.google.inject.Injector")) [
+   			members += test.toField("INJECTOR", test.newTypeRef(typeof(Injector))) [
    				it.setStatic(true)
    				it.setFinal(true)
    				it.setInitializer [
@@ -475,7 +482,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				]
    			]
    			
-   			members += test.toField("LOCATOR", test.newTypeRef("de.msg.xt.mdt.base.ActivityLocator")) [
+   			members += test.toField("LOCATOR", test.newTypeRef(typeof(ActivityLocator))) [
    				it.setStatic(true)
    				it.setFinal(true)
    				it.setInitializer [
@@ -483,7 +490,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				]
    			]
    			
-   			members += test.toField("protocol", test.newTypeRef("de.msg.xt.mdt.base.ITestProtocol")) [
+   			members += test.toField("protocol", test.newTypeRef(typeof(ITestProtocol))) [
    				it.setFinal(true)
    				it.setInitializer [
    					it.append('''INJECTOR.getInstance(de.msg.xt.mdt.base.ITestProtocol.class)''')
@@ -519,7 +526,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 	   			if (test?.useCase?.class_FQN?.toString != null) {
 	   				val useCaseClass = test.newTypeRef(test.useCase.class_FQN.toString)
 	   				if (useCaseClass != null) {
-   						parameters += test.toParameter("testDescriptor", test.newTypeRef("de.msg.xt.mdt.base.TestDescriptor", useCaseClass))
+   						parameters += test.toParameter("testDescriptor", test.newTypeRef(typeof(TestDescriptor), useCaseClass))
    					}
    				}
    				body = [
@@ -531,7 +538,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				]
    			]
    			
-   			members += test.toMethod("setup", "void".getTypeForName(test)) [
+   			members += test.toMethod("setup", test.newTypeRef(Void::TYPE)) [
    				annotations += test.toAnnotation(typeof(org.junit.Before))
    				
    				body = [
@@ -539,7 +546,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				]
    			]
    			
-   			members += test.toMethod("cleanup", "void".getTypeForName(test)) [
+   			members += test.toMethod("cleanup", test.newTypeRef(Void::TYPE)) [
    				annotations += test.toAnnotation(typeof(After))
    				
    				body = [
@@ -547,7 +554,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				]
    			]
    			
-   			members += test.toMethod("test", "void".getTypeForName(test)) [
+   			members += test.toMethod("test", test.newTypeRef(Void::TYPE)) [
    				annotations += test.toAnnotation(typeof(org.junit.Test))
    				
    				body = [
@@ -582,7 +589,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    					if (operation.returnType != null)
    						operation.returnType.mappedBy
    					else
-   						references.getTypeForName(typeof(void) as Class<?>, operation)
+   						references.getTypeForName(Void::TYPE, operation)
    				if (operation.name != null) {
 	   				val JvmOperation op = operation.toMethod(operation.name, returnType) [
    						for (param : operation.params) {
@@ -605,7 +612,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    			return
    		
    		val JvmEnumerationType equivalenceClass = dataType.toEnumerationType(dataType.equivalenceClass_name)[
-   			superTypes += dataType.newTypeRef("de.msg.xt.mdt.base.EquivalenceClass")
+   			superTypes += dataType.newTypeRef(typeof(EquivalenceClass))
    			
    			for (clazz : dataType.classes) {
    				if (clazz.name != null) {
@@ -635,7 +642,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
         						xbaseCompiler.compileAsJavaExpression(clazz.value, it, expectedType)
         					} else if (clazz.values != null) {
         						it.append('''java.lang.Iterable<«dataType.type.mappedBy.qualifiedName»> «clazz.name.toFirstLower»Iterable = ''')
-        						val expectedType = dataType.newTypeRef("java.lang.Iterable", dataType.type.mappedBy)
+        						val expectedType = dataType.newTypeRef(typeof(Iterable), dataType.type.mappedBy)
         						xbaseCompiler.compileAsJavaExpression(clazz.values, it, expectedType)
         						it.append(''';
         							value = de.msg.xt.mdt.base.util.TDslHelper.selectRandom(«clazz.name.toFirstLower»Iterable.iterator());
@@ -660,7 +667,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 	   			]
    			}
    			
-   			members += dataType.toMethod("getTags", dataType.newTypeRef("de.msg.xt.mdt.base.Tag").createArrayType) [
+   			members += dataType.toMethod("getTags", dataType.newTypeRef(typeof(Tag)).createArrayType) [
    				setBody [
 					it.append('''
 					    de.msg.xt.mdt.base.Tag[] tags = null;                                   
@@ -734,7 +741,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 
    		
    		acceptor.accept(dataType.toClass(dataType.fullyQualifiedName)).initializeLater([
-   			superTypes += dataType.newTypeRef("de.msg.xt.mdt.base.DataType", dataType.type.mappedBy, newTypeRef(equivalenceClass))
+   			superTypes += dataType.newTypeRef(typeof(de.msg.xt.mdt.base.DataType), dataType.type.mappedBy, newTypeRef(equivalenceClass))
    			
    			annotations += dataType.toAnnotation(typeof(XmlRootElement))
    			
@@ -770,7 +777,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 					)
 				]
 			]
-			members += dataType.toMethod("setValue", "void".getTypeForName(dataType)) [
+			members += dataType.toMethod("setValue", dataType.newTypeRef(Void::TYPE)) [
 				it.parameters += dataType.toParameter("value", dataType.type?.mappedBy)
 				it.body = [
 					it.append(
@@ -790,7 +797,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 					)
 				]
 			]
-			members += dataType.toMethod("setEquivalenceClass", "void".getTypeForName(dataType)) [
+			members += dataType.toMethod("setEquivalenceClass", dataType.newTypeRef(Void::TYPE)) [
 				it.parameters += dataType.toParameter("equivalenceClass", newTypeRef(equivalenceClass))
 				it.body = [
 					it.append(
@@ -818,8 +825,8 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    			return
    		val useCaseClass = useCase.toClass(useCase.class_FQN)
    		acceptor.accept(useCaseClass).initializeLater [
-   			it.superTypes += useCase.newTypeRef("de.msg.xt.mdt.base.BaseUseCase")
-   			it.superTypes += useCase.newTypeRef("java.lang.Runnable")
+   			it.superTypes += useCase.newTypeRef(typeof(BaseUseCase))
+   			it.superTypes += useCase.newTypeRef(typeof(Runnable))
 
    			it.annotations += useCase.toAnnotation("javax.xml.bind.annotation.XmlRootElement")
    			   			
@@ -833,7 +840,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    			
    			it.members += useCase.toConstructor() []
    			it.members += useCase.toConstructor() [
-   				it.parameters += useCase.toParameter("generator", useCase.newTypeRef("de.msg.xt.mdt.base.Generator"))
+   				it.parameters += useCase.toParameter("generator", useCase.newTypeRef(typeof(Generator)))
    				body = [
    					it.append('''
    					    this();
@@ -877,7 +884,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				} 
    			}
    			
-   			it.members += useCase.toMethod("run", "void".getTypeForName(useCase)) [
+   			it.members += useCase.toMethod("run", useCase.newTypeRef(Void::TYPE)) [
    				it.annotations += useCase.toAnnotation("java.lang.Override")
    				
    				body = [
@@ -890,7 +897,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    			]
    			
    			val returnType = useCase.nextActivity?.next?.class_FQN?.toString
-   			it.members += useCase.toMethod("execute", if (returnType != null) useCase.newTypeRef(returnType) else "void".getTypeForName(useCase)) [
+   			it.members += useCase.toMethod("execute", if (returnType != null) useCase.newTypeRef(returnType) else useCase.newTypeRef(Void::TYPE)) [
    				if (useCase.initialActivity?.class_FQN != null) {
    					it.parameters += useCase.toParameter("initialActivity", useCase.newTypeRef(useCase.initialActivity.class_FQN.toString))
  	  			}
@@ -900,7 +907,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    						de.msg.xt.mdt.base.AbstractActivity activity = initialActivity;
    						''')
    					for (statement : useCase.block.expressions) {
-   						xbaseCompiler.compile(statement, it, "void".getTypeForName(statement), null)
+   						xbaseCompiler.compile(statement, it, statement.newTypeRef(Void::TYPE), null)
    					}
    					if (returnType != null) {
    						it.newLine.append('''return («returnType»)activity;''')
@@ -940,7 +947,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    	def dispatch void infer(TagsDeclaration tags, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
    		if (tags?.enumClass_FQN != null) {
    			acceptor.accept(tags.toEnumerationType(tags.enumClass_FQN) [
-   				superTypes += tags.newTypeRef("de.msg.xt.mdt.base.Tag")
+   				superTypes += tags.newTypeRef(typeof(Tag))
    				for (tag : tags.tags) {
    					if (tag.name != null) {
    						val enumLit = toEnumerationLiteral(tag.enumLiteral_SimpleName)

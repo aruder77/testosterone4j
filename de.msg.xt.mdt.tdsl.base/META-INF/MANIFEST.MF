@@ -6,7 +6,6 @@ Bundle-Version: 1.0.0.qualifier
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.xtext.xbase.lib;bundle-version="2.3.0";visibility:=reexport,
- de.msg.xt.mdt.tdsl;bundle-version="1.0.0";visibility:=reexport,
  org.junit;bundle-version="4.10.0";visibility:=reexport,
  com.google.guice;bundle-version="3.0.0";visibility:=reexport,
  org.apache.log4j;bundle-version="1.2.13";visibility:=reexport,
