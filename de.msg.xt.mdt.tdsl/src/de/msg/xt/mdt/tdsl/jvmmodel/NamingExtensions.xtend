@@ -84,7 +84,7 @@ class NamingExtensions {
 	}
 	
 	def String toolkitGetter(Control control) {
-		control?.name ?: "get" + control.name.toFirstUpper
+		"get" + control?.name?.toFirstUpper
 	}
 	
 	// DataType

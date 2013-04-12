@@ -46,47 +46,44 @@ class TDslCompiler extends XbaseCompiler {
 	override protected doInternalToJavaStatement(XExpression expr, 
                                                ITreeAppendable it, 
                                                boolean isReferenced) {
-                                           
     	switch (expr) {
     		OperationCall: {
     			if (!isReferenced) {
 	    			val field = expr.operation.eContainer as Field
-	    			newLine
 	    			expr.generateParameters(it)
+	    			newLine
 					if (!expr.operation.nextActivities.empty) {
-						append('''activity = ''')
+						append("activity = ")
 					}	    			
-    				append(
-						'''
-						((«(field.eContainer as Activity).class_FQN.toString»)activity).«field.activityControlDelegationMethodName(expr.operation.name)»(''')
+    				append('''((«(field.eContainer as Activity).class_FQN.toString»)activity).«field.activityControlDelegationMethodName(expr.operation.name)»(''')
 					appendParameter(expr, it)
 					append(");")
 				}
     		}
     		GeneratedValueExpression: {
     			if (!isReferenced) {
-					append(expr.param.fullyQualifiedName.toString.toFieldName)    				
+    				newLine
+					append(expr.param.fullyQualifiedName.toString.toFieldName)			
     			}
     		}
     		ActivityOperationCall: {
-    			newLine
     			expr.generateParameters(it)
+    			newLine
 				if (!expr.operation.nextActivities.empty) {
-					append('''activity = ''')
+					append("activity = ")
 				}	    			
     			append('''((«(expr.operation.eContainer as Activity).class_FQN.toString»)activity).«expr.operation.name»(''')	
 				appendParameter(expr, it)
 				append(");")
     		}
     		SubUseCaseCall: {
-    			newLine
     			for (param : expr.paramAssignment) {
+    				newLine
     				append('''«expr.useCase.subUseCaseGetter».set«param.name.name.toFirstUpper»(''')
     				appendParameterValue(it, param.name.dataType, param.value)
-//    				compileAsJavaExpression(param.value, it, typeRefs.getTypeForName(param.name.dataType.class_FQN.toString, param))
-    				append(");")    
-    				newLine				
+    				append(");")
     			}
+    			newLine
     			append('''«expr.useCase.subUseCaseGetter».execute((«expr.useCase.initialActivity.class_FQN.toString»)activity);''')
     		}
     		GenerationSelektor: {
@@ -96,10 +93,9 @@ class TDslCompiler extends XbaseCompiler {
     		}
     		Assert: {
     			newLine
-    			append('''if (this.generator == null) {''')
-    			expr.expression.doInternalToJavaStatement(it, isReferenced)
-    			newLine
-    			append("}")
+    			append("if (this.generator == null) {").increaseIndentation
+    			expr.expression.doInternalToJavaStatement(it, false)
+    			decreaseIndentation.newLine.append("}")
     		}
     		default:
     			super.doInternalToJavaStatement(expr, it, isReferenced)
@@ -141,7 +137,7 @@ class TDslCompiler extends XbaseCompiler {
 					append(", ")
 					expr.expression.compileAsJavaExpression(it, typeRefs.createArrayType(typeRefs.getTypeForName("Tags", expr)))
 				}
-				append(''')''')
+				append(")")
 			}
 			GeneratedValueExpression: {
 				val lastExpression = expr.lastExpressionWithNextActivity
@@ -167,7 +163,8 @@ class TDslCompiler extends XbaseCompiler {
 	def generateParameters(OperationCall call, ITreeAppendable appendable) { 
 		for (mapping : call.operation.dataTypeMappings) {
 			val assignment = findAssignment(call, mapping.name)
-			val dataTypeName = mapping.datatype.class_FQN.toString
+			val dataTypeName = mapping.datatype.class_fqn
+			appendable.newLine
 			appendable.append('''«dataTypeName» «call.getVariableNameForOperationCallParameter(mapping)» = ''')
 			if (assignment == null) {
 				appendable.append('''getOrGenerateValue(«dataTypeName».class, "«call.getVariableNameForOperationCallParameter(mapping)»")''')
@@ -175,7 +172,6 @@ class TDslCompiler extends XbaseCompiler {
 				appendParameterValue(appendable, mapping.datatype, assignment.value)
 			}
 			appendable.append(";")
-			appendable.newLine
 		}		
 	}
 	
@@ -183,28 +179,28 @@ class TDslCompiler extends XbaseCompiler {
 		var i = 1
 		for (mapping : call.operation.dataTypeMappings) {
 			val assignment = findAssignment(call, mapping.name)
-			val dataTypeName = mapping.datatype.class_FQN.toString
+			val dataTypeName = mapping.datatype.class_fqn
 			if (assignment == null) {
 				appendable.append('''getOrGenerateValue(«dataTypeName».class, "«call.getVariableNameForOperationCallParameter(mapping)»")''')
 			} else {
 				appendParameterValue(appendable, mapping.datatype, assignment.value)
 			}
 			if (i < call.operation.dataTypeMappings.size)
-				appendable.append(", ").newLine
+				appendable.append(", ")
 			i = i + 1
 		}		
 	}
 	
 	def appendParameterValue(ITreeAppendable appendable, DataType datatype, XExpression expr) {
-		val dataTypeName = datatype.class_FQN.toString
+		val dataTypeName = datatype.class_fqn
 		val expectedType = expr.type
-		val typeMatch = expectedType.type.equals(datatype.newTypeRef(datatype.class_FQN.toString).type)
+		val typeMatch = expectedType.type.equals(datatype.newTypeRef(datatype.class_fqn).type)
 		if (!typeMatch) {
 			appendable.append('''new «dataTypeName»(''')
 		}
 		compileAsJavaExpression(expr, appendable, expectedType)
 		if (!typeMatch) {
-			appendable.append(''', null)''')
+			appendable.append(", null)")
 		}		
 	}
 
@@ -212,7 +208,8 @@ class TDslCompiler extends XbaseCompiler {
 	def generateParameters(ActivityOperationCall call, ITreeAppendable appendable) { 
     	for (parameter : call.operation.params) {
 			val assignment = findAssignment(call, parameter)
-			val dataTypeName = parameter.dataType.class_FQN.toString
+			val dataTypeName = parameter.dataType.class_fqn
+			appendable.newLine
 			appendable.append('''«dataTypeName» «parameter.fullyQualifiedName.toString.toFieldName» = ''')
 			if (assignment == null) {
 				appendable.append('''getOrGenerateValue(«dataTypeName».class, "«parameter.fullyQualifiedName»")''')
@@ -223,11 +220,10 @@ class TDslCompiler extends XbaseCompiler {
 				}
 				compileAsJavaExpression(assignment.value, appendable, assignment.value.type)
 				if (!assignment.value.type.type.equals(expectedType.type)) {
-					appendable.append(''', null)''')
+					appendable.append(", null)")
 				}
 			}    		
 			appendable.append(";")
-			appendable.newLine
     	} 
 	}
 	
