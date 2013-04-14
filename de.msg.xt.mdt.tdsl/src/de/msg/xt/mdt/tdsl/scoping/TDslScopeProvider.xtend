@@ -31,7 +31,6 @@ import org.eclipse.xtext.xbase.XIfExpression
 import org.eclipse.xtext.xbase.XVariableDeclaration
 import org.eclipse.xtext.xbase.scoping.LocalVariableScopeContext
 import org.eclipse.xtext.xbase.scoping.XbaseScopeProvider
-import de.msg.xt.mdt.tdsl.tDsl.Activity
 
 class TDslScopeProvider extends XbaseScopeProvider {
 	
@@ -227,17 +226,57 @@ class TDslScopeProvider extends XbaseScopeProvider {
 		if (call.operation.nextActivities.empty) {
 			Collections::singletonList(call.operation.field.parentActivity)
 		} else { 
-			call.operation.nextActivities.map[e | e.next]	
+			val nextActivityMappings = call.operation.nextActivities
+			val nextActivities = new ArrayList<Activity>
+			for (act : nextActivityMappings) {
+				if (act.next != null) {
+					nextActivities.add(act.next)
+				} else {
+					val activity = call.searchForLastActivity
+					if (activity != null) 
+						nextActivities.add(activity)
+				}
+			}			
+			nextActivities
 		}		
 	}			
 	
 	def dispatch List<Activity> determineNextActivities(ActivityOperationCall call) {
 		if (call.operation?.nextActivities.empty) {
 			Collections::singletonList(call.operation.activity)
-		} else { 
-			call.operation.nextActivities.map[e | e.next]
+		} else {
+			val nextActivityMappings = call.operation.nextActivities
+			val nextActivities = new ArrayList<Activity>
+			for (act : nextActivityMappings) {
+				if (act.next != null) {
+					nextActivities.add(act.next)
+				} else {
+					val activity = call.searchForLastActivity
+					if (activity != null) 
+						nextActivities.add(activity)
+				}
+			}			
+			nextActivities
 		}
 	}			
+	
+	def Activity searchForLastActivity(XExpression expr) {
+		var currentExpression = expr.lastExpressionWithNextActivity
+		while (currentExpression != null && currentExpression.explicitNextActivities == null) {
+			currentExpression = currentExpression.lastExpressionWithNextActivity	
+		}
+		if (currentExpression != null) {
+			switch (currentExpression) {
+				OperationCall:
+					currentExpression.operation.field.parentActivity
+				ActivityOperationCall:
+					currentExpression.operation.activity
+				SubUseCaseCall:
+					currentExpression.useCase.initialActivity
+			}
+		} else  
+			null
+	}
 	
 	def dispatch List<Activity> determineNextActivities(SubUseCaseCall call) {
 		Collections::singletonList(call.useCase.initialActivity)
