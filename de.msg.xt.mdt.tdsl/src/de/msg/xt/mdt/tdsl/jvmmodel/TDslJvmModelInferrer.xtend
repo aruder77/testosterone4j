@@ -63,6 +63,7 @@ import de.msg.xt.mdt.base.GenerationHelper
 import de.msg.xt.mdt.base.util.TDslHelper
 import java.util.Iterator
 import javax.xml.bind.annotation.XmlElement
+import java.util.Stack
 
 /**
  * <p>Infers a JVM model from the source model.</p> 
@@ -286,6 +287,8 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				    this.protocol.appendActivityOperationCall(this.getClass().getName(), "«operation.name»", null«appendActivityParameter(operation.params)»);
 				''')
 				if (operation.body != null) {
+   					operation.newTypeRef(typeof(Stack), operation.newTypeRef(typeof(AbstractActivity))).serialize(operation, it);
+   					it.append(" stack = new Stack<AbstractActivity>();").newLine
 					operation.newTypeRef(typeof(AbstractActivity)).serialize(operation, it)
 					it.append(" activity = this;")
 					var expectedReturnType = operation.newTypeRef(Void::TYPE)
@@ -876,6 +879,8 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
  	  			}
  	
    				body = [
+   					useCase.newTypeRef(typeof(Stack), useCase.newTypeRef(typeof(AbstractActivity))).serialize(useCase, it);
+   					it.append(" stack = new Stack<AbstractActivity>();").newLine
    					useCase.newTypeRef(typeof(AbstractActivity)).serialize(useCase, it)
    					it.append(" activity = initialActivity;")
    					for (statement : useCase.block.expressions) {

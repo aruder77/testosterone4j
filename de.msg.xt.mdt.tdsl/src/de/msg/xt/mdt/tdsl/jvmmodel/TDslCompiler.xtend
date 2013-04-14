@@ -52,12 +52,23 @@ class TDslCompiler extends XbaseCompiler {
 	    			val field = expr.operation.eContainer as Field
 	    			expr.generateParameters(it)
 	    			newLine
+	    			var returnToPreviousActivity = false
 					if (!expr.operation.nextActivities.empty) {
-						append("activity = ")
+						val nextActivity = expr.operation.nextActivities.get(0)
+						if (nextActivity.next != null) {
+							append("stack.push(activity);").newLine
+							append("activity = ")
+						} else if (nextActivity.returnToLastActivity) {
+							returnToPreviousActivity = true
+						}
 					}	    			
     				append('''((«(field.eContainer as Activity).class_FQN.toString»)activity).«field.activityControlDelegationMethodName(expr.operation.name)»(''')
 					appendParameter(expr, it)
 					append(");")
+					if (returnToPreviousActivity) {
+						newLine
+						append("activity = stack.pop();")
+					}
 				}
     		}
     		GeneratedValueExpression: {
@@ -69,12 +80,23 @@ class TDslCompiler extends XbaseCompiler {
     		ActivityOperationCall: {
     			expr.generateParameters(it)
     			newLine
+    			var returnToPreviousActivity = false
 				if (!expr.operation.nextActivities.empty) {
-					append("activity = ")
+					val nextActivity = expr.operation.nextActivities.get(0)
+					if (nextActivity.next != null) {
+						append("stack.push(activity);").newLine
+						append("activity = ")
+					} else if (nextActivity.returnToLastActivity) {
+						returnToPreviousActivity = true
+					}
 				}	    			
     			append('''((«(expr.operation.eContainer as Activity).class_FQN.toString»)activity).«expr.operation.name»(''')	
 				appendParameter(expr, it)
 				append(");")
+				if (returnToPreviousActivity) {
+					newLine
+					append("activity = stack.pop();")
+				}
     		}
     		SubUseCaseCall: {
     			for (param : expr.paramAssignment) {

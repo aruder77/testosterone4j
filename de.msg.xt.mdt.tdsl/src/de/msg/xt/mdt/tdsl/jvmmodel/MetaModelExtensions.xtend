@@ -22,6 +22,8 @@ import org.eclipse.xtext.EcoreUtil2
 import org.eclipse.xtext.naming.IQualifiedNameProvider
 import org.eclipse.xtext.xbase.XBlockExpression
 import org.eclipse.xtext.xbase.XExpression
+import java.util.Collections
+import com.google.common.collect.Collections2
 
 /**
  * Convenience meta-model extensions. Please order by Metamodel-Class and alphabetically!
@@ -183,17 +185,52 @@ class MetaModelExtensions {
 		return index
 	}
 	
-	def containsActivitySwitchingOperation(XExpression expr) {
-		if (expr == null)
-			return false
-		if (expr instanceof OperationCall || expr instanceof ActivityOperationCall || expr instanceof SubUseCaseCall) {
-			true
-		} else {
-			!(EcoreUtil2::getAllContentsOfType(expr, typeof(OperationCall)).empty && EcoreUtil2::getAllContentsOfType(expr, typeof(ActivityOperationCall)).empty && EcoreUtil2::getAllContentsOfType(expr, typeof(SubUseCaseCall)).empty )
-		} 
+	def dispatch boolean containsActivitySwitchingOperation(OperationCall call) {
+		true
 	}
 	
-	def activitySwitchingOperation(XExpression expr) {
+	def dispatch boolean containsActivitySwitchingOperation(ActivityOperationCall call) {
+		true
+	}
+	
+	def dispatch boolean containsActivitySwitchingOperation(SubUseCaseCall call) {
+		true
+	}
+	
+	def dispatch boolean containsActivitySwitchingOperation(XExpression expr) {
+		if (expr == null)
+			return false
+		!(EcoreUtil2::getAllContentsOfType(expr, typeof(OperationCall)).empty && EcoreUtil2::getAllContentsOfType(expr, typeof(ActivityOperationCall)).empty && EcoreUtil2::getAllContentsOfType(expr, typeof(SubUseCaseCall)).empty )
+	}
+	
+	def dispatch List<Activity> explicitNextActivities(OperationCall call) {
+		val nextActivities = call?.operation?.nextActivities.map([e | e.next])
+		if (nextActivities == null || nextActivities.empty)
+			null
+		else 
+			nextActivities
+	}
+	
+	def dispatch List<Activity> explicitNextActivities(ActivityOperationCall call) {
+		val nextActivities = call?.operation?.nextActivities.map([e | e.next])
+		if (nextActivities == null || nextActivities.empty)
+			null
+		else 
+			nextActivities
+	}
+	
+	def dispatch List<Activity> explicitNextActivities(SubUseCaseCall call) {
+		val nextActivity = call?.useCase?.nextActivity?.next
+		if (nextActivity != null)
+			Collections::singletonList(nextActivity)
+		null
+	}
+
+	def dispatch List<Activity> explicitNextActivities(XExpression call) {
+		null
+	}
+	
+	def XExpression activitySwitchingOperation(XExpression expr) {
 		var XExpression operation = null
 		val opCalls = EcoreUtil2::getAllContentsOfType(expr, typeof(OperationCall))
 		if (!opCalls.empty) {

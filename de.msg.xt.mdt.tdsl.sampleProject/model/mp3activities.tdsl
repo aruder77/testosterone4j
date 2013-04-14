@@ -95,8 +95,8 @@ package mp3manager.activities {
 	
 	activity OpenViewDialog {
 		op selectLogicalView(StringDT viewId)
-		op ok => MainWindow 
-		op cancel => MainWindow
+		op ok => returnToLastActivity 
+		op cancel => returnToLastActivity
 	}
 	
 }

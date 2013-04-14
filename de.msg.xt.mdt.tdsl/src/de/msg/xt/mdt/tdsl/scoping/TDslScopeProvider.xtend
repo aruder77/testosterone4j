@@ -31,6 +31,7 @@ import org.eclipse.xtext.xbase.XIfExpression
 import org.eclipse.xtext.xbase.XVariableDeclaration
 import org.eclipse.xtext.xbase.scoping.LocalVariableScopeContext
 import org.eclipse.xtext.xbase.scoping.XbaseScopeProvider
+import de.msg.xt.mdt.tdsl.tDsl.Activity
 
 class TDslScopeProvider extends XbaseScopeProvider {
 	
@@ -111,47 +112,41 @@ class TDslScopeProvider extends XbaseScopeProvider {
 					IScope::NULLSCOPE
 			}
 		} else if (reference == TDslPackage::eINSTANCE.operationCall_Operation || reference == TDslPackage::eINSTANCE.activityOperationCall_Operation) {
-			var Activity initialActivity = null
-			val activityOperation = EcoreUtil2::getContainerOfType(context, typeof(ActivityOperation))
-			if (activityOperation != null) {
-				initialActivity = activityOperation.activity
-			} else {
-				initialActivity = EcoreUtil2::getContainerOfType(context, typeof(UseCase)).initialActivity
+			val XExpression opCall = context as XExpression
+			var Activity initialActivity = determineInitialActivity(opCall)
+			var XExpression lastExpression = null
+			if (opCall instanceof ActivityOperationCall || opCall instanceof OperationCall) {
+				lastExpression = opCall.lastExpressionWithNextActivity
+			} else if (!(opCall instanceof XBlockExpression)) {
+				lastExpression = if (opCall.containsActivitySwitchingOperation) opCall.activitySwitchingOperation else opCall.lastExpressionWithNextActivity
 			}
-				val XExpression opCall = context as XExpression
-				var XExpression lastExpression = null
-				if (opCall instanceof ActivityOperationCall || opCall instanceof OperationCall) {
-					lastExpression = opCall.lastExpressionWithNextActivity
+			
+			if (lastExpression == null) {
+				if (reference == TDslPackage::eINSTANCE.operationCall_Operation) {
+					initialActivity.fieldOperations.calculatesScopes					
 				} else {
-					if (!(opCall instanceof XBlockExpression)) 
-						lastExpression = if (opCall.containsActivitySwitchingOperation) opCall.activitySwitchingOperation else opCall.lastExpressionWithNextActivity
+					val IScope scope = Scopes::scopeFor(initialActivity.allOperations, [QualifiedName::create('#' + it.name)], IScope::NULLSCOPE)
+					scope
 				}
-				if (lastExpression == null) {
-					if (reference == TDslPackage::eINSTANCE.operationCall_Operation) {
-						initialActivity.fieldOperations.calculatesScopes					
-					} else {
-						val IScope scope = Scopes::scopeFor(initialActivity.allOperations, [QualifiedName::create('#' + it.name)], IScope::NULLSCOPE)
-						scope
+			} else {
+				if (reference == TDslPackage::eINSTANCE.operationCall_Operation) {				
+					val operations = new ArrayList<OperationMapping>
+					for (activity : lastExpression.determineNextActivities) {
+						operations.addAll(activity.fieldOperations)
 					}
+					operations.calculatesScopes
 				} else {
-					if (reference == TDslPackage::eINSTANCE.operationCall_Operation) {				
-						val operations = new ArrayList<OperationMapping>
-						for (activity : lastExpression.determineNextActivities) {
-							operations.addAll(activity.fieldOperations)
+					val operations = new ArrayList<ActivityOperation>
+					val nextActivities = lastExpression.determineNextActivities
+					for (activity : nextActivities) {
+						if (activity?.allOperations != null) {
+							operations.addAll(activity.allOperations)
 						}
-						operations.calculatesScopes
-					} else {
-						val operations = new ArrayList<ActivityOperation>
-						val nextActivities = lastExpression.determineNextActivities
-						for (activity : nextActivities) {
-							if (activity?.allOperations != null) {
-								operations.addAll(activity.allOperations)
-							}
-						}
-						Scopes::scopeFor(operations, [QualifiedName::create('#' + it.name)], IScope::NULLSCOPE)
-						//Scopes::scopeFor(operations)
 					}
+					Scopes::scopeFor(operations, [QualifiedName::create('#' + it.name)], IScope::NULLSCOPE)
+					//Scopes::scopeFor(operations)
 				}
+			}
 		} else if (reference == TDslPackage::eINSTANCE.operationMapping_Name) {
 			var Field field 
 			if (context instanceof OperationMapping) {
@@ -196,6 +191,17 @@ class TDslScopeProvider extends XbaseScopeProvider {
 		}
 	}
 	
+	def Activity determineInitialActivity(XExpression expr) {
+		var Activity initialActivity = null
+		val activityOperation = EcoreUtil2::getContainerOfType(expr, typeof(ActivityOperation))
+		if (activityOperation != null) {
+			initialActivity = activityOperation.activity
+		} else {
+			initialActivity = EcoreUtil2::getContainerOfType(expr, typeof(UseCase)).initialActivity
+		}
+		initialActivity
+	}
+	
 	def calculatesScopes(List<OperationMapping> operationMappings) {
 		Scopes::scopeFor(operationMappings, [
 					val OperationMapping opMap = it as OperationMapping
@@ -216,35 +222,43 @@ class TDslScopeProvider extends XbaseScopeProvider {
 		}
 		operations
 	}
-		
+
+	def dispatch List<Activity> determineNextActivities(OperationCall call) {
+		if (call.operation.nextActivities.empty) {
+			Collections::singletonList(call.operation.field.parentActivity)
+		} else { 
+			call.operation.nextActivities.map[e | e.next]	
+		}		
+	}			
 	
-	def List<Activity> determineNextActivities(XExpression expr) {
-		switch (expr) {
-			OperationCall:
-				if (expr.operation.nextActivities.empty) {
-					Collections::singletonList(expr.operation.field.parentActivity)
-				} else { 
-					expr.operation.nextActivities.map[e | e.next]	
-				}
-			ActivityOperationCall:
-				if (expr.operation?.nextActivities.empty) {
-					Collections::singletonList(expr.operation.activity)
-				} else { 
-					expr.operation.nextActivities.map[e | e.next]
-				}
-			SubUseCaseCall:
-				Collections::singletonList(expr.useCase.initialActivity)
-			XIfExpression:
-				expr.then.determineNextActivities
-			XVariableDeclaration:
-				expr.right.determineNextActivities
-			XBlockExpression:
-				if(expr.expressions.last.containsActivitySwitchingOperation) 
-					expr.expressions.last.activitySwitchingOperation.determineNextActivities
-				else 
-					expr.expressions.last.lastExpressionWithNextActivity.determineNextActivities
-			default:
-				expr.activitySwitchingOperation.determineNextActivities
+	def dispatch List<Activity> determineNextActivities(ActivityOperationCall call) {
+		if (call.operation?.nextActivities.empty) {
+			Collections::singletonList(call.operation.activity)
+		} else { 
+			call.operation.nextActivities.map[e | e.next]
 		}
+	}			
+	
+	def dispatch List<Activity> determineNextActivities(SubUseCaseCall call) {
+		Collections::singletonList(call.useCase.initialActivity)
+	}			
+	
+	def dispatch List<Activity> determineNextActivities(XIfExpression ifExpr) {
+		ifExpr.then.determineNextActivities
+	}			
+	
+	def dispatch List<Activity> determineNextActivities(XVariableDeclaration varDecl) {
+		varDecl.right.determineNextActivities
+	}			
+	
+	def dispatch List<Activity> determineNextActivities(XBlockExpression blockExpr) {
+		if(blockExpr.expressions.last.containsActivitySwitchingOperation) 
+			blockExpr.expressions.last.activitySwitchingOperation.determineNextActivities
+		else 
+			blockExpr.expressions.last.lastExpressionWithNextActivity.determineNextActivities
+	}			
+	
+	def dispatch List<Activity> determineNextActivities(XExpression expr) {
+		expr.activitySwitchingOperation.determineNextActivities
 	}
 }
