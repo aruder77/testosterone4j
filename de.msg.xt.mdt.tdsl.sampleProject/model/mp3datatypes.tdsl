@@ -1,32 +1,31 @@
 package mp3manager.datatypes {
-	
 	import de.msg.xt.mdt.tdsl.basictypes.*
-	
-	tags { 
+
+	tags {
 		Pflichtfeld, Empty
 	}
-	
-	datatype ErrorStringDT type String { 
-		class ok value "OK" 
+
+	datatype ErrorStringDT type String {
+		class ok value "OK"
 		class missingValue value "Please enter a value"
 	}
-	
+
 	datatype TrackDT type String {
 		class emptyTrack value "" tags Empty
 		class realTrack value "5"
 	}
-	
+
 	datatype YearDT type String {
 		class currentYear value "2013"
 		class futureYear value "2250"
 		class pastYear value "1800"
 		class emptyYear value "" tags Empty
 	}
-	
+
 	datatype TestDT type Boolean {
 		class testBool value true
 		class testBool2 value false
 	}
-	
+
 }
 	

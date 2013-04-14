@@ -124,11 +124,10 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 		activity?.parent?.adapterInterface_fqn ?: activity?.toolkit?.activityAdapter_FQN
 	}
 	
-
    	def dispatch void infer(Activity activity, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
    		
    		var JvmGenericType activityAdapterClassVar = null
-   		if (activity.adapterInterface_fqn != null ) {
+   		if (activity.adapterInterface_fqn != null) {
 	   		activityAdapterClassVar = activity.toInterface(activity.adapterInterface_fqn) []
    			acceptor.accept(activityAdapterClassVar).initializeLater [
    				if (activity.activityAdapterParentClass != null)

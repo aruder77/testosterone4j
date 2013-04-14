@@ -1,46 +1,43 @@
 package mp3manager for Stdtoolkit {
-	
 	import de.msg.xt.mdt.tdsl.basictypes.*
 	import mp3manager.datatypes.*
 	import mp3manager.activities.*
-	
+
 	useCase OpenView(StringDT id) initial MainWindow {
 		#openView
-		#selectLogicalView(viewId=id)
+		#selectLogicalView(viewId = id)
 		#ok
 		#findLogicalView
 	} => LogicalView
-	
-	
+
 	useCase OpenLogicalView initial MainWindow {
-		call OpenView(OpenView.id="Logical View")
+		call OpenView(OpenView.id = "Logical View")
 		#findLogicalView
-		#tree.doubleClickNode(nodePath="Bob Marley/Legend/Stir It Up")
-		
-		#track.setText 
+		#tree.doubleClickNode(nodePath = "Bob Marley/Legend/Stir It Up")
+		#track.setText
 		var enteredTrack = generatedValue(str)
 		#year.setText
 		var enteredYear = generatedValue(str)
 		#comment.setText
 		var enteredComment = generatedValue(str)
 		var errorLabel = #errorMarker.getText
-		 
-		if (enteredComment.equivalenceClass == StringDTEquivalenceClass::emptyString) {
-			assert [ org::junit::Assert::assertEquals(ErrorStringDTEquivalenceClass::missingValue.getValue(), errorLabel.getValue()) ]
+		if(enteredComment.equivalenceClass == StringDTEquivalenceClass:: emptyString) {
+			assert [ org::junit::Assert:: assertEquals(ErrorStringDTEquivalenceClass:: missingValue.getValue(),
+			errorLabel.getValue()) ]
 		} else {
-			assert [ org::junit::Assert::assertEquals(ErrorStringDTEquivalenceClass::ok.getValue(), errorLabel.getValue()) ]
+			assert [ org::junit::Assert:: assertEquals(ErrorStringDTEquivalenceClass:: ok.getValue(), errorLabel.getValue()) ]
 		}
-
 		#saveAndClose
 		#findLogicalView
-		#tree.doubleClickNode(nodePath="Bob Marley/Legend/Stir It Up")
+		#tree.doubleClickNode(nodePath = "Bob Marley/Legend/Stir It Up")
 		var resultTrack = #track.getText
 		var resultYear = #year.getText
-		var resultComment = #comment.getText 
-		assert [ junit::framework::Assert::assertEquals(enteredTrack.getValue(), resultTrack.getValue()) ]	
-		assert [ junit::framework::Assert::assertEquals(enteredYear.getValue(), resultYear.getValue()) ]	
-		assert [ junit::framework::Assert::assertEquals(enteredComment.getValue(), resultComment.getValue()) ]
+		var resultComment = #comment.getText
+		assert [ junit::framework::Assert:: assertEquals(enteredTrack.getValue(), resultTrack.getValue()) ]
+		assert [ junit::framework::Assert:: assertEquals(enteredYear.getValue(), resultYear.getValue()) ]
+		assert [ junit::framework::Assert:: assertEquals(enteredComment.getValue(), resultComment.getValue()) ]
 	}
-	 
+
 	test OpenLogicalViewTest generator de.msg.xt.mdt.base.SampleTestGenerator useCase OpenLogicalView
+
 }

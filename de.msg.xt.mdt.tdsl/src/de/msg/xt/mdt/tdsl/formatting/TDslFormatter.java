@@ -3,25 +3,76 @@
  */
 package de.msg.xt.mdt.tdsl.formatting;
 
+import org.eclipse.xtext.Keyword;
 import org.eclipse.xtext.formatting.impl.AbstractDeclarativeFormatter;
 import org.eclipse.xtext.formatting.impl.FormattingConfig;
+import org.eclipse.xtext.util.Pair;
+
+import de.msg.xt.mdt.tdsl.services.TDslGrammarAccess;
 
 /**
  * This class contains custom formatting description.
  * 
  * see : http://www.eclipse.org/Xtext/documentation/latest/xtext.html#formatting
- * on how and when to use it 
+ * on how and when to use it
  * 
- * Also see {@link org.eclipse.xtext.xtext.XtextFormattingTokenSerializer} as an example
+ * Also see {@link org.eclipse.xtext.xtext.XtextFormattingTokenSerializer} as an
+ * example
  */
 public class TDslFormatter extends AbstractDeclarativeFormatter {
-	
+
 	@Override
 	protected void configureFormatting(FormattingConfig c) {
-// It's usually a good idea to activate the following three statements.
-// They will add and preserve newlines around comments
-//		c.setLinewrap(0, 1, 2).before(getGrammarAccess().getSL_COMMENTRule());
-//		c.setLinewrap(0, 1, 2).before(getGrammarAccess().getML_COMMENTRule());
-//		c.setLinewrap(0, 1, 1).after(getGrammarAccess().getML_COMMENTRule());
+		c.setAutoLinewrap(120);
+
+		TDslGrammarAccess access = (TDslGrammarAccess) getGrammarAccess();
+		c.setLinewrap(0, 1, 2).before(access.getSL_COMMENTRule());
+		c.setLinewrap(0, 1, 2).before(access.getML_COMMENTRule());
+		c.setLinewrap(0, 1, 1).after(access.getML_COMMENTRule());
+
+		// find common keywords an specify formatting for them
+		for (Pair<Keyword, Keyword> pair : access.findKeywordPairs("(", ")")) {
+			c.setNoSpace().around(pair.getFirst());
+			c.setNoSpace().before(pair.getSecond());
+		}
+		for (Keyword comma : access.findKeywords(",")) {
+			c.setNoSpace().before(comma);
+		}
+		for (Keyword dot : access.findKeywords(".")) {
+			c.setNoSpace().around(dot);
+		}
+		for (Keyword arrow : access.findKeywords("=>")) {
+			c.setNoLinewrap().before(arrow);
+		}
+		for (Keyword arrow : access.findKeywords("else")) {
+			c.setNoLinewrap().before(arrow);
+		}
+
+		for (final Pair<Keyword, Keyword> pair : grammar.findKeywordPairs(
+				"{", "}")) { //$NON-NLS-1$ //$NON-NLS-2$
+			// a space before the first '{'
+			c.setSpace(" ").before(pair.getFirst()); //$NON-NLS-1$
+			c.setLinewrap().after(pair.getFirst());
+			// indentation between
+			c.setIndentation(pair.getFirst(), pair.getSecond());
+			// and a linewrap before the last '}'
+			c.setLinewrap(1).before(pair.getSecond());
+			c.setLinewrap(1).after(pair.getSecond());
+		}
+
+		c.setLinewrap(2).after(access.getElementRule());
+
+		c.setLinewrap().after(access.getImportRule());
+		c.setLinewrap(2).between(access.getImportRule(),
+				access.getElementRule());
+
+		c.setLinewrap().after(access.getTypeRule());
+		c.setLinewrap().after(access.getEquivalenceClassRule());
+		c.setLinewrap().after(access.getOperationRule());
+		c.setLinewrap().after(access.getActivityOperationRule());
+		c.setLinewrap(2).after(access.getFieldRule());
+		c.setLinewrap().after(access.getOperationMappingRule());
+
+		c.setLinewrap().after(access.getStatementLineRule());
 	}
 }
