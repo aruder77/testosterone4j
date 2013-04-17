@@ -186,7 +186,10 @@ class TDslScopeProvider extends XbaseScopeProvider {
 				}
 			}
 		} else {
-			super.getScope(context, reference)
+			if (context != null)
+				super.getScope(context, reference)
+			else 
+				IScope::NULLSCOPE
 		}
 	}
 	

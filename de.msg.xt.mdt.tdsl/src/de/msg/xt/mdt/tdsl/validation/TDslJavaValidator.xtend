@@ -14,6 +14,8 @@ import org.eclipse.xtext.validation.Check
 import org.eclipse.xtext.xbase.XExpression
 import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder
 import org.eclipse.xtext.xbase.typing.ITypeProvider
+import de.msg.xt.mdt.tdsl.tDsl.Activity
+import de.msg.xt.mdt.tdsl.tDsl.TDslPackage
 
 class TDslJavaValidator extends AbstractTDslJavaValidator {
 	
@@ -25,6 +27,13 @@ class TDslJavaValidator extends AbstractTDslJavaValidator {
 	
 	@Inject extension ITypeProvider
 	@Inject extension JvmTypesBuilder
+	
+	@Check
+	def checkFirstUpperCaseActivities(Activity act) {
+		if (act.name != null && !act.name.toFirstUpper.equals(act.name)) {
+			error("Activity names must start with an uppercase letter.", TDslPackage$Literals::ACTIVITY__NAME)
+		}
+	}
 	
 	@Check
 	def checkOperationMapping(Field field) {
