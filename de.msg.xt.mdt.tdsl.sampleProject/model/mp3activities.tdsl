@@ -65,8 +65,8 @@ package mp3manager.activities {
 		}
 
 		field track identifiedBy "Id3TagPage.Track_Label" control TextControl {
-			op setText(TrackDT str)
-			op TrackDT getText
+			op setText(StringDT str)
+			op StringDT getText
 			op BooleanDT isEnabled
 		}
 

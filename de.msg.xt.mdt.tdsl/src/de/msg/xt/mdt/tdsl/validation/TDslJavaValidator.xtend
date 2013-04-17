@@ -17,6 +17,8 @@ import org.eclipse.xtext.xbase.typing.ITypeProvider
 
 class TDslJavaValidator extends AbstractTDslJavaValidator {
 	
+	public static val UNSUFFICIENT_OPERATION_MAPPINGS = "xt.mdt.unsufficientOperationMappings"
+	
 	@Inject extension MetaModelExtensions
 	@Inject extension NamingExtensions
 	
@@ -28,6 +30,7 @@ class TDslJavaValidator extends AbstractTDslJavaValidator {
 		val operationMappings = field.getOperations();
 		val operations = field.getControl().getOperations();
 		if (operationMappings.size != field.control.operations.size()) {
+			val missingMappings = <String>newArrayList
 			for (op : operations) {
 				var found = false;
 				for (opMapping : operationMappings) {
@@ -36,9 +39,13 @@ class TDslJavaValidator extends AbstractTDslJavaValidator {
 					}
 				}
 				if (!found) {
-					error("An operation mapping must be defined for operation " + op.getName(),
-							TDslPackage$Literals::FIELD__OPERATIONS);
+					missingMappings.add(op.name)
 				}
+			}
+			if (!missingMappings.empty) {
+				error('''An operation mapping must be defined for operations «FOR m : missingMappings SEPARATOR ", "»'«m»'«ENDFOR»''',
+							TDslPackage$Literals::FIELD__OPERATIONS, UNSUFFICIENT_OPERATION_MAPPINGS);
+				
 			}
 		}
 	}

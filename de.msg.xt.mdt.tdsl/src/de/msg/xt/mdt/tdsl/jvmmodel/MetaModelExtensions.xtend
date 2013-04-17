@@ -15,6 +15,7 @@ import de.msg.xt.mdt.tdsl.tDsl.SubUseCaseCall
 import de.msg.xt.mdt.tdsl.tDsl.Test
 import de.msg.xt.mdt.tdsl.tDsl.Toolkit
 import java.util.ArrayList
+import java.util.Collections
 import java.util.List
 import javax.inject.Inject
 import org.eclipse.emf.ecore.EObject
@@ -22,8 +23,12 @@ import org.eclipse.xtext.EcoreUtil2
 import org.eclipse.xtext.naming.IQualifiedNameProvider
 import org.eclipse.xtext.xbase.XBlockExpression
 import org.eclipse.xtext.xbase.XExpression
-import java.util.Collections
-import com.google.common.collect.Collections2
+import de.msg.xt.mdt.tdsl.tDsl.Type
+import org.eclipse.xtext.scoping.IGlobalScopeProvider
+import org.eclipse.emf.ecore.util.EcoreUtil
+import de.msg.xt.mdt.tdsl.tDsl.DataType
+import de.msg.xt.mdt.tdsl.tDsl.TDslPackage
+import org.eclipse.xtext.scoping.IScopeProvider
 
 /**
  * Convenience meta-model extensions. Please order by Metamodel-Class and alphabetically!
@@ -31,6 +36,9 @@ import com.google.common.collect.Collections2
 class MetaModelExtensions {
 	
 	@Inject extension IQualifiedNameProvider
+	
+	@Inject 
+	IScopeProvider scopeProvider;
 	
 	
 	// Activity 
@@ -63,7 +71,6 @@ class MetaModelExtensions {
 	def getActivity(ActivityOperation operation) {
 		operation?.eContainer as Activity
 	}
-	
 	
 	// DataTypeMapping
 	def getOperationMapping(DataTypeMapping dataTypeMapping) {
@@ -143,6 +150,25 @@ class MetaModelExtensions {
 	def Toolkit getSut(Test test) {
 		test?.packageDeclaration?.toolkit
 	}
+	
+	// Type
+	
+	def DataType defaultDataType(Field field, Type type) {
+		if (type != null) {
+			val scope = scopeProvider.getScope(field, TDslPackage$Literals::OPERATION_MAPPING__DATA_TYPE)
+			val objectDescriptions = scope.allElements
+			for (element : objectDescriptions) {
+				val isDefault = "true".equals(element?.getUserData("isDefault"));
+				val isCorrectType = element?.getUserData("type")?.equals(type.fullyQualifiedName?.toString);
+				if (isDefault && isCorrectType)
+					return element?.EObjectOrProxy as DataType
+			}
+			if (!objectDescriptions.empty)
+				return (objectDescriptions.last.EObjectOrProxy as DataType)
+			return null
+		}
+	}
+	
 	
 	// XExpression
 	

@@ -4,6 +4,7 @@
 package de.msg.xt.mdt.tdsl;
 
 import org.eclipse.xtext.naming.IQualifiedNameProvider;
+import org.eclipse.xtext.resource.IDefaultResourceDescriptionStrategy;
 import org.eclipse.xtext.scoping.IScopeProvider;
 import org.eclipse.xtext.xbase.compiler.XbaseCompiler;
 import org.eclipse.xtext.xbase.typing.ITypeProvider;
@@ -11,6 +12,7 @@ import org.eclipse.xtext.xbase.typing.ITypeProvider;
 import de.msg.xt.mdt.tdsl.generator.TDslJvmModelGenerator;
 import de.msg.xt.mdt.tdsl.jvmmodel.TDslCompiler;
 import de.msg.xt.mdt.tdsl.jvmmodel.TDslQualifiedNameProvider;
+import de.msg.xt.mdt.tdsl.scoping.TDslDefaultResourceDescriptionStrategy;
 import de.msg.xt.mdt.tdsl.scoping.TDslScopeProvider;
 import de.msg.xt.mdt.tdsl.typeprovider.TDslTypeProvider;
 
@@ -51,5 +53,10 @@ public class TDslRuntimeModule extends
 	@org.eclipse.xtext.service.SingletonBinding(eager = true)
 	public Class<? extends de.msg.xt.mdt.tdsl.validation.TDslJavaValidator> bindTDslJavaValidator() {
 		return de.msg.xt.mdt.tdsl.validation.TDslJavaValidator.class;
+	}
+
+	@Override
+	public Class<? extends IDefaultResourceDescriptionStrategy> bindIDefaultResourceDescriptionStrategy() {
+		return TDslDefaultResourceDescriptionStrategy.class;
 	}
 }

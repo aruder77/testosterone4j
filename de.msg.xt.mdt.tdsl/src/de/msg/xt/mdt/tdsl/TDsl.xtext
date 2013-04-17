@@ -37,7 +37,7 @@ Type:
 ;
 
 DataType:
-	'datatype' name=ID 'type' type=[Type|FQN] '{'
+	'datatype' name=ID (default?='default' 'for')? 'type' type=[Type|FQN] '{'
 		(classes+=EquivalenceClass)+
 	'}'
 ;
@@ -89,7 +89,7 @@ Field:
 	'field' name=ID ('identifiedBy' uniqueId=STRING)? 'control' control=[Control|FQN] ('datatype' dataType=[DataType|FQN])? (tags+=TagWithCondition)* 
 	(
 		 '{' 
-		 (operations+=OperationMapping)+	
+		 (operations+=OperationMapping)*	
 		 '}'
 	)?
 ;
