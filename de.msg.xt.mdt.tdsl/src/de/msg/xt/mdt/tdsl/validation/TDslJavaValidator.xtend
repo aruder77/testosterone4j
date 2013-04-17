@@ -69,32 +69,38 @@ class TDslJavaValidator extends AbstractTDslJavaValidator {
 	
 	@Check
 	def checkTypeComplianceOperationParameter(OperationParameterAssignment assignment) {
-		val JvmType expectedDataType = assignment.newTypeRef(assignment.name.datatype.class_FQN.toString).type
-		val JvmType expectedType = assignment.name.datatype.type.mappedBy.type
-		val JvmType exprType = assignment?.value.type.type 
-		if (!exprType.equals(expectedDataType) && !exprType.equals(expectedType) && !expectedType.isCompatible(exprType)) {
-			error("Value of parameter " + assignment.name.name.name + " must be either " + expectedDataType.simpleName + " or " + expectedType.simpleName + ", but was " + exprType.simpleName + "!", TDslPackage$Literals::OPERATION_PARAMETER_ASSIGNMENT__VALUE);
+		if (assignment?.name?.datatype?.class_FQN?.toString != null && assignment.name.datatype.type?.mappedBy?.type != null) { 
+			val JvmType expectedDataType = assignment.newTypeRef(assignment.name.datatype.class_FQN.toString).type
+			val JvmType expectedType = assignment.name.datatype.type.mappedBy.type
+			val JvmType exprType = assignment?.value.type.type 
+			if (!exprType.equals(expectedDataType) && !exprType.equals(expectedType) && !expectedType.isCompatible(exprType)) {
+				error("Value of parameter " + assignment.name.name.name + " must be either " + expectedDataType.simpleName + " or " + expectedType.simpleName + ", but was " + exprType.simpleName + "!", TDslPackage$Literals::OPERATION_PARAMETER_ASSIGNMENT__VALUE);
+			}
 		}
 	}
 
 	@Check
 	def checkTypeComplianceActivityOperationParameter(ActivityOperationParameterAssignment assignment) {
-		val JvmType expectedDataType = assignment.newTypeRef(assignment.name.dataType.class_FQN.toString).type
-		val JvmType expectedType = assignment.name.dataType.type.mappedBy.type
-		val JvmType exprType = assignment?.value.type.type
-		if (!exprType.equals(expectedDataType) && !exprType.equals(expectedType) && !expectedType.isCompatible(exprType)) {
-			error("Value of parameter " + assignment.name.name + " must be either " + expectedDataType.simpleName + " or " + expectedType.simpleName + ", but was " + exprType.simpleName + "!", TDslPackage$Literals::ACTIVITY_OPERATION_PARAMETER_ASSIGNMENT__VALUE);
+		if (assignment?.name?.dataType?.class_FQN?.toString != null && assignment.name.dataType.type?.mappedBy?.type != null) { 
+			val JvmType expectedDataType = assignment.newTypeRef(assignment.name.dataType.class_FQN.toString).type
+			val JvmType expectedType = assignment.name.dataType.type.mappedBy.type
+			val JvmType exprType = assignment?.value.type.type
+			if (!exprType.equals(expectedDataType) && !exprType.equals(expectedType) && !expectedType.isCompatible(exprType)) {
+				error("Value of parameter " + assignment.name.name + " must be either " + expectedDataType.simpleName + " or " + expectedType.simpleName + ", but was " + exprType.simpleName + "!", TDslPackage$Literals::ACTIVITY_OPERATION_PARAMETER_ASSIGNMENT__VALUE);
+			}
 		}
 	}
 	
 	@Check
 	def checkTypeComplianceSubUseCaseCallParameter(ParameterAssignment assignment) {
-		val JvmType expectedDataType = assignment.newTypeRef(assignment.name.dataType.class_FQN.toString).type
-		val JvmType expectedType = assignment.name.dataType.type.mappedBy.type
-		val JvmType exprType = assignment?.value.type.type 
-		if (!exprType.equals(expectedDataType) && !exprType.equals(expectedType) && !expectedType.isCompatible(exprType)) {
-			error("Value of parameter " + assignment.name.name + " must be either " + expectedDataType.simpleName + " or " + expectedType.simpleName + ", but was " + exprType.simpleName + "!", TDslPackage$Literals::PARAMETER_ASSIGNMENT__VALUE);
-		}		
+		if (assignment?.name?.dataType?.class_FQN?.toString != null && assignment.name.dataType.type?.mappedBy?.type != null) {
+			val JvmType expectedDataType = assignment.newTypeRef(assignment.name.dataType.class_FQN.toString).type
+			val JvmType expectedType = assignment.name.dataType.type.mappedBy.type
+			val JvmType exprType = assignment?.value.type.type 
+			if (!exprType.equals(expectedDataType) && !exprType.equals(expectedType) && !expectedType.isCompatible(exprType)) {
+				error("Value of parameter " + assignment.name.name + " must be either " + expectedDataType.simpleName + " or " + expectedType.simpleName + ", but was " + exprType.simpleName + "!", TDslPackage$Literals::PARAMETER_ASSIGNMENT__VALUE);
+			}		
+		}
 	}
 	
 	def boolean isCompatible(JvmType expectedType, JvmType actualType) {
