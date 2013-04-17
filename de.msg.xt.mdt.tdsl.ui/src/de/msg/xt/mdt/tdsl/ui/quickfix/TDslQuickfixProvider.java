@@ -15,12 +15,14 @@ import org.eclipse.xtext.ui.editor.quickfix.IssueResolutionAcceptor;
 import org.eclipse.xtext.validation.Issue;
 
 import de.msg.xt.mdt.tdsl.jvmmodel.MetaModelExtensions;
+import de.msg.xt.mdt.tdsl.tDsl.Activity;
 import de.msg.xt.mdt.tdsl.tDsl.ControlOperationParameter;
 import de.msg.xt.mdt.tdsl.tDsl.DataTypeMapping;
 import de.msg.xt.mdt.tdsl.tDsl.Field;
 import de.msg.xt.mdt.tdsl.tDsl.Operation;
 import de.msg.xt.mdt.tdsl.tDsl.OperationMapping;
 import de.msg.xt.mdt.tdsl.tDsl.TDslFactory;
+import de.msg.xt.mdt.tdsl.tDsl.Toolkit;
 import de.msg.xt.mdt.tdsl.validation.TDslJavaValidator;
 
 public class TDslQuickfixProvider extends DefaultQuickfixProvider {
@@ -74,5 +76,24 @@ public class TDslQuickfixProvider extends DefaultQuickfixProvider {
 						field.getOperations().add(mapping);
 					}
 				});
+	}
+
+	@Fix(TDslJavaValidator.CONTROL_NOT_IN_TOOLKIT)
+	public void addControlToToolkit(final Issue issue,
+			IssueResolutionAcceptor acceptor) {
+		String label = "Add control '" + issue.getData()[0] + "' to toolkit";
+		acceptor.accept(issue, label, label, "", new ISemanticModification() {
+
+			@Override
+			public void apply(EObject element, IModificationContext context)
+					throws Exception {
+				Field field = (Field) element;
+				Activity act = metaModelExtensions.parentActivity(field);
+				Toolkit toolkit = metaModelExtensions.getToolkit(act);
+				if (toolkit != null) {
+					toolkit.getControls().add(field.getControl());
+				}
+			}
+		});
 	}
 }

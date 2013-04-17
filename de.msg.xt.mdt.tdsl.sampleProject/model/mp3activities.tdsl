@@ -5,7 +5,7 @@ package mp3manager.activities {
 
 	toolkit Stdtoolkit using controls {
 		TextControl, TreeControl, Label
-	}
+}
 
 	activity ViewActivity {
 		op close => MainWindow

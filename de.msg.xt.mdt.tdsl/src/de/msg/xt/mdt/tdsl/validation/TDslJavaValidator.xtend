@@ -18,6 +18,7 @@ import org.eclipse.xtext.xbase.typing.ITypeProvider
 class TDslJavaValidator extends AbstractTDslJavaValidator {
 	
 	public static val UNSUFFICIENT_OPERATION_MAPPINGS = "xt.mdt.unsufficientOperationMappings"
+	public static val CONTROL_NOT_IN_TOOLKIT = "xt.mdt.controlNotInToolkit"
 	
 	@Inject extension MetaModelExtensions
 	@Inject extension NamingExtensions
@@ -54,7 +55,7 @@ class TDslJavaValidator extends AbstractTDslJavaValidator {
 	@Check
 	def checkControlsInToolkit(Field field) {
 		if(!field.parentActivity.toolkit.controls.contains(field.control)) {
-			error ("The control '" + field.control.name + "' is not included in the current toolkit!", TDslPackage$Literals::FIELD__CONTROL)
+			error ("The control '" + field.control.name + "' is not included in the current toolkit!", TDslPackage$Literals::FIELD__CONTROL, CONTROL_NOT_IN_TOOLKIT, field.control.name)
 		}
 	}
 	
