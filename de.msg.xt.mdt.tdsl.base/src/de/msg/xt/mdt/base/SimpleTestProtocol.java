@@ -1,80 +1,79 @@
 package de.msg.xt.mdt.base;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.logging.Logger;
 
 public class SimpleTestProtocol implements ITestProtocol {
 
-    String testId;
+	String testId;
 
-    private PrintWriter printWriter;
+	private PrintWriter printWriter;
 
-    public SimpleTestProtocol(String testId) {
-        this.testId = testId;
-    }
+	private static final Logger LOG = Logger.getLogger(SimpleTestProtocol.class.getName());
 
-    @Override
-    public void open() throws IOException {
-        this.printWriter = new PrintWriter(new File(this.testId + ".txt"));
-    }
+	public SimpleTestProtocol(final String testId) {
+		this.testId = testId;
+	}
 
-    @Override
-    public void openLog(int testNumber) throws IOException {
-        boolean append = (testNumber != 1);
-        this.printWriter = new PrintWriter(new FileWriter(new File(this.testId + ".log"), append));
-    }
+	@Override
+	public void open() throws IOException {
+		printWriter = new PrintWriter(new File(testId + ".txt"));
+	}
 
-    @Override
-    public void newTest(String identifier) {
-        this.printWriter.println();
-        this.printWriter.println("==================================================================================");
-        this.printWriter.println("Testcase " + this.testId + " : " + identifier);
-        this.printWriter.println();
-    }
+	@Override
+	public void newTest(final String identifier) {
+		log("\n==================================================================================");
+		log("Testcase " + testId + " : " + identifier + "\n");
+	}
 
-    @Override
-    public void close() {
-        this.printWriter.close();
-        this.printWriter = null;
-    }
+	@Override
+	public void close() {
+		printWriter.close();
+		printWriter = null;
+	}
 
-    @Override
-    public void append(String str) {
-        this.printWriter.println(str);
-    }
+	@Override
+	public void append(final String str) {
+		log(str);
+	}
 
-    @Override
-    public void appendControlOperationCall(String activityName, String fieldName, String fieldControlName, String operationName,
-            String returnValue, String... parameter) {
-        StringBuffer sb = new StringBuffer();
-        sb.append("[").append(activityName).append("]     ");
+	@Override
+	public void appendControlOperationCall(final String activityName, final String fieldName, final String fieldControlName,
+			final String operationName, final String returnValue, final String... parameter) {
+		final StringBuffer sb = new StringBuffer();
+		sb.append("[").append(activityName).append("]     ");
 
-        if (fieldControlName != null) {
-            sb.append(fieldName).append(" [").append(fieldControlName).append("].");
-        }
+		if (fieldControlName != null) {
+			sb.append(fieldName).append(" [").append(fieldControlName).append("].");
+		}
 
-        sb.append(operationName).append("(");
+		sb.append(operationName).append("(");
 
-        int idx = 0;
-        for (Object param : parameter) {
-            if (idx++ != 0) {
-                sb.append(", ");
-            }
-            sb.append("\"").append(param).append("\"");
-        }
+		int idx = 0;
+		for (final Object param : parameter) {
+			if (idx++ != 0) {
+				sb.append(", ");
+			}
+			sb.append("\"").append(param).append("\"");
+		}
 
-        sb.append(")");
-        if (returnValue != null) {
-            sb.append(": \"").append(returnValue).append("\"");
-        }
-        this.append(sb.toString());
-    }
+		sb.append(")");
+		if (returnValue != null) {
+			sb.append(": \"").append(returnValue).append("\"");
+		}
+		append(sb.toString());
+	}
 
-    @Override
-    public void appendActivityOperationCall(String activityName, String operationName, String returnValue, String... parameter) {
-        this.appendControlOperationCall(activityName, null, null, operationName, returnValue, parameter);
-    }
+	@Override
+	public void appendActivityOperationCall(final String activityName, final String operationName, final String returnValue,
+			final String... parameter) {
+		appendControlOperationCall(activityName, null, null, operationName, returnValue, parameter);
+	}
+
+	private void log(final String str) {
+		LOG.info(str + "\n");
+	}
 
 }

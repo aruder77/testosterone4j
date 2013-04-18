@@ -9,46 +9,55 @@ import javax.xml.bind.annotation.XmlElement;
 
 public class BaseUseCase implements Serializable {
 
-    protected transient Generator generator;
+	protected transient Generator generator;
 
-    @XmlElement
-    protected Map<String, DataType> generatedData = new HashMap<String, DataType>();
+	@XmlElement
+	protected Map<String, DataType> generatedData = new HashMap<String, DataType>();
 
-    @XmlElement
-    protected Map<String, BaseUseCase> generatedSubUseCases = new HashMap<String, BaseUseCase>();
+	@XmlElement
+	protected Map<String, BaseUseCase> generatedSubUseCases = new HashMap<String, BaseUseCase>();
 
-    public <T extends DataType> T getOrGenerateValue(Class<T> clazz, String key) {
-        return getOrGenerateValue(clazz, key, null);
-    }
+	public <T extends DataType> T getOrGenerateValue(final Class<T> clazz, final String key) {
+		return getOrGenerateValue(clazz, key, null);
+	}
 
-    public <T extends DataType> T getOrGenerateValue(Class<T> clazz, String key, Tag[] tags) {
-        T value = null;
-        if (this.generatedData.containsKey(key)) {
-            value = (T) this.generatedData.get(key);
-        } else {
-            value = this.generator.generateDataTypeValue(clazz, key, tags);
-            this.generatedData.put(key, value);
-        }
-        return value;
-    }
+	public <T extends DataType> T getOrGenerateValue(final Class<T> clazz, final String key, final Tag[] tags) {
+		T value = null;
+		if (generatedData.containsKey(key)) {
+			value = (T) generatedData.get(key);
+		} else {
+			value = generator.generateDataTypeValue(clazz, key, tags);
+			generatedData.put(key, value);
+		}
+		return value;
+	}
 
-    protected <E extends BaseUseCase> E getOrGenerateSubUseCase(Class<E> clazz, String key) {
-        return this.getOrGenerateSubUseCase(clazz, key, null);
-    }
+	protected <E extends BaseUseCase> E getOrGenerateSubUseCase(final Class<E> clazz, final String key) {
+		return this.getOrGenerateSubUseCase(clazz, key, null);
+	}
 
-    protected <E extends BaseUseCase> E getOrGenerateSubUseCase(Class<E> clazz, String key, Tag[] tags) {
-        E value = null;
-        if (this.generatedSubUseCases.containsKey(key)) {
-            value = (E) this.generatedSubUseCases.get(key);
-        } else {
-            try {
-                value = clazz.getConstructor(Generator.class).newInstance(this.generator);
-                this.generatedSubUseCases.put(key, value);
-            } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
-                    | NoSuchMethodException | SecurityException e) {
-                e.printStackTrace();
-            }
-        }
-        return value;
-    }
+	protected <E extends BaseUseCase> E getOrGenerateSubUseCase(final Class<E> clazz, final String key, final Tag[] tags) {
+		E value = null;
+		if (generatedSubUseCases.containsKey(key)) {
+			value = (E) generatedSubUseCases.get(key);
+		} else {
+			try {
+				value = clazz.getConstructor(Generator.class).newInstance(generator);
+				generatedSubUseCases.put(key, value);
+			} catch (final InstantiationException e) {
+				e.printStackTrace();
+			} catch (final IllegalAccessException e) {
+				e.printStackTrace();
+			} catch (final IllegalArgumentException e) {
+				e.printStackTrace();
+			} catch (final InvocationTargetException e) {
+				e.printStackTrace();
+			} catch (final NoSuchMethodException e) {
+				e.printStackTrace();
+			} catch (final SecurityException e) {
+				e.printStackTrace();
+			}
+		}
+		return value;
+	}
 }

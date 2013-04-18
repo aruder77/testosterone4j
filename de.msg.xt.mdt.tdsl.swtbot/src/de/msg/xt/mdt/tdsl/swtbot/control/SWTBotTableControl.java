@@ -120,4 +120,10 @@ public class SWTBotTableControl implements TableControl {
 		final SWTBotTableItem item = table.getTableItem(row);
 		item.check();
 	}
+
+	@Override
+	public void selectRow(final Integer row) {
+		final SWTBotTableItem item = table.getTableItem(row);
+		item.select();
+	}
 }

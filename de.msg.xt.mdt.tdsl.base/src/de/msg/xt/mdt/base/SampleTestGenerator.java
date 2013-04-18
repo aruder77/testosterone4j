@@ -60,8 +60,17 @@ public class SampleTestGenerator implements Generator {
 				}
 
 				testCases.add(testCase);
-			} catch (InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException
-					| IllegalArgumentException | InvocationTargetException e) {
+			} catch (final InstantiationException e) {
+				e.printStackTrace();
+			} catch (final SecurityException e) {
+				e.printStackTrace();
+			} catch (final NoSuchMethodException e) {
+				e.printStackTrace();
+			} catch (final IllegalArgumentException e) {
+				e.printStackTrace();
+			} catch (final IllegalAccessException e) {
+				e.printStackTrace();
+			} catch (final InvocationTargetException e) {
 				e.printStackTrace();
 			}
 		}
@@ -88,7 +97,9 @@ public class SampleTestGenerator implements Generator {
 				unsatisfiedCoverageIds.remove(id);
 				determineEquivalenceClassList(remainingValues, dataType);
 			}
-		} catch (InstantiationException | IllegalAccessException e) {
+		} catch (final InstantiationException e) {
+			e.printStackTrace();
+		} catch (final IllegalAccessException e) {
 			e.printStackTrace();
 		}
 		LOG.fine("generatedValue[id=\"" + id + "\"]:" + dataType.getValue());
@@ -133,8 +144,15 @@ public class SampleTestGenerator implements Generator {
 		try {
 			final Method valuesMethod = dataType.getEquivalenceClassEnum().getMethod("values", (Class[]) null);
 			return (Object[]) valuesMethod.invoke(null, (Object[]) null);
-		} catch (IllegalAccessException | NoSuchMethodException | SecurityException | IllegalArgumentException
-				| InvocationTargetException e) {
+		} catch (final IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (final SecurityException e) {
+			e.printStackTrace();
+		} catch (final NoSuchMethodException e) {
+			e.printStackTrace();
+		} catch (final IllegalArgumentException e) {
+			e.printStackTrace();
+		} catch (final InvocationTargetException e) {
 			e.printStackTrace();
 		}
 		return values;

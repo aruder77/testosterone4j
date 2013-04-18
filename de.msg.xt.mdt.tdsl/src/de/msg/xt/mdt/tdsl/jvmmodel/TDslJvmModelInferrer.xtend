@@ -511,18 +511,18 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				annotations += test.toAnnotation(typeof(Parameters))
    				it.setBody [
    					test.newTypeRef(typeof(GenerationHelper)).serialize(test, it)
-                   	it.append(" testHelper = INJECTOR.getInstance(GenerationHelper.class);")
+                   	it.append(" testHelper = INJECTOR.getInstance(GenerationHelper.class);").newLine
    					test.newTypeRef(typeof(Generator)).serialize(test, it)
-                   	it.append(" generator = INJECTOR.getInstance(Generator.class);")
+                   	it.append(" generator = INJECTOR.getInstance(Generator.class);").newLine
                    	if (!test.tags.empty) {
                    		it.append("generator.setTags(new ")
                    		test.newTypeRef(typeof(Tag)).createArrayType.serialize(test, it)
-                   		it.append(''' {«FOR tag : test.tags SEPARATOR ","»«tag.enumLiteral_FQN»«ENDFOR»});''')
+                   		it.append(''' {«FOR tag : test.tags SEPARATOR ","»«tag.enumLiteral_FQN»«ENDFOR»});''').newLine
                    	}
                    	if (!test.excludeTags.empty) {
                         it.append("generator.setExcludeTags(new ")
                    		test.newTypeRef(typeof(Tag)).createArrayType.serialize(test, it)
-                        it.append(''' {«FOR tag : test.excludeTags SEPARATOR ","»«tag.enumLiteral_FQN»«ENDFOR»});''')
+                        it.append(''' {«FOR tag : test.excludeTags SEPARATOR ","»«tag.enumLiteral_FQN»«ENDFOR»});''').newLine
                     }
                     it.append('''
                         LOCATOR.beforeTest();
@@ -566,12 +566,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				
    				body = [
    					it.append('''
-                        try {
-                            this.protocol.openLog(this.testNumber);
-                            this.protocol.newTest(String.valueOf(this.testNumber));
-                        } catch (java.io.IOException e) {
-                            e.printStackTrace();
-                        }
+                        this.protocol.newTest(String.valueOf(this.testNumber));
                         try {
                         	this.useCase.run();
                         } finally {
