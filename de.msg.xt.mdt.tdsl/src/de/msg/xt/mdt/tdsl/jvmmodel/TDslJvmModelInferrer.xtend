@@ -520,7 +520,9 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
                    		it.append(''' {«FOR tag : test.tags SEPARATOR ","»«tag.enumLiteral_FQN»«ENDFOR»});''')
                    	}
                    	if (!test.excludeTags.empty) {
-                        it.append('''generator.setExcludeTags(new Tag[] {«FOR tag : test.excludeTags SEPARATOR ","»«tag.enumLiteral_FQN»«ENDFOR»});''')
+                        it.append("generator.setExcludeTags(new ")
+                   		test.newTypeRef(typeof(Tag)).createArrayType.serialize(test, it)
+                        it.append(''' {«FOR tag : test.excludeTags SEPARATOR ","»«tag.enumLiteral_FQN»«ENDFOR»});''')
                     }
                     it.append('''
                         LOCATOR.beforeTest();

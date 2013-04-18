@@ -148,7 +148,11 @@ class NamingExtensions {
 	// TagDeclaration
 	
 	def String enumClass_FQN(TagsDeclaration tags) {
-		tags?.eContainer?.fullyQualifiedName?.toString + ".Tags"
+		val enumClass = tags?.eContainer?.fullyQualifiedName?.toString
+		if (enumClass != null) 
+			enumClass + ".Tags"
+		else 
+			null
 	}
 
 	// UseCase

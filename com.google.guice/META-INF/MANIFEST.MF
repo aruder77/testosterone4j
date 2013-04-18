@@ -4,7 +4,7 @@ Bundle-Name: Guice
 Bundle-SymbolicName: com.google.guice
 Bundle-Version: 3.0.0.qualifier
 Bundle-Vendor: GOOGLE
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: jars/aopalliance.jar,
  jars/guice-3.0.jar,
  jars/guice-assistedinject-3.0.jar,

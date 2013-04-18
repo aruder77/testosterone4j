@@ -20,7 +20,7 @@ import de.msg.xt.mdt.tdsl.tDsl.TDslPackage
 class TDslJavaValidator extends AbstractTDslJavaValidator {
 	
 	public static val UNSUFFICIENT_OPERATION_MAPPINGS = "xt.mdt.unsufficientOperationMappings"
-	public static val CONTROL_NOT_IN_TOOLKIT = "xt.mdt.controlNotInToolkit"
+	public static val CONTROL_NOT_IN_TOOLKIT = "xt.mdt.controlNotInToolkit" 
 	
 	@Inject extension MetaModelExtensions
 	@Inject extension NamingExtensions

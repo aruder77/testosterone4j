@@ -3,11 +3,11 @@ Bundle-ManifestVersion: 2
 Bundle-Name: TDsl SWT-Bot Adaption
 Bundle-SymbolicName: de.msg.xt.mdt.tdsl.swtbot;singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Require-Bundle: org.eclipse.ui,
+Require-Bundle: org.eclipse.swtbot.eclipse.finder;bundle-version="2.1.1";visibility:=reexport,
+ org.eclipse.ui,
  org.eclipse.core.runtime,
  de.msg.xt.mdt.tdsl.base;bundle-version="1.0.0",
- de.msg.xt.mdt.tdsl.basictypes;bundle-version="1.0.0",
- org.eclipse.swtbot.eclipse.finder;bundle-version="2.0.5";visibility:=reexport
+ de.msg.xt.mdt.tdsl.basictypes;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: de.msg.xt.mdt.tdsl.swtbot,
  de.msg.xt.mdt.tdsl.swtbot.activityadapter,
