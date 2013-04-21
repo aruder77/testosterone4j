@@ -1,6 +1,5 @@
 package de.msg.xt.mdt.tdsl.sampleProject.template.test.test;
 
-import java.io.IOException;
 import java.util.Collection;
 
 import org.junit.Test;
@@ -45,12 +44,7 @@ public class SampleTest {
 
     @Test
     public void test() {
-        try {
-            this.protocol.openLog(this.testNumber);
-            this.protocol.newTest(String.valueOf(this.testNumber));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        this.protocol.newTest(String.valueOf(this.testNumber));
         this.useCase.run();
         this.protocol.close();
     }

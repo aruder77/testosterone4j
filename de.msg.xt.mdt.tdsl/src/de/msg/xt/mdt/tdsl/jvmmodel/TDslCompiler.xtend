@@ -23,6 +23,7 @@ import org.eclipse.xtext.xbase.compiler.XbaseCompiler
 import org.eclipse.xtext.xbase.compiler.output.ITreeAppendable
 import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder
 import org.eclipse.xtext.xbase.typing.ITypeProvider
+import de.msg.xt.mdt.base.Tag
 
 class TDslCompiler extends XbaseCompiler {
 	
@@ -38,9 +39,7 @@ class TDslCompiler extends XbaseCompiler {
 	
 	@Inject extension JvmTypesBuilder
 	
-	
-	@Inject
-	TypeReferences typeRefs
+	@Inject extension TypeReferences typeRefs
 	
 	
 	override protected doInternalToJavaStatement(XExpression expr, 
@@ -62,7 +61,9 @@ class TDslCompiler extends XbaseCompiler {
 							returnToPreviousActivity = true
 						}
 					}	    			
-    				append('''((«(field.eContainer as Activity).class_FQN.toString»)activity).«field.activityControlDelegationMethodName(expr.operation.name)»(''')
+					append("((")
+					expr.newTypeRef((field.eContainer as Activity).class_FQN.toString).serialize(expr, it)					
+    				append(''')activity).«field.activityControlDelegationMethodName(expr.operation.name)»(''')
 					appendParameter(expr, it)
 					append(");")
 					if (returnToPreviousActivity) {
@@ -90,7 +91,9 @@ class TDslCompiler extends XbaseCompiler {
 						returnToPreviousActivity = true
 					}
 				}	    			
-    			append('''((«(expr.operation.eContainer as Activity).class_FQN.toString»)activity).«expr.operation.name»(''')	
+				append("((")
+				expr.newTypeRef((expr.operation.eContainer as Activity).class_FQN.toString).serialize(expr, it)
+    			append(''')activity).«expr.operation.name»(''')	
 				appendParameter(expr, it)
 				append(");")
 				if (returnToPreviousActivity) {
@@ -106,7 +109,9 @@ class TDslCompiler extends XbaseCompiler {
     				append(");")
     			}
     			newLine
-    			append('''«expr.useCase.subUseCaseGetter».execute((«expr.useCase.initialActivity.class_FQN.toString»)activity);''')
+    			append('''«expr.useCase.subUseCaseGetter».execute((''')
+    			expr.newTypeRef(expr.useCase.initialActivity.class_FQN.toString).serialize(expr, it)
+    			append(''')activity);''')
     		}
     		GenerationSelektor: {
     		}
@@ -130,7 +135,9 @@ class TDslCompiler extends XbaseCompiler {
  		switch (expr) {
  			OperationCall: {
      			val field = expr.operation.eContainer as Field
-    			append('''((«(field.eContainer as Activity).class_FQN.toString»)activity).«field.activityControlDelegationMethodName(expr.operation.name)»(''')
+     			append("((")
+     			expr.newTypeRef((field.eContainer as Activity).class_FQN.toString).serialize(expr, it)
+    			append(''')activity).«field.activityControlDelegationMethodName(expr.operation.name)»(''')
     			expr.generateEmbeddedParameters(it)
     			append(")") 		
 			}
@@ -151,9 +158,13 @@ class TDslCompiler extends XbaseCompiler {
 						varName = container.name.fullyQualifiedName.toString
 					}
 				}
-				append('''getOrGenerateValue(«dataType.class_FQN.toString».class, "«varName»"''')
+				append("getOrGenerateValue(")
+				expr.newTypeRef(dataType.class_FQN.toString).serialize(expr, it)
+				append('''.class, "«varName»"''')
 				if (!expr.tags.empty) {
-					append(''', new de.msg.xt.mdt.base.Tag[] {«FOR tag: expr.tags SEPARATOR ","»Tags.«tag.name»«ENDFOR»}''')
+					append(", ")
+					expr.newTypeRef(typeof(Tag)).createArrayType.serialize(expr, it)
+					append(''' {«FOR tag: expr.tags SEPARATOR ","»Tags.«tag.name»«ENDFOR»}''')
 				}
 				if (expr.expression != null) {
 					append(", ")
@@ -187,9 +198,12 @@ class TDslCompiler extends XbaseCompiler {
 			val assignment = findAssignment(call, mapping.name)
 			val dataTypeName = mapping.datatype.class_fqn
 			appendable.newLine
-			appendable.append('''«dataTypeName» «call.getVariableNameForOperationCallParameter(mapping)» = ''')
+			mapping.newTypeRef(dataTypeName).serialize(mapping, appendable)
+			appendable.append(''' «call.getVariableNameForOperationCallParameter(mapping)» = ''')
 			if (assignment == null) {
-				appendable.append('''getOrGenerateValue(«dataTypeName».class, "«call.getVariableNameForOperationCallParameter(mapping)»")''')
+				appendable.append("getOrGenerateValue(")
+				mapping.newTypeRef(dataTypeName).serialize(mapping, appendable)
+				appendable.append('''.class, "«call.getVariableNameForOperationCallParameter(mapping)»")''')
 			} else {
 				appendParameterValue(appendable, mapping.datatype, assignment.value)
 			}
@@ -203,7 +217,9 @@ class TDslCompiler extends XbaseCompiler {
 			val assignment = findAssignment(call, mapping.name)
 			val dataTypeName = mapping.datatype.class_fqn
 			if (assignment == null) {
-				appendable.append('''getOrGenerateValue(«dataTypeName».class, "«call.getVariableNameForOperationCallParameter(mapping)»")''')
+				appendable.append("getOrGenerateValue(")
+				mapping.newTypeRef(dataTypeName).serialize(mapping, appendable)
+				appendable.append('''.class, "«call.getVariableNameForOperationCallParameter(mapping)»")''')
 			} else {
 				appendParameterValue(appendable, mapping.datatype, assignment.value)
 			}
@@ -218,7 +234,9 @@ class TDslCompiler extends XbaseCompiler {
 		val expectedType = expr.type
 		val typeMatch = expectedType.type.equals(datatype.newTypeRef(datatype.class_fqn).type)
 		if (!typeMatch) {
-			appendable.append('''new «dataTypeName»(''')
+			appendable.append("new ")
+			datatype.newTypeRef(dataTypeName).serialize(datatype, appendable)
+			appendable.append("(")
 		}
 		compileAsJavaExpression(expr, appendable, expectedType)
 		if (!typeMatch) {
@@ -232,13 +250,18 @@ class TDslCompiler extends XbaseCompiler {
 			val assignment = findAssignment(call, parameter)
 			val dataTypeName = parameter.dataType.class_fqn
 			appendable.newLine
-			appendable.append('''«dataTypeName» «parameter.fullyQualifiedName.toString.toFieldName» = ''')
+			parameter.newTypeRef(dataTypeName).serialize(parameter, appendable)
+			appendable.append(''' «parameter.fullyQualifiedName.toString.toFieldName» = ''')
 			if (assignment == null) {
-				appendable.append('''getOrGenerateValue(«dataTypeName».class, "«parameter.fullyQualifiedName»")''')
+				appendable.append("getOrGenerateValue(")
+				parameter.newTypeRef(dataTypeName).serialize(parameter, appendable)			
+				appendable.append('''.class, "«parameter.fullyQualifiedName»")''')
 			} else {
 				val expectedType = typeRefs.getTypeForName(dataTypeName, call)
 				if (!assignment.value.type.type.equals(expectedType.type)) {
-					appendable.append('''new «dataTypeName»(''')
+					appendable.append("new ")
+					parameter.newTypeRef(dataTypeName).serialize(parameter, appendable)			
+					appendable.append("(")
 				}
 				compileAsJavaExpression(assignment.value, appendable, assignment.value.type)
 				if (!assignment.value.type.type.equals(expectedType.type)) {

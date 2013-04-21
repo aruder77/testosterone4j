@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: TDsl SWT-Bot Adaption
 Bundle-SymbolicName: de.msg.xt.mdt.tdsl.swtbot;singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Require-Bundle: org.eclipse.swtbot.eclipse.finder;bundle-version="2.1.1";visibility:=reexport,
+Require-Bundle: org.eclipse.swtbot.eclipse.finder;visibility:=reexport,
  org.eclipse.ui,
  org.eclipse.core.runtime,
  de.msg.xt.mdt.tdsl.base;bundle-version="1.0.0",
