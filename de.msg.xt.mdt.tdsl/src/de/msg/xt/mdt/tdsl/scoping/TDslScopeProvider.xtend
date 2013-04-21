@@ -65,32 +65,32 @@ class TDslScopeProvider extends XbaseScopeProvider {
     
     Logger logger = LoggerFactory::getLogger(typeof(TDslScopeProvider))
     
-	override protected createLocalVarScope(IScope parentScope, LocalVariableScopeContext scopeContext) {
-		if (scopeContext != null && scopeContext.context != null) {
-			val context = scopeContext.context
-			if (context instanceof StatementLine) {
-				val useCaseBlock = EcoreUtil2::getContainerOfType(context, typeof(XBlockExpression))
-				var IScope pScope = parentScope
-				if (scopeContext.canSpawnForContainer())
-					pScope = createLocalVarScope(parentScope, scopeContext.spawnForContainer());
-				
-				val localVars = new ArrayList<XExpression>()
-				val statementLine = EcoreUtil2::getContainerOfType(context, typeof(StatementLine))
-				val indexInBlock = statementLine.indexInParentBlock
-				for (expr : useCaseBlock.expressions.subList(0, indexInBlock)) {
-					val line = expr as StatementLine
-					if (line?.statement instanceof XVariableDeclaration) {
-						localVars.add(line.statement)
-					}
-				}
-				return Scopes::scopeFor(localVars, pScope)
-			} else if (context instanceof UseCase) {
-				
-			}
-		}
-		
-		return super.createLocalVarScope(parentScope, scopeContext)
-	}
+//	override protected createLocalVarScope(IScope parentScope, LocalVariableScopeContext scopeContext) {
+//		if (scopeContext != null && scopeContext.context != null) {
+//			val context = scopeContext.context
+//			if (context instanceof StatementLine) {
+//				val useCaseBlock = EcoreUtil2::getContainerOfType(context, typeof(XBlockExpression))
+//				var IScope pScope = parentScope
+//				if (scopeContext.canSpawnForContainer())
+//					pScope = createLocalVarScope(parentScope, scopeContext.spawnForContainer());
+//				
+//				val localVars = new ArrayList<XExpression>()
+//				val statementLine = EcoreUtil2::getContainerOfType(context, typeof(StatementLine))
+//				val indexInBlock = statementLine.indexInParentBlock
+//				for (expr : useCaseBlock.expressions.subList(0, indexInBlock)) {
+//					val line = expr as StatementLine
+//					if (line?.statement instanceof XVariableDeclaration) {
+//						localVars.add(line.statement)
+//					}
+//				}
+//				return Scopes::scopeFor(localVars, pScope)
+//			} else if (context instanceof UseCase) {
+//				
+//			}
+//		}
+//		
+//		return super.createLocalVarScope(parentScope, scopeContext)
+//	}
     
 //    override IScope createLocalVarScope(Object context,
 //            IScope parentScope) {

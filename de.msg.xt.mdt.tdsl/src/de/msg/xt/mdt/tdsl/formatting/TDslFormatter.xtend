@@ -5,6 +5,10 @@ package de.msg.xt.mdt.tdsl.formatting
 
 import org.eclipse.xtext.formatting.impl.AbstractDeclarativeFormatter
 import org.eclipse.xtext.formatting.impl.FormattingConfig
+import javax.inject.Inject
+import de.msg.xt.mdt.tdsl.services.TDslGrammarAccess
+import org.eclipse.xtext.Keyword
+
 // import com.google.inject.Inject;
 // import de.msg.xt.mdt.tdsl.services.TDslGrammarAccess
 
@@ -18,13 +22,59 @@ import org.eclipse.xtext.formatting.impl.FormattingConfig
  */
 class TDslFormatter extends AbstractDeclarativeFormatter {
 
-//	@Inject extension TDslGrammarAccess
+	@Inject extension TDslGrammarAccess
 	
 	override protected void configureFormatting(FormattingConfig c) {
-// It's usually a good idea to activate the following three statements.
-// They will add and preserve newlines around comments
-//		c.setLinewrap(0, 1, 2).before(SL_COMMENTRule)
-//		c.setLinewrap(0, 1, 2).before(ML_COMMENTRule)
-//		c.setLinewrap(0, 1, 1).after(ML_COMMENTRule)
+		c.setAutoLinewrap(120);
+
+		val access = getGrammarAccess() as TDslGrammarAccess
+		c.setLinewrap(0, 1, 2).before(access.getSL_COMMENTRule());
+		c.setLinewrap(0, 1, 2).before(access.getML_COMMENTRule());
+		c.setLinewrap(0, 1, 1).after(access.getML_COMMENTRule());
+
+		// find common keywords an specify formatting for them
+		for (pair : access.findKeywordPairs("(", ")")) {
+			c.setNoSpace().around(pair.getFirst());
+			c.setNoSpace().before(pair.getSecond());
+		}
+		for (Keyword comma : access.findKeywords(",")) {
+			c.setNoSpace().before(comma);
+		}
+		for (Keyword dot : access.findKeywords(".")) {
+			c.setNoSpace().around(dot);
+		}
+		for (Keyword arrow : access.findKeywords("=>")) {
+			c.setNoLinewrap().before(arrow);
+		}
+		for (Keyword arrow : access.findKeywords("else")) {
+			c.setNoLinewrap().before(arrow);
+		}
+
+		for (pair : grammar.findKeywordPairs(
+				"{", "}")) { //$NON-NLS-1$ //$NON-NLS-2$
+			// a space before the first '{'
+			c.setSpace(" ").before(pair.getFirst()); //$NON-NLS-1$
+			c.setLinewrap().after(pair.getFirst());
+			// indentation between
+			c.setIndentation(pair.getFirst(), pair.getSecond());
+			// and a linewrap before the last '}'
+			c.setLinewrap(1).before(pair.getSecond());
+			c.setLinewrap(1).after(pair.getSecond());
+		}
+
+		c.setLinewrap(2).after(access.getElementRule());
+
+		c.setLinewrap().after(access.getImportRule());
+		c.setLinewrap(2).between(access.getImportRule(),
+				access.getElementRule());
+
+		c.setLinewrap().after(access.getTypeRule());
+		c.setLinewrap().after(access.getEquivalenceClassRule());
+		c.setLinewrap().after(access.getOperationRule());
+		c.setLinewrap().after(access.getActivityOperationRule());
+		c.setLinewrap(2).after(access.getFieldRule());
+		c.setLinewrap().after(access.getOperationMappingRule());
+
+		c.setLinewrap().after(access.getStatementLineRule());
 	}
 }

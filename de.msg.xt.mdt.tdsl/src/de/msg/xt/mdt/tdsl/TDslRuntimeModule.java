@@ -44,12 +44,6 @@ public class TDslRuntimeModule extends
 	}
 
 	@Override
-	@org.eclipse.xtext.service.SingletonBinding(eager = true)
-	public Class<? extends de.msg.xt.mdt.tdsl.validation.TDslJavaValidator> bindTDslJavaValidator() {
-		return de.msg.xt.mdt.tdsl.validation.TDslJavaValidator.class;
-	}
-
-	@Override
 	public Class<? extends IDefaultResourceDescriptionStrategy> bindIDefaultResourceDescriptionStrategy() {
 		return TDslDefaultResourceDescriptionStrategy.class;
 	}

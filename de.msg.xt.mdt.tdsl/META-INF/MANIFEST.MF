@@ -19,6 +19,8 @@ Require-Bundle: org.eclipse.xtext;visibility:=reexport,
  org.eclipse.xtext.xbase.lib;visibility:=reexport,
  org.junit;bundle-version="4.10.0",
  org.apache.commons.logging;bundle-version="1.0.4",
+ org.eclipse.xtend.lib,
+ com.google.guava,
  de.msg.xt.mdt.tdsl.base;bundle-version="1.0.0";visibility:=reexport,
  org.slf4j.api;bundle-version="1.7.2"
 Import-Package: org.apache.log4j,

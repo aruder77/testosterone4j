@@ -3,6 +3,21 @@
 */
 package de.msg.xt.mdt.tdsl.ui.quickfix
 
+import de.msg.xt.mdt.tdsl.jvmmodel.MetaModelExtensions
+import de.msg.xt.mdt.tdsl.tDsl.Field
+import de.msg.xt.mdt.tdsl.tDsl.Operation
+import de.msg.xt.mdt.tdsl.tDsl.OperationMapping
+import de.msg.xt.mdt.tdsl.tDsl.TDslFactory
+import de.msg.xt.mdt.tdsl.validation.TDslValidator
+import java.util.HashMap
+import javax.inject.Inject
+import org.eclipse.emf.ecore.EObject
+import org.eclipse.xtext.ui.editor.model.edit.IModificationContext
+import org.eclipse.xtext.ui.editor.quickfix.Fix
+import org.eclipse.xtext.ui.editor.quickfix.IssueResolutionAcceptor
+import org.eclipse.xtext.validation.Issue
+import org.eclipse.xtext.xbase.ui.quickfix.XbaseQuickfixProvider
+
 //import org.eclipse.xtext.ui.editor.quickfix.Fix
 //import org.eclipse.xtext.ui.editor.quickfix.IssueResolutionAcceptor
 //import org.eclipse.xtext.validation.Issue
@@ -12,15 +27,60 @@ package de.msg.xt.mdt.tdsl.ui.quickfix
  *
  * see http://www.eclipse.org/Xtext/documentation.html#quickfixes
  */
-class TDslQuickfixProvider extends org.eclipse.xtext.xbase.ui.quickfix.XbaseQuickfixProvider {
+class TDslQuickfixProvider extends XbaseQuickfixProvider {
 
-//	@Fix(MyDslValidator::INVALID_NAME)
-//	def capitalizeName(Issue issue, IssueResolutionAcceptor acceptor) {
-//		acceptor.accept(issue, 'Capitalize name', 'Capitalize the name.', 'upcase.png') [
-//			context |
-//			val xtextDocument = context.xtextDocument
-//			val firstLetter = xtextDocument.get(issue.offset, 1)
-//			xtextDocument.replace(issue.offset, 1, firstLetter.toUpperCase)
-//		]
-//	}
+	@Inject
+	MetaModelExtensions metaModelExtensions;
+
+	@Fix(TDslValidator::UNSUFFICIENT_OPERATION_MAPPINGS)
+	def capitalizeName(Issue issue,
+			IssueResolutionAcceptor acceptor) {
+		acceptor.accept(
+				issue,
+				"Insert missing operation mappings",
+				"Insert all necessary operation mappings using default datatypes.",
+				"upcase.png") [EObject element,
+							IModificationContext context |
+						val field = element as Field
+						val controlOperations = field.getControl()
+								.getOperations();
+						val opMappings = new HashMap<Operation, OperationMapping>();
+						for (opMapping : field.getOperations()) {
+							opMappings.put(opMapping.getName(), opMapping);
+						}
+						for (Operation op : controlOperations) {
+							if (!opMappings.containsKey(op)) {
+								val factory = TDslFactory::eINSTANCE;
+								val mapping = factory.createOperationMapping();
+								mapping.setName(op);
+								mapping.setDataType(metaModelExtensions
+									.defaultDataType(field, op.getReturnType()));
+								val params = op.getParams();
+								for (param : params) {
+									val dtMapping = factory
+										.createDataTypeMapping();
+									dtMapping.setName(param);
+									dtMapping.setDatatype(metaModelExtensions
+										.defaultDataType(field, param.getType()));
+									mapping.getDataTypeMappings().add(dtMapping);
+								}
+								field.getOperations().add(mapping);
+							}
+						}
+					]
+	}
+
+	@Fix(TDslValidator::CONTROL_NOT_IN_TOOLKIT)
+	def addControlToToolkit(Issue issue,
+			IssueResolutionAcceptor acceptor) {
+		val label = "Add control '" + issue.data.get(0) + "' to toolkit";
+		acceptor.accept(issue, label, label, "") [EObject element, IModificationContext context |
+				val field = element as Field;
+				val act = metaModelExtensions.parentActivity(field);
+				val toolkit = metaModelExtensions.getToolkit(act);
+				if (toolkit != null) {
+					toolkit.getControls().add(field.getControl());
+				}
+			]
+	}
 }
