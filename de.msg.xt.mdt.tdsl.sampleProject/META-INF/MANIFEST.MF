@@ -8,6 +8,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  de.msg.xt.mdt.tdsl.swtbot;bundle-version="1.0.0",
  de.msg.xt.mdt.tdsl.base;bundle-version="1.0.0",
- de.msg.xt.mdt.tdsl.basictypes;bundle-version="1.0.0"
+ de.msg.xt.mdt.tdsl.basictypes;bundle-version="1.0.0",
+ com.google.inject;bundle-version="3.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
