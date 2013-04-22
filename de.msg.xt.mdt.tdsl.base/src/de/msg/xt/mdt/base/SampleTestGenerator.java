@@ -1,6 +1,5 @@
 package de.msg.xt.mdt.base;
 
-import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -41,11 +40,6 @@ public class SampleTestGenerator implements Generator {
 	public <E extends Runnable> List<E> generate(final Class<E> clazz) {
 		final List<E> testCases = new ArrayList<E>();
 		int idx = 1;
-		try {
-			protocol.open();
-		} catch (final IOException e1) {
-			e1.printStackTrace();
-		}
 		while (!unsatisfiedCoverageIds.isEmpty() || testCases.isEmpty()) {
 			try {
 				final Constructor<E> constructor = clazz.getConstructor(Generator.class);
@@ -74,7 +68,6 @@ public class SampleTestGenerator implements Generator {
 				e.printStackTrace();
 			}
 		}
-		protocol.close();
 		return testCases;
 	}
 

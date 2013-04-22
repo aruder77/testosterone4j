@@ -1,7 +1,5 @@
 package de.msg.xt.mdt.base;
 
-import java.io.File;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.logging.Logger;
 
@@ -12,36 +10,26 @@ public class SimpleTestProtocol implements ITestProtocol {
 	private PrintWriter printWriter;
 
 	private static final Logger LOG = Logger.getLogger(SimpleTestProtocol.class.getName());
+	private static final Logger GENERATION_LOG = Logger.getLogger("GenerationLog");
 
 	public SimpleTestProtocol(final String testId) {
 		this.testId = testId;
 	}
 
 	@Override
-	public void open() throws IOException {
-		printWriter = new PrintWriter(new File(testId + ".txt"));
+	public void newTest(final String identifier, final boolean generationLog) {
+		log("\n==================================================================================", generationLog);
+		log("Testcase " + testId + " : " + identifier + "\n", generationLog);
 	}
 
 	@Override
-	public void newTest(final String identifier) {
-		log("\n==================================================================================");
-		log("Testcase " + testId + " : " + identifier + "\n");
-	}
-
-	@Override
-	public void close() {
-		printWriter.close();
-		printWriter = null;
-	}
-
-	@Override
-	public void append(final String str) {
-		log(str);
+	public void append(final String str, final boolean generationLog) {
+		log(str, generationLog);
 	}
 
 	@Override
 	public void appendControlOperationCall(final String activityName, final String fieldName, final String fieldControlName,
-			final String operationName, final String returnValue, final String... parameter) {
+			final String operationName, final String returnValue, final boolean generationLog, final String... parameter) {
 		final StringBuffer sb = new StringBuffer();
 		sb.append("[").append(activityName).append("]     ");
 
@@ -68,12 +56,38 @@ public class SimpleTestProtocol implements ITestProtocol {
 
 	@Override
 	public void appendActivityOperationCall(final String activityName, final String operationName, final String returnValue,
-			final String... parameter) {
+			final boolean generationLog, final String... parameter) {
 		appendControlOperationCall(activityName, null, null, operationName, returnValue, parameter);
 	}
 
-	private void log(final String str) {
-		LOG.info(str + "\n");
+	private void log(final String str, final boolean generationLog) {
+		if (generationLog) {
+			GENERATION_LOG.info(str + "\n");
+		} else {
+			LOG.info(str + "\n");
+		}
+	}
+
+	@Override
+	public void newTest(final String identifier) {
+		newTest(identifier, false);
+	}
+
+	@Override
+	public void append(final String str) {
+		append(str, false);
+	}
+
+	@Override
+	public void appendControlOperationCall(final String activityName, final String fieldName, final String fieldControlName,
+			final String operationName, final String returnValue, final String... parameter) {
+		appendControlOperationCall(activityName, fieldName, fieldControlName, operationName, returnValue, false, parameter);
+	}
+
+	@Override
+	public void appendActivityOperationCall(final String activityName, final String operationName, final String returnValue,
+			final String... parameter) {
+		appendActivityOperationCall(activityName, operationName, returnValue, false, parameter);
 	}
 
 }
