@@ -304,19 +304,30 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 				} else {
 					operation.newTypeRef(typeof(Object)).serialize(operation, it)
 					it.append(''' o = contextAdapter.«operation.name»(«FOR param : operation.params SEPARATOR ', '»«param.name».getValue()«ENDFOR»);''').newLine
-					it.append('''
-   					    «IF !voidReturn»
-   					    	«nextActivityClass» nextActivity = null;
-   					    	if (o instanceof «nextActivityClass») {
-   					    		nextActivity = («nextActivityClass»)o;
-   					    	} else {
-   					    		«nextActivityClass»Adapter adapter = injector.getInstance(«nextActivityClass»Adapter.class);
-   					    		adapter.setContext(o);
-   					    		nextActivity = new «nextActivityClass»(adapter);
-   					    	}
-   					    	return nextActivity;
-   				    	«ENDIF»
-   				    ''')
+					if (!voidReturn) {
+						operation.newTypeRef(nextActivityClass).serialize(operation, it)
+						it.append('''
+							 nextActivity = null;
+							if (o instanceof ''')
+						operation.newTypeRef(nextActivityClass).serialize(operation, it)
+						it.append(") {").increaseIndentation.newLine
+						it.append("nextActivity = (")
+						operation.newTypeRef(nextActivityClass).serialize(operation, it)
+						it.append(")o;").decreaseIndentation.newLine
+						it.append("} else {").increaseIndentation.newLine
+						operation.newTypeRef(nextActivityClass + "Adapter").serialize(operation, it)
+						it.append(" adapter = injector.getInstance(")
+						operation.newTypeRef(nextActivityClass + "Adapter").serialize(operation, it)
+						it.append('''
+							.class);
+							adapter.setContext(o);
+							nextActivity = new ''')
+						operation.newTypeRef(nextActivityClass).serialize(operation, it)
+						it.append("(adapter);").decreaseIndentation.newLine
+						it.append('''
+							}
+							return nextActivity;''')					
+					}
 				}
    			]
    		]
@@ -524,9 +535,13 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
                    		test.newTypeRef(typeof(Tag)).createArrayType.serialize(test, it)
                         it.append(''' {«FOR tag : test.excludeTags SEPARATOR ","»«tag.enumLiteral_FQN»«ENDFOR»});''').newLine
                     }
-                    it.append('''
-                        LOCATOR.beforeTest();
-                        return testHelper.readOrGenerateTestCases(TEST_CASES_SERIALIZATION, generator, «test.useCase?.class_fqn».class);''')
+                    if (test.useCase?.class_fqn != null) {
+                    	it.append('''
+                        	LOCATOR.beforeTest();
+                        	return testHelper.readOrGenerateTestCases(TEST_CASES_SERIALIZATION, generator, ''')
+                    	test.newTypeRef(test.useCase.class_fqn).serialize(test, it)
+                    	it.append(".class);")                   
+                    }
    				]
    			]
    			
@@ -567,11 +582,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				body = [
    					it.append('''
                         this.protocol.newTest(String.valueOf(this.testNumber));
-                        try {
-                        	this.useCase.run();
-                        } finally {
-                        	this.protocol.close();
-                        }''')
+                        this.useCase.run();''')
    				]
    			]
    		])

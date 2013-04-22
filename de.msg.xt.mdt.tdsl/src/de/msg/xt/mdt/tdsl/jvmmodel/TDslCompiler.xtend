@@ -190,7 +190,8 @@ class TDslCompiler extends XbaseCompiler {
 	}
     
     def getVariableNameForOperationCallParameter(OperationCall call, DataTypeMapping mapping) {
-    	call?.fullyQualifiedName?.toString?.toFieldName + "_" + mapping?.fullyQualifiedName?.toString?.toFieldName
+    	val name = call?.fullyQualifiedName?.toString
+    	mapping?.name?.name + name?.substring(name?.lastIndexOf("@") + 1)?.toFieldName
     }
     
 	def generateParameters(OperationCall call, ITreeAppendable appendable) { 
