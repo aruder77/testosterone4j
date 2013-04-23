@@ -801,6 +801,13 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 				]
 			]
 			
+			members += dataType.toMethod("getTags", dataType.newTypeRef(typeof(Tag)).createArrayType) [
+				it.body = [
+					it.append('''
+						return getEquivalenceClass().getTags();''')
+				]
+			]
+			
 			members += dataType.toMethod("getEquivalenceClassEnum", dataType.newTypeRef(typeof(Class), newTypeRef(equivalenceClass))) [
 				it.body = [
 					it.append('''
