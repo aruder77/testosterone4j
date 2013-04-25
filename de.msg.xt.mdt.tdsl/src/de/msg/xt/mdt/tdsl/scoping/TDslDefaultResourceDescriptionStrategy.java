@@ -3,7 +3,9 @@ package de.msg.xt.mdt.tdsl.scoping;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.xtext.EcoreUtil2;
 import org.eclipse.xtext.naming.QualifiedName;
 import org.eclipse.xtext.resource.EObjectDescription;
 import org.eclipse.xtext.resource.IDefaultResourceDescriptionStrategy;
@@ -23,11 +25,9 @@ public class TDslDefaultResourceDescriptionStrategy extends
 		if (eObject instanceof DataType) {
 			DataType dt = (DataType) eObject;
 			Map<String, String> userData = new HashMap<String, String>();
-			if (dt.getType() != null
-					&& getQualifiedNameProvider().getFullyQualifiedName(
-							dt.getType()) != null) {
-				userData.put("type", getQualifiedNameProvider()
-						.getFullyQualifiedName(dt.getType()).toString());
+			if (dt.getType() != null) {
+				URI typeUri = EcoreUtil2.getURI(dt.getType());
+				userData.put("type", typeUri.toString());
 			}
 			userData.put("isDefault", dt.isDefault() ? "true" : "false");
 			QualifiedName qualifiedName = getQualifiedNameProvider()

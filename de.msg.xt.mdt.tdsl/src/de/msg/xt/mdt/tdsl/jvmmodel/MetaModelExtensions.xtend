@@ -159,7 +159,9 @@ class MetaModelExtensions {
 			val objectDescriptions = scope.allElements
 			for (element : objectDescriptions) {
 				val isDefault = "true".equals(element?.getUserData("isDefault"));
-				val isCorrectType = element?.getUserData("type")?.equals(type.fullyQualifiedName?.toString);
+				val desiredTypeUri = EcoreUtil2::getURI(type).toString
+				val elementUri = element?.getUserData("type")
+				val isCorrectType = elementUri?.equals(desiredTypeUri);
 				if (isDefault && isCorrectType)
 					return element?.EObjectOrProxy as DataType
 			}
