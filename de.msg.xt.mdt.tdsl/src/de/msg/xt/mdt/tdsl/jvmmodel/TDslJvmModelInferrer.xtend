@@ -604,7 +604,12 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				body = [
    					it.append('''
                         this.protocol.newTest(String.valueOf(this.testNumber));
-                        this.useCase.run();''')
+                        try {
+                        	this.useCase.run();
+                        	this.protocol.append("Test OK");
+                        } finally {
+                        	this.protocol.appendSummary();
+                        }''')
    				]
    			]
    		])
