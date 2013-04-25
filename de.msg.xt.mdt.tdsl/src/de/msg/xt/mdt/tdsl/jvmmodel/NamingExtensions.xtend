@@ -17,6 +17,7 @@ import org.eclipse.xtext.common.types.JvmTypeReference
 import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder
 import de.msg.xt.mdt.base.AbstractActivity
 import org.eclipse.emf.ecore.EObject
+import de.msg.xt.mdt.tdsl.tDsl.PackageDeclaration
 
 class NamingExtensions {
 	
@@ -128,6 +129,10 @@ class NamingExtensions {
 	
 
 	// PackageDeclaration
+	
+	def String predicateClass_fqn(PackageDeclaration pack) {
+		pack.fqn + ".Predicates"
+	}
 	
 	// SUT
 	

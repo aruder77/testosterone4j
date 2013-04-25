@@ -64,6 +64,9 @@ import de.msg.xt.mdt.base.util.TDslHelper
 import java.util.Iterator
 import javax.xml.bind.annotation.XmlElement
 import java.util.Stack
+import de.msg.xt.mdt.tdsl.tDsl.Predicate
+import de.msg.xt.mdt.tdsl.tDsl.Element
+import de.msg.xt.mdt.tdsl.tDsl.Predicate
 
 /**
  * <p>Infers a JVM model from the source model.</p> 
@@ -96,8 +99,27 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 	
 	def dispatch void infer(PackageDeclaration pack, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
 		
-		for (element : pack.elements) {
+		for (element : pack.elements.filter([!(it instanceof Predicate)])) {
 			element.infer(acceptor, isPreIndexingPhase)
+		}
+		
+		val predicates = pack.elements.filter(typeof(Predicate))
+		if (!predicates.empty) { 
+			acceptor.accept(pack.toClass(pack.predicateClass_fqn)).initializeLater [
+				
+				for (predicate : predicates) {
+					members += predicate.toMethod(predicate.name, predicate.newTypeRef(typeof(Boolean))) [
+						parameters += predicate.toParameter("fieldTags", predicate.newTypeRef(typeof(Tag)).createArrayType)
+						parameters += predicate.toParameter("equivClassTags", predicate.newTypeRef(typeof(Tag)).createArrayType)
+						
+						it.body = [
+							it.append('''
+								return false;
+							''')
+						]
+					]
+				}
+			]
 		}
 	}
 
@@ -815,6 +837,13 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 				]
 			]
    		])
+   	}
+   	
+   	
+   	def dispatch void infer(Predicate predicate, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
+   		if (predicate?.name != null) {
+   			
+   		}
    	}
    	
    	def dispatch void infer(UseCase useCase, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {

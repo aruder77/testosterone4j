@@ -46,6 +46,5 @@ public class SampleTest {
     public void test() {
         this.protocol.newTest(String.valueOf(this.testNumber));
         this.useCase.run();
-        this.protocol.close();
     }
 }

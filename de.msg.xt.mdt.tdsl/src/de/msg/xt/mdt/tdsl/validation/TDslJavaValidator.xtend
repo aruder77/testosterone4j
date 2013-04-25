@@ -16,6 +16,7 @@ import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder
 import org.eclipse.xtext.xbase.typing.ITypeProvider
 import de.msg.xt.mdt.tdsl.tDsl.Activity
 import de.msg.xt.mdt.tdsl.tDsl.TDslPackage
+import de.msg.xt.mdt.tdsl.tDsl.Predicate
 
 class TDslJavaValidator extends AbstractTDslJavaValidator {
 	
@@ -63,14 +64,14 @@ class TDslJavaValidator extends AbstractTDslJavaValidator {
 	
 	@Check
 	def checkControlsInToolkit(Field field) {
-		if(!field.parentActivity.toolkit.controls.contains(field.control)) {
+		if(!field.parentActivity.toolkit.controls.contains(field.control) && field.control.name != null) {
 			error ("The control '" + field.control.name + "' is not included in the current toolkit!", TDslPackage$Literals::FIELD__CONTROL, CONTROL_NOT_IN_TOOLKIT, field.control.name)
 		}
 	}
 	
 	@Check
 	override checkImplicitReturn(XExpression expr) {
-		if (expr.eContainer() instanceof ActivityOperation) {
+		if (expr.eContainer() instanceof ActivityOperation || expr.eContainer instanceof Predicate) {
 			return;
 		}
 		super.checkImplicitReturn(expr);

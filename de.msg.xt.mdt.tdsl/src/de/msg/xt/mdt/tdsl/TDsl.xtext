@@ -23,7 +23,7 @@ FqnWithWildCard:
 ;
     
 Element:
-	Activity | UseCase | Control | Type | DataType | Test | TagsDeclaration | Toolkit
+	Activity | UseCase | Control | Type | DataType | Test | TagsDeclaration | Toolkit | Predicate
 ;
 
 Toolkit:
@@ -40,6 +40,10 @@ DataType:
 	'datatype' name=ID (default?='default' 'for')? 'type' type=[Type|FQN] '{'
 		(classes+=EquivalenceClass)+
 	'}'
+;
+
+Predicate:
+	'predicate' name=ID body=XClosure
 ;
 
 EquivalenceClass:

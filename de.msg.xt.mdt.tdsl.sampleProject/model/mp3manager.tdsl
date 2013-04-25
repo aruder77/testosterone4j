@@ -2,6 +2,8 @@ package mp3manager for Stdtoolkit {
 	import de.msg.xt.mdt.tdsl.basictypes.*
 	import mp3manager.datatypes.*
 	import mp3manager.activities.*
+	
+	predicate valid [ de.msg.xt.mdt.base.Tag[]  tags1, de.msg.xt.mdt.base.Tag[]  tags2 | true ]
 
 	useCase OpenView(StringDT id) initial MainWindow {
 		#openView
@@ -21,7 +23,7 @@ package mp3manager for Stdtoolkit {
 		#comment.setText
 		var enteredComment = generatedValue(str)
 		var errorLabel = #errorMarker.getText
-		if(enteredComment.equivalenceClass.equals(StringDTEquivalenceClass:: emptyString)) {
+		if(enteredComment.getTags().contains(de::msg::xt::mdt::tdsl::basictypes::Tags::Empty)) {
 			assert [ org::junit::Assert:: assertEquals(ErrorStringDTEquivalenceClass:: missingValue.getValue(),
 			errorLabel.getValue()) ]
 		} else {
