@@ -5,8 +5,7 @@ Bundle-SymbolicName: de.msg.xt.mdt.tdsl.base;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- org.junit;bundle-version="4.10.0";visibility:=reexport,
- org.apache.log4j;bundle-version="1.2.13";visibility:=reexport,
+ org.apache.log4j;visibility:=reexport,
  org.junit4;bundle-version="4.8.1";visibility:=reexport,
  com.google.inject;bundle-version="3.0.0";visibility:=reexport,
  javax.inject;bundle-version="1.0.0"
