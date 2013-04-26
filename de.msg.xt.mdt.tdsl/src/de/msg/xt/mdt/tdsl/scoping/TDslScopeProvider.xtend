@@ -245,6 +245,7 @@ class TDslScopeProvider extends XbaseScopeProvider {
 	}			
 	
 	def dispatch List<Activity> determineNextActivities(ActivityOperationCall call) {
+	System::out.println("DetermineNextActivities for: " + EcoreUtil2::getURI(call).toString)
 		if (call.operation?.nextActivities.empty) {
 			Collections::singletonList(call.operation.activity)
 		} else {
