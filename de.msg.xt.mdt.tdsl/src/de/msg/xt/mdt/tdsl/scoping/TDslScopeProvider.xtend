@@ -207,34 +207,38 @@ class TDslScopeProvider extends XbaseScopeProvider {
 		}
 	}
 	
-	def IEObjectDescription getDescriptionForObject(EObject eObject, EReference reference) {
+	def IEObjectDescription getDescriptionForObject(EObject eObject, Resource resource) {
 		val activityURI = EcoreUtil2::getURI(eObject)
-		val activityDescriptions = getDescriptionsFromURI(eObject.eResource, eObject.eClass, activityURI.toString)
+		val activityDescriptions = getDescriptionsFromURI(resource, eObject.eClass, activityURI.toString)
 		activityDescriptions.allElements.head		
 	}
 	
-	def IEObjectDescription getDescriptionForActivity(Activity activity) {
-		getDescriptionForObject(activity, TDslPackage$Literals::CONDITIONAL_NEXT_ACTIVITY__NEXT)
+	def IEObjectDescription getDescriptionForActivity(Activity activity, Resource resource) {
+		getDescriptionForObject(activity, resource)
 	}
 	
 	def IScope readActivityOperationsFromObjectDescription(Activity activity, Resource resource) { 
-		val activityDescription = getDescriptionForActivity(activity)
-		val operationsUris = activityDescription.getUserData("operations")
+		val activityDescription = getDescriptionForActivity(activity, resource)
+		val operationsUris = activityDescription.getUserData("operationUris")
 		val operationDescriptions = getDescriptionsFromURI(resource, TDslPackage$Literals::ACTIVITY_OPERATION, operationsUris)
 		operationDescriptions	
 	}
 
 	def IScope readOperationsFromObjectDescription(Activity activity, Resource resource) {
-		val activityDescription = getDescriptionForActivity(activity)
-		val fieldUris = activityDescription.getUserData("fields")
+		val activityDescription = getDescriptionForActivity(activity, resource)
+		val fieldUris = activityDescription.getUserData("fieldUris")
 		val fieldScope = getDescriptionsFromURI(resource, TDslPackage$Literals::FIELD, fieldUris)
 		val operationScopedElements = new ArrayList<IEObjectDescription>
 		for (fieldDescription : fieldScope.allElements) {
-			val fieldOperationUris = fieldDescription.getUserData("operations")
-			val operationDescriptions = getDescriptionsFromURI(resource, TDslPackage$Literals::OPERATION, fieldOperationUris)
-			for (opDesc: operationDescriptions.allElements) {
-				val name = "#" + opDesc.name.lastSegment
-				operationScopedElements.add(EObjectDescription::create(name, opDesc.EObjectOrProxy))
+			val operationMappingUris = fieldDescription.getUserData("operationMappingUris")
+			if (operationMappingUris == null) {
+				System::out.println("WARNING! OperationMappings null for field " + fieldDescription.qualifiedName)
+			} else {
+				val operationMappingDescriptions = getDescriptionsFromURI(resource, TDslPackage$Literals::OPERATION_MAPPING, operationMappingUris)
+				for (opMapDesc: operationMappingDescriptions.allElements) {
+					val name = "#" + opMapDesc.getUserData("operationName")
+					operationScopedElements.add(EObjectDescription::create(name, opMapDesc.EObjectOrProxy))
+				}
 			}
 		}	
 		new SimpleScope(operationScopedElements)
@@ -282,12 +286,15 @@ class TDslScopeProvider extends XbaseScopeProvider {
 		]
 	}
 	
-	def List<Activity> getNextActivitiesFromDescription(EObject eObj, EReference reference) {
+	def List<Activity> getNextActivitiesFromDescription(EObject eObj, Resource resource, EReference reference) {
 		val operationProxy = eObj.eGet(reference, false) as EObject
 		val operationUri = EcoreUtil2::getURI(operationProxy)
-		val operationScope = getDescriptionsFromURI(eObj.eResource, reference.EReferenceType, operationUri.toString)
+		val operationScope = getDescriptionsFromURI(resource, reference.EReferenceType, operationUri.toString)
 		val operationDescription = operationScope.allElements.head
-		val nextActivityUriStr = operationDescription.getUserData("nextActivityUri")
+		if (operationDescription == null) {
+			System::out.println("WARNING! Operation with URI " + operationUri + " not found in scope!!!")
+		}
+		val nextActivityUriStr = operationDescription.getUserData("nextActivityUris")
 		val nextActivity = TDslFactory::eINSTANCE.createActivity
 		val nextActivityProxy = (nextActivity as InternalEObject)
 		nextActivityProxy.eSetProxyURI(URI::createURI(nextActivityUriStr))
@@ -295,11 +302,11 @@ class TDslScopeProvider extends XbaseScopeProvider {
 	}
 
 	def dispatch List<Activity> determineExplicitNextActivities(OperationCall call) {
-		getNextActivitiesFromDescription(call, TDslPackage$Literals::OPERATION_CALL__OPERATION)		
+		getNextActivitiesFromDescription(call, call.eResource, TDslPackage$Literals::OPERATION_CALL__OPERATION)		
 	}			
 	
 	def dispatch List<Activity> determineExplicitNextActivities(ActivityOperationCall call) {
-		getNextActivitiesFromDescription(call, TDslPackage$Literals::ACTIVITY_OPERATION_CALL__OPERATION)		
+		getNextActivitiesFromDescription(call, call.eResource, TDslPackage$Literals::ACTIVITY_OPERATION_CALL__OPERATION)		
 	}			
 	
 	def dispatch List<Activity> determineExplicitNextActivities(SubUseCaseCall call) {
@@ -334,7 +341,10 @@ class TDslScopeProvider extends XbaseScopeProvider {
 	}			
 	
 	def dispatch List<Activity> determineExplicitNextActivities(XExpression expr) {
-		expr.activitySwitchingOperation.determineExplicitNextActivities
+		if (expr.containsActivitySwitchingOperation)
+			expr.activitySwitchingOperation.determineExplicitNextActivities
+		else 
+			Collections::emptyList
 	}
 	
 	def lastActivitySwitchingExpression(XExpression expr) {

@@ -42,17 +42,18 @@ public class TDslDefaultResourceDescriptionStrategy extends DefaultResourceDescr
 				final ConditionalNextActivity condNextAct = operation.getNextActivities().get(0);
 				final Activity nextActivity = condNextAct.getNext();
 				final URI nextActivityUri = EcoreUtil2.getURI(nextActivity);
-				userData.put("nextActivity", nextActivityUri.toString());
+				userData.put("nextActivityUris", nextActivityUri.toString());
 			}
 			createDescription(acceptor, operation, userData);
 		} else if (eObject instanceof OperationMapping) {
 			final OperationMapping operation = (OperationMapping) eObject;
 			final Map<String, String> userData = new HashMap<String, String>();
+			userData.put("operationName", operation.getName().getName());
 			if (!operation.getNextActivities().isEmpty()) {
 				final ConditionalNextActivity condNextAct = operation.getNextActivities().get(0);
 				final Activity nextActivity = condNextAct.getNext();
 				final URI nextActivityUri = EcoreUtil2.getURI(nextActivity);
-				userData.put("nextActivity", nextActivityUri.toString());
+				userData.put("nextActivityUris", nextActivityUri.toString());
 			}
 			createDescription(acceptor, operation, userData);
 		} else if (eObject instanceof Activity) {
