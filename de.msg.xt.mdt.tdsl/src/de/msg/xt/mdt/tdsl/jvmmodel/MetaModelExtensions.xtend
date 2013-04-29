@@ -174,6 +174,42 @@ class MetaModelExtensions {
 	
 	// XExpression
 	
+	def Integer getIndexInParentBlock(XExpression expr) {
+		if (expr == null) {
+			return -1
+		}
+		var EObject currentExpr = expr
+		var parent = expr.eContainer
+		while (!(parent instanceof XBlockExpression) && parent != null) {
+			currentExpr = parent
+			parent = parent.eContainer
+		}
+		if (parent == null) {
+			return -1
+		}
+		val index = (parent as XBlockExpression).expressions.indexOf(currentExpr)
+		return index
+	}
+	
+	def XExpression precedingExpression(XExpression expr) {
+		if (expr == null)
+			return null
+		var XExpression lastStatement
+		val exprBlock = expr.block
+		val index = expr.indexInParentBlock
+		if (index > 0) {
+			lastStatement = (exprBlock?.expressions?.get(index - 1) as StatementLine)?.statement
+		} else {
+			val parentIndex = exprBlock?.indexInParentBlock
+			if (parentIndex == null || parentIndex == -1) {
+				return null
+			}
+			val parentBlock = EcoreUtil2::getContainerOfType(exprBlock?.eContainer, typeof(XBlockExpression))
+			return parentBlock?.expressions?.get(parentIndex)?.precedingExpression
+		}
+		return lastStatement			
+	}
+	
 	def XExpression lastExpressionWithNextActivity(XExpression expr) {
 		if (expr == null)
 			return null
@@ -196,23 +232,6 @@ class MetaModelExtensions {
 		return lastStatement	
 	}
 		
-	def Integer getIndexInParentBlock(XExpression expr) {
-		if (expr == null) {
-			return -1
-		}
-		var EObject currentExpr = expr
-		var parent = expr.eContainer
-		while (!(parent instanceof XBlockExpression) && parent != null) {
-			currentExpr = parent
-			parent = parent.eContainer
-		}
-		if (parent == null) {
-			return -1
-		}
-		val index = (parent as XBlockExpression).expressions.indexOf(currentExpr)
-		return index
-	}
-	
 	def dispatch boolean containsActivitySwitchingOperation(OperationCall call) {
 		true
 	}

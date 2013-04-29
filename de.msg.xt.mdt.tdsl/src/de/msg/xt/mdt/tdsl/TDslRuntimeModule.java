@@ -13,6 +13,7 @@ import de.msg.xt.mdt.tdsl.generator.TDslJvmModelGenerator;
 import de.msg.xt.mdt.tdsl.jvmmodel.TDslCompiler;
 import de.msg.xt.mdt.tdsl.jvmmodel.TDslQualifiedNameProvider;
 import de.msg.xt.mdt.tdsl.scoping.TDslDefaultResourceDescriptionStrategy;
+import de.msg.xt.mdt.tdsl.scoping.TDslGlobalScopeProvider;
 import de.msg.xt.mdt.tdsl.scoping.TDslScopeProvider;
 import de.msg.xt.mdt.tdsl.typeprovider.TDslTypeProvider;
 
@@ -59,4 +60,10 @@ public class TDslRuntimeModule extends
 	public Class<? extends IDefaultResourceDescriptionStrategy> bindIDefaultResourceDescriptionStrategy() {
 		return TDslDefaultResourceDescriptionStrategy.class;
 	}
+
+	@Override
+	public Class<? extends org.eclipse.xtext.scoping.IGlobalScopeProvider> bindIGlobalScopeProvider() {
+		return TDslGlobalScopeProvider.class;
+	}
+
 }
