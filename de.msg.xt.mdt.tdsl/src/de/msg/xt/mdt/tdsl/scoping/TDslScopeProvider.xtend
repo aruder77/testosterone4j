@@ -43,6 +43,7 @@ import com.google.common.collect.Iterables
 import java.util.Collection
 import org.eclipse.xtext.resource.IEObjectDescription
 import org.eclipse.emf.ecore.EClass
+import org.eclipse.xtext.util.CancelIndicator
 
 class TDslScopeProvider extends XbaseScopeProvider {
 	
@@ -127,28 +128,17 @@ class TDslScopeProvider extends XbaseScopeProvider {
 			}
 		} else if (reference == TDslPackage::eINSTANCE.operationCall_Operation || reference == TDslPackage::eINSTANCE.activityOperationCall_Operation) {
 			val XExpression opCall = context as XExpression
-			var Activity initialActivity = determineInitialActivity(opCall)
-			var XExpression lastExpression = opCall.lastActivitySwitchingExpression
-			
-			if (lastExpression == null) {
-				if (reference == TDslPackage::eINSTANCE.operationCall_Operation) {
-					initialActivity.fieldOperations.calculatesScopes					
-				} else {
-					Scopes::scopeFor(initialActivity.allOperations, [QualifiedName::create('#' + it.name)], IScope::NULLSCOPE)
-				}
-			} else {
+			val nextActivities = opCall.currentActivities
 				if (reference == TDslPackage::eINSTANCE.operationCall_Operation) {				
 					val operations = new ArrayList<OperationMapping>
-					val nextActivities = lastExpression.determineExplicitNextActivities
 					val scopedNextFieldOperations = new ArrayList<IEObjectDescription>
-					for (activity : lastExpression.determineExplicitNextActivities) {
+					for (activity : nextActivities) {
 						val scope = activity.readOperationsFromObjectDescription(context.eResource)
 						scopedNextFieldOperations.addAll(scope.allElements)
 					}
 					new SimpleScope(scopedNextFieldOperations)
 				} else {
 					val operations = new ArrayList<EObjectDescription>
-					val nextActivities = lastExpression.determineExplicitNextActivities
 					val scopedNextActivities = new ArrayList<IEObjectDescription>
 					for (activity : nextActivities) {
 						val scope = activity.readActivityOperationsFromObjectDescription(context.eResource)
@@ -159,7 +149,6 @@ class TDslScopeProvider extends XbaseScopeProvider {
 					}
 					new SimpleScope(scopedNextActivities, false)
 				}
-			}
 		} else if (reference == TDslPackage::eINSTANCE.operationMapping_Name) {
 			var Field field 
 			if (context instanceof OperationMapping) {
@@ -213,19 +202,15 @@ class TDslScopeProvider extends XbaseScopeProvider {
 		activityDescriptions.allElements.head		
 	}
 	
-	def IEObjectDescription getDescriptionForActivity(Activity activity, Resource resource) {
-		getDescriptionForObject(activity, resource)
-	}
-	
 	def IScope readActivityOperationsFromObjectDescription(Activity activity, Resource resource) { 
-		val activityDescription = getDescriptionForActivity(activity, resource)
+		val activityDescription = getDescriptionForObject(activity, resource)
 		val operationsUris = activityDescription.getUserData("operationUris")
 		val operationDescriptions = getDescriptionsFromURI(resource, TDslPackage$Literals::ACTIVITY_OPERATION, operationsUris)
 		operationDescriptions	
 	}
 
 	def IScope readOperationsFromObjectDescription(Activity activity, Resource resource) {
-		val activityDescription = getDescriptionForActivity(activity, resource)
+		val activityDescription = getDescriptionForObject(activity, resource)
 		val fieldUris = activityDescription.getUserData("fieldUris")
 		val fieldScope = getDescriptionsFromURI(resource, TDslPackage$Literals::FIELD, fieldUris)
 		val operationScopedElements = new ArrayList<IEObjectDescription>
@@ -277,13 +262,21 @@ class TDslScopeProvider extends XbaseScopeProvider {
 	}
 	
 	def IScope getDescriptionsFromURI(Resource resource, EClass eClass, String commaSeparatedUris) {
+		System::out.println("getting descriptions for URIs: " + commaSeparatedUris)
+		if (commaSeparatedUris.contains("xtext")) {
+			System::out.println("ERROR: unresolved uri!")
+		}
 		val tokenizer = new StringTokenizer(commaSeparatedUris, ",")
 		val uris = newHashSet
 		while (tokenizer.hasMoreTokens) 
 			uris.add(tokenizer.nextToken)
-		(globalScopeProvider as TDslGlobalScopeProvider).getScope(resource, eClass) [
-			uris.contains(it.EObjectURI.toString)
+		val scope = (globalScopeProvider as TDslGlobalScopeProvider).getScope(resource, eClass) [
+			true
 		]
+		for (elem : scope.allElements) {
+			System::out.println("potential URI: " + elem.EObjectURI)
+		}
+		new SimpleScope(scope.allElements.filter [ uris.contains(it.EObjectURI.toString)])
 	}
 	
 	def List<Activity> getNextActivitiesFromDescription(EObject eObj, Resource resource, EReference reference) {
@@ -294,7 +287,11 @@ class TDslScopeProvider extends XbaseScopeProvider {
 		if (operationDescription == null) {
 			System::out.println("WARNING! Operation with URI " + operationUri + " not found in scope!!!")
 		}
-		val nextActivityUriStr = operationDescription.getUserData("nextActivityUris")
+		var nextActivityUriStr = operationDescription.getUserData("nextActivityUris")
+		if (nextActivityUriStr == null && operationDescription.getUserData("returnToPreviousActivity").equalsIgnoreCase("true"))
+			nextActivityUriStr = "returnToPreviousActivity"
+		if (nextActivityUriStr == null)
+			return Collections::emptyList
 		val nextActivity = TDslFactory::eINSTANCE.createActivity
 		val nextActivityProxy = (nextActivity as InternalEObject)
 		nextActivityProxy.eSetProxyURI(URI::createURI(nextActivityUriStr))
@@ -356,5 +353,25 @@ class TDslScopeProvider extends XbaseScopeProvider {
 	}	
 	
 	
-	
+	def List<Activity> currentActivities(XExpression expr) {
+		val lastExpression = expr?.lastActivitySwitchingExpression
+		if (lastExpression == null) {
+			val act = expr.determineInitialActivity
+			act.name			
+			return Collections::singletonList(act)
+		}
+
+		val nextActivities = lastExpression.determineExplicitNextActivities	
+		val returnList = new ArrayList<Activity> 
+		for (nextActivity : nextActivities) {
+			val uriString = EcoreUtil2::getURI(nextActivity)
+			if (uriString.equals("returnToPreviousActivity")) {
+				val previousExpression = lastExpression.lastActivitySwitchingExpression
+				returnList.addAll(previousExpression.currentActivities)
+			} else {
+				returnList.add(nextActivity)
+			}
+		}
+		returnList
+	}
 }
