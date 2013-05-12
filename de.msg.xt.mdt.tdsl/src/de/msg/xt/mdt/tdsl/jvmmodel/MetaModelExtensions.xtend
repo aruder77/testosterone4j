@@ -66,6 +66,16 @@ class MetaModelExtensions {
 		ops
 	}	
 	
+	def List<OperationMapping> getFieldOperations(Activity activity) {
+		val fieldOperations = new ArrayList<OperationMapping>()
+		if (activity != null) {
+			for (field : activity.fields) {
+				fieldOperations.addAll(field.operations)
+			}
+		}
+		fieldOperations
+	}
+	
 	// ActivityOperation
 	
 	def getActivity(ActivityOperation operation) {

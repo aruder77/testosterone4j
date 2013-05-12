@@ -129,26 +129,22 @@ class TDslScopeProvider extends XbaseScopeProvider {
 		} else if (reference == TDslPackage::eINSTANCE.operationCall_Operation || reference == TDslPackage::eINSTANCE.activityOperationCall_Operation) {
 			val XExpression opCall = context as XExpression
 			val nextActivities = opCall.currentActivities
-				if (reference == TDslPackage::eINSTANCE.operationCall_Operation) {				
-					val operations = new ArrayList<OperationMapping>
-					val scopedNextFieldOperations = new ArrayList<IEObjectDescription>
-					for (activity : nextActivities) {
-						val scope = activity.readOperationsFromObjectDescription(context.eResource)
-						scopedNextFieldOperations.addAll(scope.allElements)
-					}
-					new SimpleScope(scopedNextFieldOperations)
-				} else {
-					val operations = new ArrayList<EObjectDescription>
-					val scopedNextActivities = new ArrayList<IEObjectDescription>
-					for (activity : nextActivities) {
-						val scope = activity.readActivityOperationsFromObjectDescription(context.eResource)
-						for (description: scope.allElements) {
-							val name = '#' + description.name.lastSegment
-							scopedNextActivities.add(new EObjectDescription(QualifiedName::create(name), description.EObjectOrProxy, null))
-						}
-					}
-					new SimpleScope(scopedNextActivities, false)
+			if (reference == TDslPackage::eINSTANCE.operationCall_Operation) {				
+				val operations = new ArrayList<OperationMapping>
+				for (activity : nextActivities) {
+					operations.addAll(activity.fieldOperations)
 				}
+				calculatesScopes(operations)
+			} else {
+				val activityOperations = new ArrayList<ActivityOperation>()
+				for (activity : nextActivities) {
+					activityOperations.addAll(activity.allOperations)
+				}
+				Scopes::scopeFor(activityOperations, [
+					val actOp = it as ActivityOperation
+					QualifiedName::create("#" + actOp.name)
+				], IScope::NULLSCOPE)
+			}
 		} else if (reference == TDslPackage::eINSTANCE.operationMapping_Name) {
 			var Field field 
 			if (context instanceof OperationMapping) {
@@ -196,39 +192,6 @@ class TDslScopeProvider extends XbaseScopeProvider {
 		}
 	}
 	
-	def IEObjectDescription getDescriptionForObject(EObject eObject, Resource resource) {
-		val activityURI = EcoreUtil2::getURI(eObject)
-		val activityDescriptions = getDescriptionsFromURI(resource, eObject.eClass, activityURI.toString)
-		activityDescriptions.allElements.head		
-	}
-	
-	def IScope readActivityOperationsFromObjectDescription(Activity activity, Resource resource) { 
-		val activityDescription = getDescriptionForObject(activity, resource)
-		val operationsUris = activityDescription.getUserData("operationUris")
-		val operationDescriptions = getDescriptionsFromURI(resource, TDslPackage$Literals::ACTIVITY_OPERATION, operationsUris)
-		operationDescriptions	
-	}
-
-	def IScope readOperationsFromObjectDescription(Activity activity, Resource resource) {
-		val activityDescription = getDescriptionForObject(activity, resource)
-		val fieldUris = activityDescription.getUserData("fieldUris")
-		val fieldScope = getDescriptionsFromURI(resource, TDslPackage$Literals::FIELD, fieldUris)
-		val operationScopedElements = new ArrayList<IEObjectDescription>
-		for (fieldDescription : fieldScope.allElements) {
-			val operationMappingUris = fieldDescription.getUserData("operationMappingUris")
-			if (operationMappingUris == null) {
-				System::out.println("WARNING! OperationMappings null for field " + fieldDescription.qualifiedName)
-			} else {
-				val operationMappingDescriptions = getDescriptionsFromURI(resource, TDslPackage$Literals::OPERATION_MAPPING, operationMappingUris)
-				for (opMapDesc: operationMappingDescriptions.allElements) {
-					val name = "#" + opMapDesc.getUserData("operationName")
-					operationScopedElements.add(EObjectDescription::create(name, opMapDesc.EObjectOrProxy))
-				}
-			}
-		}	
-		new SimpleScope(operationScopedElements)
-	}
-	
 	def Activity determineInitialActivity(XExpression expr) {
 		var Activity initialActivity = null
 		val activityOperation = EcoreUtil2::getContainerOfType(expr, typeof(ActivityOperation))
@@ -261,50 +224,6 @@ class TDslScopeProvider extends XbaseScopeProvider {
 		operations
 	}
 	
-	def IScope getDescriptionsFromURI(Resource resource, EClass eClass, String commaSeparatedUris) {
-		System::out.println("getting descriptions for URIs: " + commaSeparatedUris)
-		if (commaSeparatedUris.contains("xtext")) {
-			System::out.println("ERROR: unresolved uri!")
-		}
-		val tokenizer = new StringTokenizer(commaSeparatedUris, ",")
-		val uris = newHashSet
-		while (tokenizer.hasMoreTokens) 
-			uris.add(tokenizer.nextToken)
-		val scope = (globalScopeProvider as TDslGlobalScopeProvider).getScope(resource, eClass) [
-			true
-		]
-		for (elem : scope.allElements) {
-			System::out.println("potential URI: " + elem.EObjectURI)
-		}
-		new SimpleScope(scope.allElements.filter [ uris.contains(it.EObjectURI.toString)])
-	}
-	
-	def List<Activity> getNextActivitiesFromDescription(EObject eObj, Resource resource, EReference reference) {
-		val operationProxy = eObj.eGet(reference, false) as EObject
-		val operationUri = EcoreUtil2::getURI(operationProxy)
-		val operationScope = getDescriptionsFromURI(resource, reference.EReferenceType, operationUri.toString)
-		val operationDescription = operationScope.allElements.head
-		if (operationDescription == null) {
-			System::out.println("WARNING! Operation with URI " + operationUri + " not found in scope!!!")
-		}
-		var nextActivityUriStr = operationDescription.getUserData("nextActivityUris")
-		if (nextActivityUriStr == null && operationDescription.getUserData("returnToPreviousActivity").equalsIgnoreCase("true"))
-			nextActivityUriStr = "returnToPreviousActivity"
-		if (nextActivityUriStr == null)
-			return Collections::emptyList
-		val nextActivity = TDslFactory::eINSTANCE.createActivity
-		val nextActivityProxy = (nextActivity as InternalEObject)
-		nextActivityProxy.eSetProxyURI(URI::createURI(nextActivityUriStr))
-		Collections::singletonList(nextActivityProxy as Activity)		
-	}
-
-	def dispatch List<Activity> determineExplicitNextActivities(OperationCall call) {
-		getNextActivitiesFromDescription(call, call.eResource, TDslPackage$Literals::OPERATION_CALL__OPERATION)		
-	}			
-	
-	def dispatch List<Activity> determineExplicitNextActivities(ActivityOperationCall call) {
-		getNextActivitiesFromDescription(call, call.eResource, TDslPackage$Literals::ACTIVITY_OPERATION_CALL__OPERATION)		
-	}			
 	
 	def dispatch List<Activity> determineExplicitNextActivities(SubUseCaseCall call) {
 		var nextActivity = call?.useCase?.nextActivity?.next
