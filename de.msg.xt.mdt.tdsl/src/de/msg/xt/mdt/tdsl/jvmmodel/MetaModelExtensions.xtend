@@ -289,6 +289,8 @@ class MetaModelExtensions {
 	
 	def XExpression activitySwitchingOperation(XExpression expr) {
 		var XExpression operation = null
+		if (expr instanceof OperationCall || expr instanceof ActivityOperationCall || expr instanceof SubUseCaseCall)
+			return expr
 		val opCalls = EcoreUtil2::getAllContentsOfType(expr, typeof(OperationCall))
 		if (!opCalls.empty) {
 			operation = opCalls.get(0)

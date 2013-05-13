@@ -280,18 +280,20 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    			return null
    		}
    		var JvmTypeReference returnTypeRef
-   		var Boolean voidReturnType = true
+   		var Boolean voidReturnType = false
    		var String nextActivityClassVar 
    		if (operation.nextActivities.empty) {
-   			returnTypeRef = operation.newTypeRef(Void::TYPE)
+   			nextActivityClassVar = operation.activity.class_fqn
+   			returnTypeRef = operation.newTypeRef(nextActivityClassVar)
    		} else {
-   			val Activity nextActivity = operation.nextActivities.get(0).next
+   			val condNext = operation.nextActivities.get(0)
+   			val Activity nextActivity = condNext.next
    			nextActivityClassVar = nextActivity?.class_fqn
    			if (nextActivityClassVar != null) {
    				returnTypeRef = operation.newTypeRef(nextActivityClassVar)
-   				voidReturnType = false
    			} else {
    				returnTypeRef = operation.newTypeRef(Void::TYPE)
+   				voidReturnType = true
    			}
    		}
    		val voidReturn = voidReturnType

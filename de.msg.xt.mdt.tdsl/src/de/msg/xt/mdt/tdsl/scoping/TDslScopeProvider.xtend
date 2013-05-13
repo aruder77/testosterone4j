@@ -44,6 +44,7 @@ import java.util.Collection
 import org.eclipse.xtext.resource.IEObjectDescription
 import org.eclipse.emf.ecore.EClass
 import org.eclipse.xtext.util.CancelIndicator
+import de.msg.xt.mdt.tdsl.tDsl.ConditionalNextActivity
 
 class TDslScopeProvider extends XbaseScopeProvider {
 	
@@ -224,6 +225,14 @@ class TDslScopeProvider extends XbaseScopeProvider {
 		operations
 	}
 	
+	
+	def dispatch List<Activity> determineExplicitNextActivities(OperationCall call) {
+		call?.operation?.nextActivities?.map[it.next]
+	}			
+	
+	def dispatch List<Activity> determineExplicitNextActivities(ActivityOperationCall call) {
+		call?.operation?.nextActivities?.map[it.next]
+	}			
 	
 	def dispatch List<Activity> determineExplicitNextActivities(SubUseCaseCall call) {
 		var nextActivity = call?.useCase?.nextActivity?.next
