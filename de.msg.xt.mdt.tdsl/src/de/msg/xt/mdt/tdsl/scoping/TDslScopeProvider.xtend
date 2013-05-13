@@ -292,8 +292,7 @@ class TDslScopeProvider extends XbaseScopeProvider {
 		val nextActivities = lastExpression.determineExplicitNextActivities	
 		val returnList = new ArrayList<Activity> 
 		for (nextActivity : nextActivities) {
-			val uriString = EcoreUtil2::getURI(nextActivity)
-			if (uriString.equals("returnToPreviousActivity")) {
+			if (nextActivity == null) {
 				val previousExpression = lastExpression.lastActivitySwitchingExpression
 				returnList.addAll(previousExpression.currentActivities)
 			} else {

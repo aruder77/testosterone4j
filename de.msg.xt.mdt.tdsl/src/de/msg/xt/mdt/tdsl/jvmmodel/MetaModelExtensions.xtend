@@ -202,6 +202,10 @@ class MetaModelExtensions {
 	}
 	
 	def XExpression precedingExpression(XExpression expr) {
+		System::out.println("Determining precedingExpression for " + expr + "[" + expr?.fullyQualifiedName?.toString + "]")
+		if (expr?.fullyQualifiedName?.toString != null && expr?.fullyQualifiedName?.toString.equals("bne3.usecases.paket.CreatePaket.longName")) {
+			System::out.println("bne3.usecases.paket.CreatePaket.longName")
+		}
 		if (expr == null)
 			return null
 		var XExpression lastStatement
