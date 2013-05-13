@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Importer
+Bundle-SymbolicName: com.bmw.bne3.client.uitest.importer;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: BMW
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.resources,
+ org.eclipse.ui,
+ com.bmw.smartfaces.model;bundle-version="3.0.4",
+ de.msg.xt.mdt.tdsl;bundle-version="1.0.0"

@@ -397,7 +397,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    						if (opMapping != null) {
    							it.append('''
    								«operation.returnType?.name» value = «field.fieldGetterName»().«operation.name»(«mapParameters(field, operation)»); 
-   								this.protocol.appendControlOperationCall(this.getClass().getName(), "«field.name»", «field.control?.name».class.getName(), "«operation.name»", value.toString()«appendParameter(opMapping.dataTypeMappings)»);
+   								this.protocol.appendControlOperationCall(this.getClass().getName(), "«field.name»", «field.control?.name».class.getName(), "«operation.name»", value != null ? value.toString() : "null" «appendParameter(opMapping.dataTypeMappings)»);
    								return new «opMapping.dataType?.class_FQN»(value, «opMapping.dataType?.equivalenceClass_name».getByValue(value));''')
    						}
    					}
@@ -609,6 +609,8 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
                         try {
                         	this.useCase.run();
                         	this.protocol.append("Test OK");
+                        } catch (java.lang.RuntimeException ex) {
+                        	throw ex;
                         } finally {
                         	this.protocol.appendSummary();
                         }''')

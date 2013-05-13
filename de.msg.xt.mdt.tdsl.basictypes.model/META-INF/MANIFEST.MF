@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: TDsl Basic Types
+Bundle-SymbolicName: de.msg.xt.mdt.tdsl.basictypes.model;singleton:=true
+Bundle-Version: 3.0.4.qualifier
+Require-Bundle: org.eclipse.core.runtime,
+ de.msg.xt.mdt.tdsl.base;bundle-version="1.0.0",
+ de.msg.xt.mdt.tdsl;bundle-version="1.0.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+

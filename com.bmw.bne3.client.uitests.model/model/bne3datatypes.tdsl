@@ -1,0 +1,72 @@
+package bne3.datatypes {
+	
+	import de.msg.xt.mdt.tdsl.basictypes.*
+	
+	tags {
+		Pflichtfeld
+	}
+	
+	datatype ShortName type String { 
+		class emptyShortName value "" tags Empty
+		class regularShortName valueGenerator { "Shortname" + System::currentTimeMillis } classPredicate [String e | e.startsWith("Shortname")]
+		class umlautShortName value "Shortname 256 $/__!" tags Invalid
+		class longShortName value "LongLongLongLongLongLongLongLongLongLongLongLongLongLongLongLongLongLongShortname" tags Invalid
+	}
+	
+	datatype LongName type String {
+		class emptyLongName value "" tags Empty
+		class regularLongName value "Shortname"
+		class umlautLongName value "Shortname 256 $/__!" tags Invalid
+		class longLongName value "LongLongLongLongLongLongLongLongLongLongLongLongLongLongLongLongLongLongShortname"
+	}
+	
+	datatype DoubleStringDT type String {
+		class string value "ABC" tags Invalid
+		class negative values newArrayList("-0.5", "-100.3", "-1.0354")
+		class zero value "0.0"
+		class positive values newArrayList("1.0345", "53.3453", "12346754.0978908")
+	}
+	
+	datatype IntegerStringDT type String {
+		class string value "ABC" tags Invalid
+		class negative values newArrayList("-1", "-99", "-2345234523")
+		class zero value "0"
+		class positive values newArrayList("1", "44", "255", "23452345345")
+	}
+	
+	datatype BasisdatentypDT type String {
+		class wert values newArrayList("A_ASCIISTRING", "A_BITFIELD", "A_BYTEFIELD", "A_FLOAT32", "A_FLOAT64", "A_INT16", "A_INT32", "A_INT64", "A_INT8", "A_UINT16", "A_UINT32", "A_UINT64", "A_UINT8", "A_UNICODE2STRING", "OTHER")
+	}
+	
+	datatype IntervallgrenzeDT type String {
+		class wert values newArrayList("OPEN", "INFINITE", "CLOSED")
+	}
+	
+	datatype KategorieDT type String {
+		class wert values newArrayList("END_OF_PDU", "LEADING_LENGTH_INFO_TYPE", "MIN_MAX_LENGTH_TYPE", "STANDARD_LENGTH_TYPE")
+	}
+	
+	datatype EncodingDT type String {
+		class wert values newArrayList("_1C", "_2C", "BCD", "BCD_P", "BCD_UP", "BIT", "DSP_FRACTIONAL", "IEEE_FLOATING_TYPE", "ISO_8859_1", "ISO_8859_2", "SIGNED", "SM", "UCS_2", "UNSIGNED", "UTF_8", "WINDOWS_1252")
+	}
+	
+	datatype TerminationDT type String {
+		class wert values newArrayList("HEX_FF", "LENGTH", "NONE", "ZERO")
+	}
+	
+	datatype LanguageDT type String {
+		class de value "DE"
+		class en value "EN"
+	}
+	
+	datatype FormalAnnotationDT type String {
+		class diagnostic value "Diagnostics"
+		class errorCode value "Error-Code"
+		class infoCode value "Info-Code"
+	}
+	
+	datatype ChangeRequestTitle type String {
+		class normalTitle valueGenerator { "ChangeRequest" + System::currentTimeMillis } classPredicate [String e | e.startsWith("ChangeRequest")]
+	}
+}
+	

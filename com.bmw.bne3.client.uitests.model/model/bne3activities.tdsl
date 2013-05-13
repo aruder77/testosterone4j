@@ -1,0 +1,1188 @@
+package bne3.activities {
+	import de.msg.xt.mdt.tdsl.basictypes.*
+	import de.msg.xt.mdt.tdsl.swtbot.*
+	import bne3.datatypes.*
+	import bne3.activities.changerequest.*
+	import bne3.bnecontrols.*
+	import bne3.activities.datatypetype.*
+
+	toolkit Stdtoolkit using controls {
+		TextControl, TreeControl, Label, Button, TableControl, ComboBox, RadioButton
+	}
+
+	activity ViewActivity {
+		op close => MainWindow
+		op returnToMain => MainWindow
+	}
+
+	activity EditorActivity {
+		op saveAndClose => MainWindow
+		op close => MainWindow
+		op BooleanDT isDirty
+		op returnToMain => MainWindow
+	}
+
+	activity DialogActivity {
+	}
+
+	activity MainWindow {
+		op openView => OpenViewDialog
+		op openBne3DevPerspective
+		op openBne3Perspective
+		op resetPerspective
+		op openPerspective(StringDT perspectiveId)
+		op openPerspectiveByName(StringDT perspectiveName)
+		op findEthernetNavigator => EthernetNavigator
+		op findNewCodingEditor => CodingEditor
+		op findNewAenderungsantragEditor => Aenderungsantrag
+		op findNewBasisdatentypEditor => BasisDatentypEditor
+		op findNewAufzaehlungstypEditor => AufzaehlungstypenEditor
+		op findNewStrukturtypEditor => StrukturEditor
+		op findNewUniontypEditor => UniontypEditor
+	}
+
+	activity OpenViewDialog {
+		op selectView(StringDT category, StringDT viewId)
+		op ok => MainWindow
+		op cancel => MainWindow
+	}
+
+	activity EthernetNavigator extends ViewActivity {
+		field filterText identifiedBy "filterText" control TextControl {
+			op StringDT getText
+			op BooleanDT isEnabled
+			op setText(StringDT str)
+		}
+
+		field searchButton identifiedBy "searchButton" control Button {
+			op BooleanDT isEnabled
+			op push
+		}
+
+		field clearButton identifiedBy "clearButton" control Button {
+			op BooleanDT isEnabled
+			op push
+		}
+
+		field tree identifiedBy "ethernet.navigator.tree" control TreeControl {
+			op BooleanDT isEnabled
+			op doubleClickNode(StringDT nodePath)
+			op selectNode(StringDT nodePath)
+			op invokeContextMenu(StringDT nodePath, StringDT contextMenuEntry)
+			op isContextMenuEnabled(StringDT nodePath, StringDT contextMenuEntry)
+			op hasChildNode(StringDT nodePath, StringDT nodePattern, BooleanDT recursive)
+		}
+
+		op activateChangeRequest(StringDT title)
+		op openCoding(StringDT title) => CodingEditor
+		op addChangeRequest {
+			#tree.invokeContextMenu(nodePath = "Änderungsmanagement/Änderungsantrag", contextMenuEntry =
+			"Änderungsantrag hinzufügen")
+			#returnToMain
+			#findNewAenderungsantragEditor
+		} => Aenderungsantrag
+		op openChangeRequest(StringDT title) => Aenderungsantrag
+		op addBasisDatentyp {
+			#tree.invokeContextMenu(nodePath = "Ethernet/Datentypen/Basisdatentypen", contextMenuEntry =
+			"Basisdatentyp hinzufügen")
+			#returnToMain
+			#findNewBasisdatentypEditor
+		} => BasisDatentypEditor
+		op openBasisDatentyp(StringDT title) => BasisDatentypEditor
+		op addAufzaehlungstyp {
+			#tree.invokeContextMenu(nodePath = "Ethernet/Datentypen/Aufzählungen", contextMenuEntry = "Aufzählung hinzufügen")
+			#returnToMain
+			#findNewAufzaehlungstypEditor
+		} => AufzaehlungstypenEditor
+		op openAufzaehlungstyp(StringDT title) => AufzaehlungstypenEditor
+		op addStrukturtyp {
+			#tree.invokeContextMenu(nodePath = "Ethernet/Datentypen/Strukturen", contextMenuEntry = "Struktur hinzufügen")
+			#returnToMain
+			#findNewStrukturtypEditor
+		} => StrukturEditor
+		op openStrukturtyp(StringDT title) => StrukturEditor
+		op addUniontyp {
+			#tree.invokeContextMenu(nodePath = "Ethernet/Datentypen/Unions", contextMenuEntry = "Union hinzufügen")
+			#returnToMain
+			#findNewUniontypEditor
+		} => UniontypEditor
+		op openUniontyp(StringDT title) => UniontypEditor
+		op addPaket {
+			#tree.invokeContextMenu(nodePath = "Ethernet/Datentypen/Unions", contextMenuEntry = "Union hinzufügen")
+			#returnToMain
+			#findNewUniontypEditor
+		} => UniontypEditor
+		op openPaket(StringDT title) => bne3.activities.paket.PaketEditor
+	}
+
+	activity CodingEditor identifiedBy "CodingTypePresentation" extends EditorActivity {
+		op allgemeinPage => AllgemeinPage
+		op verwendungPage
+		op kodierungPage => CodingEditorKodierungPage
+	}
+
+	activity AllgemeinPage {
+		field longname identifiedBy "longname" control TextControl {
+			op LongName getText
+			op setText(LongName str)
+			op BooleanDT isEnabled
+		}
+
+		field shortname identifiedBy "shortname" control TextControl {
+			op ShortName getText
+			op setText(ShortName str)
+			op BooleanDT isEnabled
+		}
+
+		field textuelleBeschreibung identifiedBy "bne3.table.Descriptions" control TableControl {
+			op IntegerDT getRowCount
+			op StringDT getText(IntegerDT row, IntegerDT column)
+			op StringDT getTextByName(IntegerDT row, StringDT columnName)
+			op BooleanDT isContextMenuEnabled(StringDT contextMenuEntry)
+			op setText(IntegerDT row, IntegerDT column, StringDT textValue)
+			op setTextByName(IntegerDT row, StringDT columnName, StringDT textValue)
+			op selectValue(IntegerDT row, IntegerDT column, LanguageDT textValue)
+			op selectValueByName(IntegerDT row, StringDT columnName, LanguageDT textValue)
+			op invokeContextMenu(StringDT contextMenuEntry)
+			op invokeContextMenuOnRow(IntegerDT row, StringDT contextMenuEntry)
+			op checkRow(IntegerDT row)
+			op selectRow(IntegerDT row)
+		}
+
+		field formaleAnnotationen identifiedBy "components.table.FormalAnnotations" control TableControl {
+			op IntegerDT getRowCount
+			op StringDT getText(IntegerDT row, IntegerDT column)
+			op StringDT getTextByName(IntegerDT row, StringDT columnName)
+			op BooleanDT isContextMenuEnabled(StringDT contextMenuEntry)
+			op setText(IntegerDT row, IntegerDT column, StringDT textValue)
+			op setTextByName(IntegerDT row, StringDT columnName, StringDT textValue)
+			op selectValue(IntegerDT row, IntegerDT column, FormalAnnotationDT textValue)
+			op selectValueByName(IntegerDT row, StringDT columnName, FormalAnnotationDT textValue)
+			op invokeContextMenu(StringDT contextMenuEntry)
+			op invokeContextMenuOnRow(IntegerDT row, StringDT contextMenuEntry)
+			op checkRow(IntegerDT row)
+			op selectRow(IntegerDT row)
+		}
+
+		op returnToEditor => CodingEditor
+	}
+
+	activity CodingEditorKodierungPage {
+		field physBasisDatenTyp identifiedBy "coding.physicaltype.basedatatype" control ComboBox {
+			op setText(BasisdatentypDT str)
+			op BasisdatentypDT getText
+			op BooleanDT isEnabled
+		}
+
+		field physMinimum identifiedBy "coding.physicaltype.minimum" control TextControl {
+			op DoubleStringDT getText
+			op setText(DoubleStringDT str)
+			op BooleanDT isEnabled
+		}
+
+		field physAufloesung identifiedBy "coding.physicaltype.precision" control TextControl {
+			op DoubleStringDT getText
+			op setText(DoubleStringDT str)
+			op BooleanDT isEnabled
+		}
+
+		field physMaximum identifiedBy "coding.physicaltype.maximum" control TextControl {
+			op DoubleStringDT getText
+			op setText(DoubleStringDT str)
+			op BooleanDT isEnabled
+		}
+
+		field physMinimumIntervallgrenze identifiedBy "coding.physicaltype.intervaltype" control ComboBox {
+			op setText(IntervallgrenzeDT str)
+			op IntervallgrenzeDT getText
+			op BooleanDT isEnabled
+		}
+
+		field physMaximumIntervallgrenze identifiedBy "coding.physicaltype.maximum.intervaltype" control ComboBox {
+			op setText(IntervallgrenzeDT str)
+			op IntervallgrenzeDT getText
+			op BooleanDT isEnabled
+		}
+
+		field internalBasisDatenTyp identifiedBy "coding.codedtype.basedatatype" control ComboBox {
+			op setText(BasisdatentypDT str)
+			op BasisdatentypDT getText
+			op BooleanDT isEnabled
+		}
+
+		field internalKategorie identifiedBy "coding.codedtype.category" control ComboBox {
+			op setText(KategorieDT str)
+			op KategorieDT getText
+			op BooleanDT isEnabled
+		}
+
+		field internalEncoding identifiedBy "coding.codedtype.encoding" control ComboBox {
+			op setText(EncodingDT str)
+			op EncodingDT getText
+			op BooleanDT isEnabled
+		}
+
+		field internalTermination identifiedBy "coding.codedtype.termination" control ComboBox {
+			op setText(TerminationDT str)
+			op TerminationDT getText
+			op BooleanDT isEnabled
+		}
+
+		field fixedBitLengthButton identifiedBy "data.codedTypeFixedBitLength" control RadioButton {
+			op BooleanDT isSelected
+			op BooleanDT isEnabled
+			op click
+		}
+
+		field bitLength identifiedBy "data.codedTypeBitLength" control TextControl {
+			op IntegerStringDT getText
+			op setText(IntegerStringDT str)
+			op BooleanDT isEnabled
+		}
+
+		field variableBitLengthButton identifiedBy "data.codedTypeVariableBitLength" control RadioButton {
+			op BooleanDT isSelected
+			op BooleanDT isEnabled
+			op click
+		}
+
+		op returnToEditor => CodingEditor
+	}
+
+}
+
+package bne3.activities.changerequest for bne3.activities.Stdtoolkit {
+	
+	import de.msg.xt.mdt.tdsl.basictypes.*
+	import de.msg.xt.mdt.tdsl.swtbot.*
+	import bne3.datatypes.*
+	import bne3.activities.*
+	
+	activity Aenderungsantrag identifiedBy "Änderungsantrag" extends EditorActivity {
+		field titel identifiedBy "ChangeRequest.title" control TextControl {
+			op ChangeRequestTitle getText
+			op setText(ChangeRequestTitle str)
+			op BooleanDT isEnabled			
+		}
+	}
+}
+
+package bne3.activities.datatypetype for bne3.activities.Stdtoolkit {
+	import de.msg.xt.mdt.tdsl.basictypes.*
+	import de.msg.xt.mdt.tdsl.swtbot.*
+	import bne3.datatypes.*
+	import bne3.activities.*
+
+	activity BasisDatentypEditor identifiedBy "CommonDatatypeTypePresentation" extends EditorActivity {
+		op allgemeinPage => BasisdatentypEditorAllgemeinPage
+		op speziellPage => BasisDatentypSpeziellPage
+	}
+
+	activity BasisDatentypSpeziellPage identifiedBy "Speziell" {
+		field codingSelectionText identifiedBy "typeSelectionField.text" control TextControl {
+			op setText(StringDT str)
+			op StringDT getText
+			op BooleanDT isEnabled
+		}
+
+		field codingSelectionSearchButton identifiedBy "typeSelectionField.searchButton" control Button {
+			op push => CodingTypeSearch
+			op BooleanDT isEnabled
+		}
+
+		field codingSelectionNavigation identifiedBy "typeSelectionField.jumpButton" control Button {
+			op push
+			op BooleanDT isEnabled
+		}
+
+		op returnToEditor => BasisDatentypEditor
+	}
+
+	activity BasisdatentypEditorAllgemeinPage {
+		field longname identifiedBy "longname" control TextControl {
+			op LongName getText
+			op setText(LongName str)
+			op BooleanDT isEnabled
+		}
+
+		field shortname identifiedBy "shortname" control TextControl {
+			op ShortName getText
+			op setText(ShortName str)
+			op BooleanDT isEnabled
+		}
+
+		field packageSelectionCombo identifiedBy "typeSelectionCombo.combo" control ComboBox {
+			op setText(StringDT str)
+			op StringDT getText
+			op BooleanDT isEnabled
+		}
+
+		field packageSelectionNavigation identifiedBy "typeSelectionCombo.jumpButton" control Button {
+			op push
+			op BooleanDT isEnabled
+		}
+
+		field textuelleBeschreibung identifiedBy "bne3.table.Descriptions" control TableControl {
+			op IntegerDT getRowCount
+			op StringDT getText(IntegerDT row, IntegerDT column)
+			op StringDT getTextByName(IntegerDT row, StringDT columnName)
+			op BooleanDT isContextMenuEnabled(StringDT contextMenuEntry)
+			op setText(IntegerDT row, IntegerDT column, StringDT textValue)
+			op setTextByName(IntegerDT row, StringDT columnName, StringDT textValue)
+			op selectValue(IntegerDT row, IntegerDT column, LanguageDT textValue)
+			op selectValueByName(IntegerDT row, StringDT columnName, LanguageDT textValue)
+			op invokeContextMenu(StringDT contextMenuEntry)
+			op invokeContextMenuOnRow(IntegerDT row, StringDT contextMenuEntry)
+			op checkRow(IntegerDT row)
+			op selectRow(IntegerDT row)
+		}
+
+		field formaleAnnotationen identifiedBy "components.table.FormalAnnotations" control TableControl {
+			op IntegerDT getRowCount
+			op StringDT getText(IntegerDT row, IntegerDT column)
+			op StringDT getTextByName(IntegerDT row, StringDT columnName)
+			op BooleanDT isContextMenuEnabled(StringDT contextMenuEntry)
+			op setText(IntegerDT row, IntegerDT column, StringDT textValue)
+			op setTextByName(IntegerDT row, StringDT columnName, StringDT textValue)
+			op selectValue(IntegerDT row, IntegerDT column, FormalAnnotationDT textValue)
+			op selectValueByName(IntegerDT row, StringDT columnName, FormalAnnotationDT textValue)
+			op invokeContextMenu(StringDT contextMenuEntry)
+			op invokeContextMenuOnRow(IntegerDT row, StringDT contextMenuEntry)
+			op checkRow(IntegerDT row)
+			op selectRow(IntegerDT row)
+		}
+
+		op returnToEditor => BasisDatentypEditor
+	}
+
+	activity CodingTypeSearch extends DialogActivity {
+		field searchText identifiedBy "searchText" control TextControl {
+			op setText(StringDT str)
+			op StringDT getText
+			op BooleanDT isEnabled
+		}
+
+		field searchButton identifiedBy "searchButton" control Button {
+			op push
+			op BooleanDT isEnabled
+		}
+
+		field elements identifiedBy "elementsTable" control TableControl {
+			op invokeContextMenu(StringDT contextMenuEntry)
+			op invokeContextMenuOnRow(IntegerDT row, StringDT contextMenuEntry)
+			op isContextMenuEnabled(StringDT contextMenuEntry)
+			op StringDT getText(IntegerDT row, IntegerDT column)
+			op StringDT getTextByName(IntegerDT row, StringDT columnName)
+			op setText(IntegerDT row, IntegerDT column, StringDT textValue)
+			op setTextByName(IntegerDT row, StringDT columnName, StringDT textValue)
+			op selectValue(IntegerDT row, IntegerDT column, StringDT textValue)
+			op selectValueByName(IntegerDT row, StringDT columnName, StringDT textValue)
+			op IntegerDT getRowCount
+			op checkRow(IntegerDT row)
+			op selectRow(IntegerDT row)
+		}
+
+		field cancelButton identifiedBy "cancel" control Button {
+			op push => BasisDatentypSpeziellPage
+			op BooleanDT isEnabled
+		}
+
+		field okButton identifiedBy "ok" control Button {
+			op push => BasisDatentypEditor
+			op BooleanDT isEnabled
+		}
+
+	}
+
+	activity AufzaehlungstypenEditor identifiedBy "EnumDatatypeTypePresentation" extends EditorActivity {
+		op allgemeinPage => AufzaehlungstypenEditorAllgemeinPage
+		op speziellPage => AufzaehlungstypenEditorSpeziellPage
+	}
+
+	activity AufzaehlungstypenEditorSpeziellPage identifiedBy "Speziell" {
+		field codingSelectionText identifiedBy "typeSelectionField.text" control TextControl {
+			op setText(StringDT str)
+			op StringDT getText
+			op BooleanDT isEnabled
+		}
+
+		field codingSelectionSearchButton identifiedBy "typeSelectionField.searchButton" control Button {
+			op push => AufzaehlungstypenCodingTypeSearch
+			op BooleanDT isEnabled
+		}
+
+		field codingSelectionNavigation identifiedBy "typeSelectionField.jumpButton" control Button {
+			op push
+			op BooleanDT isEnabled
+		}
+
+		field enumElements identifiedBy "bne3.table.EnumElementType" control TableControl {
+			op invokeContextMenu(StringDT contextMenuEntry)
+			op invokeContextMenuOnRow(IntegerDT row, StringDT contextMenuEntry)
+			op isContextMenuEnabled(StringDT contextMenuEntry)
+			op StringDT getText(IntegerDT row, IntegerDT column)
+			op StringDT getTextByName(IntegerDT row, StringDT columnName)
+			op setText(IntegerDT row, IntegerDT column, StringDT textValue)
+			op setTextByName(IntegerDT row, StringDT columnName, StringDT textValue)
+			op selectValue(IntegerDT row, IntegerDT column, StringDT textValue)
+			op selectValueByName(IntegerDT row, StringDT columnName, StringDT textValue)
+			op IntegerDT getRowCount
+			op checkRow(IntegerDT row)
+			op selectRow(IntegerDT row)
+		}
+
+		op returnToEditor => AufzaehlungstypenEditor
+	}
+
+	activity AufzaehlungstypenEditorAllgemeinPage {
+		field longname identifiedBy "longname" control TextControl {
+			op LongName getText
+			op setText(LongName str)
+			op BooleanDT isEnabled
+		}
+
+		field shortname identifiedBy "shortname" control TextControl {
+			op ShortName getText
+			op setText(ShortName str)
+			op BooleanDT isEnabled
+		}
+
+		field packageSelectionCombo identifiedBy "typeSelectionCombo.combo" control ComboBox {
+			op setText(StringDT str)
+			op StringDT getText
+			op BooleanDT isEnabled
+		}
+
+		field packageSelectionNavigation identifiedBy "typeSelectionCombo.jumpButton" control Button {
+			op push
+			op BooleanDT isEnabled
+		}
+
+		field textuelleBeschreibung identifiedBy "bne3.table.Descriptions" control TableControl {
+			op IntegerDT getRowCount
+			op StringDT getText(IntegerDT row, IntegerDT column)
+			op StringDT getTextByName(IntegerDT row, StringDT columnName)
+			op BooleanDT isContextMenuEnabled(StringDT contextMenuEntry)
+			op setText(IntegerDT row, IntegerDT column, StringDT textValue)
+			op setTextByName(IntegerDT row, StringDT columnName, StringDT textValue)
+			op selectValue(IntegerDT row, IntegerDT column, LanguageDT textValue)
+			op selectValueByName(IntegerDT row, StringDT columnName, LanguageDT textValue)
+			op invokeContextMenu(StringDT contextMenuEntry)
+			op invokeContextMenuOnRow(IntegerDT row, StringDT contextMenuEntry)
+			op checkRow(IntegerDT row)
+			op selectRow(IntegerDT row)
+		}
+
+		field formaleAnnotationen identifiedBy "components.table.FormalAnnotations" control TableControl {
+			op IntegerDT getRowCount
+			op StringDT getText(IntegerDT row, IntegerDT column)
+			op StringDT getTextByName(IntegerDT row, StringDT columnName)
+			op BooleanDT isContextMenuEnabled(StringDT contextMenuEntry)
+			op setText(IntegerDT row, IntegerDT column, StringDT textValue)
+			op setTextByName(IntegerDT row, StringDT columnName, StringDT textValue)
+			op selectValue(IntegerDT row, IntegerDT column, FormalAnnotationDT textValue)
+			op selectValueByName(IntegerDT row, StringDT columnName, FormalAnnotationDT textValue)
+			op invokeContextMenu(StringDT contextMenuEntry)
+			op invokeContextMenuOnRow(IntegerDT row, StringDT contextMenuEntry)
+			op checkRow(IntegerDT row)
+			op selectRow(IntegerDT row)
+		}
+
+		op returnToEditor => AufzaehlungstypenEditor
+	}
+
+	activity AufzaehlungstypenCodingTypeSearch extends DialogActivity {
+		field searchText identifiedBy "searchText" control TextControl {
+			op setText(StringDT str)
+			op StringDT getText
+			op BooleanDT isEnabled
+		}
+
+		field searchButton identifiedBy "searchButton" control Button {
+			op push
+			op BooleanDT isEnabled
+		}
+
+		field elements identifiedBy "elementsTable" control TableControl {
+			op invokeContextMenu(StringDT contextMenuEntry)
+			op invokeContextMenuOnRow(IntegerDT row, StringDT contextMenuEntry)
+			op isContextMenuEnabled(StringDT contextMenuEntry)
+			op StringDT getText(IntegerDT row, IntegerDT column)
+			op StringDT getTextByName(IntegerDT row, StringDT columnName)
+			op setText(IntegerDT row, IntegerDT column, StringDT textValue)
+			op setTextByName(IntegerDT row, StringDT columnName, StringDT textValue)
+			op selectValue(IntegerDT row, IntegerDT column, StringDT textValue)
+			op selectValueByName(IntegerDT row, StringDT columnName, StringDT textValue)
+			op IntegerDT getRowCount
+			op checkRow(IntegerDT row)
+			op selectRow(IntegerDT row)
+		}
+
+		field cancelButton identifiedBy "cancel" control Button {
+			op push => AufzaehlungstypenEditor
+			op BooleanDT isEnabled
+		}
+
+		field okButton identifiedBy "ok" control Button {
+			op push => AufzaehlungstypenEditor
+			op BooleanDT isEnabled
+		}
+
+	}
+
+	activity StrukturEditor identifiedBy "StructureDatatypeTypePresentation" extends EditorActivity {
+		op allgemeinPage => StrukturEditorAllgemeinPage
+		op speziellPage => StrukturEditorSpeziellPage
+	}
+
+	activity StrukturEditorSpeziellPage identifiedBy "Speziell" {
+		op returnToEditor => StrukturEditor
+	}
+
+	activity StrukturEditorAllgemeinPage {
+		field longname identifiedBy "longname" control TextControl {
+			op LongName getText
+			op setText(LongName str)
+			op BooleanDT isEnabled
+		}
+
+		field shortname identifiedBy "shortname" control TextControl {
+			op ShortName getText
+			op setText(ShortName str)
+			op BooleanDT isEnabled
+		}
+
+		field packageSelectionCombo identifiedBy "typeSelectionCombo.combo" control ComboBox {
+			op setText(StringDT str)
+			op StringDT getText
+			op BooleanDT isEnabled
+		}
+
+		field packageSelectionNavigation identifiedBy "typeSelectionCombo.jumpButton" control Button {
+			op push
+			op BooleanDT isEnabled
+		}
+
+		field textuelleBeschreibung identifiedBy "bne3.table.Descriptions" control TableControl {
+			op IntegerDT getRowCount
+			op StringDT getText(IntegerDT row, IntegerDT column)
+			op StringDT getTextByName(IntegerDT row, StringDT columnName)
+			op BooleanDT isContextMenuEnabled(StringDT contextMenuEntry)
+			op setText(IntegerDT row, IntegerDT column, StringDT textValue)
+			op setTextByName(IntegerDT row, StringDT columnName, StringDT textValue)
+			op selectValue(IntegerDT row, IntegerDT column, LanguageDT textValue)
+			op selectValueByName(IntegerDT row, StringDT columnName, LanguageDT textValue)
+			op invokeContextMenu(StringDT contextMenuEntry)
+			op invokeContextMenuOnRow(IntegerDT row, StringDT contextMenuEntry)
+			op checkRow(IntegerDT row)
+			op selectRow(IntegerDT row)
+		}
+
+		field formaleAnnotationen identifiedBy "components.table.FormalAnnotations" control TableControl {
+			op IntegerDT getRowCount
+			op StringDT getText(IntegerDT row, IntegerDT column)
+			op StringDT getTextByName(IntegerDT row, StringDT columnName)
+			op BooleanDT isContextMenuEnabled(StringDT contextMenuEntry)
+			op setText(IntegerDT row, IntegerDT column, StringDT textValue)
+			op setTextByName(IntegerDT row, StringDT columnName, StringDT textValue)
+			op selectValue(IntegerDT row, IntegerDT column, FormalAnnotationDT textValue)
+			op selectValueByName(IntegerDT row, StringDT columnName, FormalAnnotationDT textValue)
+			op invokeContextMenu(StringDT contextMenuEntry)
+			op invokeContextMenuOnRow(IntegerDT row, StringDT contextMenuEntry)
+			op checkRow(IntegerDT row)
+			op selectRow(IntegerDT row)
+		}
+
+		op returnToEditor => StrukturEditor
+	}
+
+	activity UniontypEditor identifiedBy "StructureDatatypeTypePresentation" extends EditorActivity {
+		op allgemeinPage => UniontypEditorAllgemeinPage
+		op speziellPage => UniontypEditorSpeziellPage
+	}
+
+	activity UniontypEditorSpeziellPage identifiedBy "Speziell" {
+		op returnToEditor => UniontypEditor
+	}
+
+	activity UniontypEditorAllgemeinPage {
+		field longname identifiedBy "longname" control TextControl {
+			op LongName getText
+			op setText(LongName str)
+			op BooleanDT isEnabled
+		}
+
+		field shortname identifiedBy "shortname" control TextControl {
+			op ShortName getText
+			op setText(ShortName str)
+			op BooleanDT isEnabled
+		}
+
+		field packageSelectionCombo identifiedBy "typeSelectionCombo.combo" control ComboBox {
+			op setText(StringDT str)
+			op StringDT getText
+			op BooleanDT isEnabled
+		}
+
+		field packageSelectionNavigation identifiedBy "typeSelectionCombo.jumpButton" control Button {
+			op push
+			op BooleanDT isEnabled
+		}
+
+		field textuelleBeschreibung identifiedBy "bne3.table.Descriptions" control TableControl {
+			op IntegerDT getRowCount
+			op StringDT getText(IntegerDT row, IntegerDT column)
+			op StringDT getTextByName(IntegerDT row, StringDT columnName)
+			op BooleanDT isContextMenuEnabled(StringDT contextMenuEntry)
+			op setText(IntegerDT row, IntegerDT column, StringDT textValue)
+			op setTextByName(IntegerDT row, StringDT columnName, StringDT textValue)
+			op selectValue(IntegerDT row, IntegerDT column, LanguageDT textValue)
+			op selectValueByName(IntegerDT row, StringDT columnName, LanguageDT textValue)
+			op invokeContextMenu(StringDT contextMenuEntry)
+			op invokeContextMenuOnRow(IntegerDT row, StringDT contextMenuEntry)
+			op checkRow(IntegerDT row)
+			op selectRow(IntegerDT row)
+		}
+
+		field formaleAnnotationen identifiedBy "components.table.FormalAnnotations" control TableControl {
+			op IntegerDT getRowCount
+			op StringDT getText(IntegerDT row, IntegerDT column)
+			op StringDT getTextByName(IntegerDT row, StringDT columnName)
+			op BooleanDT isContextMenuEnabled(StringDT contextMenuEntry)
+			op setText(IntegerDT row, IntegerDT column, StringDT textValue)
+			op setTextByName(IntegerDT row, StringDT columnName, StringDT textValue)
+			op selectValue(IntegerDT row, IntegerDT column, FormalAnnotationDT textValue)
+			op selectValueByName(IntegerDT row, StringDT columnName, FormalAnnotationDT textValue)
+			op invokeContextMenu(StringDT contextMenuEntry)
+			op invokeContextMenuOnRow(IntegerDT row, StringDT contextMenuEntry)
+			op checkRow(IntegerDT row)
+			op selectRow(IntegerDT row)
+		}
+
+		op returnToEditor => UniontypEditor
+	}
+
+}
+
+package bne3.activities.paket for bne3.activities.Stdtoolkit {
+	import de.msg.xt.mdt.tdsl.basictypes.*
+	import de.msg.xt.mdt.tdsl.swtbot.*
+	import bne3.datatypes.*
+	import bne3.activities.*
+
+	activity PaketEditor identifiedBy "PackageTypePresentation" extends EditorActivity {
+		op allgemeinPage => PaketEditorAllgemeinPage
+	}
+
+	activity PaketEditorAllgemeinPage {
+		field longname identifiedBy "longname" control TextControl {
+			op LongName getText
+			op setText(LongName str)
+			op BooleanDT isEnabled
+		}
+
+		field shortname identifiedBy "shortname" control TextControl {
+			op ShortName getText
+			op setText(ShortName str)
+			op BooleanDT isEnabled
+		}
+
+		field textuelleBeschreibung identifiedBy "bne3.table.Descriptions" control TableControl {
+			op IntegerDT getRowCount
+			op StringDT getText(IntegerDT row, IntegerDT column)
+			op StringDT getTextByName(IntegerDT row, StringDT columnName)
+			op BooleanDT isContextMenuEnabled(StringDT contextMenuEntry)
+			op setText(IntegerDT row, IntegerDT column, StringDT textValue)
+			op setTextByName(IntegerDT row, StringDT columnName, StringDT textValue)
+			op selectValue(IntegerDT row, IntegerDT column, LanguageDT textValue)
+			op selectValueByName(IntegerDT row, StringDT columnName, LanguageDT textValue)
+			op invokeContextMenu(StringDT contextMenuEntry)
+			op invokeContextMenuOnRow(IntegerDT row, StringDT contextMenuEntry)
+			op checkRow(IntegerDT row)
+			op selectRow(IntegerDT row)
+		}
+
+		field formaleAnnotationen identifiedBy "components.table.FormalAnnotations" control TableControl {
+			op IntegerDT getRowCount
+			op StringDT getText(IntegerDT row, IntegerDT column)
+			op StringDT getTextByName(IntegerDT row, StringDT columnName)
+			op BooleanDT isContextMenuEnabled(StringDT contextMenuEntry)
+			op setText(IntegerDT row, IntegerDT column, StringDT textValue)
+			op setTextByName(IntegerDT row, StringDT columnName, StringDT textValue)
+			op selectValue(IntegerDT row, IntegerDT column, FormalAnnotationDT textValue)
+			op selectValueByName(IntegerDT row, StringDT columnName, FormalAnnotationDT textValue)
+			op invokeContextMenu(StringDT contextMenuEntry)
+			op invokeContextMenuOnRow(IntegerDT row, StringDT contextMenuEntry)
+			op checkRow(IntegerDT row)
+			op selectRow(IntegerDT row)
+		}
+
+		op returnToEditor => PaketEditor
+	}
+
+}
+
+
+package bne3.usecases for Stdtoolkit {
+	
+	import de.msg.xt.mdt.tdsl.basictypes.*
+	import bne3.datatypes.*
+	import bne3.activities.*
+	import bne3.usecases.changerequest.*
+	
+	useCase OpenView(StringDT category, StringDT name) initial MainWindow {
+		#openView
+		#selectView(category=category, viewId=name) 
+		#ok
+	}  
+	
+	useCase CreateMinimumCoding(ShortName shortName) initial MainWindow {
+		val changeRequestName = "ChangeRequest" + System::currentTimeMillis
+		call CreateChangeRequest(CreateChangeRequest.name=changeRequestName)
+		
+		call OpenEthernetNavigator
+		#findEthernetNavigator
+		#activateChangeRequest(title=changeRequestName)
+		#tree.invokeContextMenu(nodePath="Ethernet/Datentyp-Kodierungen", contextMenuEntry="Datentyp-Kodierung hinzufügen")
+		#returnToMain
+		#findNewCodingEditor
+		
+		#allgemeinPage
+		#shortname.setText(str=shortName)
+		
+		#returnToEditor
+		#saveAndClose				
+	}
+	
+	useCase CreateCoding(ShortName shortName) initial MainWindow {
+		val changeRequestName = "ChangeRequest" + System::currentTimeMillis
+		call CreateChangeRequest(CreateChangeRequest.name=changeRequestName)
+		
+		call OpenEthernetNavigator
+		#findEthernetNavigator
+		call ActivateChangeRequest(ActivateChangeRequest.name=changeRequestName)
+		#tree.invokeContextMenu(nodePath="Ethernet/Datentyp-Kodierungen", contextMenuEntry="Datentyp-Kodierung hinzufügen")
+		#returnToMain
+	}
+		/*#findNewCodingEditor
+		
+		#allgemeinPage
+		#longname.setText
+		val longName = generatedValue(str)
+		#shortname.setText(str=shortName)
+		#textuelleBeschreibung.invokeContextMenu(contextMenuEntry="Element hinzufügen")
+		#textuelleBeschreibung.setTextByName(row=0, columnName="Text")
+		val text1 = generatedValue(textValue)	
+		#textuelleBeschreibung.selectValueByName(row=0, columnName="Sprache")
+		val sprache = generatedValue(textValue)	
+		#textuelleBeschreibung.invokeContextMenu(contextMenuEntry="Element hinzufügen")
+		#textuelleBeschreibung.setTextByName(row=1, columnName="Text", textValue="Second")
+		#textuelleBeschreibung.selectValueByName(row=1, columnName="Sprache")
+		#textuelleBeschreibung.invokeContextMenuOnRow(row=1, contextMenuEntry="Element löschen")
+		#returnToEditor
+		
+		#kodierungPage
+		[ Thread::sleep(100)]
+		#physBasisDatenTyp.setText
+		val physBasisDatenTyp = generatedValue(str)
+		#physMinimum.setText
+		val physMinimum = generatedValue(str)
+		#physMinimumIntervallgrenze.setText
+		val physMinimumIntervallgrenze = generatedValue(str)
+		#physAufloesung.setText
+		val physAufloesung = generatedValue(str)
+		#physMaximum.setText
+		val physMaximum = generatedValue(str)
+		#physMaximumIntervallgrenze.setText
+		val physMaximumIntervallgrenze = generatedValue(str)
+		
+		#internalBasisDatenTyp.setText
+		val internalBasisDatenTyp = generatedValue(str) 
+		#internalKategorie.setText
+		val internalKategorie = generatedValue(str)
+		#internalEncoding.setText
+		val internalEncoding = generatedValue(str)
+		#internalTermination.setText
+		val internalTermination = generatedValue(str)
+		
+		#fixedBitLengthButton.click
+		#bitLength.setText
+		val bitLength = generatedValue(str)
+		
+		#returnToEditor
+		#saveAndClose
+		
+		#findEthernetNavigator
+		#openCoding(title=shortName.getValue())
+		
+		#allgemeinPage
+		assert [ val actualLongName = #longname.getText ]
+		val actualShortName = #shortname.getText
+		val actualtext = #textuelleBeschreibung.getTextByName(row=0, columnName="Text")
+		val actualSprache = #textuelleBeschreibung.getTextByName(row=0, columnName="Sprache")
+		val actualAnzEntries = #textuelleBeschreibung.getRowCount
+		assert [ junit::framework::Assert::assertEquals(longName.getValue(), actualLongName.getValue())] 
+		assert [ junit::framework::Assert::assertEquals(shortName.getValue(), actualShortName.getValue())]
+		assert [ junit::framework::Assert::assertEquals(text1.getValue(), actualtext.getValue())]
+		assert [ junit::framework::Assert::assertEquals(sprache.getValue(), actualSprache.getValue())]
+		assert [ junit::framework::Assert::assertEquals(1, actualAnzEntries.getValue())]
+		#returnToEditor
+		
+		#kodierungPage
+		[ Thread::sleep(100)]
+		val actualPhysBasisDatenTyp = #physBasisDatenTyp.getText
+		val actualPhysMinimum = #physMinimum.getText
+		val actualPhysMaximum = #physMaximum.getText
+		val actualPhysAufloesung = #physAufloesung.getText
+		val actualPhysMinimumIntervallgrenze = #physMinimumIntervallgrenze.getText
+		val actualPhysMaximumIntervallgrenze = #physMaximumIntervallgrenze.getText
+		val actualInternalBasisDatenTyp = #internalBasisDatenTyp.getText
+		val actualInternalKategorie = #internalKategorie.getText
+		val actualInternalEncoding = #internalEncoding.getText
+		val actualInternalTermination = #internalTermination.getText
+		val actualFixedBitlength = #fixedBitLengthButton.isSelected
+		val actualBitLength = #bitLength.getText
+		assert [ junit::framework::Assert::assertEquals(physBasisDatenTyp.getValue(), actualPhysBasisDatenTyp.getValue()) ]
+		assert [ junit::framework::Assert::assertEquals(physMinimum.getValue(), actualPhysMinimum.getValue()) ]
+		assert [ junit::framework::Assert::assertEquals(physMaximum.getValue(), actualPhysMaximum.getValue()) ]
+		assert [ junit::framework::Assert::assertEquals(physAufloesung.getValue(), actualPhysAufloesung.getValue()) ]
+		assert [ junit::framework::Assert::assertEquals(physMinimumIntervallgrenze.getValue(), actualPhysMinimumIntervallgrenze.getValue()) ]
+		assert [ junit::framework::Assert::assertEquals(physMaximumIntervallgrenze.getValue(), actualPhysMaximumIntervallgrenze.getValue()) ]
+		assert [ junit::framework::Assert::assertEquals(internalBasisDatenTyp.getValue(), actualInternalBasisDatenTyp.getValue()) ]
+		assert [ junit::framework::Assert::assertEquals(internalKategorie.getValue(), actualInternalKategorie.getValue()) ]
+		assert [ junit::framework::Assert::assertEquals(internalEncoding.getValue(), actualInternalEncoding.getValue()) ]
+		assert [ junit::framework::Assert::assertEquals(internalTermination.getValue(), actualInternalTermination.getValue()) ]
+		assert [ junit::framework::Assert::assertEquals(true, actualFixedBitlength.getValue()) ]
+		assert [ junit::framework::Assert::assertEquals(bitLength.getValue(), actualBitLength.getValue()) ]
+	} */
+	
+	useCase ActivateChangeRequest(StringDT name) initial EthernetNavigator {
+		#activateChangeRequest(title=name)
+	}
+	
+	useCase OpenEthernetNavigator initial MainWindow {
+		call OpenView(OpenView.category="Other", OpenView.name="EthernetNavigator")
+	}
+	
+	test OpenEthernetNavigatorTest generator de.msg.xt.mdt.base.SampleTestGenerator useCase OpenEthernetNavigator
+	
+	test CreateCodingTest generator de.msg.xt.mdt.base.SampleTestGenerator useCase CreateCoding {
+		excludeTags Invalid Empty
+	}	
+	
+	
+		useCase ActivateChangeRequest(StringDT name) initial EthernetNavigator {
+		#activateChangeRequest(title=name)
+	}
+	
+	useCase CreateChangeRequest(ChangeRequestTitle name) initial MainWindow {
+		call bne3.usecases.OpenEthernetNavigator
+		#findEthernetNavigator
+		#addChangeRequest
+		#titel.setText(str=name)
+		#saveAndClose
+		#findEthernetNavigator
+		#openChangeRequest(title=name.getValue())
+		val actualTitle = #titel.getText
+		assert [ junit::framework::Assert::assertEquals(name.getValue(), actualTitle.getValue())]
+		#close
+	}
+	
+	test CreateChangeRequestTest generator de.msg.xt.mdt.base.SampleTestGenerator useCase CreateChangeRequest
+	
+}
+
+
+package bne3.usecases.paket for bne3.activities.Stdtoolkit {
+	
+	import de.msg.xt.mdt.tdsl.basictypes.*
+	import de.msg.xt.mdt.tdsl.swtbot.*
+	import bne3.datatypes.*
+	import bne3.activities.*
+
+	useCase CreatePaket(ShortName codingShortName) initial MainWindow {
+		call bne3.usecases.CreateMinimumCoding(bne3.usecases.CreateCoding.shortName=codingShortName)
+		call bne3.usecases.OpenEthernetNavigator
+		#findEthernetNavigator
+		#addBasisDatentyp
+		
+		#allgemeinPage
+		#longname.setText
+		val longName = generatedValue(str)
+		#shortname.setText
+		val shortName = generatedValue(str)
+		#textuelleBeschreibung.invokeContextMenu(contextMenuEntry="Element hinzufügen")
+		#textuelleBeschreibung.setTextByName(row=0, columnName="Text")
+		val text1 = generatedValue(textValue)	
+		#textuelleBeschreibung.selectValueByName(row=0, columnName="Sprache")
+		val sprache = generatedValue(textValue)	
+		#textuelleBeschreibung.invokeContextMenu(contextMenuEntry="Element hinzufügen")
+		#textuelleBeschreibung.setTextByName(row=1, columnName="Text", textValue="Second")
+		#textuelleBeschreibung.selectValueByName(row=1, columnName="Sprache")
+		#textuelleBeschreibung.invokeContextMenuOnRow(row=1, contextMenuEntry="Element löschen")
+		#returnToEditor		
+		#saveAndClose
+		
+		#findEthernetNavigator
+		#openBasisDatentyp(title=shortName.getValue())
+
+		#allgemeinPage
+		val actualLongName = #longname.getText
+		val actualShortName = #shortname.getText
+		val actualtext = #textuelleBeschreibung.getTextByName(row=0, columnName="Text")
+		val actualSprache = #textuelleBeschreibung.getTextByName(row=0, columnName="Sprache")
+		val actualAnzEntries = #textuelleBeschreibung.getRowCount
+		assert [ junit::framework::Assert::assertEquals(longName.getValue(), actualLongName.getValue())] 
+		assert [ junit::framework::Assert::assertEquals(shortName.getValue(), actualShortName.getValue())]
+		assert [ junit::framework::Assert::assertEquals(text1.getValue(), actualtext.getValue())]
+		assert [ junit::framework::Assert::assertEquals(sprache.getValue(), actualSprache.getValue())]
+		assert [ junit::framework::Assert::assertEquals(1, actualAnzEntries.getValue())]
+		#returnToEditor
+	}
+	
+	test CreatePaketTest generator de.msg.xt.mdt.base.SampleTestGenerator useCase CreatePaket {
+		excludeTags Invalid Empty
+	}
+
+
+}
+
+
+package bne3.usecases.datatypetype for bne3.activities.Stdtoolkit {
+	
+	import de.msg.xt.mdt.tdsl.basictypes.*
+	import de.msg.xt.mdt.tdsl.swtbot.*
+	import bne3.datatypes.*
+	import bne3.activities.*
+
+	useCase CreateBasisdatentyp(ShortName codingShortName) initial MainWindow {
+		call bne3.usecases.CreateMinimumCoding(bne3.usecases.CreateCoding.shortName=codingShortName)
+		call bne3.usecases.OpenEthernetNavigator
+		#findEthernetNavigator
+		#addBasisDatentyp
+		
+		#allgemeinPage
+		#longname.setText
+		val longName = generatedValue(str)
+		#shortname.setText
+		val shortName = generatedValue(str)
+		#packageSelectionCombo.setText(str="ABC")
+		#textuelleBeschreibung.invokeContextMenu(contextMenuEntry="Element hinzufügen")
+		#textuelleBeschreibung.setTextByName(row=0, columnName="Text")
+		val text1 = generatedValue(textValue)	
+		#textuelleBeschreibung.selectValueByName(row=0, columnName="Sprache")
+		val sprache = generatedValue(textValue)	
+		#textuelleBeschreibung.invokeContextMenu(contextMenuEntry="Element hinzufügen")
+		#textuelleBeschreibung.setTextByName(row=1, columnName="Text", textValue="Second")
+		#textuelleBeschreibung.selectValueByName(row=1, columnName="Sprache")
+		#textuelleBeschreibung.invokeContextMenuOnRow(row=1, contextMenuEntry="Element löschen")
+		#returnToEditor
+		
+		#speziellPage
+		[ Thread::sleep(100) ]
+		#codingSelectionSearchButton.push
+		#searchText.setText(str=codingShortName.getValue())
+		#searchButton.push
+		#elements.selectRow(row=0)
+		#okButton.push
+		#saveAndClose
+		
+		#findEthernetNavigator
+		#openBasisDatentyp(title=shortName.getValue())
+
+		#allgemeinPage
+		val actualLongName = #longname.getText
+		val actualShortName = #shortname.getText
+		val actualPackage = #packageSelectionCombo.getText
+		val actualtext = #textuelleBeschreibung.getTextByName(row=0, columnName="Text")
+		val actualSprache = #textuelleBeschreibung.getTextByName(row=0, columnName="Sprache")
+		val actualAnzEntries = #textuelleBeschreibung.getRowCount
+		assert [ junit::framework::Assert::assertEquals(longName.getValue(), actualLongName.getValue())] 
+		assert [ junit::framework::Assert::assertEquals(shortName.getValue(), actualShortName.getValue())]
+		assert [ junit::framework::Assert::assertEquals(text1.getValue(), actualtext.getValue())]
+		assert [ junit::framework::Assert::assertEquals(sprache.getValue(), actualSprache.getValue())]
+		assert [ junit::framework::Assert::assertEquals(1, actualAnzEntries.getValue())]
+		assert [ junit::framework::Assert::assertEquals("ABC", actualPackage.getValue()) ]
+		#returnToEditor
+		
+		#speziellPage
+		val actualCoding = #codingSelectionText.getText
+		assert [ junit::framework::Assert::assertTrue(actualCoding.getValue().matches(codingShortName.getValue() + " \\([0-9]+\\)")) ]
+	}
+	
+	useCase CreateAufzaehlungstyp(ShortName codingShortName) initial MainWindow {
+		call bne3.usecases.CreateMinimumCoding(bne3.usecases.CreateCoding.shortName=codingShortName)
+		call bne3.usecases.OpenEthernetNavigator
+		#findEthernetNavigator
+		#addAufzaehlungstyp
+		
+		#allgemeinPage
+		#longname.setText
+		val longName = generatedValue(str)
+		#shortname.setText
+		val shortName = generatedValue(str)
+		#packageSelectionCombo.setText(str="ABC")
+		#textuelleBeschreibung.invokeContextMenu(contextMenuEntry="Element hinzufügen")
+		#textuelleBeschreibung.setTextByName(row=0, columnName="Text")
+		val text1 = generatedValue(textValue)	
+		#textuelleBeschreibung.selectValueByName(row=0, columnName="Sprache")
+		val sprache = generatedValue(textValue)	
+		#textuelleBeschreibung.invokeContextMenu(contextMenuEntry="Element hinzufügen")
+		#textuelleBeschreibung.setTextByName(row=1, columnName="Text", textValue="Second")
+		#textuelleBeschreibung.selectValueByName(row=1, columnName="Sprache")
+		#textuelleBeschreibung.invokeContextMenuOnRow(row=1, contextMenuEntry="Element löschen")
+		#returnToEditor
+		
+		#speziellPage
+		[ Thread::sleep(100) ]
+		#codingSelectionSearchButton.push
+		#searchText.setText(str=codingShortName.getValue())
+		#searchButton.push
+		#elements.selectRow(row=0)
+		#okButton.push
+		#speziellPage
+		#enumElements.invokeContextMenu(contextMenuEntry="Element hinzufügen")
+		#enumElements.setTextByName(row=0, columnName="Wert", textValue="5")
+		#enumElements.setTextByName(row=0, columnName="Synonym", textValue="Synonym 1")
+		#returnToEditor
+		#saveAndClose
+		
+		#findEthernetNavigator
+		#openAufzaehlungstyp(title=shortName.getValue())
+
+		#allgemeinPage
+		val actualLongName = #longname.getText
+		val actualShortName = #shortname.getText
+		val actualPackage = #packageSelectionCombo.getText
+		val actualtext = #textuelleBeschreibung.getTextByName(row=0, columnName="Text")
+		val actualSprache = #textuelleBeschreibung.getTextByName(row=0, columnName="Sprache")
+		val actualAnzEntries = #textuelleBeschreibung.getRowCount
+		assert [ junit::framework::Assert::assertEquals(longName.getValue(), actualLongName.getValue())] 
+		assert [ junit::framework::Assert::assertEquals(shortName.getValue(), actualShortName.getValue())]
+		assert [ junit::framework::Assert::assertEquals("ABC", actualPackage.getValue()) ]
+		assert [ junit::framework::Assert::assertEquals(text1.getValue(), actualtext.getValue())]
+		assert [ junit::framework::Assert::assertEquals(sprache.getValue(), actualSprache.getValue())]
+		assert [ junit::framework::Assert::assertEquals(1, actualAnzEntries.getValue())]
+		#returnToEditor
+		
+		#speziellPage
+		val actualCoding = #codingSelectionText.getText
+		val actualWert = #enumElements.getTextByName(row=0, columnName="Wert")
+		val actualBinary = #enumElements.getTextByName(row=0, columnName="Wert (Binär)")
+		val actualHex = #enumElements.getTextByName(row=0, columnName="Wert (Hexadezimal)")
+		val actualSynonym = #enumElements.getTextByName(row=0, columnName="Synonym")
+		assert [ junit::framework::Assert::assertTrue(actualCoding.getValue().matches(codingShortName.getValue() + " \\([0-9]+\\)")) ]
+		
+		assert [ junit::framework::Assert::assertEquals("5", actualWert.getValue()) ]
+		assert [ junit::framework::Assert::assertEquals("101", actualBinary.getValue()) ]
+		assert [ junit::framework::Assert::assertEquals("5", actualHex.getValue()) ]
+		assert [ junit::framework::Assert::assertEquals("Synonym 1", actualSynonym.getValue()) ]
+	}
+	
+	useCase CreateStrukturtyp(ShortName codingShortName) initial MainWindow {
+		call bne3.usecases.CreateMinimumCoding(bne3.usecases.CreateCoding.shortName=codingShortName)
+		call bne3.usecases.OpenEthernetNavigator
+		#findEthernetNavigator
+		#addStrukturtyp
+		
+		#allgemeinPage
+		#longname.setText
+		val longName = generatedValue(str)
+		#shortname.setText
+		val shortName = generatedValue(str)
+		#packageSelectionCombo.setText(str="ABC")
+		#textuelleBeschreibung.invokeContextMenu(contextMenuEntry="Element hinzufügen")
+		#textuelleBeschreibung.setTextByName(row=0, columnName="Text")
+		val text1 = generatedValue(textValue)	
+		#textuelleBeschreibung.selectValueByName(row=0, columnName="Sprache")
+		val sprache = generatedValue(textValue)	
+		#textuelleBeschreibung.invokeContextMenu(contextMenuEntry="Element hinzufügen")
+		#textuelleBeschreibung.setTextByName(row=1, columnName="Text", textValue="Second")
+		#textuelleBeschreibung.selectValueByName(row=1, columnName="Sprache")
+		#textuelleBeschreibung.invokeContextMenuOnRow(row=1, contextMenuEntry="Element löschen")
+		#returnToEditor
+		
+		#speziellPage
+		[ Thread::sleep(100) ]
+		#returnToEditor
+		#saveAndClose
+		
+		#findEthernetNavigator
+		#openStrukturtyp(title=shortName.getValue())
+
+		#allgemeinPage
+		val actualLongName = #longname.getText
+		val actualShortName = #shortname.getText
+		val actualPackage = #packageSelectionCombo.getText
+		val actualtext = #textuelleBeschreibung.getTextByName(row=0, columnName="Text")
+		val actualSprache = #textuelleBeschreibung.getTextByName(row=0, columnName="Sprache")
+		val actualAnzEntries = #textuelleBeschreibung.getRowCount
+		assert [ junit::framework::Assert::assertEquals(longName.getValue(), actualLongName.getValue())] 
+		assert [ junit::framework::Assert::assertEquals(shortName.getValue(), actualShortName.getValue())]
+		assert [ junit::framework::Assert::assertEquals("ABC", actualPackage.getValue()) ]				
+		assert [ junit::framework::Assert::assertEquals(text1.getValue(), actualtext.getValue())]
+		assert [ junit::framework::Assert::assertEquals(sprache.getValue(), actualSprache.getValue())]
+		assert [ junit::framework::Assert::assertEquals(1, actualAnzEntries.getValue())]
+	}
+	
+	useCase CreateUniontyp(ShortName codingShortName) initial MainWindow {
+		call bne3.usecases.CreateMinimumCoding(bne3.usecases.CreateCoding.shortName=codingShortName)
+		call bne3.usecases.OpenEthernetNavigator
+		#findEthernetNavigator
+		#addUniontyp
+		
+		#allgemeinPage
+		#longname.setText
+		val longName = generatedValue(str)
+		#shortname.setText
+		val shortName = generatedValue(str)
+		#packageSelectionCombo.setText(str="ABC")
+		#textuelleBeschreibung.invokeContextMenu(contextMenuEntry="Element hinzufügen")
+		#textuelleBeschreibung.setTextByName(row=0, columnName="Text")
+		val text1 = generatedValue(textValue)	
+		#textuelleBeschreibung.selectValueByName(row=0, columnName="Sprache")
+		val sprache = generatedValue(textValue)	
+		#textuelleBeschreibung.invokeContextMenu(contextMenuEntry="Element hinzufügen")
+		#textuelleBeschreibung.setTextByName(row=1, columnName="Text", textValue="Second")
+		#textuelleBeschreibung.selectValueByName(row=1, columnName="Sprache")
+		#textuelleBeschreibung.invokeContextMenuOnRow(row=1, contextMenuEntry="Element löschen")
+		#returnToEditor		
+
+		#saveAndClose		
+
+		#findEthernetNavigator
+		#openUniontyp(title=shortName.getValue())
+		
+		#allgemeinPage
+		val actualLongName = #longname.getText
+		val actualShortName = #shortname.getText
+		val actualPackage = #packageSelectionCombo.getText
+		val actualtext = #textuelleBeschreibung.getTextByName(row=0, columnName="Text")
+		val actualSprache = #textuelleBeschreibung.getTextByName(row=0, columnName="Sprache")
+		val actualAnzEntries = #textuelleBeschreibung.getRowCount
+		assert [ junit::framework::Assert::assertEquals(longName.getValue(), actualLongName.getValue())] 
+		assert [ junit::framework::Assert::assertEquals(shortName.getValue(), actualShortName.getValue())]
+		assert [ junit::framework::Assert::assertEquals("ABC", actualPackage.getValue()) ]				
+		assert [ junit::framework::Assert::assertEquals(text1.getValue(), actualtext.getValue())]
+		assert [ junit::framework::Assert::assertEquals(sprache.getValue(), actualSprache.getValue())]
+		assert [ junit::framework::Assert::assertEquals(1, actualAnzEntries.getValue())]
+		#returnToEditor
+
+		#speziellPage
+	}
+
+	test CreateBasisdatentypTest generator de.msg.xt.mdt.base.SampleTestGenerator useCase CreateBasisdatentyp {
+		excludeTags Invalid Empty
+	}
+	
+	test CreateAufzaehlungstypTest generator de.msg.xt.mdt.base.SampleTestGenerator useCase CreateAufzaehlungstyp {
+		excludeTags Invalid Empty
+	}
+	
+	test CreateStrukturtypTest generator de.msg.xt.mdt.base.SampleTestGenerator useCase CreateStrukturtyp {
+		excludeTags Invalid Empty
+	}
+	test CreateUniontypTest generator de.msg.xt.mdt.base.SampleTestGenerator useCase CreateUniontyp {
+		excludeTags Invalid Empty
+	}	
+}

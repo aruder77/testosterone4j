@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.menus">
+   </extension>
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            id="com.bmw.bne3.client.uitest.importer.contribution1"
+            nameFilter="*.uidefinition"
+            objectClass="org.eclipse.core.resources.IFile">
+         <menu
+               id="com.bmw.bne3.client.uitest.importer.menu1"
+               label="TDsl"
+               path="additions">
+            <separator
+                  name="group1">
+            </separator>
+         </menu>
+         <action
+               class="com.bmw.bne3.client.uitest.importer.popup.actions.ActivityImportAction"
+               enablesFor="1"
+               id="com.bmw.bne3.client.uitest.importer.newAction"
+               label="Import Activities"
+               menubarPath="com.bmw.bne3.client.uitest.importer.menu1/group1">
+         </action>
+      </objectContribution>
+   </extension>
+
+</plugin>

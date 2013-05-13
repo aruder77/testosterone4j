@@ -1,0 +1,18 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: BNE3 UI Test Models
+Bundle-SymbolicName: com.bmw.bne3.client.uitests.model;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: de.msg.xt.mdt.base.Activator
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ de.msg.xt.mdt.tdsl.swtbot;bundle-version="3.0.4",
+ de.msg.xt.mdt.tdsl.basictypes;bundle-version="3.0.4",
+ com.bmw.bne3.client;bundle-version="3.0.4",
+ com.bmw.smartfaces.lpunits;bundle-version="3.0.4",
+ de.msg.xt.mdt.tdsl.base;bundle-version="1.0.0",
+ de.msg.xt.mdt.tdsl;bundle-version="1.0.0",
+ de.msg.xt.mdt.tdsl.basictypes.model;bundle-version="3.0.4",
+ de.msg.xt.mdt.tdsl.swtbot.model;bundle-version="3.0.4",
+ com.bmw.bne3.client.test.libs;bundle-version="3.0.4"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
