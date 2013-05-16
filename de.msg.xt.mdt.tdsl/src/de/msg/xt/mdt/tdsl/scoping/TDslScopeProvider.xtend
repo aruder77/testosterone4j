@@ -227,14 +227,20 @@ class TDslScopeProvider extends XbaseScopeProvider {
 	
 	
 	def dispatch List<Activity> determineExplicitNextActivities(OperationCall call) {
+		if (call.eIsProxy)
+			return null
 		call?.operation?.nextActivities?.map[it.next]
 	}			
 	
 	def dispatch List<Activity> determineExplicitNextActivities(ActivityOperationCall call) {
+		if (call.eIsProxy)
+			return null
 		call?.operation?.nextActivities?.map[it.next]
 	}			
 	
 	def dispatch List<Activity> determineExplicitNextActivities(SubUseCaseCall call) {
+		if (call.eIsProxy)
+			return null
 		var nextActivity = call?.useCase?.nextActivity?.next
 		if (nextActivity == null) 
 			nextActivity = call?.useCase?.initialActivity 
@@ -242,14 +248,20 @@ class TDslScopeProvider extends XbaseScopeProvider {
 	}			
 	
 	def dispatch List<Activity> determineExplicitNextActivities(XIfExpression ifExpr) {
+		if (ifExpr.eIsProxy)
+			return null
 		ifExpr.then.determineExplicitNextActivities
 	}			
 	
 	def dispatch List<Activity> determineExplicitNextActivities(XVariableDeclaration varDecl) {
+		if (varDecl.eIsProxy)
+			return null
 		varDecl.right.determineExplicitNextActivities
 	}			
 	
 	def dispatch List<Activity> determineExplicitNextActivities(XBlockExpression blockExpr) {
+		if (blockExpr.eIsProxy)
+			return null
 		if (blockExpr.expressions.empty)
 			return Collections::emptyList
 		var index = blockExpr.expressions.size - 1
@@ -266,6 +278,8 @@ class TDslScopeProvider extends XbaseScopeProvider {
 	}			
 	
 	def dispatch List<Activity> determineExplicitNextActivities(XExpression expr) {
+		if (expr.eIsProxy)
+			return null
 		if (expr.containsActivitySwitchingOperation)
 			expr.activitySwitchingOperation.determineExplicitNextActivities
 		else 
@@ -274,7 +288,8 @@ class TDslScopeProvider extends XbaseScopeProvider {
 	
 	def lastActivitySwitchingExpression(XExpression expr) {
 		var currentExpression = expr.precedingExpression
-		while (currentExpression != null && currentExpression.determineExplicitNextActivities.empty) {
+		val nextActivities = currentExpression?.determineExplicitNextActivities
+		while (currentExpression != null && nextActivities != null && nextActivities.empty) {
 			currentExpression = currentExpression.precedingExpression
 		} 
 		currentExpression
@@ -291,12 +306,15 @@ class TDslScopeProvider extends XbaseScopeProvider {
 
 		val nextActivities = lastExpression.determineExplicitNextActivities	
 		val returnList = new ArrayList<Activity> 
-		for (nextActivity : nextActivities) {
-			if (nextActivity == null) {
-				val previousExpression = lastExpression.lastActivitySwitchingExpression
-				returnList.addAll(previousExpression.currentActivities)
-			} else {
-				returnList.add(nextActivity)
+		if (nextActivities != null) {
+			for (nextActivity : nextActivities) {
+				if (nextActivity == null) {
+					val previousExpression = lastExpression.lastActivitySwitchingExpression
+					if (previousExpression != null) 
+						returnList.addAll(previousExpression.currentActivities)
+				} else {
+					returnList.add(nextActivity)
+				}
 			}
 		}
 		returnList

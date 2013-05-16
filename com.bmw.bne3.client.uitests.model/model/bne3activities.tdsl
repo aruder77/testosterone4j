@@ -75,46 +75,53 @@ package bne3.activities {
 
 		op activateChangeRequest(StringDT title)
 		op openCoding(StringDT title) => CodingEditor
-		op addChangeRequest {
-			#tree.invokeContextMenu(nodePath = "Änderungsmanagement/Änderungsantrag", contextMenuEntry =
-			"Änderungsantrag hinzufügen")
-			#returnToMain
-			#findNewAenderungsantragEditor
-		} => Aenderungsantrag
 		op openChangeRequest(StringDT title) => Aenderungsantrag
-		op addBasisDatentyp {
-			#tree.invokeContextMenu(nodePath = "Ethernet/Datentypen/Basisdatentypen", contextMenuEntry =
-			"Basisdatentyp hinzufügen")
-			#returnToMain
-			#findNewBasisdatentypEditor
-		} => BasisDatentypEditor
 		op openBasisDatentyp(StringDT title) => BasisDatentypEditor
-		op addAufzaehlungstyp {
-			#tree.invokeContextMenu(nodePath = "Ethernet/Datentypen/Aufzählungen", contextMenuEntry = "Aufzählung hinzufügen")
-			#returnToMain
-			#findNewAufzaehlungstypEditor
-		} => AufzaehlungstypenEditor
 		op openAufzaehlungstyp(StringDT title) => AufzaehlungstypenEditor
-		op addStrukturtyp {
-			#tree.invokeContextMenu(nodePath = "Ethernet/Datentypen/Strukturen", contextMenuEntry = "Struktur hinzufügen")
-			#returnToMain
-			#findNewStrukturtypEditor
-		} => StrukturEditor
 		op openStrukturtyp(StringDT title) => StrukturEditor
-		op addUniontyp {
-			#tree.invokeContextMenu(nodePath = "Ethernet/Datentypen/Unions", contextMenuEntry = "Union hinzufügen")
-			#returnToMain
-			#findNewUniontypEditor
-		} => UniontypEditor
 		op openUniontyp(StringDT title) => UniontypEditor
-		op addPaket {
-			#tree.invokeContextMenu(nodePath = "Ethernet/Datentypen/Unions", contextMenuEntry = "Union hinzufügen")
-			#returnToMain
-			#findNewUniontypEditor
-		} => UniontypEditor
 		op openPaket(StringDT title) => bne3.activities.paket.PaketEditor
 	}
+	
+	useCase EthernetNavigator_addChangeRequest initial EthernetNavigator {
+		#tree.invokeContextMenu(nodePath = "Änderungsmanagement/Änderungsantrag", contextMenuEntry =
+			"Änderungsantrag hinzufügen")
+		#returnToMain
+		#findNewAenderungsantragEditor
+	} => Aenderungsantrag 
+	
+	useCase EthernetNavigator_addBasisDatentyp initial EthernetNavigator {
+		#tree.invokeContextMenu(nodePath = "Ethernet/Datentypen/Basisdatentypen", contextMenuEntry =
+			"Basisdatentyp hinzufügen")
+		#returnToMain
+		#findNewBasisdatentypEditor
+	} => BasisDatentypEditor
+	
+	useCase EthernetNavigator_addAufzaehlungstyp initial EthernetNavigator {
+		#tree.invokeContextMenu(nodePath = "Ethernet/Datentypen/Aufzählungen", contextMenuEntry = "Aufzählung hinzufügen")
+		#returnToMain
+		#findNewAufzaehlungstypEditor
+	} => AufzaehlungstypenEditor
+	
+	useCase EthernetNavigator_addStrukturtyp initial EthernetNavigator {
+		#tree.invokeContextMenu(nodePath = "Ethernet/Datentypen/Strukturen", contextMenuEntry = "Struktur hinzufügen")
+		#returnToMain
+		#findNewStrukturtypEditor
+	} => StrukturEditor
 
+	useCase EthernetNavigator_addUniontyp initial EthernetNavigator {
+		#tree.invokeContextMenu(nodePath = "Ethernet/Datentypen/Unions", contextMenuEntry = "Union hinzufügen")
+		#returnToMain
+		#findNewUniontypEditor
+	} => UniontypEditor
+		
+	useCase EthernetNavigatoraddPaket initial EthernetNavigator {
+		#tree.invokeContextMenu(nodePath = "Ethernet/Datentypen/Unions", contextMenuEntry = "Union hinzufügen")
+		#returnToMain
+		#findNewUniontypEditor
+	} => UniontypEditor
+	
+	
 	activity CodingEditor identifiedBy "CodingTypePresentation" extends EditorActivity {
 		op allgemeinPage => AllgemeinPage
 		op verwendungPage
@@ -164,7 +171,7 @@ package bne3.activities {
 			op selectRow(IntegerDT row)
 		}
 
-		op returnToEditor => CodingEditor
+		op returnToEditor => returnToLastActivity
 	}
 
 	activity CodingEditorKodierungPage {
@@ -274,7 +281,7 @@ package bne3.activities.datatypetype for bne3.activities.Stdtoolkit {
 	import bne3.activities.*
 
 	activity BasisDatentypEditor identifiedBy "CommonDatatypeTypePresentation" extends EditorActivity {
-		op allgemeinPage => BasisdatentypEditorAllgemeinPage
+		op allgemeinPage => AllgemeinPageMitPaketSelektion
 		op speziellPage => BasisDatentypSpeziellPage
 	}
 
@@ -298,19 +305,7 @@ package bne3.activities.datatypetype for bne3.activities.Stdtoolkit {
 		op returnToEditor => BasisDatentypEditor
 	}
 
-	activity BasisdatentypEditorAllgemeinPage {
-		field longname identifiedBy "longname" control TextControl {
-			op LongName getText
-			op setText(LongName str)
-			op BooleanDT isEnabled
-		}
-
-		field shortname identifiedBy "shortname" control TextControl {
-			op ShortName getText
-			op setText(ShortName str)
-			op BooleanDT isEnabled
-		}
-
+	activity AllgemeinPageMitPaketSelektion extends AllgemeinPage {
 		field packageSelectionCombo identifiedBy "typeSelectionCombo.combo" control ComboBox {
 			op setText(StringDT str)
 			op StringDT getText
@@ -321,38 +316,6 @@ package bne3.activities.datatypetype for bne3.activities.Stdtoolkit {
 			op push
 			op BooleanDT isEnabled
 		}
-
-		field textuelleBeschreibung identifiedBy "bne3.table.Descriptions" control TableControl {
-			op IntegerDT getRowCount
-			op StringDT getText(IntegerDT row, IntegerDT column)
-			op StringDT getTextByName(IntegerDT row, StringDT columnName)
-			op BooleanDT isContextMenuEnabled(StringDT contextMenuEntry)
-			op setText(IntegerDT row, IntegerDT column, StringDT textValue)
-			op setTextByName(IntegerDT row, StringDT columnName, StringDT textValue)
-			op selectValue(IntegerDT row, IntegerDT column, LanguageDT textValue)
-			op selectValueByName(IntegerDT row, StringDT columnName, LanguageDT textValue)
-			op invokeContextMenu(StringDT contextMenuEntry)
-			op invokeContextMenuOnRow(IntegerDT row, StringDT contextMenuEntry)
-			op checkRow(IntegerDT row)
-			op selectRow(IntegerDT row)
-		}
-
-		field formaleAnnotationen identifiedBy "components.table.FormalAnnotations" control TableControl {
-			op IntegerDT getRowCount
-			op StringDT getText(IntegerDT row, IntegerDT column)
-			op StringDT getTextByName(IntegerDT row, StringDT columnName)
-			op BooleanDT isContextMenuEnabled(StringDT contextMenuEntry)
-			op setText(IntegerDT row, IntegerDT column, StringDT textValue)
-			op setTextByName(IntegerDT row, StringDT columnName, StringDT textValue)
-			op selectValue(IntegerDT row, IntegerDT column, FormalAnnotationDT textValue)
-			op selectValueByName(IntegerDT row, StringDT columnName, FormalAnnotationDT textValue)
-			op invokeContextMenu(StringDT contextMenuEntry)
-			op invokeContextMenuOnRow(IntegerDT row, StringDT contextMenuEntry)
-			op checkRow(IntegerDT row)
-			op selectRow(IntegerDT row)
-		}
-
-		op returnToEditor => BasisDatentypEditor
 	}
 
 	activity CodingTypeSearch extends DialogActivity {
@@ -395,7 +358,7 @@ package bne3.activities.datatypetype for bne3.activities.Stdtoolkit {
 	}
 
 	activity AufzaehlungstypenEditor identifiedBy "EnumDatatypeTypePresentation" extends EditorActivity {
-		op allgemeinPage => AufzaehlungstypenEditorAllgemeinPage
+		op allgemeinPage => AllgemeinPageMitPaketSelektion
 		op speziellPage => AufzaehlungstypenEditorSpeziellPage
 	}
 
@@ -427,63 +390,6 @@ package bne3.activities.datatypetype for bne3.activities.Stdtoolkit {
 			op selectValue(IntegerDT row, IntegerDT column, StringDT textValue)
 			op selectValueByName(IntegerDT row, StringDT columnName, StringDT textValue)
 			op IntegerDT getRowCount
-			op checkRow(IntegerDT row)
-			op selectRow(IntegerDT row)
-		}
-
-		op returnToEditor => AufzaehlungstypenEditor
-	}
-
-	activity AufzaehlungstypenEditorAllgemeinPage {
-		field longname identifiedBy "longname" control TextControl {
-			op LongName getText
-			op setText(LongName str)
-			op BooleanDT isEnabled
-		}
-
-		field shortname identifiedBy "shortname" control TextControl {
-			op ShortName getText
-			op setText(ShortName str)
-			op BooleanDT isEnabled
-		}
-
-		field packageSelectionCombo identifiedBy "typeSelectionCombo.combo" control ComboBox {
-			op setText(StringDT str)
-			op StringDT getText
-			op BooleanDT isEnabled
-		}
-
-		field packageSelectionNavigation identifiedBy "typeSelectionCombo.jumpButton" control Button {
-			op push
-			op BooleanDT isEnabled
-		}
-
-		field textuelleBeschreibung identifiedBy "bne3.table.Descriptions" control TableControl {
-			op IntegerDT getRowCount
-			op StringDT getText(IntegerDT row, IntegerDT column)
-			op StringDT getTextByName(IntegerDT row, StringDT columnName)
-			op BooleanDT isContextMenuEnabled(StringDT contextMenuEntry)
-			op setText(IntegerDT row, IntegerDT column, StringDT textValue)
-			op setTextByName(IntegerDT row, StringDT columnName, StringDT textValue)
-			op selectValue(IntegerDT row, IntegerDT column, LanguageDT textValue)
-			op selectValueByName(IntegerDT row, StringDT columnName, LanguageDT textValue)
-			op invokeContextMenu(StringDT contextMenuEntry)
-			op invokeContextMenuOnRow(IntegerDT row, StringDT contextMenuEntry)
-			op checkRow(IntegerDT row)
-			op selectRow(IntegerDT row)
-		}
-
-		field formaleAnnotationen identifiedBy "components.table.FormalAnnotations" control TableControl {
-			op IntegerDT getRowCount
-			op StringDT getText(IntegerDT row, IntegerDT column)
-			op StringDT getTextByName(IntegerDT row, StringDT columnName)
-			op BooleanDT isContextMenuEnabled(StringDT contextMenuEntry)
-			op setText(IntegerDT row, IntegerDT column, StringDT textValue)
-			op setTextByName(IntegerDT row, StringDT columnName, StringDT textValue)
-			op selectValue(IntegerDT row, IntegerDT column, FormalAnnotationDT textValue)
-			op selectValueByName(IntegerDT row, StringDT columnName, FormalAnnotationDT textValue)
-			op invokeContextMenu(StringDT contextMenuEntry)
-			op invokeContextMenuOnRow(IntegerDT row, StringDT contextMenuEntry)
 			op checkRow(IntegerDT row)
 			op selectRow(IntegerDT row)
 		}
@@ -531,7 +437,7 @@ package bne3.activities.datatypetype for bne3.activities.Stdtoolkit {
 	}
 
 	activity StrukturEditor identifiedBy "StructureDatatypeTypePresentation" extends EditorActivity {
-		op allgemeinPage => StrukturEditorAllgemeinPage
+		op allgemeinPage => AllgemeinPageMitPaketSelektion
 		op speziellPage => StrukturEditorSpeziellPage
 	}
 
@@ -539,129 +445,14 @@ package bne3.activities.datatypetype for bne3.activities.Stdtoolkit {
 		op returnToEditor => StrukturEditor
 	}
 
-	activity StrukturEditorAllgemeinPage {
-		field longname identifiedBy "longname" control TextControl {
-			op LongName getText
-			op setText(LongName str)
-			op BooleanDT isEnabled
-		}
-
-		field shortname identifiedBy "shortname" control TextControl {
-			op ShortName getText
-			op setText(ShortName str)
-			op BooleanDT isEnabled
-		}
-
-		field packageSelectionCombo identifiedBy "typeSelectionCombo.combo" control ComboBox {
-			op setText(StringDT str)
-			op StringDT getText
-			op BooleanDT isEnabled
-		}
-
-		field packageSelectionNavigation identifiedBy "typeSelectionCombo.jumpButton" control Button {
-			op push
-			op BooleanDT isEnabled
-		}
-
-		field textuelleBeschreibung identifiedBy "bne3.table.Descriptions" control TableControl {
-			op IntegerDT getRowCount
-			op StringDT getText(IntegerDT row, IntegerDT column)
-			op StringDT getTextByName(IntegerDT row, StringDT columnName)
-			op BooleanDT isContextMenuEnabled(StringDT contextMenuEntry)
-			op setText(IntegerDT row, IntegerDT column, StringDT textValue)
-			op setTextByName(IntegerDT row, StringDT columnName, StringDT textValue)
-			op selectValue(IntegerDT row, IntegerDT column, LanguageDT textValue)
-			op selectValueByName(IntegerDT row, StringDT columnName, LanguageDT textValue)
-			op invokeContextMenu(StringDT contextMenuEntry)
-			op invokeContextMenuOnRow(IntegerDT row, StringDT contextMenuEntry)
-			op checkRow(IntegerDT row)
-			op selectRow(IntegerDT row)
-		}
-
-		field formaleAnnotationen identifiedBy "components.table.FormalAnnotations" control TableControl {
-			op IntegerDT getRowCount
-			op StringDT getText(IntegerDT row, IntegerDT column)
-			op StringDT getTextByName(IntegerDT row, StringDT columnName)
-			op BooleanDT isContextMenuEnabled(StringDT contextMenuEntry)
-			op setText(IntegerDT row, IntegerDT column, StringDT textValue)
-			op setTextByName(IntegerDT row, StringDT columnName, StringDT textValue)
-			op selectValue(IntegerDT row, IntegerDT column, FormalAnnotationDT textValue)
-			op selectValueByName(IntegerDT row, StringDT columnName, FormalAnnotationDT textValue)
-			op invokeContextMenu(StringDT contextMenuEntry)
-			op invokeContextMenuOnRow(IntegerDT row, StringDT contextMenuEntry)
-			op checkRow(IntegerDT row)
-			op selectRow(IntegerDT row)
-		}
-
-		op returnToEditor => StrukturEditor
-	}
-
 	activity UniontypEditor identifiedBy "StructureDatatypeTypePresentation" extends EditorActivity {
-		op allgemeinPage => UniontypEditorAllgemeinPage
+		op allgemeinPage => AllgemeinPageMitPaketSelektion
 		op speziellPage => UniontypEditorSpeziellPage
 	}
 
 	activity UniontypEditorSpeziellPage identifiedBy "Speziell" {
 		op returnToEditor => UniontypEditor
 	}
-
-	activity UniontypEditorAllgemeinPage {
-		field longname identifiedBy "longname" control TextControl {
-			op LongName getText
-			op setText(LongName str)
-			op BooleanDT isEnabled
-		}
-
-		field shortname identifiedBy "shortname" control TextControl {
-			op ShortName getText
-			op setText(ShortName str)
-			op BooleanDT isEnabled
-		}
-
-		field packageSelectionCombo identifiedBy "typeSelectionCombo.combo" control ComboBox {
-			op setText(StringDT str)
-			op StringDT getText
-			op BooleanDT isEnabled
-		}
-
-		field packageSelectionNavigation identifiedBy "typeSelectionCombo.jumpButton" control Button {
-			op push
-			op BooleanDT isEnabled
-		}
-
-		field textuelleBeschreibung identifiedBy "bne3.table.Descriptions" control TableControl {
-			op IntegerDT getRowCount
-			op StringDT getText(IntegerDT row, IntegerDT column)
-			op StringDT getTextByName(IntegerDT row, StringDT columnName)
-			op BooleanDT isContextMenuEnabled(StringDT contextMenuEntry)
-			op setText(IntegerDT row, IntegerDT column, StringDT textValue)
-			op setTextByName(IntegerDT row, StringDT columnName, StringDT textValue)
-			op selectValue(IntegerDT row, IntegerDT column, LanguageDT textValue)
-			op selectValueByName(IntegerDT row, StringDT columnName, LanguageDT textValue)
-			op invokeContextMenu(StringDT contextMenuEntry)
-			op invokeContextMenuOnRow(IntegerDT row, StringDT contextMenuEntry)
-			op checkRow(IntegerDT row)
-			op selectRow(IntegerDT row)
-		}
-
-		field formaleAnnotationen identifiedBy "components.table.FormalAnnotations" control TableControl {
-			op IntegerDT getRowCount
-			op StringDT getText(IntegerDT row, IntegerDT column)
-			op StringDT getTextByName(IntegerDT row, StringDT columnName)
-			op BooleanDT isContextMenuEnabled(StringDT contextMenuEntry)
-			op setText(IntegerDT row, IntegerDT column, StringDT textValue)
-			op setTextByName(IntegerDT row, StringDT columnName, StringDT textValue)
-			op selectValue(IntegerDT row, IntegerDT column, FormalAnnotationDT textValue)
-			op selectValueByName(IntegerDT row, StringDT columnName, FormalAnnotationDT textValue)
-			op invokeContextMenu(StringDT contextMenuEntry)
-			op invokeContextMenuOnRow(IntegerDT row, StringDT contextMenuEntry)
-			op checkRow(IntegerDT row)
-			op selectRow(IntegerDT row)
-		}
-
-		op returnToEditor => UniontypEditor
-	}
-
 }
 
 package bne3.activities.paket for bne3.activities.Stdtoolkit {
@@ -671,55 +462,8 @@ package bne3.activities.paket for bne3.activities.Stdtoolkit {
 	import bne3.activities.*
 
 	activity PaketEditor identifiedBy "PackageTypePresentation" extends EditorActivity {
-		op allgemeinPage => PaketEditorAllgemeinPage
+		op allgemeinPage => AllgemeinPage
 	}
-
-	activity PaketEditorAllgemeinPage {
-		field longname identifiedBy "longname" control TextControl {
-			op LongName getText
-			op setText(LongName str)
-			op BooleanDT isEnabled
-		}
-
-		field shortname identifiedBy "shortname" control TextControl {
-			op ShortName getText
-			op setText(ShortName str)
-			op BooleanDT isEnabled
-		}
-
-		field textuelleBeschreibung identifiedBy "bne3.table.Descriptions" control TableControl {
-			op IntegerDT getRowCount
-			op StringDT getText(IntegerDT row, IntegerDT column)
-			op StringDT getTextByName(IntegerDT row, StringDT columnName)
-			op BooleanDT isContextMenuEnabled(StringDT contextMenuEntry)
-			op setText(IntegerDT row, IntegerDT column, StringDT textValue)
-			op setTextByName(IntegerDT row, StringDT columnName, StringDT textValue)
-			op selectValue(IntegerDT row, IntegerDT column, LanguageDT textValue)
-			op selectValueByName(IntegerDT row, StringDT columnName, LanguageDT textValue)
-			op invokeContextMenu(StringDT contextMenuEntry)
-			op invokeContextMenuOnRow(IntegerDT row, StringDT contextMenuEntry)
-			op checkRow(IntegerDT row)
-			op selectRow(IntegerDT row)
-		}
-
-		field formaleAnnotationen identifiedBy "components.table.FormalAnnotations" control TableControl {
-			op IntegerDT getRowCount
-			op StringDT getText(IntegerDT row, IntegerDT column)
-			op StringDT getTextByName(IntegerDT row, StringDT columnName)
-			op BooleanDT isContextMenuEnabled(StringDT contextMenuEntry)
-			op setText(IntegerDT row, IntegerDT column, StringDT textValue)
-			op setTextByName(IntegerDT row, StringDT columnName, StringDT textValue)
-			op selectValue(IntegerDT row, IntegerDT column, FormalAnnotationDT textValue)
-			op selectValueByName(IntegerDT row, StringDT columnName, FormalAnnotationDT textValue)
-			op invokeContextMenu(StringDT contextMenuEntry)
-			op invokeContextMenuOnRow(IntegerDT row, StringDT contextMenuEntry)
-			op checkRow(IntegerDT row)
-			op selectRow(IntegerDT row)
-		}
-
-		op returnToEditor => PaketEditor
-	}
-
 }
 
 
@@ -763,8 +507,8 @@ package bne3.usecases for Stdtoolkit {
 		call ActivateChangeRequest(ActivateChangeRequest.name=changeRequestName)
 		#tree.invokeContextMenu(nodePath="Ethernet/Datentyp-Kodierungen", contextMenuEntry="Datentyp-Kodierung hinzufügen")
 		#returnToMain
-	}
-		/*#findNewCodingEditor
+		
+		#findNewCodingEditor
 		
 		#allgemeinPage
 		#longname.setText
@@ -854,7 +598,7 @@ package bne3.usecases for Stdtoolkit {
 		assert [ junit::framework::Assert::assertEquals(internalTermination.getValue(), actualInternalTermination.getValue()) ]
 		assert [ junit::framework::Assert::assertEquals(true, actualFixedBitlength.getValue()) ]
 		assert [ junit::framework::Assert::assertEquals(bitLength.getValue(), actualBitLength.getValue()) ]
-	} */
+	}
 	
 	useCase ActivateChangeRequest(StringDT name) initial EthernetNavigator {
 		#activateChangeRequest(title=name)
