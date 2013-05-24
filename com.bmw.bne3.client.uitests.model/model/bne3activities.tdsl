@@ -75,53 +75,46 @@ package bne3.activities {
 
 		op activateChangeRequest(StringDT title)
 		op openCoding(StringDT title) => CodingEditor
+		op addChangeRequest {
+			#tree.invokeContextMenu(nodePath = "Änderungsmanagement/Änderungsantrag", contextMenuEntry =
+			"Änderungsantrag hinzufügen")
+			#returnToMain
+			#findNewAenderungsantragEditor
+		} => Aenderungsantrag
 		op openChangeRequest(StringDT title) => Aenderungsantrag
+		op addBasisDatentyp {
+			#tree.invokeContextMenu(nodePath = "Ethernet/Datentypen/Basisdatentypen", contextMenuEntry =
+			"Basisdatentyp hinzufügen")
+			#returnToMain
+			#findNewBasisdatentypEditor
+		} => BasisDatentypEditor
 		op openBasisDatentyp(StringDT title) => BasisDatentypEditor
+		op addAufzaehlungstyp {
+			#tree.invokeContextMenu(nodePath = "Ethernet/Datentypen/Aufzählungen", contextMenuEntry = "Aufzählung hinzufügen")
+			#returnToMain
+			#findNewAufzaehlungstypEditor
+		} => AufzaehlungstypenEditor
 		op openAufzaehlungstyp(StringDT title) => AufzaehlungstypenEditor
+		op addStrukturtyp {
+			#tree.invokeContextMenu(nodePath = "Ethernet/Datentypen/Strukturen", contextMenuEntry = "Struktur hinzufügen")
+			#returnToMain
+			#findNewStrukturtypEditor
+		} => StrukturEditor
 		op openStrukturtyp(StringDT title) => StrukturEditor
+		op addUniontyp {
+			#tree.invokeContextMenu(nodePath = "Ethernet/Datentypen/Unions", contextMenuEntry = "Union hinzufügen")
+			#returnToMain
+			#findNewUniontypEditor
+		} => UniontypEditor
 		op openUniontyp(StringDT title) => UniontypEditor
+		op addPaket {
+			#tree.invokeContextMenu(nodePath = "Ethernet/Datentypen/Unions", contextMenuEntry = "Union hinzufügen")
+			#returnToMain
+			#findNewUniontypEditor
+		} => UniontypEditor
 		op openPaket(StringDT title) => bne3.activities.paket.PaketEditor
 	}
-	
-	useCase EthernetNavigator_addChangeRequest initial EthernetNavigator {
-		#tree.invokeContextMenu(nodePath = "Änderungsmanagement/Änderungsantrag", contextMenuEntry =
-			"Änderungsantrag hinzufügen")
-		#returnToMain
-		#findNewAenderungsantragEditor
-	} => Aenderungsantrag 
-	
-	useCase EthernetNavigator_addBasisDatentyp initial EthernetNavigator {
-		#tree.invokeContextMenu(nodePath = "Ethernet/Datentypen/Basisdatentypen", contextMenuEntry =
-			"Basisdatentyp hinzufügen")
-		#returnToMain
-		#findNewBasisdatentypEditor
-	} => BasisDatentypEditor
-	
-	useCase EthernetNavigator_addAufzaehlungstyp initial EthernetNavigator {
-		#tree.invokeContextMenu(nodePath = "Ethernet/Datentypen/Aufzählungen", contextMenuEntry = "Aufzählung hinzufügen")
-		#returnToMain
-		#findNewAufzaehlungstypEditor
-	} => AufzaehlungstypenEditor
-	
-	useCase EthernetNavigator_addStrukturtyp initial EthernetNavigator {
-		#tree.invokeContextMenu(nodePath = "Ethernet/Datentypen/Strukturen", contextMenuEntry = "Struktur hinzufügen")
-		#returnToMain
-		#findNewStrukturtypEditor
-	} => StrukturEditor
 
-	useCase EthernetNavigator_addUniontyp initial EthernetNavigator {
-		#tree.invokeContextMenu(nodePath = "Ethernet/Datentypen/Unions", contextMenuEntry = "Union hinzufügen")
-		#returnToMain
-		#findNewUniontypEditor
-	} => UniontypEditor
-		
-	useCase EthernetNavigatoraddPaket initial EthernetNavigator {
-		#tree.invokeContextMenu(nodePath = "Ethernet/Datentypen/Unions", contextMenuEntry = "Union hinzufügen")
-		#returnToMain
-		#findNewUniontypEditor
-	} => UniontypEditor
-	
-	
 	activity CodingEditor identifiedBy "CodingTypePresentation" extends EditorActivity {
 		op allgemeinPage => AllgemeinPage
 		op verwendungPage
@@ -305,7 +298,7 @@ package bne3.activities.datatypetype for bne3.activities.Stdtoolkit {
 		op returnToEditor => BasisDatentypEditor
 	}
 
-	activity AllgemeinPageMitPaketSelektion extends AllgemeinPage {
+	activity AllgemeinPageMitPaketSelektion {
 		field packageSelectionCombo identifiedBy "typeSelectionCombo.combo" control ComboBox {
 			op setText(StringDT str)
 			op StringDT getText
@@ -316,6 +309,50 @@ package bne3.activities.datatypetype for bne3.activities.Stdtoolkit {
 			op push
 			op BooleanDT isEnabled
 		}
+		
+		field longname identifiedBy "longname" control TextControl {
+			op LongName getText
+			op setText(LongName str)
+			op BooleanDT isEnabled
+		}
+
+		field shortname identifiedBy "shortname" control TextControl {
+			op ShortName getText
+			op setText(ShortName str)
+			op BooleanDT isEnabled
+		}
+
+		field textuelleBeschreibung identifiedBy "bne3.table.Descriptions" control TableControl {
+			op IntegerDT getRowCount
+			op StringDT getText(IntegerDT row, IntegerDT column)
+			op StringDT getTextByName(IntegerDT row, StringDT columnName)
+			op BooleanDT isContextMenuEnabled(StringDT contextMenuEntry)
+			op setText(IntegerDT row, IntegerDT column, StringDT textValue)
+			op setTextByName(IntegerDT row, StringDT columnName, StringDT textValue)
+			op selectValue(IntegerDT row, IntegerDT column, LanguageDT textValue)
+			op selectValueByName(IntegerDT row, StringDT columnName, LanguageDT textValue)
+			op invokeContextMenu(StringDT contextMenuEntry)
+			op invokeContextMenuOnRow(IntegerDT row, StringDT contextMenuEntry)
+			op checkRow(IntegerDT row)
+			op selectRow(IntegerDT row)
+		}
+
+		field formaleAnnotationen identifiedBy "components.table.FormalAnnotations" control TableControl {
+			op IntegerDT getRowCount
+			op StringDT getText(IntegerDT row, IntegerDT column)
+			op StringDT getTextByName(IntegerDT row, StringDT columnName)
+			op BooleanDT isContextMenuEnabled(StringDT contextMenuEntry)
+			op setText(IntegerDT row, IntegerDT column, StringDT textValue)
+			op setTextByName(IntegerDT row, StringDT columnName, StringDT textValue)
+			op selectValue(IntegerDT row, IntegerDT column, FormalAnnotationDT textValue)
+			op selectValueByName(IntegerDT row, StringDT columnName, FormalAnnotationDT textValue)
+			op invokeContextMenu(StringDT contextMenuEntry)
+			op invokeContextMenuOnRow(IntegerDT row, StringDT contextMenuEntry)
+			op checkRow(IntegerDT row)
+			op selectRow(IntegerDT row)
+		}
+
+		op returnToEditor => returnToLastActivity
 	}
 
 	activity CodingTypeSearch extends DialogActivity {
@@ -480,6 +517,27 @@ package bne3.usecases for Stdtoolkit {
 		#ok
 	}  
 	
+	useCase ActivateChangeRequest(StringDT name) initial EthernetNavigator {
+		#activateChangeRequest(title=name)
+	}
+	
+	useCase OpenEthernetNavigator initial MainWindow {
+		call OpenView(OpenView.category="Other", OpenView.name="EthernetNavigator")
+	}
+	
+	useCase CreateChangeRequest(ChangeRequestTitle name) initial MainWindow {
+		call bne3.usecases.OpenEthernetNavigator
+		#findEthernetNavigator
+		#addChangeRequest
+		#titel.setText(str=name)
+		#saveAndClose
+		#findEthernetNavigator
+		#openChangeRequest(title=name.getValue())
+		val actualTitle = #titel.getText
+		assert [ junit::framework::Assert::assertEquals(name.getValue(), actualTitle.getValue())]
+		#close
+	}
+
 	useCase CreateMinimumCoding(ShortName shortName) initial MainWindow {
 		val changeRequestName = "ChangeRequest" + System::currentTimeMillis
 		call CreateChangeRequest(CreateChangeRequest.name=changeRequestName)
@@ -560,7 +618,7 @@ package bne3.usecases for Stdtoolkit {
 		#openCoding(title=shortName.getValue())
 		
 		#allgemeinPage
-		assert [ val actualLongName = #longname.getText ]
+		val actualLongName = #longname.getText
 		val actualShortName = #shortname.getText
 		val actualtext = #textuelleBeschreibung.getTextByName(row=0, columnName="Text")
 		val actualSprache = #textuelleBeschreibung.getTextByName(row=0, columnName="Sprache")
@@ -600,13 +658,7 @@ package bne3.usecases for Stdtoolkit {
 		assert [ junit::framework::Assert::assertEquals(bitLength.getValue(), actualBitLength.getValue()) ]
 	}
 	
-	useCase ActivateChangeRequest(StringDT name) initial EthernetNavigator {
-		#activateChangeRequest(title=name)
-	}
-	
-	useCase OpenEthernetNavigator initial MainWindow {
-		call OpenView(OpenView.category="Other", OpenView.name="EthernetNavigator")
-	}
+
 	
 	test OpenEthernetNavigatorTest generator de.msg.xt.mdt.base.SampleTestGenerator useCase OpenEthernetNavigator
 	
@@ -619,18 +671,7 @@ package bne3.usecases for Stdtoolkit {
 		#activateChangeRequest(title=name)
 	}
 	
-	useCase CreateChangeRequest(ChangeRequestTitle name) initial MainWindow {
-		call bne3.usecases.OpenEthernetNavigator
-		#findEthernetNavigator
-		#addChangeRequest
-		#titel.setText(str=name)
-		#saveAndClose
-		#findEthernetNavigator
-		#openChangeRequest(title=name.getValue())
-		val actualTitle = #titel.getText
-		assert [ junit::framework::Assert::assertEquals(name.getValue(), actualTitle.getValue())]
-		#close
-	}
+
 	
 	test CreateChangeRequestTest generator de.msg.xt.mdt.base.SampleTestGenerator useCase CreateChangeRequest
 	
@@ -928,5 +969,5 @@ package bne3.usecases.datatypetype for bne3.activities.Stdtoolkit {
 	}
 	test CreateUniontypTest generator de.msg.xt.mdt.base.SampleTestGenerator useCase CreateUniontyp {
 		excludeTags Invalid Empty
-	}	
+	}
 }
