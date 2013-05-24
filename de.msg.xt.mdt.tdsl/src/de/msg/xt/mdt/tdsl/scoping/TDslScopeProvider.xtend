@@ -45,6 +45,9 @@ import org.eclipse.xtext.resource.IEObjectDescription
 import org.eclipse.emf.ecore.EClass
 import org.eclipse.xtext.util.CancelIndicator
 import de.msg.xt.mdt.tdsl.tDsl.ConditionalNextActivity
+import de.msg.xt.mdt.tdsl.tDsl.StatementLine
+import de.msg.xt.mdt.tdsl.tDsl.StatementLine
+import org.eclipse.emf.ecore.util.EcoreUtil
 
 class TDslScopeProvider extends XbaseScopeProvider {
 	
@@ -104,46 +107,83 @@ class TDslScopeProvider extends XbaseScopeProvider {
 //    }
     
 	override getScope(EObject context, EReference reference) {
+		try {
 		if (reference == TDslPackage::eINSTANCE.operationParameterAssignment_Name) {
 			switch (context) {
 				OperationCall: {
+					System::out.println("getScope " + context.description + " OperationParameterAssignment_Name")
 					val maps = context.operation.dataTypeMappings
 					val scope = Scopes::scopeFor(maps, [
-						QualifiedName::create(it?.name?.name)
+						val controlOperationParameterName = it?.name?.name
+						if (it.name.eIsProxy) {
+							throw new ScopingException("ControlOperationParameter could not be resolved: " + context.description + "OperationParameterAssignment_Name")
+						}
+						QualifiedName::create(controlOperationParameterName)
 					], IScope::NULLSCOPE)
 					return scope
 				}
-				OperationParameterAssignment:
-					return Scopes::scopeFor((context.eContainer as OperationCall).operation.dataTypeMappings, [
-						QualifiedName::create(it?.name?.name)
+				OperationParameterAssignment: {
+					System::out.println("getScope " + (context.eContainer as OperationCall).description + "/Param" + " OperationParameterAssignment_Name")
+					val dataTypeMappings = (context.eContainer as OperationCall).operation.dataTypeMappings
+					if ((context.eContainer as OperationCall).operation.eIsProxy) {
+						throw new ScopingException("Operation could not be resolved: " + (context.eContainer as OperationCall).operation + " OperationParameterAssignment_Name")
+					}
+					return Scopes::scopeFor(dataTypeMappings, [
+						val controlOperationParameterName = it?.name?.name
+						if (it?.name?.eIsProxy) {
+							throw new ScopingException("ControlOperationParameter could not be resolved: " + (context.eContainer as OperationCall).operation + " OperationParameterAssignment_Name")
+						}			
+						QualifiedName::create(controlOperationParameterName)
+						
 					], IScope::NULLSCOPE)
+				}
 			}
 		} else if (reference == TDslPackage::eINSTANCE.activityOperationParameterAssignment_Name) {
 			switch (context) {
-				ActivityOperationCall:
-					return Scopes::scopeFor(context.operation.params)
-				ActivityOperationParameterAssignment:
-					return Scopes::scopeFor((context.eContainer as ActivityOperationCall).operation.params)
+				ActivityOperationCall: {
+					System::out.println("getScope " + context.useCasePath + " activityOperationParameterAssignment_Name")
+					val operationParameters = context.operation.params
+					if (context.operation.eIsProxy) {
+						throw new ScopingException("OperationParameters could not be resolved: " + context.useCasePath + " activtiyOperationParameterAssignment_Name")
+					}					
+					return Scopes::scopeFor(operationParameters)
+				}
+				ActivityOperationParameterAssignment: {
+					System::out.println("getScope " + (context.eContainer as ActivityOperationCall).useCasePath + "/Param" + " activityOperationParameterAssignment_Name")
+					val params = (context.eContainer as ActivityOperationCall).operation.params 					
+					if ((context.eContainer as ActivityOperationCall).operation.eIsProxy) {
+						throw new ScopingException("OperationParameters could not be resolved: " + (context.eContainer as ActivityOperationCall).useCasePath + " activtiyOperationParameterAssignment_Name")
+					}					
+					return Scopes::scopeFor(params)
+				}
 				default:
 					IScope::NULLSCOPE
 			}
 		} else if (reference == TDslPackage::eINSTANCE.operationCall_Operation || reference == TDslPackage::eINSTANCE.activityOperationCall_Operation) {
 			val XExpression opCall = context as XExpression
 			val nextActivities = opCall.currentActivities
-			if (reference == TDslPackage::eINSTANCE.operationCall_Operation) {				
+			if (reference == TDslPackage::eINSTANCE.operationCall_Operation) {	
+				val millis = System::currentTimeMillis			
+				System::out.println(millis + " getScope " + opCall.useCasePath + " operationCall_Operation")
 				val operations = new ArrayList<OperationMapping>
 				for (activity : nextActivities) {
 					operations.addAll(activity.fieldOperations)
 				}
+				System::out.println(millis + " getScope finished " + opCall.useCasePath + " operationCall_Operation")
 				calculatesScopes(operations)
 			} else {
+				System::out.println("getScope " + opCall.useCasePath + " activityOperationCall_Operation")
 				val activityOperations = new ArrayList<ActivityOperation>()
 				for (activity : nextActivities) {
 					activityOperations.addAll(activity.allOperations)
 				}
 				Scopes::scopeFor(activityOperations, [
 					val actOp = it as ActivityOperation
-					QualifiedName::create("#" + actOp.name)
+					val name = actOp.name
+					if (actOp.eIsProxy) {
+						throw new ScopingException("ActivityOperation could not be resolved: " + opCall.useCasePath + " activtiyOperationCall_Operation")
+					}
+					QualifiedName::create("#" + name)
 				], IScope::NULLSCOPE)
 			}
 		} else if (reference == TDslPackage::eINSTANCE.operationMapping_Name) {
@@ -154,7 +194,11 @@ class TDslScopeProvider extends XbaseScopeProvider {
 				field = context as Field
 			}
 			if (field.control != null) {
-				Scopes::scopeFor(field.control.operations)
+				val operations = field.control.operations
+				if (field.control.eIsProxy) {
+					throw new ScopingException("Could not resolve control for field " + field.name)
+				}
+				Scopes::scopeFor(operations)
 			} else 
 				IScope::NULLSCOPE
 		} else if (reference == TDslPackage::eINSTANCE.dataTypeMapping_Name) {
@@ -166,6 +210,9 @@ class TDslScopeProvider extends XbaseScopeProvider {
 				opMap = dataTypeMap?.operationMapping
 			}
 			val params = opMap?.name?.params
+			if (opMap.name.eIsProxy) {
+				throw new ScopingException("Could not resolve operation!")
+			}
 			if (params != null)
 				Scopes::scopeFor(params)
 			else
@@ -176,9 +223,16 @@ class TDslScopeProvider extends XbaseScopeProvider {
 				if (lastExpression instanceof OperationCall) {
 					val opCall = lastExpression as OperationCall
 					val dataTypeMappings = opCall?.operation?.dataTypeMappings
+					if (opCall.operation.eIsProxy) {
+						throw new ScopingException("Could not resolve operation: " + opCall.useCasePath + " generatedValueExpression_Param")
+					}
 					if (dataTypeMappings != null) 
 						Scopes::scopeFor(dataTypeMappings, [
 							val DataTypeMapping dtMap = it as DataTypeMapping
+							val name = dtMap.name?.name
+							if (dtMap.name.eIsProxy) {
+								throw new ScopingException("Could not resolve ControlOperationParameter: " + opCall.useCasePath + " generatedValueExpression_Param")
+							}
 							QualifiedName::create(dtMap.name.name)
 						], IScope::NULLSCOPE)
 					else 
@@ -190,6 +244,10 @@ class TDslScopeProvider extends XbaseScopeProvider {
 				super.getScope(context, reference)
 			else 
 				IScope::NULLSCOPE
+		}
+		} catch(ScopingException ex) {
+			System::out.println(ex.message)
+			return IScope::NULLSCOPE
 		}
 	}
 	
@@ -210,7 +268,7 @@ class TDslScopeProvider extends XbaseScopeProvider {
 					if (opMap?.name?.name != null) {
 						QualifiedName::create('#' + opMap.field.name, opMap.name.name)
 					} else {
-						QualifiedName::EMPTY
+						throw new ScopingException("Could not resolve operation in caculatesScopes!")
 					}
 				], IScope::NULLSCOPE) 
 	}
@@ -226,42 +284,53 @@ class TDslScopeProvider extends XbaseScopeProvider {
 	}
 	
 	
-	def dispatch List<Activity> determineExplicitNextActivities(OperationCall call) {
-		if (call.eIsProxy)
-			return null
-		call?.operation?.nextActivities?.map[it.next]
+	def dispatch List<ConditionalNextActivity> determineExplicitNextActivities(OperationCall call) throws ScopingException {
+		val operation = call?.operation
+		if (operation.eIsProxy) {
+			throw new ScopingException("Call operation could not get resolved!")
+		} 
+		val nextActivities = operation.nextActivities
+		if (nextActivities == null || nextActivities.empty) {
+				Collections::singletonList(call.operation.field.parentActivity)
+		}
+		nextActivities
 	}			
 	
-	def dispatch List<Activity> determineExplicitNextActivities(ActivityOperationCall call) {
-		if (call.eIsProxy)
-			return null
-		call?.operation?.nextActivities?.map[it.next]
+	def dispatch List<ConditionalNextActivity> determineExplicitNextActivities(ActivityOperationCall call) throws ScopingException {
+		val nextActivities = call?.operation?.nextActivities
+		if (nextActivities == null) {
+			if (call.operation.eIsProxy) {
+				throw new ScopingException("Call operation could not get resolved!")
+			} else {
+				Collections::singletonList(call.operation.activity)
+			}
+		}
+		nextActivities
 	}			
 	
-	def dispatch List<Activity> determineExplicitNextActivities(SubUseCaseCall call) {
-		if (call.eIsProxy)
-			return null
-		var nextActivity = call?.useCase?.nextActivity?.next
-		if (nextActivity == null) 
-			nextActivity = call?.useCase?.initialActivity 
+	def dispatch List<ConditionalNextActivity> determineExplicitNextActivities(SubUseCaseCall call) throws ScopingException {
+		var nextActivity = call?.useCase?.nextActivity
+		if (nextActivity == null) {
+			if (call.useCase.eIsProxy) {
+				throw new ScopingException("Call operation could not get resolved!")			
+			} else {
+				val condNextAct = TDslFactory::eINSTANCE.createConditionalNextActivity
+				condNextAct.next = call?.useCase?.initialActivity
+				nextActivity = condNextAct
+			}
+		} 
 		Collections::singletonList(nextActivity)
 	}			
 	
-	def dispatch List<Activity> determineExplicitNextActivities(XIfExpression ifExpr) {
-		if (ifExpr.eIsProxy)
-			return null
+	def dispatch List<ConditionalNextActivity> determineExplicitNextActivities(XIfExpression ifExpr) {
 		ifExpr.then.determineExplicitNextActivities
 	}			
 	
-	def dispatch List<Activity> determineExplicitNextActivities(XVariableDeclaration varDecl) {
-		if (varDecl.eIsProxy)
-			return null
+	def dispatch List<ConditionalNextActivity> determineExplicitNextActivities(XVariableDeclaration varDecl) {
 		varDecl.right.determineExplicitNextActivities
 	}			
 	
-	def dispatch List<Activity> determineExplicitNextActivities(XBlockExpression blockExpr) {
-		if (blockExpr.eIsProxy)
-			return null
+	def dispatch List<ConditionalNextActivity> determineExplicitNextActivities(XBlockExpression blockExpr) {
 		if (blockExpr.expressions.empty)
 			return Collections::emptyList
 		var index = blockExpr.expressions.size - 1
@@ -277,30 +346,43 @@ class TDslScopeProvider extends XbaseScopeProvider {
 		}
 	}			
 	
-	def dispatch List<Activity> determineExplicitNextActivities(XExpression expr) {
-		if (expr.eIsProxy)
-			return null
-		if (expr.containsActivitySwitchingOperation)
+	def dispatch List<ConditionalNextActivity> determineExplicitNextActivities(XExpression expr) {
+		/*if (expr.containsActivitySwitchingOperation)
 			expr.activitySwitchingOperation.determineExplicitNextActivities
-		else 
+		else */ 
 			Collections::emptyList
 	}
 	
-	def lastActivitySwitchingExpression(XExpression expr) {
-		var currentExpression = expr.precedingExpression
-		val nextActivities = currentExpression?.determineExplicitNextActivities
-		while (currentExpression != null && nextActivities != null && nextActivities.empty) {
-			currentExpression = currentExpression.precedingExpression
-		} 
+	def lastActivitySwitchingExpression(XExpression expr, boolean startWithCurrent) {
+		var XExpression currentExpression = 
+			/*if (startWithCurrent) 
+				expr
+			else */ 
+				expr.precedingExpression 
+		System::out.println("LastActivitySwitchingExpression: currentExpression: " + currentExpression.useCasePath)
+		if (currentExpression != null) {
+			var nextActivities = currentExpression?.determineExplicitNextActivities
+			while (currentExpression != null && nextActivities != null && nextActivities.empty) {
+				currentExpression = currentExpression.precedingExpression
+				System::out.println("LastActivitySwitchingExpression: currentExpression: " + currentExpression.useCasePath)
+				nextActivities = currentExpression?.determineExplicitNextActivities
+			} 
+		}
 		currentExpression
 	}	
 	
 	
 	def List<Activity> currentActivities(XExpression expr) {
-		val lastExpression = expr?.lastActivitySwitchingExpression
+		val currentTime = System::currentTimeMillis
+		System::out.println(currentTime + " CurrentActivities for " + expr.useCasePath)
+		if (expr.useCasePath.equals("CreateCoding::22")) {
+			System::out.println("Jetzt wirds spannend!")
+		}
+		val lastExpression = expr?.lastActivitySwitchingExpression(expr instanceof StatementLine)
 		if (lastExpression == null) {
 			val act = expr.determineInitialActivity
 			act.name			
+			System::out.println(currentTime + " Finished CurrentActivities for " + expr.useCasePath + ": " + act.name)
 			return Collections::singletonList(act)
 		}
 
@@ -308,15 +390,20 @@ class TDslScopeProvider extends XbaseScopeProvider {
 		val returnList = new ArrayList<Activity> 
 		if (nextActivities != null) {
 			for (nextActivity : nextActivities) {
-				if (nextActivity == null) {
-					val previousExpression = lastExpression.lastActivitySwitchingExpression
+				if (nextActivity.returnToLastActivity) {
+					val previousExpression = lastExpression.lastActivitySwitchingExpression(false)
+					System::out.println("CurrentActivities: returnToLastActivity: previousExpression: " + previousExpression.useCasePath)
 					if (previousExpression != null) 
 						returnList.addAll(previousExpression.currentActivities)
 				} else {
-					returnList.add(nextActivity)
+					returnList.add(nextActivity.next)
+				}
+				if (nextActivity.eIsProxy) {
+					throw new ScopingException("Could not resolve nextActivity: " + lastExpression.useCasePath)
 				}
 			}
 		}
+		System::out.println(currentTime + " Finished CurrentActivities for " + expr.useCasePath + ": " + returnList.head?.name)
 		returnList
 	}
 }

@@ -16,11 +16,8 @@ import org.eclipse.xtext.util.CancelIndicator;
 import org.eclipse.xtext.util.IAcceptor;
 
 import de.msg.xt.mdt.tdsl.tDsl.Activity;
-import de.msg.xt.mdt.tdsl.tDsl.ActivityOperation;
 import de.msg.xt.mdt.tdsl.tDsl.ConditionalNextActivity;
 import de.msg.xt.mdt.tdsl.tDsl.DataType;
-import de.msg.xt.mdt.tdsl.tDsl.Field;
-import de.msg.xt.mdt.tdsl.tDsl.OperationMapping;
 
 public class TDslDefaultResourceDescriptionStrategy extends
 		DefaultResourceDescriptionStrategy implements
@@ -39,42 +36,10 @@ public class TDslDefaultResourceDescriptionStrategy extends
 			}
 			userData.put("isDefault", dt.isDefault() ? "true" : "false");
 			createDescription(acceptor, dt, userData);
-		} else if (eObject instanceof ActivityOperation) {
-			final ActivityOperation operation = (ActivityOperation) eObject;
-			final Map<String, String> userData = new HashMap<String, String>();
-			if (!operation.getNextActivities().isEmpty()) {
-				final ConditionalNextActivity condNextAct = operation
-						.getNextActivities().get(0);
-				addConditionalNextActivityToUserData(userData, condNextAct);
-			}
-			createDescription(acceptor, operation, userData);
-		} else if (eObject instanceof OperationMapping) {
-			final OperationMapping operation = (OperationMapping) eObject;
-			final Map<String, String> userData = new HashMap<String, String>();
-			userData.put("operationName", operation.getName().getName());
-			if (!operation.getNextActivities().isEmpty()) {
-				final ConditionalNextActivity condNextAct = operation
-						.getNextActivities().get(0);
-				addConditionalNextActivityToUserData(userData, condNextAct);
-			}
-			createDescription(acceptor, operation, userData);
-		} else if (eObject instanceof Activity) {
-			final Activity activity = (Activity) eObject;
-			final Map<String, String> userData = new HashMap<String, String>();
-			final String fieldUris = getUriStrings(activity.getFields());
-			final String operationUris = getUriStrings(activity.getOperations());
-			userData.put("fieldUris", fieldUris);
-			userData.put("operationUris", operationUris);
-			createDescription(acceptor, activity, userData);
-		} else if (eObject instanceof Field) {
-			final Field field = (Field) eObject;
-			final Map<String, String> userData = new HashMap<String, String>();
-			final String operationMappingUris = getUriStrings(field
-					.getOperations());
-			userData.put("operationMappingUris", operationMappingUris);
-			createDescription(acceptor, field, userData);
+			return true;
+		} else {
+			return super.createEObjectDescriptions(eObject, acceptor);
 		}
-		return super.createEObjectDescriptions(eObject, acceptor);
 	}
 
 	private void addConditionalNextActivityToUserData(

@@ -29,6 +29,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil
 import de.msg.xt.mdt.tdsl.tDsl.DataType
 import de.msg.xt.mdt.tdsl.tDsl.TDslPackage
 import org.eclipse.xtext.scoping.IScopeProvider
+import de.msg.xt.mdt.tdsl.tDsl.UseCase
 
 /**
  * Convenience meta-model extensions. Please order by Metamodel-Class and alphabetically!
@@ -127,6 +128,10 @@ class MetaModelExtensions {
 			null
 	}
 	
+	def description(OperationCall opCall) {
+		opCall.useCasePath
+	}
+	
 	
 	// OperationMapping
 	
@@ -202,10 +207,7 @@ class MetaModelExtensions {
 	}
 	
 	def XExpression precedingExpression(XExpression expr) {
-		System::out.println("Determining precedingExpression for " + expr + "[" + expr?.fullyQualifiedName?.toString + "]")
-		if (expr?.fullyQualifiedName?.toString != null && expr?.fullyQualifiedName?.toString.equals("bne3.usecases.paket.CreatePaket.longName")) {
-			System::out.println("bne3.usecases.paket.CreatePaket.longName")
-		}
+		System::out.println("Determining precedingExpression for " + expr + "[" + expr.useCasePath + "]")
 		if (expr == null)
 			return null
 		var XExpression lastStatement
@@ -310,5 +312,28 @@ class MetaModelExtensions {
 				operation = subUseCaseCalls.get(0)		
 		}
 		operation
+	}
+	
+	def getUseCase(XExpression expr) {
+		EcoreUtil2::getContainerOfType(expr, typeof(UseCase))
+	}
+	
+	def getActivityOperation(XExpression expr) {
+		EcoreUtil2::getContainerOfType(expr, typeof(ActivityOperation))
+	}
+	
+	def String getUseCasePath(XExpression expr) {
+		if (expr == null)
+			return null
+		val index = expr?.indexInParentBlock
+		if (index >= 0) {
+			expr?.block?.useCasePath + "::" + index			
+		} else {
+			val useCase = expr.useCase
+			if (useCase != null)
+				expr?.useCase?.name 
+			else 
+				expr?.activityOperation?.name
+		}
 	}
 }
