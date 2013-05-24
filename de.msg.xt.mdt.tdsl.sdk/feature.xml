@@ -43,4 +43,32 @@
          version="0.0.0"
          unpack="false"/>
 
+   <plugin
+         id="com.bmw.bne3.client.uitest.importer"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.bmw.smartfaces.model"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="de.msg.xt.mdt.tdsl"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="de.msg.xt.mdt.tdsl.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
 </feature>

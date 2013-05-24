@@ -14,5 +14,6 @@ Require-Bundle: org.eclipse.ui,
  de.msg.xt.mdt.tdsl;bundle-version="1.0.0",
  de.msg.xt.mdt.tdsl.basictypes.model;bundle-version="3.0.4",
  de.msg.xt.mdt.tdsl.swtbot.model;bundle-version="3.0.4",
- com.bmw.bne3.client.test.libs;bundle-version="3.0.4"
+ com.bmw.bne3.client.test.libs;bundle-version="3.0.4",
+ com.bmw.bne3.client.uitests;bundle-version="3.0.4"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
