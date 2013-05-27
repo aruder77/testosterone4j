@@ -1,0 +1,15 @@
+package bne3.activities.changerequest for bne3.activities.Stdtoolkit {
+	
+	import de.msg.xt.mdt.tdsl.basictypes.*
+	import de.msg.xt.mdt.tdsl.swtbot.*
+	import bne3.datatypes.*
+	import bne3.activities.*
+	
+	activity Aenderungsantrag identifiedBy "Änderungsantrag" extends EditorActivity {
+		field titel identifiedBy "ChangeRequest.title" control TextControl {
+			op ChangeRequestTitle getText
+			op setText(ChangeRequestTitle str)
+			op BooleanDT isEnabled			
+		}
+	}
+}

@@ -1,0 +1,57 @@
+package bne3.activities.paket for bne3.activities.Stdtoolkit {
+	import de.msg.xt.mdt.tdsl.basictypes.*
+	import de.msg.xt.mdt.tdsl.swtbot.*
+	import bne3.datatypes.*
+	import bne3.activities.*
+
+	activity PaketEditor identifiedBy "PackageTypePresentation" extends EditorActivity {
+		op allgemeinPage => PaketEditorAllgemeinPage
+	}
+
+	activity PaketEditorAllgemeinPage {
+		field longname identifiedBy "longname" control TextControl {
+			op LongName getText
+			op setText(LongName str)
+			op BooleanDT isEnabled
+		}
+
+		field shortname identifiedBy "shortname" control TextControl {
+			op ShortName getText
+			op setText(ShortName str)
+			op BooleanDT isEnabled
+		}
+
+		field textuelleBeschreibung identifiedBy "bne3.table.Descriptions" control TableControl {
+			op IntegerDT getRowCount
+			op StringDT getText(IntegerDT row, IntegerDT column)
+			op StringDT getTextByName(IntegerDT row, StringDT columnName)
+			op BooleanDT isContextMenuEnabled(StringDT contextMenuEntry)
+			op setText(IntegerDT row, IntegerDT column, StringDT textValue)
+			op setTextByName(IntegerDT row, StringDT columnName, StringDT textValue)
+			op selectValue(IntegerDT row, IntegerDT column, LanguageDT textValue)
+			op selectValueByName(IntegerDT row, StringDT columnName, LanguageDT textValue)
+			op invokeContextMenu(StringDT contextMenuEntry)
+			op invokeContextMenuOnRow(IntegerDT row, StringDT contextMenuEntry)
+			op checkRow(IntegerDT row)
+			op selectRow(IntegerDT row)
+		}
+
+		field formaleAnnotationen identifiedBy "components.table.FormalAnnotations" control TableControl {
+			op IntegerDT getRowCount
+			op StringDT getText(IntegerDT row, IntegerDT column)
+			op StringDT getTextByName(IntegerDT row, StringDT columnName)
+			op BooleanDT isContextMenuEnabled(StringDT contextMenuEntry)
+			op setText(IntegerDT row, IntegerDT column, StringDT textValue)
+			op setTextByName(IntegerDT row, StringDT columnName, StringDT textValue)
+			op selectValue(IntegerDT row, IntegerDT column, FormalAnnotationDT textValue)
+			op selectValueByName(IntegerDT row, StringDT columnName, FormalAnnotationDT textValue)
+			op invokeContextMenu(StringDT contextMenuEntry)
+			op invokeContextMenuOnRow(IntegerDT row, StringDT contextMenuEntry)
+			op checkRow(IntegerDT row)
+			op selectRow(IntegerDT row)
+		}
+
+		op returnToEditor => PaketEditor
+	}
+
+}
