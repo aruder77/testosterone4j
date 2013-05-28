@@ -19,7 +19,7 @@
             </separator>
          </menu>
          <action
-               class="com.bmw.bne3.client.uitest.importer.popup.actions.ActivityImportAction"
+               class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:com.bmw.bne3.client.uitest.importer.popup.actions.ActivityImportAction"
                enablesFor="1"
                id="com.bmw.bne3.client.uitest.importer.newAction"
                label="Import Activities"

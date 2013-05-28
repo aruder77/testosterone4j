@@ -24,9 +24,8 @@ import org.eclipse.xtext.resource.SaveOptions;
 
 import com.bmw.bne3.client.uitest.m2m.UIDescriptionTransformer;
 import com.bmw.smartfaces.model.UIDescription;
-import com.google.inject.Injector;
+import com.google.inject.Inject;
 
-import de.msg.xt.mdt.tdsl.TDslStandaloneSetup;
 import de.msg.xt.mdt.tdsl.tDsl.PackageDeclaration;
 import de.msg.xt.mdt.tdsl.tDsl.TDslFactory;
 import de.msg.xt.mdt.tdsl.tDsl.TestModel;
@@ -36,6 +35,9 @@ public class ActivityImportAction implements IObjectActionDelegate {
 	private Shell shell;
 
 	private IWorkbenchPart part;
+
+	@Inject
+	UIDescriptionTransformer transformer;
 
 	/**
 	 * Constructor for Action1.
@@ -84,10 +86,6 @@ public class ActivityImportAction implements IObjectActionDelegate {
 
 	private TestModel transformToTestModel(UIDescription description,
 			TestModel model) {
-		Injector injector = new TDslStandaloneSetup()
-				.createInjectorAndDoEMFRegistration();
-		UIDescriptionTransformer transformer = injector
-				.getInstance(UIDescriptionTransformer.class);
 		return transformer.transform(description, model);
 	}
 
