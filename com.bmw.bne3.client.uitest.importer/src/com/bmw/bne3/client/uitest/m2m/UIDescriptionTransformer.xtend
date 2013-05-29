@@ -150,7 +150,7 @@ class UIDescriptionTransformer {
 			field.name = "f" + node.key.convertToId
 			field.uniqueId = node.key
 			
-			field.control = determineControl(node, field)
+			//field.control = determineControl(node, field)
 			
 			if (field.control == null) {
 				createControl(node, field)

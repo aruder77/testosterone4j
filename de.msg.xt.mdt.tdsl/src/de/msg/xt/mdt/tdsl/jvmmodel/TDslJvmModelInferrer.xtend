@@ -245,7 +245,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				parameters += activity.toParameter("contextAdapter", newTypeRef(activityAdapterClass))
    				it.setBody [
    					it.append('''
-   					    «IF activity.parent != null»super(contextAdapter)«ELSE»this()«ENDIF»;
+   					    super(contextAdapter);
    					    this.contextAdapter = contextAdapter;''')
    				]
    			]
@@ -282,13 +282,16 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    		var JvmTypeReference returnTypeRef
    		var Boolean voidReturnType = false
    		var String nextActivityClassVar 
+   		var String nextActivityAdapterClassVar
    		if (operation.nextActivities.empty) {
    			nextActivityClassVar = operation.activity.class_fqn
+   			nextActivityAdapterClassVar = operation.activity.adapterInterface_fqn
    			returnTypeRef = operation.newTypeRef(nextActivityClassVar)
    		} else {
    			val condNext = operation.nextActivities.get(0)
    			val Activity nextActivity = condNext.next
    			nextActivityClassVar = nextActivity?.class_fqn
+   			nextActivityAdapterClassVar = nextActivity?.adapterInterface_fqn
    			if (nextActivityClassVar != null) {
    				returnTypeRef = operation.newTypeRef(nextActivityClassVar)
    			} else {
@@ -298,6 +301,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    		}
    		val voidReturn = voidReturnType
    		val nextActivityClass = nextActivityClassVar
+   		val nextActivityAdapterClass = nextActivityAdapterClassVar
    		operation.toMethod(operation.name, returnTypeRef) [
   			for (param : operation.params) {
 				if (param?.dataType?.class_fqn != null) {
@@ -320,10 +324,14 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 					}
 					xbaseCompiler.compile(operation.body, it, expectedReturnType)
 
-					if (!voidReturn) {					
-						it.newLine.append("return (")
+					if (!voidReturn) {
+						it.newLine.append("return ");
+						operation.newTypeRef(typeof(TDslHelper)).serialize(operation, it)
+						it.append(".castActivity(injector, activity, ")										
 						operation.newTypeRef(nextActivityClass).serialize(operation, it)
-						it.append(")activity;")
+						it.append(".class, ")
+						operation.newTypeRef(nextActivityAdapterClass).serialize(operation, it)
+						it.append(".class);")
 					}
 				} else {
 					operation.newTypeRef(typeof(Object)).serialize(operation, it)
