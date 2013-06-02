@@ -4,6 +4,6 @@ src-gen
 .metadata
 xtend-gen
 *._trace
-*._smap
+*.smap
 
 
