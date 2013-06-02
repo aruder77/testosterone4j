@@ -364,9 +364,9 @@ class TDslScopeProvider extends XbaseScopeProvider {
 	
 	def lastActivitySwitchingExpression(XExpression expr, boolean startWithCurrent) {
 		var XExpression currentExpression = 
-			/*if (startWithCurrent) 
-				expr
-			else */ 
+			if (startWithCurrent) 
+				expr.activitySwitchingOperation
+			else 
 				expr.precedingExpression 
 		System::out.println("LastActivitySwitchingExpression: currentExpression: " + currentExpression.useCasePath)
 		if (currentExpression != null) {
@@ -384,9 +384,6 @@ class TDslScopeProvider extends XbaseScopeProvider {
 	def List<Activity> currentActivities(XExpression expr) {
 		val currentTime = System::currentTimeMillis
 		System::out.println(currentTime + " CurrentActivities for " + expr.useCasePath)
-		if (expr.useCasePath.equals("CreateCoding::22")) {
-			System::out.println("Jetzt wirds spannend!")
-		}
 		val lastExpression = expr?.lastActivitySwitchingExpression(expr instanceof StatementLine)
 		if (lastExpression == null) {
 			val act = expr.determineInitialActivity
