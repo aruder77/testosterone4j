@@ -5,6 +5,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
@@ -21,6 +25,7 @@ import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.ISelectionService;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.xtext.resource.SaveOptions;
+import org.eclipse.xtext.ui.resource.XtextResourceSetProvider;
 
 import com.bmw.bne3.client.uitest.m2m.UIDescriptionTransformer;
 import com.bmw.smartfaces.model.UIDescription;
@@ -38,6 +43,9 @@ public class ActivityImportAction implements IObjectActionDelegate {
 
 	@Inject
 	UIDescriptionTransformer transformer;
+
+	@Inject
+	XtextResourceSetProvider provider;
 
 	/**
 	 * Constructor for Action1.
@@ -73,12 +81,17 @@ public class ActivityImportAction implements IObjectActionDelegate {
 		dlg.setFilterNames(new String[] { "TDsl Files" });
 		dlg.setFilterExtensions(new String[] { "*.tdsl" });
 		String fn = dlg.open();
+
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		IPath location = Path.fromOSString(fn);
+		IFile ifile = workspace.getRoot().getFileForLocation(location);
+
 		if (fn != null)
-			writeToFile(fn, model);
+			writeToFile(ifile, model);
 
 		transformToTestModel(description, model);
 
-		writeToFile(fn, model);
+		writeToFile(ifile, model);
 
 		MessageDialog.openInformation(shell, "Importer",
 				"Activities imported successfully.");
@@ -89,23 +102,18 @@ public class ActivityImportAction implements IObjectActionDelegate {
 		return transformer.transform(description, model);
 	}
 
-	private void writeToFile(String fileName, TestModel model) {
-		ResourceSet rs = new ResourceSetImpl();
-		// File f = new File(fileName);
-		// Resource resource = null;
-		// if (f.exists()) {
-		// resource = rs.getResource(URI.createURI(fileName), true);
-		// } else {
-		// resource = rs.createResource(URI.createURI(fileName));
-		// }
-		Resource resource = rs.createResource(URI.createURI(fileName));
+	private void writeToFile(IFile file, TestModel model) {
+		ResourceSet rs = provider.get(file.getProject());
+		Resource resource = rs.createResource(URI.createURI(file.getLocation()
+				.toString()));
 
 		if (!resource.getContents().contains(model)) {
 			resource.getContents().add(model);
 		}
 		try {
-			resource.save(new FileOutputStream(fileName), SaveOptions
-					.newBuilder().format().getOptions().toOptionsMap());
+			resource.save(new FileOutputStream(file.getLocation().toString()),
+					SaveOptions.newBuilder().format().getOptions()
+							.toOptionsMap());
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

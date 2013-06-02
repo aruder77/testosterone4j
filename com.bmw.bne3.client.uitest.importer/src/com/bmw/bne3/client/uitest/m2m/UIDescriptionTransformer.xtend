@@ -1,66 +1,38 @@
 package com.bmw.bne3.client.uitest.m2m
 
-import com.bmw.smartfaces.model.EditorNode
-import com.bmw.smartfaces.model.FieldNode
-import com.bmw.smartfaces.model.Folder
-import com.bmw.smartfaces.model.PageNode
-import com.bmw.smartfaces.model.UIDescription
-import de.msg.xt.mdt.tdsl.jvmmodel.MetaModelExtensions
-import de.msg.xt.mdt.tdsl.jvmmodel.NamingExtensions
-import de.msg.xt.mdt.tdsl.tDsl.Activity
-import de.msg.xt.mdt.tdsl.tDsl.Control
-import de.msg.xt.mdt.tdsl.tDsl.DataType
-import de.msg.xt.mdt.tdsl.tDsl.Field
-import de.msg.xt.mdt.tdsl.tDsl.PackageDeclaration
-import de.msg.xt.mdt.tdsl.tDsl.TDslFactory
 import de.msg.xt.mdt.tdsl.tDsl.TestModel
-import de.msg.xt.mdt.tdsl.tDsl.Type
-import java.util.HashMap
-import java.util.Map
-import javax.inject.Inject
+import com.bmw.smartfaces.model.UIDescription
+import de.msg.xt.mdt.tdsl.tDsl.TDslFactory
 import org.eclipse.xtext.EcoreUtil2
-import org.eclipse.xtext.naming.IQualifiedNameProvider
+import com.bmw.smartfaces.model.Folder
+import com.bmw.smartfaces.model.EditorNode
+import de.msg.xt.mdt.tdsl.tDsl.Activity
+import com.bmw.smartfaces.model.PageNode
+import de.msg.xt.mdt.tdsl.jvmmodel.MetaModelExtensions
+import de.msg.xt.mdt.tdsl.tDsl.PackageDeclaration
+import com.bmw.smartfaces.model.FieldNode
+import de.msg.xt.mdt.tdsl.tDsl.Field
+import de.msg.xt.mdt.tdsl.tDsl.Control
+import de.msg.xt.mdt.tdsl.jvmmodel.NamingExtensions
+import javax.inject.Inject
+import org.eclipse.xtext.scoping.IScopeProvider
+import de.msg.xt.mdt.tdsl.tDsl.TDslPackage
+import org.eclipse.xtext.naming.QualifiedName
+import org.eclipse.emf.ecore.EObject
 import org.eclipse.xtext.scoping.IGlobalScopeProvider
+import de.msg.xt.mdt.tdsl.tDsl.Control
 
 class UIDescriptionTransformer {
 	
 	@Inject extension MetaModelExtensions
 	@Inject extension NamingExtensions
-	@Inject extension IQualifiedNameProvider	
 	
 	@Inject
-	IGlobalScopeProvider globalScopeProvider
+	IScopeProvider scopeProvider
 	
-	@Inject
-	TDslResourceLoader resourceLoader
-	
-	Map<String, Control> controlMap = new HashMap<String, Control>()
-	Map<Type, DataType> defaultTypes = new HashMap<Type, DataType>()
-	
-	Map<String, String> controlMapping = newHashMap(
-		"com.bmw.smartfaces.boxed.controls.StringFieldFactory" -> "de.msg.xt.mdt.tdsl.swtbot.TextControl"
-	)
 	
 	def basePackage() {
 		"com.bmw.bne3"
-	}
-	
-	def readResources() {
-		val resources = resourceLoader.findTdslResource
-		for (resource: resources) {
-			for (elem: resource.contents) {
-				val controls = EcoreUtil2::getAllContentsOfType(elem, typeof(Control))
-				for (control : controls) {
-					controlMap.put(control.fullyQualifiedName.toString, control)				
-				}
-				val dataTypes = EcoreUtil2::getAllContentsOfType(elem, typeof(DataType))
-				for (datatype : dataTypes) {
-					if (datatype.isDefault()) {
-						defaultTypes.put(datatype.type, datatype)
-					}
-				}
-			}
-		}
 	}
 	
 	def packageName(Folder folder) {
@@ -95,11 +67,6 @@ class UIDescriptionTransformer {
 	def TestModel transform(UIDescription descr, TestModel model) {
 		
 		val factory = TDslFactory::eINSTANCE 
-		
-		readResources
-		
-		System::out.println("Controls found: " + controlMap.size)
-		System::out.println("Default types found: " + defaultTypes.size)
 
 		val concreteFolders = EcoreUtil2::getAllContentsOfType(descr, typeof(Folder)).filter [
 			!it.editors.empty
@@ -220,11 +187,20 @@ class UIDescriptionTransformer {
 
 	
 	def Control determineControl(FieldNode node, Field field) { 
-		if (node.factory != null) {
-			val factoryName = node.factory.classname
-			return controlMap.get(controlMapping.get(node.factory.classname))
+		val resource = field.eResource
+		val scope = scopeProvider.getScope(field, TDslPackage$Literals::FIELD__CONTROL)
+		for (element : scope.allElements) {
+			System::out.println("Element in scope: " + element.name.toString)
 		}
-		return null
+		if (node.factory != null) {
+			return scope.getSingleElement(mapFactoryToControlName(node.factory.classname)) as Control
+		} else {
+			return scope.getSingleElement(QualifiedName::create("de", "msg", "xt", "mdt", "tdsl", "swtbot", "TableControl")) as Control			
+		}
+	}
+	
+	def QualifiedName mapFactoryToControlName(String string) { 
+		return QualifiedName::create("de", "msg", "xt", "mdt", "tdsl", "swtbot", "TextControl")
 	}
 	
 	def editor(PageNode node) { 

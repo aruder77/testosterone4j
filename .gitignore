@@ -2,3 +2,8 @@ bin
 target
 src-gen
 .metadata
+xtend-gen
+*._trace
+*._smap
+
+

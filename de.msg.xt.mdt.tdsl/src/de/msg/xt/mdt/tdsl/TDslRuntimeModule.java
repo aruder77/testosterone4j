@@ -65,5 +65,4 @@ public class TDslRuntimeModule extends
 	public Class<? extends org.eclipse.xtext.scoping.IGlobalScopeProvider> bindIGlobalScopeProvider() {
 		return TDslGlobalScopeProvider.class;
 	}
-
 }
