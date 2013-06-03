@@ -18,6 +18,7 @@ import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder
 import de.msg.xt.mdt.base.AbstractActivity
 import org.eclipse.emf.ecore.EObject
 import de.msg.xt.mdt.tdsl.tDsl.PackageDeclaration
+import de.msg.xt.mdt.base.ActivityAdapter
 
 class NamingExtensions {
 	
@@ -58,7 +59,11 @@ class NamingExtensions {
 	}
 	
 	def String adapterInterface_fqn(Activity activity) {
-		activity?.fullyQualifiedName?.toString + "Adapter"
+		val providingActivity = activity.adapterProvidingActivity
+		if (providingActivity == null) {
+			activity?.toolkit?.activityAdapter_FQN
+		} else 
+			providingActivity.fullyQualifiedName?.toString + "Adapter"
 	}
 	
 	def JvmTypeReference superClass_ref(Activity activity) {

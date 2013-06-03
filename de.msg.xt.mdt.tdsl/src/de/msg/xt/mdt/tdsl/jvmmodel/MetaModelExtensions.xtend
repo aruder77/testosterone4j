@@ -77,6 +77,22 @@ class MetaModelExtensions {
 		fieldOperations
 	}
 	
+	def boolean needsOwnActivityAdapter(Activity activity) {
+		if (activity == null)
+			return false
+		!activity.operations.filter[it.body == null].empty
+//		true
+	}
+	
+	def Activity adapterProvidingActivity(Activity activity) {
+		if (activity == null)
+			return null
+		if (activity.needsOwnActivityAdapter)
+			activity
+		else 
+			activity.parent?.adapterProvidingActivity
+	}
+	
 	// ActivityOperation
 	
 	def getActivity(ActivityOperation operation) {

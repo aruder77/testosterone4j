@@ -149,7 +149,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    	def dispatch void infer(Activity activity, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
    		
    		var JvmGenericType activityAdapterClassVar = null
-   		if (activity.adapterInterface_fqn != null) {
+   		if (activity.needsOwnActivityAdapter && activity.adapterInterface_fqn != null) {
 	   		activityAdapterClassVar = activity.toInterface(activity.adapterInterface_fqn) []
    			acceptor.accept(activityAdapterClassVar).initializeLater [
    				if (activity.activityAdapterParentClass != null)
@@ -171,8 +171,14 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				}
    			]
    		}
-   		val activityAdapterClass = activityAdapterClassVar
    		
+   		var JvmTypeReference typeRef = null
+   		if (activityAdapterClassVar == null) {
+   			typeRef = activity.newTypeRef(activity.adapterInterface_fqn)
+   		} else {
+   			typeRef = newTypeRef(activityAdapterClassVar)
+   		}
+   		val activityAdapterClassRef = typeRef
    		
    		if (activity.class_FQN == null)
    			return
@@ -221,7 +227,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				]
    			]
    			   				
-   			members += activity.toField("contextAdapter", newTypeRef(activityAdapterClass))
+   			members += activity.toField("contextAdapter", activityAdapterClassRef)
    			
    			members += activity.toMethod("find", newTypeRef(activityClass)) [
    				it.setStatic(true)
@@ -242,7 +248,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    			]
    			
    			members += activity.toConstructor [
-   				parameters += activity.toParameter("contextAdapter", newTypeRef(activityAdapterClass))
+   				parameters += activity.toParameter("contextAdapter", activityAdapterClassRef)
    				it.setBody [
    					it.append('''
    					    super(contextAdapter);
@@ -347,9 +353,9 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 						operation.newTypeRef(nextActivityClass).serialize(operation, it)
 						it.append(")o;").decreaseIndentation.newLine
 						it.append("} else {").increaseIndentation.newLine
-						operation.newTypeRef(nextActivityClass + "Adapter").serialize(operation, it)
+						operation.newTypeRef(nextActivityAdapterClass).serialize(operation, it)
 						it.append(" adapter = injector.getInstance(")
-						operation.newTypeRef(nextActivityClass + "Adapter").serialize(operation, it)
+						operation.newTypeRef(nextActivityAdapterClass).serialize(operation, it)
 						it.append('''
 							.class);
 							adapter.setContext(o);
