@@ -810,6 +810,15 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 			members += dataType.toConstructor [
 				setVisibility(JvmVisibility::PUBLIC)
 				parameters += dataType.toParameter("value", dataType.type?.mappedBy)
+				it.body = [
+					it.append('''
+						this._value = value;''')
+				]
+			]
+			
+			members += dataType.toConstructor [
+				setVisibility(JvmVisibility::PUBLIC)
+				parameters += dataType.toParameter("value", dataType.type?.mappedBy)
 				parameters += dataType.toParameter("equivalenceClass", newTypeRef(equivalenceClass))
 				
 				it.body = [

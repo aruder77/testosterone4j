@@ -20,7 +20,8 @@ import javax.inject.Inject;
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class SampleTestGenerator implements Generator {
 
-	public static final Logger LOG = Logger.getLogger(SampleTestGenerator.class.getName());
+	public static final Logger LOG = Logger.getLogger(SampleTestGenerator.class
+			.getName());
 
 	Map<String, Stack<EquivalenceClass>> remainingValuesPerId = new HashMap<String, Stack<EquivalenceClass>>();
 
@@ -40,9 +41,11 @@ public class SampleTestGenerator implements Generator {
 	public <E extends Runnable> List<E> generate(final Class<E> clazz) {
 		final List<E> testCases = new ArrayList<E>();
 		int idx = 1;
+		protocol.openGenerationFile();
 		while (!unsatisfiedCoverageIds.isEmpty() || testCases.isEmpty()) {
 			try {
-				final Constructor<E> constructor = clazz.getConstructor(Generator.class);
+				final Constructor<E> constructor = clazz
+						.getConstructor(Generator.class);
 				final E testCase = constructor.newInstance(this);
 				protocol.newTest(String.valueOf(idx++));
 
@@ -68,11 +71,13 @@ public class SampleTestGenerator implements Generator {
 				e.printStackTrace();
 			}
 		}
+		protocol.closeGenerationFile();
 		return testCases;
 	}
 
 	@Override
-	public <T extends DataType> T generateDataTypeValue(final Class<T> clazz, final String id, final Tag[] tags) {
+	public <T extends DataType> T generateDataTypeValue(final Class<T> clazz,
+			final String id, final Tag[] tags) {
 		Stack<EquivalenceClass> remainingValues = remainingValuesPerId.get(id);
 		T dataType = null;
 		try {
@@ -99,9 +104,10 @@ public class SampleTestGenerator implements Generator {
 		return dataType;
 	}
 
-	private <T extends DataType> void determineEquivalenceClassList(final Stack<EquivalenceClass> remainingValues,
-			final T dataType) {
-		final List<Object> list = Arrays.asList(getEquivalenceClasses(dataType));
+	private <T extends DataType> void determineEquivalenceClassList(
+			final Stack<EquivalenceClass> remainingValues, final T dataType) {
+		final List<Object> list = Arrays
+				.asList(getEquivalenceClasses(dataType));
 		Collections.shuffle(list, new Random(System.currentTimeMillis()));
 		for (final Object o : list) {
 			final EquivalenceClass ec = (EquivalenceClass) o;
@@ -135,7 +141,8 @@ public class SampleTestGenerator implements Generator {
 	private <T extends DataType> Object[] getEquivalenceClasses(final T dataType) {
 		final Object[] values = null;
 		try {
-			final Method valuesMethod = dataType.getEquivalenceClassEnum().getMethod("values", (Class[]) null);
+			final Method valuesMethod = dataType.getEquivalenceClassEnum()
+					.getMethod("values", (Class[]) null);
 			return (Object[]) valuesMethod.invoke(null, (Object[]) null);
 		} catch (final IllegalAccessException e) {
 			e.printStackTrace();

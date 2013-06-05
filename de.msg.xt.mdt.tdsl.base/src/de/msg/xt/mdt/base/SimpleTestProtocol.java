@@ -1,5 +1,8 @@
 package de.msg.xt.mdt.base;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.logging.Logger;
 
@@ -16,28 +19,31 @@ public class SimpleTestProtocol implements ITestProtocol {
 
 	private static StringBuffer buffer = null;
 
+	private PrintWriter generationLogger;
+
+	private boolean generationMode = false;
+
 	public SimpleTestProtocol(final String testId) {
 		this.testId = testId;
 	}
 
 	@Override
-	public void newTest(final String identifier, final boolean generationLog) {
+	public void newTest(final String identifier) {
 		buffer = new StringBuffer();
-		log("\n==================================================================================",
-				generationLog);
-		log("Testcase " + testId + " : " + identifier + "\n", generationLog);
+		log("\n==================================================================================");
+		log("Testcase " + testId + " : " + identifier + "\n");
 	}
 
 	@Override
-	public void append(final String str, final boolean generationLog) {
-		log(str, generationLog);
+	public void append(final String str) {
+		log(str);
 	}
 
 	@Override
 	public void appendControlOperationCall(final String activityName,
 			final String fieldName, final String fieldControlName,
 			final String operationName, final String returnValue,
-			final boolean generationLog, final String... parameter) {
+			final String... parameter) {
 		final StringBuffer sb = new StringBuffer();
 		sb.append("[").append(activityName).append("]     ");
 
@@ -66,14 +72,15 @@ public class SimpleTestProtocol implements ITestProtocol {
 	@Override
 	public void appendActivityOperationCall(final String activityName,
 			final String operationName, final String returnValue,
-			final boolean generationLog, final String... parameter) {
+			final String... parameter) {
 		appendControlOperationCall(activityName, null, null, operationName,
 				returnValue, parameter);
 	}
 
-	private void log(final String str, final boolean generationLog) {
-		if (generationLog) {
+	private void log(final String str) {
+		if (this.generationMode) {
 			GENERATION_LOG.fine(str + "\n");
+			generationLogger.println(str);
 		} else {
 			if (buffer != null) {
 				buffer.append(str + "\n");
@@ -83,37 +90,27 @@ public class SimpleTestProtocol implements ITestProtocol {
 	}
 
 	@Override
-	public void newTest(final String identifier) {
-		newTest(identifier, false);
-	}
-
-	@Override
-	public void append(final String str) {
-		append(str, false);
-	}
-
-	@Override
-	public void appendControlOperationCall(final String activityName,
-			final String fieldName, final String fieldControlName,
-			final String operationName, final String returnValue,
-			final String... parameter) {
-		appendControlOperationCall(activityName, fieldName, fieldControlName,
-				operationName, returnValue, false, parameter);
-	}
-
-	@Override
-	public void appendActivityOperationCall(final String activityName,
-			final String operationName, final String returnValue,
-			final String... parameter) {
-		appendActivityOperationCall(activityName, operationName, returnValue,
-				false, parameter);
-	}
-
-	@Override
 	public void appendSummary() {
 		append("==================================================================================\n");
 		LOG.info("TEST CASE SUMMARY:\n");
 		LOG.info(buffer.toString());
+	}
+
+	@Override
+	public void openGenerationFile() {
+		try {
+			this.generationMode = true;
+			this.generationLogger = new PrintWriter(new FileWriter(new File(
+					testId + ".txt")));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void closeGenerationFile() {
+		generationLogger.close();
+		this.generationMode = false;
 	}
 
 }
