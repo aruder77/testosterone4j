@@ -511,7 +511,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				it.setStatic(true)
    				it.setFinal(true)
    				it.setInitializer[
-   					it.append('''"./«test.name.toUpperCase»_«System::currentTimeMillis»"''')
+   					it.append('''"./testser/«test.name.toUpperCase»_«System::currentTimeMillis»"''')
    				]
    			]
    			
