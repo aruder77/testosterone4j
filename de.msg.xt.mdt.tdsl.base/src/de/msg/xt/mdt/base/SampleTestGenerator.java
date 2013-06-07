@@ -8,8 +8,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 import java.util.Stack;
@@ -24,6 +26,8 @@ public class SampleTestGenerator implements Generator {
 			.getName());
 
 	Map<String, Stack<EquivalenceClass>> remainingValuesPerId = new HashMap<String, Stack<EquivalenceClass>>();
+
+	Map<String, List<DataType<Object, EquivalenceClass>>> statisticsPerId = new HashMap<String, List<DataType<Object, EquivalenceClass>>>();
 
 	Set<String> unsatisfiedCoverageIds = new HashSet<String>();
 
@@ -71,8 +75,53 @@ public class SampleTestGenerator implements Generator {
 				e.printStackTrace();
 			}
 		}
+		printStatistics(idx - 1);
 		protocol.closeGenerationFile();
 		return testCases;
+	}
+
+	private void printStatistics(int totalNumberOfTests) {
+		Iterator<Entry<String, List<DataType<Object, EquivalenceClass>>>> entries = statisticsPerId
+				.entrySet().iterator();
+		int overallTotalNumberOfEquivalenceClasses = 0;
+		int overallTotalNumberOfMatchingEquivalenceClasses = 0;
+		int overallCoveredClasses = 0;
+		protocol.addCoverageSummaryHeader();
+		while (entries.hasNext()) {
+			Entry<String, List<DataType<Object, EquivalenceClass>>> entry = entries
+					.next();
+			Object[] equivalenceClasses = getEquivalenceClasses(entry
+					.getValue().get(0));
+			int totalNumberOfEquivalenceClasses = equivalenceClasses.length;
+
+			int totalMatchingEquivalenceClasses = 0;
+			for (Object o : equivalenceClasses) {
+				EquivalenceClass ec = (EquivalenceClass) o;
+				if (checkTagCompliance(ec.getTags())) {
+					totalMatchingEquivalenceClasses++;
+				}
+			}
+
+			overallTotalNumberOfEquivalenceClasses += totalNumberOfEquivalenceClasses;
+			overallTotalNumberOfMatchingEquivalenceClasses += totalMatchingEquivalenceClasses;
+			Set<Object> eqs = new HashSet<Object>();
+			for (Object o : equivalenceClasses) {
+				eqs.add(o);
+			}
+			for (DataType<Object, EquivalenceClass> dt : entry.getValue()) {
+				eqs.remove(dt.getEquivalenceClass());
+			}
+			int coveredClasses = totalNumberOfEquivalenceClasses - eqs.size();
+			overallCoveredClasses += coveredClasses;
+			protocol.addDataValueCoverageSummary(entry.getKey(),
+					totalNumberOfEquivalenceClasses,
+					totalMatchingEquivalenceClasses, coveredClasses,
+					entry.getValue());
+		}
+		protocol.addCoverageSummary(
+				totalNumberOfTests,
+				((double) overallCoveredClasses / (double) overallTotalNumberOfEquivalenceClasses),
+				((double) overallCoveredClasses / (double) overallTotalNumberOfMatchingEquivalenceClasses));
 	}
 
 	@Override
@@ -101,7 +150,19 @@ public class SampleTestGenerator implements Generator {
 			e.printStackTrace();
 		}
 		LOG.fine("generatedValue[id=\"" + id + "\"]:" + dataType.getValue());
+		addStatistics(id, dataType);
 		return dataType;
+	}
+
+	private <T extends DataType<Object, EquivalenceClass>> void addStatistics(
+			final String id, T dataType) {
+		List<DataType<Object, EquivalenceClass>> usedValues = statisticsPerId
+				.get(id);
+		if (usedValues == null) {
+			usedValues = new ArrayList<DataType<Object, EquivalenceClass>>();
+		}
+		usedValues.add(dataType);
+		statisticsPerId.put(id, usedValues);
 	}
 
 	private <T extends DataType> void determineEquivalenceClassList(

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 import java.util.logging.Logger;
 
 public class SimpleTestProtocol implements ITestProtocol {
@@ -111,6 +112,46 @@ public class SimpleTestProtocol implements ITestProtocol {
 	public void closeGenerationFile() {
 		generationLogger.close();
 		this.generationMode = false;
+	}
+
+	@Override
+	public void addCoverageSummaryHeader() {
+		append("\n\n============= Coverage summary ================");
+	}
+
+	@Override
+	public void addCoverageSummary(int numberOfTests, double classCoverage,
+			double matchingClassCoverage) {
+		append("Number of tests generated: " + numberOfTests);
+		append("Total equivalence class coverage: "
+				+ ((int) (classCoverage * 100)) + "%");
+		append("Total matching equivalence class coverage: "
+				+ ((int) (matchingClassCoverage * 100)) + "%");
+	}
+
+	@Override
+	public <E extends Object, T extends EquivalenceClass> void addDataValueCoverageSummary(
+			String dataValueId, int totalClasses, int totalMatchingClasses,
+			int coveredClasses, List<DataType<E, T>> values) {
+		StringBuffer sb = new StringBuffer();
+		for (int i = 0; i < values.size(); i++) {
+			sb.append("\"" + values.get(i).getValue() + "\"("
+					+ values.get(i).getEquivalenceClass().getName() + ")");
+			if (i != (values.size() - 1)) {
+				sb.append(",");
+			}
+		}
+		append("Data field coverage for " + dataValueId + " " + coveredClasses
+				+ "/" + totalMatchingClasses + "/" + totalClasses + ": ["
+				+ sb.toString() + "]");
+	}
+
+	@Override
+	public void addDataValueCoverageSummary(String dataValueId,
+			int totalClasses, int totalMatchingClasses, int coveredClasses,
+			Object[] values) {
+		// TODO Auto-generated method stub
+
 	}
 
 }

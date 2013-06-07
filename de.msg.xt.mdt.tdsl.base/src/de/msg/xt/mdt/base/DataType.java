@@ -2,15 +2,15 @@ package de.msg.xt.mdt.base;
 
 import java.io.Serializable;
 
-public interface DataType<DT, EC> extends Serializable {
+public interface DataType<DT, EC extends EquivalenceClass> extends Serializable {
 
-    DT getValue();
+	DT getValue();
 
-    void setValue(DT value);
+	void setValue(DT value);
 
-    EC getEquivalenceClass();
+	EC getEquivalenceClass();
 
-    void setEquivalenceClass(EC equivalenceClass);
+	void setEquivalenceClass(EC equivalenceClass);
 
-    Class<EC> getEquivalenceClassEnum();
+	Class<EC> getEquivalenceClassEnum();
 }

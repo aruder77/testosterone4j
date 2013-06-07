@@ -5,4 +5,6 @@ public interface EquivalenceClass {
 	Object getValue();
 
 	Tag[] getTags();
+
+	String getName();
 }

@@ -681,6 +681,12 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    		]
    		acceptor.accept(equivalenceClass).initializeLater [
    			
+   			members += dataType.toMethod("getName", dataType.newTypeRef(typeof(String))) [
+   				setBody [
+   					it.append("return this.name();")
+   				]
+   			]
+   			
    			if (dataType.type?.mappedBy != null) {
    				members += dataType.toMethod("getValue", dataType.type.mappedBy) [
    					setBody [

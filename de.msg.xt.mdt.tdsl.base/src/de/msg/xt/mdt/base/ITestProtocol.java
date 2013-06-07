@@ -1,5 +1,6 @@
 package de.msg.xt.mdt.base;
 
+import java.util.List;
 
 public interface ITestProtocol {
 
@@ -19,5 +20,18 @@ public interface ITestProtocol {
 	public void openGenerationFile();
 
 	public void closeGenerationFile();
+
+	public void addCoverageSummaryHeader();
+
+	public void addCoverageSummary(int numberOfTests, double classCoverage,
+			double matchingClassCoverage);
+
+	public void addDataValueCoverageSummary(String dataValueId,
+			int totalClasses, int totalMatchingClasses, int coveredClasses,
+			Object[] values);
+
+	<E extends Object, T extends EquivalenceClass> void addDataValueCoverageSummary(
+			String dataValueId, int totalClasses, int totalMatchingClasses,
+			int coveredClasses, List<DataType<E, T>> values);
 
 }

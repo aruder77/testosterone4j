@@ -9,6 +9,11 @@ import javax.xml.bind.annotation.XmlElement;
 
 public class BaseUseCase implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	protected transient Generator generator;
 
 	@XmlElement
@@ -17,11 +22,13 @@ public class BaseUseCase implements Serializable {
 	@XmlElement
 	protected Map<String, BaseUseCase> generatedSubUseCases = new HashMap<String, BaseUseCase>();
 
-	public <T extends DataType> T getOrGenerateValue(final Class<T> clazz, final String key) {
+	public <T extends DataType> T getOrGenerateValue(final Class<T> clazz,
+			final String key) {
 		return getOrGenerateValue(clazz, key, null);
 	}
 
-	public <T extends DataType> T getOrGenerateValue(final Class<T> clazz, final String key, final Tag[] tags) {
+	public <T extends DataType> T getOrGenerateValue(final Class<T> clazz,
+			final String key, final Tag[] tags) {
 		T value = null;
 		if (generatedData.containsKey(key)) {
 			value = (T) generatedData.get(key);
@@ -32,17 +39,20 @@ public class BaseUseCase implements Serializable {
 		return value;
 	}
 
-	protected <E extends BaseUseCase> E getOrGenerateSubUseCase(final Class<E> clazz, final String key) {
+	protected <E extends BaseUseCase> E getOrGenerateSubUseCase(
+			final Class<E> clazz, final String key) {
 		return this.getOrGenerateSubUseCase(clazz, key, null);
 	}
 
-	protected <E extends BaseUseCase> E getOrGenerateSubUseCase(final Class<E> clazz, final String key, final Tag[] tags) {
+	protected <E extends BaseUseCase> E getOrGenerateSubUseCase(
+			final Class<E> clazz, final String key, final Tag[] tags) {
 		E value = null;
 		if (generatedSubUseCases.containsKey(key)) {
 			value = (E) generatedSubUseCases.get(key);
 		} else {
 			try {
-				value = clazz.getConstructor(Generator.class).newInstance(generator);
+				value = clazz.getConstructor(Generator.class).newInstance(
+						generator);
 				generatedSubUseCases.put(key, value);
 			} catch (final InstantiationException e) {
 				e.printStackTrace();
