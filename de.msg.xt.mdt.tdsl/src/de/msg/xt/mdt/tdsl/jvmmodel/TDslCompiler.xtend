@@ -24,6 +24,8 @@ import org.eclipse.xtext.xbase.compiler.output.ITreeAppendable
 import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder
 import org.eclipse.xtext.xbase.typing.ITypeProvider
 import de.msg.xt.mdt.base.Tag
+import de.msg.xt.mdt.tdsl.tDsl.ParameterAssignment
+import de.msg.xt.mdt.tdsl.tDsl.Parameter
 
 class TDslCompiler extends XbaseCompiler {
 	
@@ -75,7 +77,7 @@ class TDslCompiler extends XbaseCompiler {
     		GeneratedValueExpression: {
     			if (!isReferenced) {
     				newLine
-					append(expr.param.fullyQualifiedName.toString.toFieldName)			
+    				append(expr.param.fullyQualifiedName.toString.toFieldName)
     			}
     		}
     		ActivityOperationCall: {
@@ -109,7 +111,10 @@ class TDslCompiler extends XbaseCompiler {
     				append(");")
     			}
     			newLine
-    			append('''«expr.useCase.subUseCaseGetter».execute((''')
+    			expr.newTypeRef(expr.useCase.class_fqn).serialize(expr, it)
+    			append(''' «expr.variableName» = «expr.useCase.subUseCaseGetter»;''')
+    			newLine
+    			append('''«expr.variableName».execute((''')
     			expr.newTypeRef(expr.useCase.initialActivity.class_FQN.toString).serialize(expr, it)
     			append(''')activity);''')
     		}
@@ -174,8 +179,7 @@ class TDslCompiler extends XbaseCompiler {
 			}
 			GeneratedValueExpression: {
 				val lastExpression = expr.lastExpressionWithNextActivity
-				val opCall = lastExpression as OperationCall
-				append(opCall.getVariableNameForOperationCallParameter(expr.param))
+				appendGeneratedValueExpression(lastExpression, expr, it)
 			}
 			StatementLine: {
 				expr.statement.internalToJavaExpression(it)
@@ -188,7 +192,26 @@ class TDslCompiler extends XbaseCompiler {
 				super.internalToConvertedExpression(expr, it)
         }                          	
 	}
+	
+	def dispatch appendGeneratedValueExpression(XExpression lastExpression, GeneratedValueExpression generatedValueExpr, ITreeAppendable appendable) {
+	}
     
+	def dispatch appendGeneratedValueExpression(OperationCall lastExpression, GeneratedValueExpression generatedValueExpr, ITreeAppendable appendable) {
+		val variableName = lastExpression.getVariableNameForOperationCallParameter(generatedValueExpr.param as DataTypeMapping)
+		appendable.append(variableName) 
+	}
+
+	def dispatch appendGeneratedValueExpression(ActivityOperationCall lastExpression, GeneratedValueExpression generatedValueExpr, ITreeAppendable appendable) {
+		val variableName = generatedValueExpr.param.fullyQualifiedName.toString.toFieldName
+		appendable.append(variableName) 
+	}
+
+	def dispatch appendGeneratedValueExpression(SubUseCaseCall lastExpression, GeneratedValueExpression generatedValueExpr, ITreeAppendable appendable) {
+		val variableName = lastExpression.variableName
+		val getterName = (generatedValueExpr.param as Parameter).name.getterName
+		appendable.append('''«variableName».«getterName»()''') 
+	}
+
     def getVariableNameForOperationCallParameter(OperationCall call, DataTypeMapping mapping) {
     	val name = call?.fullyQualifiedName?.toString
     	mapping?.name?.name + name?.substring(name?.lastIndexOf("@") + 1)?.toFieldName
@@ -274,6 +297,34 @@ class TDslCompiler extends XbaseCompiler {
 	}
 	
     
+	def generateParameters(SubUseCaseCall call, ITreeAppendable appendable) { 
+    	for (parameter : call.useCase.inputParameter) {
+			val assignment = findAssignment(call, parameter)
+			val dataTypeName = parameter.dataType.class_fqn
+			appendable.newLine
+			parameter.newTypeRef(dataTypeName).serialize(parameter, appendable)
+			appendable.append(''' «parameter.fullyQualifiedName.toString.toFieldName» = ''')
+			if (assignment == null) {
+				appendable.append("getOrGenerateValue(")
+				parameter.newTypeRef(dataTypeName).serialize(parameter, appendable)			
+				appendable.append('''.class, "«parameter.fullyQualifiedName»")''')
+			} else {
+				val expectedType = typeRefs.getTypeForName(dataTypeName, call)
+				if (!assignment.value.type.type.equals(expectedType.type)) {
+					appendable.append("new ")
+					parameter.newTypeRef(dataTypeName).serialize(parameter, appendable)			
+					appendable.append("(")
+				}
+				compileAsJavaExpression(assignment.value, appendable, assignment.value.type)
+				if (!assignment.value.type.type.equals(expectedType.type)) {
+					appendable.append(", null)")
+				}
+			}    		
+			appendable.append(";")
+    	} 
+	}
+	
+    
     def appendParameter(ActivityOperationCall call, ITreeAppendable appendable) {
     	appendable.append('''«FOR parameter : call.operation.params SEPARATOR ', '»«parameter.fullyQualifiedName.toString.toFieldName»«ENDFOR»''')
     }
@@ -295,6 +346,15 @@ class TDslCompiler extends XbaseCompiler {
 	def findAssignment(OperationCall call, ControlOperationParameter param) {
 		for (assignment : call.paramAssignment) {
 			if (assignment.name.name.equals(param)) {
+				return assignment
+			}
+		}
+		return null
+	}    
+
+	def findAssignment(SubUseCaseCall call, Parameter param) {
+		for (assignment : call.paramAssignment) {
+			if (assignment.name.equals(param)) {
 				return assignment
 			}
 		}

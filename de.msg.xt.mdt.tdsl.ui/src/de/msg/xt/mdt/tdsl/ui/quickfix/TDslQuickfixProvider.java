@@ -39,7 +39,6 @@ public class TDslQuickfixProvider extends DefaultQuickfixProvider {
 				"Insert all necessary operation mappings using default datatypes.",
 				"upcase.png", new ISemanticModification() {
 
-					@Override
 					public void apply(EObject element,
 							IModificationContext context) throws Exception {
 						Field field = (Field) element;
@@ -84,7 +83,6 @@ public class TDslQuickfixProvider extends DefaultQuickfixProvider {
 		String label = "Add control '" + issue.getData()[0] + "' to toolkit";
 		acceptor.accept(issue, label, label, "", new ISemanticModification() {
 
-			@Override
 			public void apply(EObject element, IModificationContext context)
 					throws Exception {
 				Field field = (Field) element;

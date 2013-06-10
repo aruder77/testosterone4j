@@ -19,6 +19,7 @@ import de.msg.xt.mdt.base.AbstractActivity
 import org.eclipse.emf.ecore.EObject
 import de.msg.xt.mdt.tdsl.tDsl.PackageDeclaration
 import de.msg.xt.mdt.base.ActivityAdapter
+import de.msg.xt.mdt.tdsl.tDsl.SubUseCaseCall
 
 class NamingExtensions {
 	
@@ -61,7 +62,7 @@ class NamingExtensions {
 	def String adapterInterface_fqn(Activity activity) {
 		val providingActivity = activity.adapterProvidingActivity
 		if (providingActivity == null) {
-			activity?.toolkit?.activityAdapter_FQN
+			activity?.toolkit?.activityAdapter_FQN ?: "de.msg.xt.mdt.base.ActivityAdapter"
 		} else 
 			providingActivity.fullyQualifiedName?.toString + "Adapter"
 	}
@@ -137,6 +138,12 @@ class NamingExtensions {
 	
 	def String predicateClass_fqn(PackageDeclaration pack) {
 		pack.fqn + ".Predicates"
+	}
+	
+	// SubUseCaseCall
+	
+	def variableName(SubUseCaseCall call) {
+		(call?.useCase?.name + "_" + call?.useCasePath)?.toFieldName
 	}
 	
 	// SUT

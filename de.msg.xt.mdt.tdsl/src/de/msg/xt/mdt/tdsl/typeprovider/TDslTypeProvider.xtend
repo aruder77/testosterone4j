@@ -17,6 +17,12 @@ import org.eclipse.xtext.common.types.JvmTypeReference
 import org.eclipse.xtext.common.types.util.TypeReferences
 import org.eclipse.xtext.xbase.XFeatureCall
 import org.eclipse.xtext.xbase.typing.XbaseTypeProvider
+import java.util.EventObject
+import org.eclipse.emf.ecore.EObject
+import de.msg.xt.mdt.tdsl.tDsl.Parameter
+import de.msg.xt.mdt.tdsl.tDsl.ControlOperationParameter
+import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationParameter
+import de.msg.xt.mdt.tdsl.tDsl.DataTypeMapping
 
 @Singleton
 class TDslTypeProvider extends XbaseTypeProvider {
@@ -65,7 +71,15 @@ class TDslTypeProvider extends XbaseTypeProvider {
   	}
   	
   	def dispatch type(GeneratedValueExpression expr, JvmTypeReference typeRef, boolean isRawType) {
-  		val dataTypeName = expr?.param?.datatype?.class_FQN?.toString
+  		val param = expr?.param
+  		val dataTypeName = switch param {
+  			Parameter:
+  				param?.dataType?.class_FQN?.toString
+  			DataTypeMapping:
+  				param?.datatype?.class_FQN?.toString
+  			ActivityOperationParameter:
+  				param?.dataType?.class_FQN?.toString
+  		}
   		if (dataTypeName == null)
   			typeReferences.getTypeForName(Void::TYPE, expr)
   		else 

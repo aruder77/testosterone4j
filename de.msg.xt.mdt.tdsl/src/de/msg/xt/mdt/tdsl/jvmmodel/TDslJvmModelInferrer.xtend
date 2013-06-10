@@ -941,6 +941,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    			for (inputParam : useCase.inputParameter) {
    				if (inputParam?.dataType?.class_fqn != null) {
    					members += inputParam.toSetter(inputParam.name, inputParam.newTypeRef(inputParam.dataType.class_fqn))	
+   					members += inputParam.toGetter(inputParam.name, inputParam.newTypeRef(inputParam.dataType.class_fqn))	
    				} 
    			}
    			
