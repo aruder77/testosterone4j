@@ -48,6 +48,7 @@ import de.msg.xt.mdt.tdsl.tDsl.ConditionalNextActivity
 import de.msg.xt.mdt.tdsl.tDsl.StatementLine
 import de.msg.xt.mdt.tdsl.tDsl.StatementLine
 import org.eclipse.emf.ecore.util.EcoreUtil
+import de.msg.xt.mdt.tdsl.tDsl.SubUseCaseCall
 
 class TDslScopeProvider extends XbaseScopeProvider {
 	
@@ -231,7 +232,7 @@ class TDslScopeProvider extends XbaseScopeProvider {
 					val opCall = lastExpression as OperationCall
 					val operation = opCall?.operation
 					val dataTypeMappings = operation?.dataTypeMappings
-					if (operation.eIsProxy) {
+					if (operation?.eIsProxy) {
 						throw new ScopingException("Could not resolve operation: " + opCall.useCasePath + " generatedValueExpression_Param")
 					}
 					if (dataTypeMappings != null) 
@@ -246,6 +247,26 @@ class TDslScopeProvider extends XbaseScopeProvider {
 						], IScope::NULLSCOPE)
 					else 
 						IScope::NULLSCOPE
+				} else if (lastExpression instanceof ActivityOperationCall) {
+					val opCall = lastExpression as ActivityOperationCall
+					val operation = opCall?.operation
+					if (operation?.eIsProxy) {
+						throw new ScopingException("Could not resolve operation: " + opCall.useCasePath + " generatedValueExpression_Param")
+					}
+					val operationParams = operation?.params
+					if (operationParams != null) {
+						Scopes::scopeFor(operationParams)
+					}
+				} else if (lastExpression instanceof SubUseCaseCall) {
+					val call = lastExpression as SubUseCaseCall
+					val useCase = call?.useCase
+					if (useCase?.eIsProxy) {
+						throw new ScopingException("Could not resolve operation: " + call.useCasePath + " generatedValueExpression_Param")
+					}
+					val params = call?.useCase?.inputParameter
+					if (params != null) {
+						Scopes::scopeFor(params)
+					}
 				}
 			}
 		} else {
