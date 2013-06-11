@@ -173,7 +173,7 @@ class UIDescriptionTransformer {
 		if (node.key != null && node.key.trim.length != 0) {
 			field = factory.createField
 			activity.fields += field
-			field.name = node.key.convertToId
+			field.name = "f" + node.key.convertToId
 			field.uniqueId = node.key
 			
 			//field.control = determineControl(node, field)
