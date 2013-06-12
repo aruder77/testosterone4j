@@ -64,6 +64,26 @@ class UIDescriptionTransformer {
 	 * 			- für alle direkten und indirekten Felder erzeuge Fields
 	 * 			- return ActivityOperation
 	 * 		* erzeuge ActivityOperations für Pages
+	 * 
+	 * 
+	 * 
+	 * Mapping der Controls:
+	 * HexDecBinField		=> Composite + 3 TextControl
+	 * StringField			=> TextControl
+	 * RadioButtonField	=> RadioButton 				? SWT-DATA-ID?
+	 * BrowserField		=> StyledText				?
+	 * PushButtonField		=> Button					?
+	 * LongField			=> TextControl
+	 * EnumCombo		=> ComboBox
+	 * DisplayPackageField	=> TextControl
+	 * DisplayTypeField		=> TextControl
+	 * CheckButtonField	=> CheckBox
+ 	 * ComboFielld
+	 * DoubleField			=> TextControl
+	 * ConsoleField		=> TextControl
+	 * NavigationFilter		=> Compositer + Text + 2 Button
+	 * NavigationTreeViewer	=> Tree
+	 * SpacerField		=> Label
 	 */
 	def TestModel transform(UIDescription descr, TestModel model) {
 		
