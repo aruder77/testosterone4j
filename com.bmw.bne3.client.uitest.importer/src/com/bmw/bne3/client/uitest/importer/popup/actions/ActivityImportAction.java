@@ -31,6 +31,7 @@ import com.bmw.bne3.client.uitest.m2m.UIDescriptionTransformer;
 import com.bmw.smartfaces.model.UIDescription;
 import com.google.inject.Inject;
 
+import de.msg.xt.mdt.tdsl.tDsl.Import;
 import de.msg.xt.mdt.tdsl.tDsl.PackageDeclaration;
 import de.msg.xt.mdt.tdsl.tDsl.TDslFactory;
 import de.msg.xt.mdt.tdsl.tDsl.TestModel;
@@ -76,6 +77,9 @@ public class ActivityImportAction implements IObjectActionDelegate {
 				.createPackageDeclaration();
 		pack.setName("fakepackage");
 		model.getPackages().add(pack);
+		Import imp = TDslFactory.eINSTANCE.createImport();
+		imp.setImportedNamespace("de.msg.xt.mdt.tdsl.swtbot.*");
+		pack.getImports().add(imp);
 
 		FileDialog dlg = new FileDialog(shell, SWT.SAVE);
 		dlg.setFilterNames(new String[] { "TDsl Files" });

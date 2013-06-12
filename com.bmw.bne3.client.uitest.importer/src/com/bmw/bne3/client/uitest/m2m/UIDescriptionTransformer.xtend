@@ -21,6 +21,7 @@ import org.eclipse.xtext.naming.QualifiedName
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.xtext.scoping.IGlobalScopeProvider
 import de.msg.xt.mdt.tdsl.tDsl.Control
+import de.msg.xt.mdt.tdsl.tDsl.Import
 
 class UIDescriptionTransformer {
 	
@@ -77,6 +78,10 @@ class UIDescriptionTransformer {
 				val pack = factory.createPackageDeclaration;
 				model.packages.add(pack);
 				pack.setName(folder.packageName)
+				val Import imp = TDslFactory::eINSTANCE.createImport();
+				imp.setImportedNamespace("de.msg.xt.mdt.tdsl.swtbot.*");
+				pack.getImports().add(imp);
+				
 			
 				for (editor : folder.editors) {
 					editor.createActivity(pack)
@@ -148,7 +153,7 @@ class UIDescriptionTransformer {
 		if (node.key != null && node.key.trim.length != 0) {
 			field = factory.createField
 			activity.fields += field
-			field.name = node.key.convertToId
+			field.name = "f" + node.key.convertToId
 			field.uniqueId = node.key
 			
 			//field.control = determineControl(node, field)
