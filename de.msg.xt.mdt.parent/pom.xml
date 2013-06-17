@@ -1,0 +1,71 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>de.msg.xt.mdt</groupId>
+	<artifactId>de.msg.xt.mdt.tdsl.parent</artifactId>
+	<packaging>pom</packaging>
+	<name>BNE3 Client (POM)</name>
+	<description>This is the BNE3 client parent project</description>
+
+	<modules>
+	<module>../com.bmw.bne3.client.uitest.feature</module>
+	<module>../../bne3/com.bmw.smartfaces.model</module>
+	<module>../de.msg.xt.mdt.tdsl</module>
+	<module>../de.msg.xt.mdt.tdsl.base</module>
+	<module>../de.msg.xt.mdt.tdsl.runtime.feature</module>
+	<module>../de.msg.xt.mdt.tdsl.sdk</module>
+	<module>../de.msg.xt.mdt.tdsl.ui</module>
+	<module>../de.msg.xt.mdt.update-site</module>
+	</modules>
+
+	<properties>
+		<tycho.version>0.17.0</tycho.version>
+	</properties>
+
+	<repositories>
+		<repository>
+			<id>bne3.target</id>
+			<layout>p2</layout>
+			<url>http://libne3ci01.bmwgroup.net:11000/eclipse/com.bmw.bne3.target-3.0.4/</url>
+		</repository>
+		<repository>
+			<id>xt.mdt</id>
+			<layout>p2</layout>
+			<url>http://libne3ci01.bmwgroup.net:11000/eclipse/de.msg.xt.mdt.update-site-1.0.0/</url>
+		</repository>
+	</repositories>
+
+	<build>
+		<defaultGoal>install</defaultGoal>
+		<plugins>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-maven-plugin</artifactId>
+				<version>${tycho.version}</version>
+				<extensions>true</extensions>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>target-platform-configuration</artifactId>
+				<version>${tycho.version}</version>
+				<configuration>
+					<pomDependencies>consider</pomDependencies>
+					<environments>
+						<environment>
+							<os>win32</os>
+							<ws>win32</ws>
+							<arch>x86_64</arch>
+						</environment>
+						<environment>
+							<os>win32</os>
+							<ws>win32</ws>
+							<arch>x86</arch>
+						</environment>
+					</environments>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+	<version>0.0.1-SNAPSHOT</version>
+</project>

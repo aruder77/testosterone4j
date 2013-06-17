@@ -4,7 +4,8 @@
   <packaging>eclipse-repository</packaging>
   <parent>
   	<groupId>de.msg.xt.mdt</groupId>
-  	<artifactId>de.msg.xt.mdt.parent</artifactId>
+  	<artifactId>de.msg.xt.mdt.tdsl.parent</artifactId>
   	<version>0.0.1-SNAPSHOT</version>
+  	<relativePath>../de.msg.xt.mdt.parent</relativePath>
   </parent>
 </project>
