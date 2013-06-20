@@ -31,45 +31,34 @@ public class TDslQuickfixProvider extends DefaultQuickfixProvider {
 	MetaModelExtensions metaModelExtensions;
 
 	@Fix(TDslJavaValidator.UNSUFFICIENT_OPERATION_MAPPINGS)
-	public void capitalizeName(final Issue issue,
-			IssueResolutionAcceptor acceptor) {
-		acceptor.accept(
-				issue,
-				"Insert missing operation mappings",
-				"Insert all necessary operation mappings using default datatypes.",
-				"upcase.png", new ISemanticModification() {
+	public void capitalizeName(final Issue issue, final IssueResolutionAcceptor acceptor) {
+		acceptor.accept(issue, "Insert missing operation mappings",
+				"Insert all necessary operation mappings using default datatypes.", "upcase.png", new ISemanticModification() {
 
-					public void apply(EObject element,
-							IModificationContext context) throws Exception {
-						Field field = (Field) element;
-						List<Operation> controlOperations = field.getControl()
-								.getOperations();
-						Map<Operation, OperationMapping> opMappings = new HashMap<Operation, OperationMapping>();
-						for (OperationMapping opMapping : field.getOperations()) {
+					public void apply(final EObject element, final IModificationContext context) throws Exception {
+						final Field field = (Field) element;
+						final List<Operation> controlOperations = field.getControl().getOperations();
+						final Map<Operation, OperationMapping> opMappings = new HashMap<Operation, OperationMapping>();
+						for (final OperationMapping opMapping : field.getOperations()) {
 							opMappings.put(opMapping.getName(), opMapping);
 						}
-						for (Operation op : controlOperations) {
+						for (final Operation op : controlOperations) {
 							if (!opMappings.containsKey(op)) {
 								insertMappingForOperation(field, op);
 							}
 						}
 					}
 
-					private void insertMappingForOperation(Field field,
-							Operation op) {
-						TDslFactory factory = TDslFactory.eINSTANCE;
-						OperationMapping mapping = factory
-								.createOperationMapping();
+					private void insertMappingForOperation(final Field field, final Operation op) {
+						final TDslFactory factory = TDslFactory.eINSTANCE;
+						final OperationMapping mapping = factory.createOperationMapping();
 						mapping.setName(op);
-						mapping.setDataType(metaModelExtensions
-								.defaultDataType(field, op.getReturnType()));
-						List<ControlOperationParameter> params = op.getParams();
-						for (ControlOperationParameter param : params) {
-							DataTypeMapping dtMapping = factory
-									.createDataTypeMapping();
+						mapping.setDataType(metaModelExtensions.defaultDataType(field, op.getReturnType()));
+						final List<ControlOperationParameter> params = op.getParams();
+						for (final ControlOperationParameter param : params) {
+							final DataTypeMapping dtMapping = factory.createDataTypeMapping();
 							dtMapping.setName(param);
-							dtMapping.setDatatype(metaModelExtensions
-									.defaultDataType(field, param.getType()));
+							dtMapping.setDatatype(metaModelExtensions.defaultDataType(field, param.getType()));
 							mapping.getDataTypeMappings().add(dtMapping);
 						}
 						field.getOperations().add(mapping);
@@ -78,16 +67,14 @@ public class TDslQuickfixProvider extends DefaultQuickfixProvider {
 	}
 
 	@Fix(TDslJavaValidator.CONTROL_NOT_IN_TOOLKIT)
-	public void addControlToToolkit(final Issue issue,
-			IssueResolutionAcceptor acceptor) {
-		String label = "Add control '" + issue.getData()[0] + "' to toolkit";
+	public void addControlToToolkit(final Issue issue, final IssueResolutionAcceptor acceptor) {
+		final String label = "Add control '" + issue.getData()[0] + "' to toolkit";
 		acceptor.accept(issue, label, label, "", new ISemanticModification() {
 
-			public void apply(EObject element, IModificationContext context)
-					throws Exception {
-				Field field = (Field) element;
-				Activity act = metaModelExtensions.parentActivity(field);
-				Toolkit toolkit = metaModelExtensions.getToolkit(act);
+			public void apply(final EObject element, final IModificationContext context) throws Exception {
+				final Field field = (Field) element;
+				final Activity act = metaModelExtensions.parentActivity(field);
+				final Toolkit toolkit = metaModelExtensions.getToolkit(act);
 				if (toolkit != null) {
 					toolkit.getControls().add(field.getControl());
 				}

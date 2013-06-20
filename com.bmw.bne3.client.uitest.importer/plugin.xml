@@ -26,6 +26,26 @@
                menubarPath="com.bmw.bne3.client.uitest.importer.menu1/group1">
          </action>
       </objectContribution>
+      <objectContribution
+            id="com.bmw.bne3.client.uitest.importer.convertControls"
+            nameFilter="*.tdsl"
+            objectClass="org.eclipse.core.resources.IFile">
+         <action
+               class="com.bmw.bne3.client.uitest.importer.popup.actions.ConvertControlAction"
+               enablesFor="1"
+               id="com.bmw.bne3.client.uitest.importer.convertControlAction"
+               label="Convert Controls"
+               menubarPath="com.bmw.bne3.client.uitest.importer.menu2/group1">
+         </action>
+         <menu
+               id="com.bmw.bne3.client.uitest.importer.menu2"
+               label="TDsl"
+               path="additions">
+            <separator
+                  name="group1">
+            </separator>
+         </menu>
+      </objectContribution>
    </extension>
 
 </plugin>

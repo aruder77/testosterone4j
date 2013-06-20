@@ -14,6 +14,7 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -24,8 +25,10 @@ import org.eclipse.ui.IActionDelegate;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.ISelectionService;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.xtext.EcoreUtil2;
 import org.eclipse.xtext.resource.SaveOptions;
 import org.eclipse.xtext.ui.resource.XtextResourceSetProvider;
+import org.eclipse.xtext.util.CancelIndicator;
 
 import com.bmw.bne3.client.uitest.m2m.UIDescriptionTransformer;
 import com.bmw.smartfaces.model.UIDescription;
@@ -59,8 +62,8 @@ public class ActivityImportAction implements IObjectActionDelegate {
 	 * @see IObjectActionDelegate#setActivePart(IAction, IWorkbenchPart)
 	 */
 	@Override
-	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
-		this.part = targetPart;
+	public void setActivePart(final IAction action, final IWorkbenchPart targetPart) {
+		part = targetPart;
 		shell = targetPart.getSite().getShell();
 	}
 
@@ -68,76 +71,82 @@ public class ActivityImportAction implements IObjectActionDelegate {
 	 * @see IActionDelegate#run(IAction)
 	 */
 	@Override
-	public void run(IAction action) {
-		IFile file = getSelectedFile();
-		UIDescription description = readModel(file);
+	public void run(final IAction action) {
+		final IFile file = getSelectedFile();
+		final UIDescription description = readModel(file);
 
-		TestModel model = TDslFactory.eINSTANCE.createTestModel();
-		PackageDeclaration pack = TDslFactory.eINSTANCE
-				.createPackageDeclaration();
+		final TestModel model = TDslFactory.eINSTANCE.createTestModel();
+		final PackageDeclaration pack = TDslFactory.eINSTANCE.createPackageDeclaration();
 		pack.setName("fakepackage");
 		model.getPackages().add(pack);
-		Import imp = TDslFactory.eINSTANCE.createImport();
+		final Import imp = TDslFactory.eINSTANCE.createImport();
 		imp.setImportedNamespace("de.msg.xt.mdt.tdsl.swtbot.*");
 		pack.getImports().add(imp);
 
-		FileDialog dlg = new FileDialog(shell, SWT.SAVE);
+		final FileDialog dlg = new FileDialog(shell, SWT.SAVE);
 		dlg.setFilterNames(new String[] { "TDsl Files" });
 		dlg.setFilterExtensions(new String[] { "*.tdsl" });
-		String fn = dlg.open();
+		final String fn = dlg.open();
 
-		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		IPath location = Path.fromOSString(fn);
-		IFile ifile = workspace.getRoot().getFileForLocation(location);
+		final InputDialog inputDialog = new InputDialog(shell, "Activity to import",
+				"Bitte geben Sie den Namen der zu importierenden Activity (Editor, initialValue, validator) ein.!", "", null);
+		inputDialog.setBlockOnOpen(true);
+		inputDialog.open();
+		final String editorName = inputDialog.getValue();
 
-		if (fn != null)
+		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		final IPath location = Path.fromOSString(fn);
+		final IFile ifile = workspace.getRoot().getFileForLocation(location);
+
+		if (fn != null) {
 			writeToFile(ifile, model);
+		}
 
-		transformToTestModel(description, model);
+		transformToTestModel(description, model, editorName);
 
 		writeToFile(ifile, model);
 
-		MessageDialog.openInformation(shell, "Importer",
-				"Activities imported successfully.");
+		MessageDialog.openInformation(shell, "Importer", "Activities imported successfully.");
 	}
 
-	private TestModel transformToTestModel(UIDescription description,
-			TestModel model) {
-		return transformer.transform(description, model);
+	private TestModel transformToTestModel(final UIDescription description, final TestModel model, final String editorName) {
+		return transformer.transform(description, model, editorName);
 	}
 
-	private void writeToFile(IFile file, TestModel model) {
-		ResourceSet rs = provider.get(file.getProject());
-		Resource resource = rs.createResource(URI.createURI(file.getLocation()
-				.toString()));
+	private void writeToFile(final IFile file, final TestModel model) {
+		final ResourceSet rs = provider.get(file.getProject());
+		final Resource resource = rs.createResource(URI.createURI(file.getLocation().toString()));
 
 		if (!resource.getContents().contains(model)) {
 			resource.getContents().add(model);
 		}
 		try {
-			resource.save(new FileOutputStream(file.getLocation().toString()),
-					SaveOptions.newBuilder().format().getOptions()
-							.toOptionsMap());
-		} catch (FileNotFoundException e) {
+			resource.save(new FileOutputStream(file.getLocation().toString()), SaveOptions.newBuilder().format().getOptions()
+					.toOptionsMap());
+		} catch (final FileNotFoundException e) {
 			e.printStackTrace();
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
 		}
 	}
 
 	private IFile getSelectedFile() {
-		ISelectionService selectionService = this.part.getSite()
-				.getWorkbenchWindow().getSelectionService();
-		IStructuredSelection selection = (IStructuredSelection) selectionService
-				.getSelection();
-		IFile file = (IFile) selection.getFirstElement();
+		final ISelectionService selectionService = part.getSite().getWorkbenchWindow().getSelectionService();
+		final IStructuredSelection selection = (IStructuredSelection) selectionService.getSelection();
+		final IFile file = (IFile) selection.getFirstElement();
 		return file;
 	}
 
-	private UIDescription readModel(IFile file) {
-		ResourceSet rs = new ResourceSetImpl();
-		Resource resource = rs.getResource(
-				URI.createURI(file.getLocationURI().toString()), true);
+	private UIDescription readModel(final IFile file) {
+		final ResourceSet rs = new ResourceSetImpl();
+		final Resource resource = rs.getResource(URI.createURI(file.getLocationURI().toString()), true);
+		EcoreUtil2.resolveAll(resource, new CancelIndicator() {
+
+			@Override
+			public boolean isCanceled() {
+				return false;
+			}
+		});
 		return (UIDescription) resource.getContents().get(0);
 	}
 
@@ -145,7 +154,7 @@ public class ActivityImportAction implements IObjectActionDelegate {
 	 * @see IActionDelegate#selectionChanged(IAction, ISelection)
 	 */
 	@Override
-	public void selectionChanged(IAction action, ISelection selection) {
+	public void selectionChanged(final IAction action, final ISelection selection) {
 	}
 
 }

@@ -85,7 +85,7 @@ class UIDescriptionTransformer {
 	 * NavigationTreeViewer	=> Tree
 	 * SpacerField		=> Label
 	 */
-	def TestModel transform(UIDescription descr, TestModel model) {
+	def TestModel transform(UIDescription descr, TestModel model, String editorName) {
 		
 		val factory = TDslFactory::eINSTANCE 
 
@@ -104,7 +104,8 @@ class UIDescriptionTransformer {
 				
 			
 				for (editor : folder.editors) {
-					editor.createActivity(pack)
+					if (editor.key != null && editor.key.equalsIgnoreCase(editorName))
+						editor.createActivity(pack)
 				}			
 			}
 		}
@@ -173,10 +174,16 @@ class UIDescriptionTransformer {
 		if (node.key != null && node.key.trim.length != 0) {
 			field = factory.createField
 			activity.fields += field
-			field.name = "f" + node.key.convertToId
-			field.uniqueId = node.key
 			
-			//field.control = determineControl(node, field)
+			if (node.fieldReference != null && node.fieldReference.table != null) {
+				field.name = node.fieldReference.table.key.convertToId
+			} else {
+				field.name = node.key.convertToId			
+			}
+			
+			field.uniqueId = field.name
+			
+			field.control = determineControl(node, field)
 			
 			if (field.control == null) {
 				createControl(node, field)
@@ -233,7 +240,10 @@ class UIDescriptionTransformer {
 	}
 
 	def String convertToId(String id) {
-		id.trim.replace(' ', '').replaceAll("ß","ss").replace('-','_').replace('.','_').replace('/','_').replace("ä", "ae").replace("ö", "Oe").replace("ü", "ue").replace("Ä", "Ae").replace("Ö", "Oe").replace("Ü", "Ue").replace('\"','').replace("(","").replace(")", "")
+		var temp = id.trim.replace(' ', '').replaceAll("ß","ss").replace('-','_').replace('.','_').replace('/','_').replace("ä", "ae").replace("ö", "Oe").replace("ü", "ue").replace("Ä", "Ae").replace("Ö", "Oe").replace("Ü", "Ue").replace('\"','').replace("(","").replace(")", "").replace("!", "").replace(",", "")
+		if (!Character::isLetter(temp.charAt(0)))
+			temp = "f" + temp
+		return temp
 	}
 	
 }

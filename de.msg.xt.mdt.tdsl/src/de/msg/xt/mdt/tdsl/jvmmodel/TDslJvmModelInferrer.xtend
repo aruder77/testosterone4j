@@ -802,6 +802,14 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    			
    			annotations += dataType.toAnnotation(typeof(XmlRootElement))
    			
+   			members += dataType.toField("serialVersionUID", dataType.newTypeRef(typeof(long))) [
+   				setFinal(true)
+   				setStatic(true)
+   				it.setInitializer [
+   					it.append(System::currentTimeMillis + "L")
+   				]
+   			]
+   			
 			members += dataType.toField("_value", dataType.type?.mappedBy) [
 				annotations += dataType.toAnnotation(typeof(XmlAttribute))
 			]
@@ -893,6 +901,15 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    			it.superTypes += useCase.newTypeRef(typeof(Runnable))
 
    			it.annotations += useCase.toAnnotation(typeof(XmlRootElement))
+   			
+   			members += useCase.toField("serialVersionUID", useCase.newTypeRef(typeof(long))) [
+   				setFinal(true)
+   				setStatic(true)
+   				it.setInitializer [
+   					it.append(System::currentTimeMillis + "L")
+   				]
+   			]
+   			
    			   			
    			for (inputParam : useCase.inputParameter) {
    				if (inputParam.name != null && inputParam?.dataType?.class_fqn != null) {
