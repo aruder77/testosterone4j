@@ -279,11 +279,11 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				]
    			]
    			
-   			members += activity.toMethod("getFields", activity.newTypeRef(typeof(List), activity.newTypeRef(typeof(ControlField)))) [
+   			members += activity.toMethod("getFields", activity.newTypeRef(typeof(Set), activity.newTypeRef(typeof(ControlField)))) [
    				it.setBody [
-   					it.append("java.util.List list = new java.util.ArrayList<ControlField>();").newLine
-   					it.append("list.addAll(java.util.Arrays.asList(fields));").newLine
-   					it.append("return list;")   					
+   					it.append("java.util.Set set = new java.util.HashSet<ControlField>();").newLine
+   					it.append("set.addAll(java.util.Arrays.asList(fields));").newLine
+   					it.append("return set;")   					
    				]
    			]
    			

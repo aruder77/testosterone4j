@@ -23,29 +23,51 @@ public class ConvertControlAction implements IObjectActionDelegate {
 	private IWorkbenchPart part;
 
 	private final String[][] controlMap = new String[][] {
-			{ "com_bmw_smartfaces_boxed_controls_StringFieldFactory", "TextControl" },
-			{ "com_bmw_smartfaces_boxed_controls_LongFieldFactory", "TextControl" },
+			{ "com_bmw_smartfaces_boxed_controls_StringFieldFactory",
+					"TextControl" },
+			{ "com_bmw_smartfaces_boxed_controls_LongFieldFactory",
+					"TextControl" },
 			{ "com_bmw_smartfaces_boxed_controls_ComboFieldFactory", "ComboBox" },
-			{ "com_bmw_smartfaces_boxed_controls_DoubleFieldFactory", "TextControl" },
-			{ "com_bmw_smartfaces_boxed_controls_HexDecBinFieldFactory", "TextControl" }, // TODO
+			{ "com_bmw_smartfaces_boxed_controls_DoubleFieldFactory",
+					"TextControl" },
+			{ "com_bmw_smartfaces_boxed_controls_HexDecBinFieldFactory",
+					"HexDecBin" }, // TODO
 			{ "com_bmw_smartfaces_boxed_controls_SpacerFieldFactory", "Label" },
-			{ "com_bmw_smartfaces_boxed_controls_TableControlFactory", "TableControl" },
+			{ "com_bmw_smartfaces_boxed_controls_TableControlFactory",
+					"TableControl" },
+			{ "com_bmw_smartfaces_boxed_controls_MessageFieldFactory", "Label" },
 
-			{ "com_bmw_smartfaces_boxed_controls_buttons_RadioButtonFieldFactory", "RadioButton" },
-			{ "com_bmw_smartfaces_boxed_controls_buttons_PushButtonFieldFactory", "Button" },
-			{ "com_bmw_smartfaces_boxed_controls_buttons_CheckButtonFieldFactory", "CheckBox" },
+			{
+					"com_bmw_smartfaces_boxed_controls_buttons_RadioButtonFieldFactory",
+					"RadioButton" },
+			{
+					"com_bmw_smartfaces_boxed_controls_buttons_PushButtonFieldFactory",
+					"Button" },
+			{
+					"com_bmw_smartfaces_boxed_controls_buttons_CheckButtonFieldFactory",
+					"CheckBox" },
 
-			{ "com_bmw_smartfaces_boxed_controls_browser_BrowserFieldFactory", "StyledText" },
+			{ "com_bmw_smartfaces_boxed_controls_browser_BrowserFieldFactory",
+					"StyledText" },
 
-			{ "com_bmw_smartfaces_boxed_controls_console_ConsoleFieldFactory", "TextControl" },
+			{ "com_bmw_smartfaces_boxed_controls_console_ConsoleFieldFactory",
+					"TextControl" },
 
 			{ "com_bmw_bne3_client_controls_EnumComboFactory", "TableControl" },
-			{ "com_bmw_bne3_client_controls_TypeSelectionComboFactory", "TableControl" },
-			{ "com_bmw_bne3_client_controls_NavigationFilterFactory", "TextControl" }, // TODO
-			{ "com_bmw_bne3_client_controls_NavigationTreeViewerFactory", "Tree" },
+			{ "com_bmw_bne3_client_controls_TypeSelectionComboFactory",
+					"TypeSelectionCombo" },
+			{ "com_bmw_bne3_client_controls_TypeSelectionFieldFactory",
+					"TypeSelectionField" },
+			{ "com_bmw_bne3_client_controls_NavigationFilterFactory",
+					"NavigationFilter" }, // TODO
+			{ "com_bmw_bne3_client_controls_NavigationTreeViewerFactory",
+					"Tree" },
 
-			{ "com_bmw_bne3_client_controls_display_DisplayPackageFieldFactory", "TableControl" },
-			{ "com_bmw_bne3_client_controls_display_DisplayTypeFieldFactory", "TableControl" } };
+			{
+					"com_bmw_bne3_client_controls_display_DisplayPackageFieldFactory",
+					"TableControl" },
+			{ "com_bmw_bne3_client_controls_display_DisplayTypeFieldFactory",
+					"TableControl" } };
 
 	/**
 	 * Constructor for Action1.
@@ -58,7 +80,8 @@ public class ConvertControlAction implements IObjectActionDelegate {
 	 * @see IObjectActionDelegate#setActivePart(IAction, IWorkbenchPart)
 	 */
 	@Override
-	public void setActivePart(final IAction action, final IWorkbenchPart targetPart) {
+	public void setActivePart(final IAction action,
+			final IWorkbenchPart targetPart) {
 		part = targetPart;
 		shell = targetPart.getSite().getShell();
 	}
@@ -70,19 +93,22 @@ public class ConvertControlAction implements IObjectActionDelegate {
 	public void run(final IAction action) {
 		final IFile file = getSelectedFile();
 		try {
-			final BufferedReader reader = new BufferedReader(new InputStreamReader(file.getContents()));
+			final BufferedReader reader = new BufferedReader(
+					new InputStreamReader(file.getContents()));
 			final StringBuffer sb = new StringBuffer();
 			String line = reader.readLine();
 			while (line != null) {
 				String currentLine = line;
 				for (final String[] element : controlMap) {
-					currentLine = currentLine.replaceAll(element[0], element[1]);
+					currentLine = currentLine
+							.replaceAll(element[0], element[1]);
 				}
 				sb.append(currentLine + "\n");
 				line = reader.readLine();
 			}
 			reader.close();
-			file.setContents(new StringInputStream(sb.toString()), true, true, null);
+			file.setContents(new StringInputStream(sb.toString()), true, true,
+					null);
 		} catch (final CoreException e) {
 			e.printStackTrace();
 		} catch (final IOException e) {
@@ -91,8 +117,10 @@ public class ConvertControlAction implements IObjectActionDelegate {
 	}
 
 	private IFile getSelectedFile() {
-		final ISelectionService selectionService = part.getSite().getWorkbenchWindow().getSelectionService();
-		final IStructuredSelection selection = (IStructuredSelection) selectionService.getSelection();
+		final ISelectionService selectionService = part.getSite()
+				.getWorkbenchWindow().getSelectionService();
+		final IStructuredSelection selection = (IStructuredSelection) selectionService
+				.getSelection();
 		final IFile file = (IFile) selection.getFirstElement();
 		return file;
 	}
@@ -101,7 +129,8 @@ public class ConvertControlAction implements IObjectActionDelegate {
 	 * @see IActionDelegate#selectionChanged(IAction, ISelection)
 	 */
 	@Override
-	public void selectionChanged(final IAction action, final ISelection selection) {
+	public void selectionChanged(final IAction action,
+			final ISelection selection) {
 	}
 
 }

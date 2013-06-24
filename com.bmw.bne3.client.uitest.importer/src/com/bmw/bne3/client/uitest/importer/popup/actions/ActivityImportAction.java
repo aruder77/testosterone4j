@@ -62,7 +62,8 @@ public class ActivityImportAction implements IObjectActionDelegate {
 	 * @see IObjectActionDelegate#setActivePart(IAction, IWorkbenchPart)
 	 */
 	@Override
-	public void setActivePart(final IAction action, final IWorkbenchPart targetPart) {
+	public void setActivePart(final IAction action,
+			final IWorkbenchPart targetPart) {
 		part = targetPart;
 		shell = targetPart.getSite().getShell();
 	}
@@ -76,7 +77,8 @@ public class ActivityImportAction implements IObjectActionDelegate {
 		final UIDescription description = readModel(file);
 
 		final TestModel model = TDslFactory.eINSTANCE.createTestModel();
-		final PackageDeclaration pack = TDslFactory.eINSTANCE.createPackageDeclaration();
+		final PackageDeclaration pack = TDslFactory.eINSTANCE
+				.createPackageDeclaration();
 		pack.setName("fakepackage");
 		model.getPackages().add(pack);
 		final Import imp = TDslFactory.eINSTANCE.createImport();
@@ -88,8 +90,11 @@ public class ActivityImportAction implements IObjectActionDelegate {
 		dlg.setFilterExtensions(new String[] { "*.tdsl" });
 		final String fn = dlg.open();
 
-		final InputDialog inputDialog = new InputDialog(shell, "Activity to import",
-				"Bitte geben Sie den Namen der zu importierenden Activity (Editor, initialValue, validator) ein.!", "", null);
+		final InputDialog inputDialog = new InputDialog(
+				shell,
+				"Activity to import",
+				"Bitte geben Sie den Namen der zu importierenden Activity (Editor, initialValue, validator) ein.!",
+				"", null);
 		inputDialog.setBlockOnOpen(true);
 		inputDialog.open();
 		final String editorName = inputDialog.getValue();
@@ -106,40 +111,73 @@ public class ActivityImportAction implements IObjectActionDelegate {
 
 		writeToFile(ifile, model);
 
-		MessageDialog.openInformation(shell, "Importer", "Activities imported successfully.");
+		MessageDialog.openInformation(shell, "Importer",
+				"Activities imported successfully.");
 	}
 
-	private TestModel transformToTestModel(final UIDescription description, final TestModel model, final String editorName) {
+	private TestModel transformToTestModel(final UIDescription description,
+			final TestModel model, final String editorName) {
 		return transformer.transform(description, model, editorName);
 	}
 
 	private void writeToFile(final IFile file, final TestModel model) {
 		final ResourceSet rs = provider.get(file.getProject());
-		final Resource resource = rs.createResource(URI.createURI(file.getLocation().toString()));
+		// final Resource resource =
+		// rs.createResource(URI.createURI(file.getLocation().toString()));
+		final Resource resource = rs
+				.createResource(URI.createPlatformResourceURI(file
+						.getFullPath().toString(), true));
 
 		if (!resource.getContents().contains(model)) {
 			resource.getContents().add(model);
 		}
 		try {
-			resource.save(new FileOutputStream(file.getLocation().toString()), SaveOptions.newBuilder().format().getOptions()
-					.toOptionsMap());
+			resource.save(new FileOutputStream(file.getLocation().toString()),
+					SaveOptions.newBuilder().format().getOptions()
+							.toOptionsMap());
 		} catch (final FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (final IOException e) {
 			e.printStackTrace();
 		}
+
+		/*
+		 * URI uri = d.eResource().getURI(); uri = uri.trimFragment(); uri =
+		 * uri.trimFileExtension(); uri = uri.appendFileExtension("model");
+		 * ResourceSet rSet = d.eResource().getResourceSet(); final
+		 * IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace()
+		 * .getRoot(); IResource file =
+		 * workspaceRoot.findMember(uri.toPlatformString(true)); if (file ==
+		 * null || !file.exists()) { Resource createResource =
+		 * rSet.createResource(uri);
+		 * createResource.save(Collections.emptyMap());
+		 * createResource.setTrackingModification(true); } final Resource
+		 * resource = rSet.getResource(uri, true);
+		 * 
+		 * if (obj instanceof DiagramDialog) { final CommandStack commandStack =
+		 * editingDomain.getCommandStack(); commandStack.execute(new
+		 * RecordingCommand(editingDomain) {
+		 * 
+		 * @Override protected void doExecute() { //Save DiagramDialog at proper
+		 * position ((DocumentRoot)
+		 * resource.getContents().get(0)).getProcedure()
+		 * .get(0).add((DiagramDialog ) obj); } }); }
+		 */
 	}
 
 	private IFile getSelectedFile() {
-		final ISelectionService selectionService = part.getSite().getWorkbenchWindow().getSelectionService();
-		final IStructuredSelection selection = (IStructuredSelection) selectionService.getSelection();
+		final ISelectionService selectionService = part.getSite()
+				.getWorkbenchWindow().getSelectionService();
+		final IStructuredSelection selection = (IStructuredSelection) selectionService
+				.getSelection();
 		final IFile file = (IFile) selection.getFirstElement();
 		return file;
 	}
 
 	private UIDescription readModel(final IFile file) {
 		final ResourceSet rs = new ResourceSetImpl();
-		final Resource resource = rs.getResource(URI.createURI(file.getLocationURI().toString()), true);
+		final Resource resource = rs.getResource(
+				URI.createURI(file.getLocationURI().toString()), true);
 		EcoreUtil2.resolveAll(resource, new CancelIndicator() {
 
 			@Override
@@ -154,7 +192,8 @@ public class ActivityImportAction implements IObjectActionDelegate {
 	 * @see IActionDelegate#selectionChanged(IAction, ISelection)
 	 */
 	@Override
-	public void selectionChanged(final IAction action, final ISelection selection) {
+	public void selectionChanged(final IAction action,
+			final ISelection selection) {
 	}
 
 }

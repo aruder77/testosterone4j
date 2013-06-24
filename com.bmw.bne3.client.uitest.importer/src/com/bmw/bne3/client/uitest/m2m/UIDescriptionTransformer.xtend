@@ -22,6 +22,9 @@ import org.eclipse.emf.ecore.EObject
 import org.eclipse.xtext.scoping.IGlobalScopeProvider
 import de.msg.xt.mdt.tdsl.tDsl.Control
 import de.msg.xt.mdt.tdsl.tDsl.Import
+import java.util.HashMap
+import de.msg.xt.mdt.tdsl.tDsl.Operation
+import de.msg.xt.mdt.tdsl.tDsl.OperationMapping
 
 class UIDescriptionTransformer {
 	
@@ -101,8 +104,16 @@ class UIDescriptionTransformer {
 				val Import imp = TDslFactory::eINSTANCE.createImport();
 				imp.setImportedNamespace("de.msg.xt.mdt.tdsl.swtbot.*");
 				pack.getImports().add(imp);
-				
-			
+				val Import imp2 = TDslFactory::eINSTANCE.createImport();
+				imp2.setImportedNamespace("de.msg.xt.mdt.tdsl.basictypes.*");
+				pack.getImports().add(imp2);
+				val Import imp3 = TDslFactory::eINSTANCE.createImport();
+				imp3.setImportedNamespace("com.bmw.bne3.client.uitest.datatypes.*");
+				pack.getImports().add(imp3);
+				val Import imp4 = TDslFactory::eINSTANCE.createImport();
+				imp4.setImportedNamespace("com.bmw.bne3.client.uitest.activities.*");
+				pack.getImports().add(imp4);
+							
 				for (editor : folder.editors) {
 					if (editor.key != null && editor.key.equalsIgnoreCase(editorName))
 						editor.createActivity(pack)
@@ -167,6 +178,8 @@ class UIDescriptionTransformer {
 		
 		return activity
 	}
+	
+	
 	def Field createField(FieldNode node, Activity activity) { 
 		val factory = TDslFactory::eINSTANCE
 		var Field field
@@ -181,17 +194,21 @@ class UIDescriptionTransformer {
 				field.name = node.key.convertToId			
 			}
 			
-			field.uniqueId = field.name
+			field.uniqueId = node.key
 			
 			field.control = determineControl(node, field)
 			
 			if (field.control == null) {
 				createControl(node, field)
 			}
+			
+			field.insertFieldOperationMappings
 		}
 		
 		return field		
 	}
+	
+	
 	def createControl(FieldNode node, Field field) { 
 		var controlName = "someControl"
 		if (node.factory != null)
@@ -214,7 +231,7 @@ class UIDescriptionTransformer {
 			control.operations += op
 			op.name = "isEnabled"
 		}
-		field.control = control
+		field.control = control		
 	}
 
 	
@@ -225,7 +242,7 @@ class UIDescriptionTransformer {
 			System::out.println("Element in scope: " + element.name.toString)
 		}
 		if (node.factory != null) {
-			return scope.getSingleElement(mapFactoryToControlName(node.factory.classname)) as Control
+			return (scope.getSingleElement(mapFactoryToControlName(node.factory.classname)).EObjectOrProxy as Control)
 		} else {
 			return scope.getSingleElement(QualifiedName::create("de", "msg", "xt", "mdt", "tdsl", "swtbot", "TableControl")) as Control			
 		}
@@ -244,6 +261,35 @@ class UIDescriptionTransformer {
 		if (!Character::isLetter(temp.charAt(0)))
 			temp = "f" + temp
 		return temp
+	}
+	
+	
+	def insertFieldOperationMappings(Field field) {
+		val controlOperations = field.getControl().getOperations();
+		val opMappings = new HashMap<Operation, OperationMapping>();
+		for (opMapping : field.getOperations()) {
+			opMappings.put(opMapping.getName(), opMapping);
+		}
+		for (op : controlOperations) {
+			if (!opMappings.containsKey(op)) {
+				insertMappingForOperation(field, op);
+			}
+		}
+	}
+
+	def insertMappingForOperation(Field field, Operation op) {
+		val factory = TDslFactory::eINSTANCE;
+		val mapping = factory.createOperationMapping();
+		mapping.setName(op);
+		mapping.setDataType(field.defaultDataType(op.getReturnType()));
+		val params = op.getParams();
+		for (param : params) {
+			val dtMapping = factory.createDataTypeMapping();
+			dtMapping.setName(param);
+			dtMapping.setDatatype(field.defaultDataType(param.getType()));
+			mapping.getDataTypeMappings().add(dtMapping);
+		}
+		field.getOperations().add(mapping);
 	}
 	
 }
