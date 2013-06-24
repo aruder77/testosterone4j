@@ -236,14 +236,8 @@ class TDslScopeProvider extends XbaseScopeProvider {
 						throw new ScopingException("Could not resolve operation: " + opCall.useCasePath + " generatedValueExpression_Param")
 					}
 					if (dataTypeMappings != null) 
-						Scopes::scopeFor(dataTypeMappings, [
-							val DataTypeMapping dtMap = it as DataTypeMapping
-							val controlOpParam = dtMap.name
-							val name = controlOpParam?.name
-							if (controlOpParam.eIsProxy) {
-								throw new ScopingException("Could not resolve ControlOperationParameter: " + opCall.useCasePath + " generatedValueExpression_Param")
-							}
-							QualifiedName::create(dtMap.name.name)
+						Scopes::scopeFor(dataTypeMappings.filter [ it?.name?.name != null ], [
+							QualifiedName::create(it.name.name)
 						], IScope::NULLSCOPE)
 					else 
 						IScope::NULLSCOPE
@@ -293,13 +287,8 @@ class TDslScopeProvider extends XbaseScopeProvider {
 	}
 	
 	def calculatesScopes(List<OperationMapping> operationMappings) {
-		Scopes::scopeFor(operationMappings, [
-					val OperationMapping opMap = it as OperationMapping
-					if (opMap?.name?.name != null) {
-						QualifiedName::create('#' + opMap.field.name, opMap.name.name)
-					} else {
-						throw new ScopingException("Could not resolve operation in caculatesScopes!")
-					}
+		Scopes::scopeFor(operationMappings.filter [ it?.name?.name != null ], [
+					QualifiedName::create('#' + it.field.name, it.name.name)
 				], IScope::NULLSCOPE) 
 	}
 	

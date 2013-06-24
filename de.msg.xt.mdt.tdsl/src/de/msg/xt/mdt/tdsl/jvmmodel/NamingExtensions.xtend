@@ -20,6 +20,7 @@ import org.eclipse.emf.ecore.EObject
 import de.msg.xt.mdt.tdsl.tDsl.PackageDeclaration
 import de.msg.xt.mdt.base.ActivityAdapter
 import de.msg.xt.mdt.tdsl.tDsl.SubUseCaseCall
+import de.msg.xt.mdt.tdsl.tDsl.Predicate
 
 class NamingExtensions {
 	
@@ -133,6 +134,10 @@ class NamingExtensions {
 		"get" + field?.name?.toFirstUpper + field?.control?.name?.toFirstUpper
 	}
 	
+	def String controlFieldName(Field field) {
+		field?.name + "Field"
+	}
+	
 
 	// PackageDeclaration
 	
@@ -140,6 +145,14 @@ class NamingExtensions {
 		pack.fqn + ".Predicates"
 	}
 	
+	
+	// Predicate
+	
+	def String class_fqn(Predicate predicate) {
+		predicate?.fullyQualifiedName?.toString
+	}
+
+
 	// SubUseCaseCall
 	
 	def variableName(SubUseCaseCall call) {

@@ -71,7 +71,7 @@ class TDslJavaValidator extends AbstractTDslJavaValidator {
 	
 	@Check
 	override checkImplicitReturn(XExpression expr) {
-		if (expr.eContainer() instanceof ActivityOperation || expr.eContainer instanceof Predicate) {
+		if (expr.eContainer() instanceof ActivityOperation /*|| expr.eContainer instanceof Predicate */) {
 			return;
 		}
 		super.checkImplicitReturn(expr);

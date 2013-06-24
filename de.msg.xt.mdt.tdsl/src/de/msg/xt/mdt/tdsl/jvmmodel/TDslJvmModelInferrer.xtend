@@ -66,7 +66,10 @@ import javax.xml.bind.annotation.XmlElement
 import java.util.Stack
 import de.msg.xt.mdt.tdsl.tDsl.Predicate
 import de.msg.xt.mdt.tdsl.tDsl.Element
-import de.msg.xt.mdt.tdsl.tDsl.Predicate
+import org.eclipse.xtext.xbase.lib.Functions$Function2
+import java.util.Set
+import de.msg.xt.mdt.base.ControlField
+import de.msg.xt.mdt.base.IEvalutaionGroup
 
 /**
  * <p>Infers a JVM model from the source model.</p> 
@@ -99,11 +102,11 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 	
 	def dispatch void infer(PackageDeclaration pack, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
 		
-		for (element : pack.elements.filter([!(it instanceof Predicate)])) {
+		for (element : pack.elements/* .filter([!(it instanceof Predicate)] ) */) {
 			element.infer(acceptor, isPreIndexingPhase)
 		}
 		
-		val predicates = pack.elements.filter(typeof(Predicate))
+/*		val predicates = pack.elements.filter(typeof(Predicate))
 		if (!predicates.empty) { 
 			acceptor.accept(pack.toClass(pack.predicateClass_fqn)).initializeLater [
 				
@@ -120,7 +123,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 					]
 				}
 			]
-		}
+		} */
 	}
 
 	def dispatch void infer(Toolkit toolkit, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
@@ -147,6 +150,8 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 	}
 	
    	def dispatch void infer(Activity activity, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
+   		
+   		System::out.println("Resource URL: " + activity.eResource.URI.toString)
    		
    		var JvmGenericType activityAdapterClassVar = null
    		if (activity.needsOwnActivityAdapter && activity.adapterInterface_fqn != null) {
@@ -189,6 +194,8 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    			val superClass = activity.superClass_ref
    			if (superClass != null)
    				superTypes += superClass
+   				
+   			superTypes += activity.newTypeRef(typeof(IEvalutaionGroup))
    			
    			members += activity.toField("ID", activity.newTypeRef(typeof(String))) [
    				it.setStatic(true)
@@ -223,11 +230,27 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				it.setInitializer [
    					it.append("this.injector.getInstance(")
    					activity.newTypeRef(typeof(ITestProtocol)).serialize(activity, it)
-   					it.append(".class)");
+   					it.append(".class)")
    				]
    			]
    			   				
    			members += activity.toField("contextAdapter", activityAdapterClassRef)
+   			
+   			for (field: activity.fields) {
+   				members += field.toField(field.controlFieldName, field.newTypeRef(typeof(ControlField))) [
+   					it.setFinal(true)
+   					it.setInitializer [
+   						it.append('''new de.msg.xt.mdt.base.ControlField("«field.name»", new de.msg.xt.mdt.base.Tag[] {«FOR tag: field.tags SEPARATOR ","»«tag.tag.enumLiteral_FQN»«ENDFOR»})''')
+   					]
+   				]
+   			}
+   			
+   			members += activity.toField("fields", activity.newTypeRef(typeof(ControlField)).createArrayType) [
+   				it.setFinal(true)
+   				it.setInitializer [
+   					it.append('''new de.msg.xt.mdt.base.ControlField[] {«FOR field: activity.fields SEPARATOR ", "»«field.controlFieldName»«ENDFOR»}''')
+   				]
+   			]
    			
    			members += activity.toMethod("find", newTypeRef(activityClass)) [
    				it.setStatic(true)
@@ -256,6 +279,14 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				]
    			]
    			
+   			members += activity.toMethod("getFields", activity.newTypeRef(typeof(List), activity.newTypeRef(typeof(ControlField)))) [
+   				it.setBody [
+   					it.append("java.util.List list = new java.util.ArrayList<ControlField>();").newLine
+   					it.append("list.addAll(java.util.Arrays.asList(fields));").newLine
+   					it.append("return list;")   					
+   				]
+   			]
+   			
 			for (field : activity.fields) {
 				if (field?.control?.fqn != null) {
 					members += field.toMethod(field.fieldGetterName, field.newTypeRef(field.control.fqn)) [
@@ -265,6 +296,10 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 						]
 					]
 				}
+			}
+			
+			for (field : activity.fields) {
+				members += field.toGetter(field.controlFieldName, field.newTypeRef(typeof(ControlField)))
 			}
 			
 			for (field : activity.fields) {
@@ -402,6 +437,8 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    						}
    					
    						if (opMapping != null) {
+   							if(opMapping.dataTypeMappings.size == 1)
+   								it.append('''«field.controlFieldName».setLastEnteredValue(«opMapping.dataTypeMappings.head?.name?.name»);''').newLine
 		   					it.append('''
 		   						this.protocol.appendControlOperationCall(this.getClass().getName(), "«field.name»", «field.control?.name».class.getName(), "«operation.name»", null«appendParameter(opMapping.dataTypeMappings)»);
 		   						«field.fieldGetterName»().«operation.name»(«mapParameters(field, operation)»);
@@ -888,7 +925,37 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    	
    	def dispatch void infer(Predicate predicate, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
    		if (predicate?.name != null) {
-   			
+   			acceptor.accept(predicate.toClass(predicate.class_fqn)).initializeLater [
+
+				val fieldTypeRef = predicate.newTypeRef(typeof(ControlField))
+				members += predicate.toMethod("evaluate", predicate.newTypeRef(typeof(boolean))) [
+					it.setStatic(true)
+					it.parameters += predicate.toParameter("field", fieldTypeRef)
+					body = [
+						it.append("java.util.Set<de.msg.xt.mdt.base.Tag> valueTags = new java.util.HashSet<de.msg.xt.mdt.base.Tag>(java.util.Arrays.asList(field.getLastEnteredValue().getEquivalenceClass().getTags()));")
+						it.append("return predicateFunction().apply(field.getTags(), valueTags);")
+					]
+				] 				
+				
+				members += predicate.toMethod("evaluate", predicate.newTypeRef(typeof(boolean))) [
+					it.setStatic(true)
+					it.parameters += predicate.toParameter("fieldTags", predicate.newTypeRef(typeof(Set), predicate.newTypeRef(typeof(Tag))))
+					it.parameters += predicate.toParameter("valueTags", predicate.newTypeRef(typeof(Set), predicate.newTypeRef(typeof(Tag))))
+					body = [
+						it.append("return predicateFunction().apply(fieldTags, valueTags);")
+					]
+				] 				
+
+				val fieldTagRef = predicate.newTypeRef(typeof(Set), predicate.newTypeRef(typeof(Tag)))
+				val valueTagRef = predicate.newTypeRef(typeof(Set), predicate.newTypeRef(typeof(Tag)))
+				members += predicate.toMethod("predicateFunction", predicate.newTypeRef(typeof(Functions$Function2), fieldTagRef, valueTagRef, predicate.newTypeRef(typeof(Boolean)))) [
+					it.setStatic(true)
+					body = [
+						xbaseCompiler.compile(predicate.body, it, predicate.newTypeRef(typeof(Functions$Function2), fieldTagRef, valueTagRef,  predicate.newTypeRef(typeof(Boolean))))
+					]
+				]
+				
+   			]
    		}
    	}
    	
