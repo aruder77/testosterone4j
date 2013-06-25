@@ -25,6 +25,8 @@ import de.msg.xt.mdt.tdsl.tDsl.Import
 import java.util.HashMap
 import de.msg.xt.mdt.tdsl.tDsl.Operation
 import de.msg.xt.mdt.tdsl.tDsl.OperationMapping
+import org.eclipse.xtext.xbase.XbaseFactory
+import org.eclipse.emf.ecore.EReference
 
 class UIDescriptionTransformer {
 	
@@ -133,18 +135,44 @@ class UIDescriptionTransformer {
 			pack.elements += activity
 		
 			activity.name = node.key.convertToId
+	
+			activity.parent = findEObjectRef(activity, TDslPackage$Literals::ACTIVITY__PARENT, "com.bmw.bne3.client.uitest.activities.EditorActivity") as Activity
 		
 			for (page : node.pages) {
 				if (page.key != null) {
 					val subActivity = page.createActivity(pack)
 					
 					if (subActivity != null) {
-						val operation = factory.createActivityOperation
-						activity.operations += operation
-						operation.name = page.key.convertToId + "PageActivity"			
-						val condNextAct = factory.createConditionalNextActivity
-						operation.nextActivities += condNextAct			
-						condNextAct.next = subActivity
+						val field = factory.createField
+						activity.fields += field
+						field.name = page.label.convertToId.toFirstLower
+						field.uniqueId = page.key
+						field.control = findControl(field, "de.msg.xt.mdt.tdsl.swtbot.TabItem")
+						insertFieldOperationMappings(field)
+						val pushOperations = field.operations.filter [it.name.name == "push"]
+						var OperationMapping pushOperation = null
+						if (!pushOperations.empty) {
+							pushOperation = pushOperations.head
+							val condNextAct1 = factory.createConditionalNextActivity
+							pushOperation.nextActivities += condNextAct1			
+							condNextAct1.next = subActivity							
+						
+							val operation = factory.createActivityOperation
+							activity.operations += operation
+							operation.name = (page.key.convertToId + "Page").toFirstLower
+						
+							val body = XbaseFactory::eINSTANCE.createXBlockExpression
+							operation.body = body
+							val statement1 = factory.createStatementLine
+							body.expressions += statement1
+							val opCall = factory.createOperationCall
+							statement1.statement = opCall
+							opCall.operation = pushOperation
+						
+							val condNextAct2 = factory.createConditionalNextActivity
+							operation.nextActivities += condNextAct2			
+							condNextAct2.next = subActivity
+						}
 					}
 				}
 			}
@@ -152,6 +180,12 @@ class UIDescriptionTransformer {
 		
 		return activity 
 	}
+	
+	def EObject findEObjectRef(EObject context, EReference reference, String string) { 
+		val scope = scopeProvider.getScope(context, reference)
+		return scope.getSingleElement(string.fqnForName)?.EObjectOrProxy
+	}
+
 	
 	def dispatch Activity createActivity(PageNode page, PackageDeclaration pack) {
 		val factory = TDslFactory::eINSTANCE
@@ -161,6 +195,8 @@ class UIDescriptionTransformer {
 			pack.elements += activity
 			activity.name = page.editor.key.convertToId + "_" + page.key.convertToId
 			activity.setUniqueId(page.key)
+			activity.parent = findEObjectRef(activity, TDslPackage$Literals::ACTIVITY__PARENT, "com.bmw.bne3.client.uitest.activities.PageActivity") as Activity
+			
 			
 			val fields = EcoreUtil2::getAllContentsOfType(page, typeof(FieldNode))
 			
@@ -171,6 +207,7 @@ class UIDescriptionTransformer {
 			val operation = factory.createActivityOperation
 			activity.operations += operation
 			operation.name = "returnToEditor"
+			operation.body = XbaseFactory::eINSTANCE.createXBlockExpression
 			val condNextAct = factory.createConditionalNextActivity
 			operation.nextActivities += condNextAct
 			condNextAct.returnToLastActivity = true
@@ -188,15 +225,16 @@ class UIDescriptionTransformer {
 			field = factory.createField
 			activity.fields += field
 			
-			if (node.fieldReference != null && node.fieldReference.table != null) {
-				field.name = node.fieldReference.table.key.convertToId
-			} else {
-				field.name = node.key.convertToId			
-			}
-			
+			field.control = determineControl(node, field)
+
+			field.name = node.label?.convertToId?.toFirstLower
+			if (field.name == null)
+				field.name = node.key.convertToId.toFirstLower		
 			field.uniqueId = node.key
 			
-			field.control = determineControl(node, field)
+			if (node.fieldReference?.table != null) {
+				field.uniqueId = node.fieldReference.table.key
+			}
 			
 			if (field.control == null) {
 				createControl(node, field)
@@ -233,23 +271,61 @@ class UIDescriptionTransformer {
 		}
 		field.control = control		
 	}
-
 	
-	def Control determineControl(FieldNode node, Field field) { 
-		val resource = field.eResource
+	def Control findControl(Field field, String name) {
 		val scope = scopeProvider.getScope(field, TDslPackage$Literals::FIELD__CONTROL)
-		for (element : scope.allElements) {
-			System::out.println("Element in scope: " + element.name.toString)
-		}
-		if (node.factory != null) {
-			return (scope.getSingleElement(mapFactoryToControlName(node.factory.classname)).EObjectOrProxy as Control)
-		} else {
-			return scope.getSingleElement(QualifiedName::create("de", "msg", "xt", "mdt", "tdsl", "swtbot", "TableControl")) as Control			
-		}
+		scope.getSingleElement(name.fqnForName)?.EObjectOrProxy as Control
+	}
+
+	def QualifiedName fqnForName(String name) {
+		val segments = name.split("\\.")
+		return QualifiedName::create(segments)		
 	}
 	
-	def QualifiedName mapFactoryToControlName(String string) { 
-		return QualifiedName::create("de", "msg", "xt", "mdt", "tdsl", "swtbot", "TextControl")
+	def Control determineControl(FieldNode node, Field field) { 
+		val scope = scopeProvider.getScope(field, TDslPackage$Literals::FIELD__CONTROL)
+		if (node.factory != null) {
+			val controlName = mapFactoryToControlName(node.factory.classname)
+			if (controlName == null)
+				return null
+			return (scope.getSingleElement(controlName)?.EObjectOrProxy as Control)
+		} 
+	}
+	
+	
+	def QualifiedName mapFactoryToControlName(String string) {
+		
+		val controlMap = newHashMap(
+			"com.bmw.smartfaces.boxed.controls.StringFieldFactory" -> "de.msg.xt.mdt.tdsl.swtbot.TextControl",
+			"com.bmw.smartfaces.boxed.controls.LongFieldFactory" -> "de.msg.xt.mdt.tdsl.swtbot.TextControl",
+			"com.bmw.smartfaces.boxed.controls.ComboFieldFactory" -> "de.msg.xt.mdt.tdsl.swtbot.ComboBox",
+			"com.bmw.smartfaces.boxed.controls.DoubleFieldFactory" -> "de.msg.xt.mdt.tdsl.swtbot.TextControl",
+			"com.bmw.smartfaces.boxed.controls.HexDecBinFieldFactory" -> "de.msg.xt.mdt.tdsl.swtbot.HexDecBin", // TODO
+			"com.bmw.smartfaces.boxed.controls.SpacerFieldFactory" -> "de.msg.xt.mdt.tdsl.swtbot.Label",
+			"com.bmw.smartfaces.boxed.controls.TableControlFactory" -> "de.msg.xt.mdt.tdsl.swtbot.TableControl",
+			"com.bmw.smartfaces.boxed.controls.MessageFieldFactory" -> "de.msg.xt.mdt.tdsl.swtbot.Label",
+
+			"com.bmw.smartfaces.boxed.controls.buttons.RadioButtonFieldFactory" -> "de.msg.xt.mdt.tdsl.swtbot.RadioButton",
+			"com.bmw.smartfaces.boxed.controls.buttons.PushButtonFieldFactory" -> "de.msg.xt.mdt.tdsl.swtbot.Button",
+			"com.bmw.smartfaces.boxed.controls.buttons.CheckButtonFieldFactory" -> "de.msg.xt.mdt.tdsl.swtbot.CheckBox",
+
+			"com.bmw.smartfaces.boxed.controls.browser.BrowserFieldFactory" -> "de.msg.xt.mdt.tdsl.swtbot.StyledText",
+
+			"com.bmw.smartfaces.boxed.controls.console.ConsoleFieldFactory" -> "de.msg.xt.mdt.tdsl.swtbot.TextControl",
+
+			"com.bmw.bne3.client.controls.EnumComboFactory" -> "de.msg.xt.mdt.tdsl.swtbot.TableControl",
+			"com.bmw.bne3.client.controls.TypeSelectionComboFactory" -> "de.msg.xt.mdt.tdsl.swtbot.TypeSelectionCombo",
+			"com.bmw.bne3.client.controls.TypeSelectionFieldFactory" -> "de.msg.xt.mdt.tdsl.swtbot.TypeSelectionField",
+			"com.bmw.bne3.client.controls.NavigationFilterFactory" -> "de.msg.xt.mdt.tdsl.swtbot.NavigationFilter", // TODO
+			"com.bmw.bne3.client.controls.NavigationTreeViewerFactory" -> "de.msg.xt.mdt.tdsl.swtbot.Tree",
+
+			"com.bmw.bne3.client.controls.display.DisplayPackageFieldFactory" -> "de.msg.xt.mdt.tdsl.swtbot.TableControl",
+			"com.bmw.bne3.client.controls.display.DisplayTypeFieldFactory" -> "de.msg.xt.mdt.tdsl.swtbot.TableControl"
+		)
+		if (controlMap.get(string) == null)
+			return null
+		val controlName = controlMap.get(string)
+		return controlName.fqnForName
 	}
 	
 	def editor(PageNode node) { 
@@ -258,7 +334,7 @@ class UIDescriptionTransformer {
 
 	def String convertToId(String id) {
 		var temp = id.trim.replace(' ', '').replaceAll("ß","ss").replace('-','_').replace('.','_').replace('/','_').replace("ä", "ae").replace("ö", "Oe").replace("ü", "ue").replace("Ä", "Ae").replace("Ö", "Oe").replace("Ü", "Ue").replace('\"','').replace("(","").replace(")", "").replace("!", "").replace(",", "")
-		if (!Character::isLetter(temp.charAt(0)))
+		if (temp.length > 0 && !Character::isLetter(temp.charAt(0)))
 			temp = "f" + temp
 		return temp
 	}
