@@ -51,6 +51,8 @@ public class ActivityImportAction implements IObjectActionDelegate {
 	@Inject
 	XtextResourceSetProvider provider;
 
+	private static String BASE_PACKAGE = "com.bmw.bne3.client.uitest.activities";
+
 	/**
 	 * Constructor for Action1.
 	 */
@@ -76,15 +78,6 @@ public class ActivityImportAction implements IObjectActionDelegate {
 		final IFile file = getSelectedFile();
 		final UIDescription description = readModel(file);
 
-		final TestModel model = TDslFactory.eINSTANCE.createTestModel();
-		final PackageDeclaration pack = TDslFactory.eINSTANCE
-				.createPackageDeclaration();
-		pack.setName("fakepackage");
-		model.getPackages().add(pack);
-		final Import imp = TDslFactory.eINSTANCE.createImport();
-		imp.setImportedNamespace("de.msg.xt.mdt.tdsl.swtbot.*");
-		pack.getImports().add(imp);
-
 		final FileDialog dlg = new FileDialog(shell, SWT.SAVE);
 		dlg.setFilterNames(new String[] { "TDsl Files" });
 		dlg.setFilterExtensions(new String[] { "*.tdsl" });
@@ -103,11 +96,36 @@ public class ActivityImportAction implements IObjectActionDelegate {
 		final IPath location = Path.fromOSString(fn);
 		final IFile ifile = workspace.getRoot().getFileForLocation(location);
 
+		final TestModel model = TDslFactory.eINSTANCE.createTestModel();
+		final PackageDeclaration pack = TDslFactory.eINSTANCE
+				.createPackageDeclaration();
+		pack.setName("fakepackage");
+		model.getPackages().add(pack);
+		final Import imp0 = TDslFactory.eINSTANCE.createImport();
+		imp0.setImportedNamespace("de.msg.xt.mdt.tdsl.swtbot.*");
+		pack.getImports().add(imp0);
+
+		String namespace = ifile.getName().substring(0,
+				ifile.getName().length() - 4);
+		pack.setName(BASE_PACKAGE + "." + namespace.toLowerCase());
+		Import imp = TDslFactory.eINSTANCE.createImport();
+		imp.setImportedNamespace("de.msg.xt.mdt.tdsl.swtbot.*");
+		pack.getImports().add(imp);
+		Import imp2 = TDslFactory.eINSTANCE.createImport();
+		imp2.setImportedNamespace("de.msg.xt.mdt.tdsl.basictypes.*");
+		pack.getImports().add(imp2);
+		Import imp3 = TDslFactory.eINSTANCE.createImport();
+		imp3.setImportedNamespace("com.bmw.bne3.client.uitest.datatypes.*");
+		pack.getImports().add(imp3);
+		Import imp4 = TDslFactory.eINSTANCE.createImport();
+		imp4.setImportedNamespace("com.bmw.bne3.client.uitest.activities.*");
+		pack.getImports().add(imp4);
+
 		if (fn != null) {
 			writeToFile(ifile, model);
 		}
 
-		transformToTestModel(description, model, editorName);
+		transformToTestModel(description, pack, editorName);
 
 		writeToFile(ifile, model);
 
@@ -115,9 +133,9 @@ public class ActivityImportAction implements IObjectActionDelegate {
 				"Activities imported successfully.");
 	}
 
-	private TestModel transformToTestModel(final UIDescription description,
-			final TestModel model, final String editorName) {
-		return transformer.transform(description, model, editorName);
+	private void transformToTestModel(final UIDescription description,
+			final PackageDeclaration pack, final String editorName) {
+		transformer.transform(description, pack, editorName);
 	}
 
 	private void writeToFile(final IFile file, final TestModel model) {

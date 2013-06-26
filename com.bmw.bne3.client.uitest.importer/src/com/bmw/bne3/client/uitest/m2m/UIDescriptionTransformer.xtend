@@ -37,10 +37,6 @@ class UIDescriptionTransformer {
 	IScopeProvider scopeProvider
 	
 	
-	def basePackage() {
-		"com.bmw.bne3"
-	}
-	
 	def packageName(Folder folder) {
 		var String packageName = folder?.folderName?.toLowerCase.convertToId
 		if (folder?.parentFolder != null) {
@@ -90,40 +86,17 @@ class UIDescriptionTransformer {
 	 * NavigationTreeViewer	=> Tree
 	 * SpacerField		=> Label
 	 */
-	def TestModel transform(UIDescription descr, TestModel model, String editorName) {
+	def transform(UIDescription descr, PackageDeclaration pack, String editorName) {
 		
 		val factory = TDslFactory::eINSTANCE 
 
-		val concreteFolders = EcoreUtil2::getAllContentsOfType(descr, typeof(Folder)).filter [
-			!it.editors.empty
+		val editors = EcoreUtil2::getAllContentsOfType(descr, typeof(EditorNode)).filter [
+			it.key.toLowerCase.equalsIgnoreCase(editorName)
 		]
 		
-		for (folder : concreteFolders) {
-			if (folder.packageName != null) {
-				val pack = factory.createPackageDeclaration;
-				model.packages.add(pack);
-				pack.setName(folder.packageName)
-				val Import imp = TDslFactory::eINSTANCE.createImport();
-				imp.setImportedNamespace("de.msg.xt.mdt.tdsl.swtbot.*");
-				pack.getImports().add(imp);
-				val Import imp2 = TDslFactory::eINSTANCE.createImport();
-				imp2.setImportedNamespace("de.msg.xt.mdt.tdsl.basictypes.*");
-				pack.getImports().add(imp2);
-				val Import imp3 = TDslFactory::eINSTANCE.createImport();
-				imp3.setImportedNamespace("com.bmw.bne3.client.uitest.datatypes.*");
-				pack.getImports().add(imp3);
-				val Import imp4 = TDslFactory::eINSTANCE.createImport();
-				imp4.setImportedNamespace("com.bmw.bne3.client.uitest.activities.*");
-				pack.getImports().add(imp4);
+		val editor = editors.head
 							
-				for (editor : folder.editors) {
-					if (editor.key != null && editor.key.equalsIgnoreCase(editorName))
-						editor.createActivity(pack)
-				}			
-			}
-		}
-				
-		return model
+		editor.createActivity(pack)				
 	}
 	
 	def dispatch Activity createActivity(EditorNode node, PackageDeclaration pack) { 
@@ -228,12 +201,18 @@ class UIDescriptionTransformer {
 			field.control = determineControl(node, field)
 
 			field.name = node.label?.convertToId?.toFirstLower
-			if (field.name == null)
+			if (field.name == null || field.name.trim.equals(""))
 				field.name = node.key.convertToId.toFirstLower		
 			field.uniqueId = node.key
 			
 			if (node.fieldReference?.table != null) {
 				field.uniqueId = node.fieldReference.table.key
+				if (field.name == null || field.name.trim.equals("")) {
+					if (node.fieldReference.table.name != null) 
+						field.name = node.fieldReference.table.name?.convertToId?.toFirstLower
+					else if (node.fieldReference.table.key != null)
+						field.name = node.fieldReference.table.key?.convertToId?.toFirstLower
+				}
 			}
 			
 			if (field.control == null) {
