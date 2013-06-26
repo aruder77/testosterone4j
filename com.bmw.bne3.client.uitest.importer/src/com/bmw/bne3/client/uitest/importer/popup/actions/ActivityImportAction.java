@@ -3,6 +3,7 @@ package com.bmw.bne3.client.uitest.importer.popup.actions;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IWorkspace;
@@ -14,10 +15,12 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
@@ -25,12 +28,14 @@ import org.eclipse.ui.IActionDelegate;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.ISelectionService;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.dialogs.ListSelectionDialog;
 import org.eclipse.xtext.EcoreUtil2;
 import org.eclipse.xtext.resource.SaveOptions;
 import org.eclipse.xtext.ui.resource.XtextResourceSetProvider;
 import org.eclipse.xtext.util.CancelIndicator;
 
 import com.bmw.bne3.client.uitest.m2m.UIDescriptionTransformer;
+import com.bmw.smartfaces.model.EditorNode;
 import com.bmw.smartfaces.model.UIDescription;
 import com.google.inject.Inject;
 
@@ -83,15 +88,6 @@ public class ActivityImportAction implements IObjectActionDelegate {
 		dlg.setFilterExtensions(new String[] { "*.tdsl" });
 		final String fn = dlg.open();
 
-		final InputDialog inputDialog = new InputDialog(
-				shell,
-				"Activity to import",
-				"Bitte geben Sie den Namen der zu importierenden Activity (Editor, initialValue, validator) ein.!",
-				"", null);
-		inputDialog.setBlockOnOpen(true);
-		inputDialog.open();
-		final String editorName = inputDialog.getValue();
-
 		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		final IPath location = Path.fromOSString(fn);
 		final IFile ifile = workspace.getRoot().getFileForLocation(location);
@@ -125,7 +121,26 @@ public class ActivityImportAction implements IObjectActionDelegate {
 			writeToFile(ifile, model);
 		}
 
-		transformToTestModel(description, pack, editorName);
+		List<EditorNode> editorList = EcoreUtil2.getAllContentsOfType(
+				description, EditorNode.class);
+		ILabelProvider labelProvider = new LabelProvider() {
+			@Override
+			public String getText(Object element) {
+				EditorNode node = (EditorNode) element;
+				return node.getLabel();
+			}
+		};
+		ListSelectionDialog editorSelectionDialog = new ListSelectionDialog(
+				shell, editorList, ArrayContentProvider.getInstance(),
+				labelProvider, "Please select editors to import");
+		editorSelectionDialog.setBlockOnOpen(true);
+		int result = editorSelectionDialog.open();
+
+		Object[] resultList = editorSelectionDialog.getResult();
+
+		for (Object o : resultList) {
+			transformToTestModel(description, pack, (EditorNode) o);
+		}
 
 		writeToFile(ifile, model);
 
@@ -134,8 +149,8 @@ public class ActivityImportAction implements IObjectActionDelegate {
 	}
 
 	private void transformToTestModel(final UIDescription description,
-			final PackageDeclaration pack, final String editorName) {
-		transformer.transform(description, pack, editorName);
+			final PackageDeclaration pack, EditorNode editorNode) {
+		transformer.transform(description, pack, editorNode);
 	}
 
 	private void writeToFile(final IFile file, final TestModel model) {

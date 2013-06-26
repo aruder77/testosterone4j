@@ -86,17 +86,9 @@ class UIDescriptionTransformer {
 	 * NavigationTreeViewer	=> Tree
 	 * SpacerField		=> Label
 	 */
-	def transform(UIDescription descr, PackageDeclaration pack, String editorName) {
+	def transform(UIDescription descr, PackageDeclaration pack, EditorNode editorNode) {
 		
-		val factory = TDslFactory::eINSTANCE 
-
-		val editors = EcoreUtil2::getAllContentsOfType(descr, typeof(EditorNode)).filter [
-			it.key.toLowerCase.equalsIgnoreCase(editorName)
-		]
-		
-		val editor = editors.head
-							
-		editor.createActivity(pack)				
+		editorNode.createActivity(pack)				
 	}
 	
 	def dispatch Activity createActivity(EditorNode node, PackageDeclaration pack) { 
@@ -107,7 +99,7 @@ class UIDescriptionTransformer {
 			activity = factory.createActivity
 			pack.elements += activity
 		
-			activity.name = node.key.convertToId
+			activity.name = node.key.convertToId.toFirstUpper
 	
 			activity.parent = findEObjectRef(activity, TDslPackage$Literals::ACTIVITY__PARENT, "com.bmw.bne3.client.uitest.activities.EditorActivity") as Activity
 		
@@ -166,7 +158,7 @@ class UIDescriptionTransformer {
 		if (page?.key != null && page.key.trim.length != 0) { 
 			activity = factory.createActivity
 			pack.elements += activity
-			activity.name = page.editor.key.convertToId + "_" + page.key.convertToId
+			activity.name = page.editor.key.convertToId.toFirstUpper + "_" + page.key.convertToId
 			activity.setUniqueId(page.key)
 			activity.parent = findEObjectRef(activity, TDslPackage$Literals::ACTIVITY__PARENT, "com.bmw.bne3.client.uitest.activities.PageActivity") as Activity
 			
@@ -279,7 +271,7 @@ class UIDescriptionTransformer {
 			"com.bmw.smartfaces.boxed.controls.LongFieldFactory" -> "de.msg.xt.mdt.tdsl.swtbot.TextControl",
 			"com.bmw.smartfaces.boxed.controls.ComboFieldFactory" -> "de.msg.xt.mdt.tdsl.swtbot.ComboBox",
 			"com.bmw.smartfaces.boxed.controls.DoubleFieldFactory" -> "de.msg.xt.mdt.tdsl.swtbot.TextControl",
-			"com.bmw.smartfaces.boxed.controls.HexDecBinFieldFactory" -> "de.msg.xt.mdt.tdsl.swtbot.HexDecBin", // TODO
+			"com.bmw.smartfaces.boxed.controls.HexDecBinFieldFactory" -> "de.msg.xt.mdt.tdsl.swtbot.HexDecBinControl",
 			"com.bmw.smartfaces.boxed.controls.SpacerFieldFactory" -> "de.msg.xt.mdt.tdsl.swtbot.Label",
 			"com.bmw.smartfaces.boxed.controls.TableControlFactory" -> "de.msg.xt.mdt.tdsl.swtbot.TableControl",
 			"com.bmw.smartfaces.boxed.controls.MessageFieldFactory" -> "de.msg.xt.mdt.tdsl.swtbot.Label",
