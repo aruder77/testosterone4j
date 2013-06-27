@@ -21,8 +21,7 @@ import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IActionDelegate;
 import org.eclipse.ui.IObjectActionDelegate;
@@ -31,6 +30,8 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.dialogs.ListSelectionDialog;
 import org.eclipse.xtext.EcoreUtil2;
 import org.eclipse.xtext.resource.SaveOptions;
+import org.eclipse.xtext.scoping.IScope;
+import org.eclipse.xtext.scoping.IScopeProvider;
 import org.eclipse.xtext.ui.resource.XtextResourceSetProvider;
 import org.eclipse.xtext.util.CancelIndicator;
 
@@ -42,7 +43,9 @@ import com.google.inject.Inject;
 import de.msg.xt.mdt.tdsl.tDsl.Import;
 import de.msg.xt.mdt.tdsl.tDsl.PackageDeclaration;
 import de.msg.xt.mdt.tdsl.tDsl.TDslFactory;
+import de.msg.xt.mdt.tdsl.tDsl.TDslPackage;
 import de.msg.xt.mdt.tdsl.tDsl.TestModel;
+import de.msg.xt.mdt.tdsl.tDsl.Toolkit;
 
 public class ActivityImportAction implements IObjectActionDelegate {
 
@@ -55,6 +58,9 @@ public class ActivityImportAction implements IObjectActionDelegate {
 
 	@Inject
 	XtextResourceSetProvider provider;
+
+	@Inject
+	IScopeProvider scopeProvider;
 
 	private static String BASE_PACKAGE = "com.bmw.bne3.client.uitest.activities";
 
@@ -83,43 +89,10 @@ public class ActivityImportAction implements IObjectActionDelegate {
 		final IFile file = getSelectedFile();
 		final UIDescription description = readModel(file);
 
-		final FileDialog dlg = new FileDialog(shell, SWT.SAVE);
-		dlg.setFilterNames(new String[] { "TDsl Files" });
-		dlg.setFilterExtensions(new String[] { "*.tdsl" });
+		final DirectoryDialog dlg = new DirectoryDialog(shell);
+		dlg.setText("Select output directory");
+		dlg.setMessage("Please select the output directory.");
 		final String fn = dlg.open();
-
-		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		final IPath location = Path.fromOSString(fn);
-		final IFile ifile = workspace.getRoot().getFileForLocation(location);
-
-		final TestModel model = TDslFactory.eINSTANCE.createTestModel();
-		final PackageDeclaration pack = TDslFactory.eINSTANCE
-				.createPackageDeclaration();
-		pack.setName("fakepackage");
-		model.getPackages().add(pack);
-		final Import imp0 = TDslFactory.eINSTANCE.createImport();
-		imp0.setImportedNamespace("de.msg.xt.mdt.tdsl.swtbot.*");
-		pack.getImports().add(imp0);
-
-		String namespace = ifile.getName().substring(0,
-				ifile.getName().length() - 4);
-		pack.setName(BASE_PACKAGE + "." + namespace.toLowerCase());
-		Import imp = TDslFactory.eINSTANCE.createImport();
-		imp.setImportedNamespace("de.msg.xt.mdt.tdsl.swtbot.*");
-		pack.getImports().add(imp);
-		Import imp2 = TDslFactory.eINSTANCE.createImport();
-		imp2.setImportedNamespace("de.msg.xt.mdt.tdsl.basictypes.*");
-		pack.getImports().add(imp2);
-		Import imp3 = TDslFactory.eINSTANCE.createImport();
-		imp3.setImportedNamespace("com.bmw.bne3.client.uitest.datatypes.*");
-		pack.getImports().add(imp3);
-		Import imp4 = TDslFactory.eINSTANCE.createImport();
-		imp4.setImportedNamespace("com.bmw.bne3.client.uitest.activities.*");
-		pack.getImports().add(imp4);
-
-		if (fn != null) {
-			writeToFile(ifile, model);
-		}
 
 		List<EditorNode> editorList = EcoreUtil2.getAllContentsOfType(
 				description, EditorNode.class);
@@ -139,10 +112,53 @@ public class ActivityImportAction implements IObjectActionDelegate {
 		Object[] resultList = editorSelectionDialog.getResult();
 
 		for (Object o : resultList) {
-			transformToTestModel(description, pack, (EditorNode) o);
-		}
+			EditorNode editorNode = (EditorNode) o;
+			String fileName = fn + "/"
+					+ transformer.convertToId(editorNode.getLabel()) + ".tdsl";
 
-		writeToFile(ifile, model);
+			final IWorkspace workspace = ResourcesPlugin.getWorkspace();
+			final IPath location = Path.fromOSString(fileName);
+			final IFile ifile = workspace.getRoot()
+					.getFileForLocation(location);
+
+			final TestModel model = TDslFactory.eINSTANCE.createTestModel();
+			final PackageDeclaration pack = TDslFactory.eINSTANCE
+					.createPackageDeclaration();
+			model.getPackages().add(pack);
+
+			String namespace = ifile.getName().substring(0,
+					ifile.getName().length() - 4);
+			pack.setName(BASE_PACKAGE + "." + namespace.toLowerCase());
+			Import imp = TDslFactory.eINSTANCE.createImport();
+			imp.setImportedNamespace("de.msg.xt.mdt.tdsl.swtbot.*");
+			pack.getImports().add(imp);
+			Import imp2 = TDslFactory.eINSTANCE.createImport();
+			imp2.setImportedNamespace("de.msg.xt.mdt.tdsl.basictypes.*");
+			pack.getImports().add(imp2);
+			Import imp3 = TDslFactory.eINSTANCE.createImport();
+			imp3.setImportedNamespace("com.bmw.bne3.client.uitest.datatypes.*");
+			pack.getImports().add(imp3);
+			Import imp4 = TDslFactory.eINSTANCE.createImport();
+			imp4.setImportedNamespace("com.bmw.bne3.client.uitest.activities.*");
+			pack.getImports().add(imp4);
+
+			if (fn != null) {
+				writeToFile(ifile, model);
+			}
+
+			IScope scope = scopeProvider.getScope(pack,
+					TDslPackage.Literals.PACKAGE_DECLARATION__SUT_REF);
+			Toolkit toolkit = (Toolkit) scope
+					.getSingleElement(
+							transformer
+									.fqnForName("com.bmw.bne3.client.uitest.activities.Stdtoolkit"))
+					.getEObjectOrProxy();
+			pack.setSutRef(toolkit);
+
+			transformToTestModel(description, pack, (EditorNode) o);
+
+			writeToFile(ifile, model);
+		}
 
 		MessageDialog.openInformation(shell, "Importer",
 				"Activities imported successfully.");
