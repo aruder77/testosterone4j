@@ -151,8 +151,6 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 	
    	def dispatch void infer(Activity activity, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
    		
-   		System::out.println("Resource URL: " + activity.eResource.URI.toString)
-   		
    		var JvmGenericType activityAdapterClassVar = null
    		if (activity.needsOwnActivityAdapter && activity.adapterInterface_fqn != null) {
 	   		activityAdapterClassVar = activity.toInterface(activity.adapterInterface_fqn) []

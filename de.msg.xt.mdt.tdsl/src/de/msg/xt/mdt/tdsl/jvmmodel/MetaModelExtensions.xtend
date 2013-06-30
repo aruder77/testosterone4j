@@ -30,6 +30,8 @@ import de.msg.xt.mdt.tdsl.tDsl.DataType
 import de.msg.xt.mdt.tdsl.tDsl.TDslPackage
 import org.eclipse.xtext.scoping.IScopeProvider
 import de.msg.xt.mdt.tdsl.tDsl.UseCase
+import org.slf4j.LoggerFactory
+import org.slf4j.Logger
 
 /**
  * Convenience meta-model extensions. Please order by Metamodel-Class and alphabetically!
@@ -41,6 +43,7 @@ class MetaModelExtensions {
 	@Inject 
 	IScopeProvider scopeProvider;
 	
+	Logger logger = LoggerFactory::getLogger(typeof(MetaModelExtensions))
 	
 	// Activity 
 	
@@ -223,7 +226,7 @@ class MetaModelExtensions {
 	}
 	
 	def XExpression precedingExpression(XExpression expr) {
-		System::out.println("Determining precedingExpression for " + expr + "[" + expr.useCasePath + "]")
+		logger.debug("Determining precedingExpression for " + expr + "[" + expr.useCasePath + "]")
 		if (expr == null)
 			return null
 		var XExpression lastStatement
