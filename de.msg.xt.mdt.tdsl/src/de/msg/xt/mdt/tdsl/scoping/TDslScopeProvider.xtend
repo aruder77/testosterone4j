@@ -382,6 +382,9 @@ class TDslScopeProvider extends XbaseScopeProvider {
 	}
 	
 	def lastActivitySwitchingExpression(XExpression expr, boolean startWithCurrent) {
+		if (expr.useCasePath.equals("openEthernetNavigator::1")) {
+			System::out.println("Test")
+		}
 		var XExpression currentExpression = 
 			if (startWithCurrent) 
 				expr.activitySwitchingOperation
@@ -402,8 +405,36 @@ class TDslScopeProvider extends XbaseScopeProvider {
 	
 	def List<Activity> currentActivities(XExpression expr) {
 		val currentTime = System::currentTimeMillis
+		var nestedCounter = 0
 		logger.info(currentTime + " CurrentActivities for " + expr.useCasePath)
-		val lastExpression = expr?.lastActivitySwitchingExpression(expr instanceof StatementLine)
+		var lastExpression = expr?.lastActivitySwitchingExpression(expr instanceof StatementLine)
+
+		val returnList = new ArrayList<Activity> 
+		while (lastExpression != null && returnList.empty) {
+			val nextActivities = lastExpression.determineExplicitNextActivities	
+			if (nextActivities != null) {
+				for (nextActivity : nextActivities) {
+					if (nextActivity.returnToLastActivity) {
+						nestedCounter = nestedCounter + 1
+						lastExpression = lastExpression.lastActivitySwitchingExpression(false)
+					} else {
+						if (nestedCounter == 0)
+							returnList.add(nextActivity.next)
+						else {
+							nestedCounter = nestedCounter - 1
+							lastExpression = lastExpression.lastActivitySwitchingExpression(false)
+						}
+					}
+					if (nextActivity.eIsProxy) {
+						logger.warn("Could not resolve nextActivity: " + lastExpression.useCasePath)
+						throw new ScopingException("Could not resolve nextActivity: " + lastExpression.useCasePath)
+					}
+				}
+			} else {
+				throw new ScopingException("Hmm... weird! LastActivitySwitchingExpression return activitiy which does not contain explicit next activities!")
+			}
+		}
+
 		if (lastExpression == null) {
 			val act = expr.determineInitialActivity
 			act.name			
@@ -411,24 +442,6 @@ class TDslScopeProvider extends XbaseScopeProvider {
 			return Collections::singletonList(act)
 		}
 
-		val nextActivities = lastExpression.determineExplicitNextActivities	
-		val returnList = new ArrayList<Activity> 
-		if (nextActivities != null) {
-			for (nextActivity : nextActivities) {
-				if (nextActivity.returnToLastActivity) {
-					val previousExpression = lastExpression.lastActivitySwitchingExpression(false)
-					logger.debug("CurrentActivities: returnToLastActivity: previousExpression: " + previousExpression.useCasePath)
-					if (previousExpression != null) 
-						returnList.addAll(previousExpression.currentActivities)
-				} else {
-					returnList.add(nextActivity.next)
-				}
-				if (nextActivity.eIsProxy) {
-					logger.warn("Could not resolve nextActivity: " + lastExpression.useCasePath)
-					throw new ScopingException("Could not resolve nextActivity: " + lastExpression.useCasePath)
-				}
-			}
-		}
 		logger.info(currentTime + " Finished CurrentActivities for " + expr.useCasePath + ": " + returnList.head?.name)
 		returnList
 	}

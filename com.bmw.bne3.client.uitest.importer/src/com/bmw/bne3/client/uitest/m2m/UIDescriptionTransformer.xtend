@@ -207,6 +207,15 @@ class UIDescriptionTransformer {
 				}
 			}
 			
+			val fieldName = field.name
+			var isNotUnique = !activity.fields.filter[it.name.equals(fieldName)].empty
+			var index = 2
+			while (isNotUnique) {
+				val currentFieldName = fieldName + index
+				isNotUnique = !activity.fields.filter[it.name.equals(currentFieldName)].empty
+				index = index + 1
+			}
+			
 			if (field.control == null) {
 				createControl(node, field)
 			}
