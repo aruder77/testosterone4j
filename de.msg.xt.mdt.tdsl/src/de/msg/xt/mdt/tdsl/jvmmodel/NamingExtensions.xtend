@@ -149,7 +149,7 @@ class NamingExtensions {
 	// Predicate
 	
 	def String class_fqn(Predicate predicate) {
-		predicate?.fullyQualifiedName?.toString
+		predicate?.packageDeclaration?.fqn + predicate?.name?.toFirstUpper
 	}
 
 

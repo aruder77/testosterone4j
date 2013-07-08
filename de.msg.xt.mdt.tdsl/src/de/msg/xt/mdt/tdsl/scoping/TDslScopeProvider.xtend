@@ -51,6 +51,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil
 import de.msg.xt.mdt.tdsl.tDsl.SubUseCaseCall
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import de.msg.xt.mdt.tdsl.tDsl.ParameterAssignment
 
 class TDslScopeProvider extends XbaseScopeProvider {
 	
@@ -168,6 +169,31 @@ class TDslScopeProvider extends XbaseScopeProvider {
 				default:
 					IScope::NULLSCOPE
 			}
+		} else if (reference == TDslPackage::eINSTANCE.parameterAssignment_Name) {
+			switch (context) {
+				SubUseCaseCall: {
+					logger.debug("getScope " + context.useCasePath + " parameterAssignment_Name")
+					val useCase = context.useCase
+					val useCaseParameter = useCase.inputParameter
+					if (useCase.eIsProxy) {
+						logger.warn("UseCase could not be resolved: " + context.useCasePath + " parameterAssignment_Name")
+						throw new ScopingException("Parameters could not be resolved: " + context.useCasePath + " parameterAssignment_Name")
+					}					
+					return Scopes::scopeFor(useCaseParameter)
+				}
+				ParameterAssignment: {
+					logger.debug("getScope " + (context.eContainer as SubUseCaseCall).useCasePath + "/Param" + " parameterAssignment_Name")
+					val useCase = (context.eContainer as SubUseCaseCall).useCase
+					val params = useCase.inputParameter 					
+					if (useCase.eIsProxy) {
+						logger.warn("UseCase could not be resolved: " + (context.eContainer as SubUseCaseCall).useCasePath + " parameterAssignment_Name")
+						throw new ScopingException("UseCase could not be resolved: " + (context.eContainer as SubUseCaseCall).useCasePath + " parameterAssignment_Name")
+					}					
+					return Scopes::scopeFor(params)
+				}
+				default:
+					IScope::NULLSCOPE	
+			}		
 		} else if (reference == TDslPackage::eINSTANCE.operationCall_Operation || reference == TDslPackage::eINSTANCE.activityOperationCall_Operation) {
 			val XExpression opCall = context as XExpression
 			val nextActivities = opCall.currentActivities

@@ -32,6 +32,9 @@ import org.eclipse.xtext.scoping.IScopeProvider
 import de.msg.xt.mdt.tdsl.tDsl.UseCase
 import org.slf4j.LoggerFactory
 import org.slf4j.Logger
+import de.msg.xt.mdt.tdsl.tDsl.PackageDeclaration
+import de.msg.xt.mdt.tdsl.tDsl.Predicate
+import de.msg.xt.mdt.tdsl.tDsl.PackageDeclaration
 
 /**
  * Convenience meta-model extensions. Please order by Metamodel-Class and alphabetically!
@@ -174,6 +177,13 @@ class MetaModelExtensions {
 		else 
 			sut
 	}
+	
+	// Predicate
+
+	def PackageDeclaration getPackageDeclaration(Predicate predicate) {
+		predicate?.eContainer as PackageDeclaration
+	}
+	
 	
 	// Test
 	
