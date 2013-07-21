@@ -377,11 +377,11 @@ class TDslScopeProvider extends XbaseScopeProvider {
 	}			
 	
 	def dispatch List<ConditionalNextActivity> determineExplicitNextActivities(XIfExpression ifExpr) {
-		ifExpr.then.determineExplicitNextActivities
+		ifExpr.then?.determineExplicitNextActivities
 	}			
 	
 	def dispatch List<ConditionalNextActivity> determineExplicitNextActivities(XVariableDeclaration varDecl) {
-		varDecl.right.determineExplicitNextActivities
+		varDecl.right?.determineExplicitNextActivities
 	}			
 	
 	def dispatch List<ConditionalNextActivity> determineExplicitNextActivities(XBlockExpression blockExpr) {
