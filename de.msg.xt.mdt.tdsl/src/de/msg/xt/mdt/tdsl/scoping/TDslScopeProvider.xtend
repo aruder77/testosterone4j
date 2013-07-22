@@ -52,6 +52,7 @@ import de.msg.xt.mdt.tdsl.tDsl.SubUseCaseCall
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import de.msg.xt.mdt.tdsl.tDsl.ParameterAssignment
+import de.msg.xt.mdt.tdsl.tDsl.Assert
 
 class TDslScopeProvider extends XbaseScopeProvider {
 	
@@ -384,6 +385,10 @@ class TDslScopeProvider extends XbaseScopeProvider {
 		varDecl.right?.determineExplicitNextActivities
 	}			
 	
+	def dispatch List<ConditionalNextActivity> determineExplicitNextActivities(Assert assert) {
+		return Collections::emptyList
+	}
+	
 	def dispatch List<ConditionalNextActivity> determineExplicitNextActivities(XBlockExpression blockExpr) {
 		if (blockExpr.expressions.empty)
 			return Collections::emptyList
@@ -408,11 +413,8 @@ class TDslScopeProvider extends XbaseScopeProvider {
 	}
 	
 	def lastActivitySwitchingExpression(XExpression expr, boolean startWithCurrent) {
-		if (expr.useCasePath.equals("openEthernetNavigator::1")) {
-			System::out.println("Test")
-		}
 		var XExpression currentExpression = 
-			if (startWithCurrent) 
+			if (startWithCurrent && (expr.activitySwitchingOperation != null)) 
 				expr.activitySwitchingOperation
 			else 
 				expr.precedingExpression 
@@ -445,7 +447,7 @@ class TDslScopeProvider extends XbaseScopeProvider {
 						lastExpression = lastExpression.lastActivitySwitchingExpression(false)
 					} else {
 						if (nestedCounter == 0)
-							returnList.add(nextActivity.next)
+								returnList.add(nextActivity.next)
 						else {
 							nestedCounter = nestedCounter - 1
 							lastExpression = lastExpression.lastActivitySwitchingExpression(false)
