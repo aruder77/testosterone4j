@@ -35,6 +35,7 @@ import org.slf4j.Logger
 import de.msg.xt.mdt.tdsl.tDsl.PackageDeclaration
 import de.msg.xt.mdt.tdsl.tDsl.Predicate
 import de.msg.xt.mdt.tdsl.tDsl.PackageDeclaration
+import org.eclipse.emf.ecore.InternalEObject
 
 /**
  * Convenience meta-model extensions. Please order by Metamodel-Class and alphabetically!
@@ -200,14 +201,14 @@ class MetaModelExtensions {
 	def DataType defaultDataType(Field field, Type type) {
 		if (type != null) {
 			val scope = scopeProvider.getScope(field, TDslPackage$Literals::OPERATION_MAPPING__DATA_TYPE)
-			val objectDescriptions = scope.allElements
+			val objectDescriptions = scope.allElements.filter [ "true".equals(it.getUserData("isDefault")) ]
 			for (element : objectDescriptions) {
-				val isDefault = "true".equals(element?.getUserData("isDefault"));
-				val desiredTypeUri = EcoreUtil2::getURI(type).toString
-				val elementUri = element?.getUserData("type")
-				val isCorrectType = elementUri?.equals(desiredTypeUri);
-				if (isDefault && isCorrectType)
-					return element?.EObjectOrProxy as DataType
+				val dataTypeProxy = element?.EObjectOrProxy as DataType
+				val dataType = EcoreUtil::resolve(dataTypeProxy, field) as DataType
+
+				if (dataType.type == type) {
+					return dataType
+				}
 			}
 			if (!objectDescriptions.empty)
 				return (objectDescriptions.last.EObjectOrProxy as DataType)

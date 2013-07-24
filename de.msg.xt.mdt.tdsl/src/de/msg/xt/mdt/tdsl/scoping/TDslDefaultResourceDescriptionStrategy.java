@@ -8,7 +8,6 @@ import javax.inject.Inject;
 
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.EReference;
 import org.eclipse.xtext.EcoreUtil2;
 import org.eclipse.xtext.naming.IQualifiedNameProvider;
 import org.eclipse.xtext.naming.QualifiedName;
@@ -29,7 +28,6 @@ import de.msg.xt.mdt.tdsl.tDsl.OperationParameterAssignment;
 import de.msg.xt.mdt.tdsl.tDsl.PackageDeclaration;
 import de.msg.xt.mdt.tdsl.tDsl.ParameterAssignment;
 import de.msg.xt.mdt.tdsl.tDsl.StatementLine;
-import de.msg.xt.mdt.tdsl.tDsl.TDslPackage;
 import de.msg.xt.mdt.tdsl.tDsl.TagWithCondition;
 import de.msg.xt.mdt.tdsl.tDsl.TagsDeclaration;
 import de.msg.xt.mdt.tdsl.tDsl.Test;
@@ -53,11 +51,6 @@ public class TDslDefaultResourceDescriptionStrategy extends
 		if (eObject instanceof DataType) {
 			final DataType dt = (DataType) eObject;
 			final Map<String, String> userData = new HashMap<String, String>();
-			String typeName = getFqnForReferencedFeature(dt,
-					TDslPackage.Literals.DATA_TYPE__TYPE);
-			if (typeName != null) {
-				userData.put("type", typeName);
-			}
 			userData.put("isDefault", dt.isDefault() ? "true" : "false");
 			createDescription(acceptor, dt, userData);
 			return true;
@@ -86,21 +79,6 @@ public class TDslDefaultResourceDescriptionStrategy extends
 		} else {
 			return super.createEObjectDescriptions(eObject, acceptor);
 		}
-	}
-
-	private String getFqnForReferencedFeature(EObject context, EReference ref) {
-		if (context == null)
-			return null;
-		EObject eObject = (EObject) context.eGet(ref, false);
-		if (eObject == null) {
-			return null;
-		}
-		QualifiedName fullyQualifiedName = nameProvider
-				.getFullyQualifiedName(eObject);
-		if (fullyQualifiedName == null) {
-			return null;
-		}
-		return fullyQualifiedName.toString();
 	}
 
 	private void addConditionalNextActivityToUserData(
