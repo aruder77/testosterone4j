@@ -767,7 +767,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    			}
    			
    			val tagArrayRef = dataType.newTypeRef(typeof(Tag)).createArrayType
-   			members += dataType.toMethod("getTags", tagArrayRef) [
+   			members += dataType.toMethod("getClassTags", tagArrayRef) [
    				setBody [
    					tagArrayRef.serialize(dataType, it)
 					it.append("tags = null;").newLine
@@ -932,10 +932,10 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 				]
 			]
 			
-			members += dataType.toMethod("getTags", dataType.newTypeRef(typeof(Tag)).createArrayType) [
+			members += dataType.toMethod("getClassTags", dataType.newTypeRef(typeof(Tag)).createArrayType) [
 				it.body = [
 					it.append('''
-						return getEquivalenceClass().getTags();''')
+						return getEquivalenceClass().getClassTags();''')
 				]
 			]
 			
@@ -958,7 +958,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 					it.setStatic(true)
 					it.parameters += predicate.toParameter("field", fieldTypeRef)
 					body = [
-						it.append("java.util.Set<de.msg.xt.mdt.base.Tag> valueTags = new java.util.HashSet<de.msg.xt.mdt.base.Tag>(java.util.Arrays.asList(field.getLastEnteredValue().getEquivalenceClass().getTags()));")
+						it.append("java.util.Set<de.msg.xt.mdt.base.Tag> valueTags = new java.util.HashSet<de.msg.xt.mdt.base.Tag>(java.util.Arrays.asList(field.getLastEnteredValue().getEquivalenceClass().getClassTags()));").newLine
 						it.append("return predicateFunction().apply(field.getTags(), valueTags);")
 					]
 				] 				

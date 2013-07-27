@@ -146,7 +146,7 @@ class MetaModelExtensions {
 	
 	def block(XExpression expr) {
 		if (expr != null)
-			EcoreUtil2::getContainerOfType(expr, typeof(XBlockExpression))
+			EcoreUtil2::getContainerOfType(expr.eContainer, typeof(XBlockExpression))
 		else 
 			null
 	}

@@ -4,7 +4,7 @@ public interface EquivalenceClass {
 
 	Object getValue();
 
-	Tag[] getTags();
+	Tag[] getClassTags();
 
 	String getName();
 }

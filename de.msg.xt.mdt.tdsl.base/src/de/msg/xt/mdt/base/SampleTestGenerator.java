@@ -97,7 +97,7 @@ public class SampleTestGenerator implements Generator {
 			int totalMatchingEquivalenceClasses = 0;
 			for (Object o : equivalenceClasses) {
 				EquivalenceClass ec = (EquivalenceClass) o;
-				if (checkTagCompliance(ec.getTags())) {
+				if (checkTagCompliance(ec.getClassTags())) {
 					totalMatchingEquivalenceClasses++;
 				}
 			}
@@ -172,7 +172,7 @@ public class SampleTestGenerator implements Generator {
 		Collections.shuffle(list, new Random(System.currentTimeMillis()));
 		for (final Object o : list) {
 			final EquivalenceClass ec = (EquivalenceClass) o;
-			if (checkTagCompliance(ec.getTags())) {
+			if (checkTagCompliance(ec.getClassTags())) {
 				remainingValues.add(ec);
 			}
 		}

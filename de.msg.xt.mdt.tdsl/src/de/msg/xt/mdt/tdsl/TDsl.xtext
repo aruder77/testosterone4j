@@ -48,7 +48,7 @@ Predicate:
 ;
 
 EquivalenceClass:
-	'class' name=ID ('value' value=XExpression | 'values' values=XExpression | 'valueGenerator' valueGenerator=XExpression 'classPredicate' classPredicate=XClosure) ('tags' (tags+=[Tag|FQN])+)? 
+	'class' name=ID ('classValue' value=XExpression | 'classValues' values=XExpression | 'valueGenerator' valueGenerator=XExpression 'classPredicate' classPredicate=XClosure) ('tags' (tags+=[Tag|FQN])+)? 
 ;
 
 TagsDeclaration:
