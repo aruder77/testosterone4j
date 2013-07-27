@@ -70,6 +70,7 @@ import org.eclipse.xtext.xbase.lib.Functions$Function2
 import java.util.Set
 import de.msg.xt.mdt.base.ControlField
 import de.msg.xt.mdt.base.IEvalutaionGroup
+import javax.xml.bind.annotation.XmlTransient
 
 /**
  * <p>Infers a JVM model from the source model.</p> 
@@ -852,8 +853,29 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 				annotations += dataType.toAnnotation(typeof(XmlAttribute))
 			]
 			
+			members += dataType.toField("valueInitialized", newTypeRef(typeof(Boolean))) [
+				annotations += dataType.toAnnotation(typeof(XmlTransient))
+				it.setInitializer [
+					it.append("false")
+				]
+			]
+
+			members += dataType.toField("valueDeterministic", newTypeRef(typeof(Boolean))) [
+				annotations += dataType.toAnnotation(typeof(XmlTransient))
+				it.setInitializer [
+					it.append("false")
+				]
+			]
+
 			members += dataType.toConstructor [
 				setVisibility(JvmVisibility::PUBLIC)
+				it.body = [
+					it.append('''
+						String deterministic = System.getProperty("deterministicValues");
+						if ("true".equals(deterministic)) {
+							valueDeterministic = true;
+						}''')
+				]
 			]
 			
 			members += dataType.toConstructor [
@@ -861,6 +883,8 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 				parameters += dataType.toParameter("value", dataType.type?.mappedBy)
 				it.body = [
 					it.append('''
+						this();
+						this.valueInitialized = true;
 						this._value = value;''')
 				]
 			]
@@ -872,14 +896,18 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 				
 				it.body = [
 					it.append('''
-						this._value = value;
+						this(value);
 						this._equivalenceClass = equivalenceClass;''')
 				]
 			]
 			
 			members += dataType.toMethod("getValue", dataType.type?.mappedBy) [
 				it.body = [
-					it.append("return this._value;")
+					it.append('''
+						if (!valueInitialized && _equivalenceClass != null && !valueDeterministic) {
+							_equivalenceClass.getValue();
+						}
+						return this._value;''')
 				]
 			]
 			members += dataType.toMethod("setValue", dataType.newTypeRef(Void::TYPE)) [
