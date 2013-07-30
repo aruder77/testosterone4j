@@ -17,6 +17,7 @@ import org.eclipse.xtext.xbase.typing.ITypeProvider
 import de.msg.xt.mdt.tdsl.tDsl.Activity
 import de.msg.xt.mdt.tdsl.tDsl.TDslPackage
 import de.msg.xt.mdt.tdsl.tDsl.Predicate
+import de.msg.xt.mdt.tdsl.validation.AbstractTDslJavaValidator
 
 class TDslJavaValidator extends AbstractTDslJavaValidator {
 	

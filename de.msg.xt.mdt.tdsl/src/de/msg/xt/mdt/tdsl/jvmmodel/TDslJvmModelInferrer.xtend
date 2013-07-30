@@ -835,6 +835,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    		
    		acceptor.accept(dataType.toClass(dataType.fullyQualifiedName)).initializeLater([
    			superTypes += dataType.newTypeRef(typeof(de.msg.xt.mdt.base.DataType), dataType.type.mappedBy, newTypeRef(equivalenceClass))
+   			superTypes += dataType.newTypeRef(typeof(de.msg.xt.mdt.base.BaseDataType))
    			
    			annotations += dataType.toAnnotation(typeof(XmlRootElement))
    			
@@ -853,28 +854,11 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 				annotations += dataType.toAnnotation(typeof(XmlAttribute))
 			]
 			
-			members += dataType.toField("valueInitialized", newTypeRef(typeof(Boolean))) [
-				annotations += dataType.toAnnotation(typeof(XmlTransient))
-				it.setInitializer [
-					it.append("false")
-				]
-			]
-
-			members += dataType.toField("valueDeterministic", newTypeRef(typeof(Boolean))) [
-				annotations += dataType.toAnnotation(typeof(XmlTransient))
-				it.setInitializer [
-					it.append("false")
-				]
-			]
-
 			members += dataType.toConstructor [
 				setVisibility(JvmVisibility::PUBLIC)
 				it.body = [
 					it.append('''
-						String deterministic = System.getProperty("deterministicValues");
-						if ("true".equals(deterministic)) {
-							valueDeterministic = true;
-						}''')
+						super();''')
 				]
 			]
 			
@@ -883,7 +867,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 				parameters += dataType.toParameter("value", dataType.type?.mappedBy)
 				it.body = [
 					it.append('''
-						this();
+						super();
 						this.valueInitialized = true;
 						this._value = value;''')
 				]
@@ -905,7 +889,8 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 				it.body = [
 					it.append('''
 						if (!valueInitialized && _equivalenceClass != null && !valueDeterministic) {
-							_equivalenceClass.getValue();
+							this._value = _equivalenceClass.getValue();
+							this.valueInitialized = true;
 						}
 						return this._value;''')
 				]
@@ -914,7 +899,8 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 				it.parameters += dataType.toParameter("value", dataType.type?.mappedBy)
 				it.body = [
 					it.append('''
-						this._value = value;''')
+						this._value = value;
+						this.valueInitialized = true;''')
 				]
 			]
 
