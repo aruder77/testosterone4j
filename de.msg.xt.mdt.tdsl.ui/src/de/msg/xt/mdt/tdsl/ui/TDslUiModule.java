@@ -5,11 +5,17 @@ package de.msg.xt.mdt.tdsl.ui;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 
+import de.msg.xt.mdt.tdsl.ui.contentassist.TDslProposalPriorities;
+
 /**
  * Use this class to register components to be used within the IDE.
  */
 public class TDslUiModule extends de.msg.xt.mdt.tdsl.ui.AbstractTDslUiModule {
 	public TDslUiModule(AbstractUIPlugin plugin) {
 		super(plugin);
+	}
+
+	public Class<? extends org.eclipse.xtext.ui.editor.contentassist.IContentProposalPriorities> bindIContentProposalPriorities() {
+		return TDslProposalPriorities.class;
 	}
 }

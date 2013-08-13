@@ -3,6 +3,12 @@
  */
 package de.msg.xt.mdt.tdsl.ui.contentassist;
 
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.xtext.RuleCall;
+import org.eclipse.xtext.ui.editor.contentassist.ContentAssistContext;
+import org.eclipse.xtext.ui.editor.contentassist.ICompletionProposalAcceptor;
+
+import de.msg.xt.mdt.tdsl.tDsl.OperationMapping;
 
 /**
  * see
@@ -10,5 +16,21 @@ package de.msg.xt.mdt.tdsl.ui.contentassist;
  * how to customize content assistant
  */
 public class TDslProposalProvider extends AbstractTDslProposalProvider {
+
+	@Override
+	public void complete_OperationMapping(EObject model, RuleCall ruleCall,
+			ContentAssistContext context, ICompletionProposalAcceptor acceptor) {
+		super.complete_OperationMapping(model, ruleCall, context, acceptor);
+	}
+
+	@Override
+	protected String getDisplayString(EObject element,
+			String qualifiedNameAsString, String shortName) {
+		if (element instanceof OperationMapping) {
+			return qualifiedNameAsString;
+		}
+		return super
+				.getDisplayString(element, qualifiedNameAsString, shortName);
+	}
 
 }

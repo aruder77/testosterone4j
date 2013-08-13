@@ -36,6 +36,8 @@ import de.msg.xt.mdt.tdsl.tDsl.PackageDeclaration
 import de.msg.xt.mdt.tdsl.tDsl.Predicate
 import de.msg.xt.mdt.tdsl.tDsl.PackageDeclaration
 import org.eclipse.emf.ecore.InternalEObject
+import de.msg.xt.mdt.tdsl.tDsl.TagsDeclaration
+import de.msg.xt.mdt.tdsl.tDsl.Tag
 
 /**
  * Convenience meta-model extensions. Please order by Metamodel-Class and alphabetically!
@@ -183,6 +185,10 @@ class MetaModelExtensions {
 
 	def PackageDeclaration getPackageDeclaration(Predicate predicate) {
 		predicate?.eContainer as PackageDeclaration
+	}
+	
+	def TagsDeclaration getTagsDeclaration(Tag tag) {
+		tag?.eContainer as TagsDeclaration
 	}
 	
 	
