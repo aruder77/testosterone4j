@@ -11,42 +11,54 @@ import java.util.List;
 
 public class GenerationHelper {
 
-	public List<Object[]> readOrGenerateTestCases(final String fileName, final Generator generator,
+	public static boolean activeGeneration = false;
+
+	public synchronized List<Object[]> readOrGenerateTestCases(
+			final String fileName, final Generator generator,
 			final Class<? extends Runnable> testClass) {
 		List<?> testCases = null;
 
 		final File f = new File(fileName);
 
 		if (!f.exists()) {
+			activeGeneration = true;
 			testCases = generate(generator, testClass);
+			activeGeneration = false;
 			try {
 				writeSerialization(testCases, testClass, f);
 			} catch (final IOException e) {
-				throw new RuntimeException("Cannot write generated test data to file!", e);
+				throw new RuntimeException(
+						"Cannot write generated test data to file!", e);
 			}
 		}
 
 		try {
 			testCases = readSerialization(testClass, f);
 		} catch (final ClassNotFoundException e) {
-			throw new RuntimeException("Cannot read test case data from file!", e);
+			throw new RuntimeException("Cannot read test case data from file!",
+					e);
 		} catch (final IOException e) {
-			throw new RuntimeException("Cannot read test case data from file!", e);
+			throw new RuntimeException("Cannot read test case data from file!",
+					e);
 		}
 		final List<Object[]> testCaseConfig = new ArrayList<Object[]>();
 		int i = 1;
 		for (final Object testCase : testCases) {
-			testCaseConfig.add(new Object[] { new TestDescriptor(i++, testCase) });
+			testCaseConfig
+					.add(new Object[] { new TestDescriptor(i++, testCase) });
 		}
 		return testCaseConfig;
 	}
 
-	public List<?> generate(final Generator generator, final Class<? extends Runnable> clazz) {
+	public List<?> generate(final Generator generator,
+			final Class<? extends Runnable> clazz) {
 		return generator.generate(clazz);
 	}
 
-	private List<Object> readSerialization(final Class<?> useCaseClass, final File f) throws IOException, ClassNotFoundException {
-		final ObjectInputStream oin = new ObjectInputStream(new FileInputStream(f));
+	private List<Object> readSerialization(final Class<?> useCaseClass,
+			final File f) throws IOException, ClassNotFoundException {
+		final ObjectInputStream oin = new ObjectInputStream(
+				new FileInputStream(f));
 		Object o = null;
 		final List<Object> list = new ArrayList<Object>();
 		while ((o = oin.readObject()) != null) {
@@ -62,8 +74,10 @@ public class GenerationHelper {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private void writeSerialization(final List<?> testCases, final Class<?> useCaseClass, final File f) throws IOException {
-		final ObjectOutputStream oout = new ObjectOutputStream(new FileOutputStream(f));
+	private void writeSerialization(final List<?> testCases,
+			final Class<?> useCaseClass, final File f) throws IOException {
+		final ObjectOutputStream oout = new ObjectOutputStream(
+				new FileOutputStream(f));
 		for (final Object testCase : testCases) {
 			oout.writeObject(testCase);
 		}

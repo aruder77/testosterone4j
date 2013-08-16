@@ -255,11 +255,17 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				it.setStatic(true)
    				
    				setBody [
+   					activityAdapterClassRef.serialize(activity, it)
+   					it.append(" adapter = null;").newLine
+   					it.append('''
+						if (!de.msg.xt.mdt.base.GenerationHelper.activeGeneration) {
+							adapter = activityLocator.find(ID, ''')
+   					activityAdapterClassRef.serialize(activity, it)
+   					it.append(".class);").newLine;
+   					it.append("}").newLine
    					it.append("return new ")
    					activity.newTypeRef(activity.class_fqn).serialize(activity, it)
-   					it.append("(activityLocator.find(ID, ")
-   					activity.newTypeRef(activity.adapterInterface_fqn).serialize(activity, it)
-   					it.append(".class));")
+   					it.append("(adapter);")
    				]
    			]
    			
@@ -291,7 +297,10 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 					members += field.toMethod(field.fieldGetterName, field.newTypeRef(field.control.fqn)) [
 						it.setBody [
 							it.append('''
-						    	 return this.contextAdapter.«field.control.activityAdapterGetter»("«field.identifier»");''')
+								if (de.msg.xt.mdt.base.GenerationHelper.activeGeneration) {
+									return null;
+								}
+								return this.contextAdapter.«field.control.activityAdapterGetter»("«field.identifier»");''')
 						]
 					]
 				}
@@ -440,15 +449,22 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    								it.append('''«field.controlFieldName».setLastEnteredValue(«opMapping.dataTypeMappings.head?.name?.name»);''').newLine
 		   					it.append('''
 		   						this.protocol.appendControlOperationCall(this.getClass().getName(), "«field.name»", «field.control?.name».class.getName(), "«operation.name»", null«appendParameter(opMapping.dataTypeMappings)»);
-		   						«field.fieldGetterName»().«operation.name»(«mapParameters(field, operation)»);
+		   						«field.control.fqn» fieldControl = «field.fieldGetterName»();
+		   						if (fieldControl != null) {
+		   							fieldControl.«operation.name»(«mapParameters(field, operation)»);
+		   						}
 		   						return «IF nextActivity == null»this«ELSE»«nextActivity.class_SimpleName».find()«ENDIF»;''')
    						}
    					} else {
    						if (opMapping != null) {
    							it.append('''
-   								«operation.returnType?.name» value = «field.fieldGetterName»().«operation.name»(«mapParameters(field, operation)»); 
-   								this.protocol.appendControlOperationCall(this.getClass().getName(), "«field.name»", «field.control?.name».class.getName(), "«operation.name»", value != null ? value.toString() : "null" «appendParameter(opMapping.dataTypeMappings)»);
-   								return new «opMapping.dataType?.class_FQN»(value, «opMapping.dataType?.equivalenceClass_name».getByValue(value));''')
+		   						«field.control.fqn» fieldControl = «field.fieldGetterName»();
+		   						«operation.returnType?.name» value = null;
+		   						if (fieldControl != null) {
+		   							value = fieldControl.«operation.name»(«mapParameters(field, operation)»);
+		   						}
+		   						this.protocol.appendControlOperationCall(this.getClass().getName(), "«field.name»", «field.control?.name».class.getName(), "«operation.name»", value != null ? value.toString() : "null" «appendParameter(opMapping.dataTypeMappings)»);
+		   						return new «opMapping.dataType?.class_FQN»(value, «opMapping.dataType?.equivalenceClass_name».getByValue(value));''')
    						}
    					}
    				]
@@ -547,7 +563,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				it.setStatic(true)
    				it.setFinal(true)
    				it.setInitializer[
-   					it.append('''"./testser/«test.name.toUpperCase»_«System::currentTimeMillis»"''')
+   					it.append('''"./testser/«test.name.toUpperCase»"''')
    				]
    			]
    			
