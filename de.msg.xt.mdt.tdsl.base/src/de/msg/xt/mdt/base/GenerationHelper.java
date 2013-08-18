@@ -21,25 +21,13 @@ public class GenerationHelper {
 		final File f = new File(fileName);
 
 		if (!f.exists()) {
-			activeGeneration = true;
-			testCases = generate(generator, testClass);
-			activeGeneration = false;
-			try {
-				writeSerialization(testCases, testClass, f);
-			} catch (final IOException e) {
-				throw new RuntimeException(
-						"Cannot write generated test data to file!", e);
-			}
+			testCases = generateTestCases(generator, testClass, f);
 		}
 
 		try {
 			testCases = readSerialization(testClass, f);
-		} catch (final ClassNotFoundException e) {
-			throw new RuntimeException("Cannot read test case data from file!",
-					e);
-		} catch (final IOException e) {
-			throw new RuntimeException("Cannot read test case data from file!",
-					e);
+		} catch (Exception ex) {
+			testCases = generateTestCases(generator, testClass, f);
 		}
 		final List<Object[]> testCaseConfig = new ArrayList<Object[]>();
 		int i = 1;
@@ -48,6 +36,21 @@ public class GenerationHelper {
 					.add(new Object[] { new TestDescriptor(i++, testCase) });
 		}
 		return testCaseConfig;
+	}
+
+	private List<?> generateTestCases(final Generator generator,
+			final Class<? extends Runnable> testClass, final File f) {
+		List<?> testCases;
+		activeGeneration = true;
+		testCases = generate(generator, testClass);
+		activeGeneration = false;
+		try {
+			writeSerialization(testCases, testClass, f);
+		} catch (final IOException e) {
+			throw new RuntimeException(
+					"Cannot write generated test data to file!", e);
+		}
+		return testCases;
 	}
 
 	public List<?> generate(final Generator generator,
