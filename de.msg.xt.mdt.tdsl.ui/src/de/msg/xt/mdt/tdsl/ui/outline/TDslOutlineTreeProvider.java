@@ -18,6 +18,7 @@ import de.msg.xt.mdt.tdsl.tDsl.Predicate;
 import de.msg.xt.mdt.tdsl.tDsl.TagsDeclaration;
 import de.msg.xt.mdt.tdsl.tDsl.Test;
 import de.msg.xt.mdt.tdsl.tDsl.TestModel;
+import de.msg.xt.mdt.tdsl.tDsl.Type;
 import de.msg.xt.mdt.tdsl.tDsl.UseCase;
 
 /**
@@ -92,6 +93,13 @@ public class TDslOutlineTreeProvider extends DefaultOutlineTreeProvider {
 	}
 
 	protected boolean _isLeaf(Predicate modelElement) {
+		return true;
+	}
+
+	protected void _createChildren(IOutlineNode parentNode, Type type) {
+	}
+
+	protected boolean _isLeaf(Type modelElement) {
 		return true;
 	}
 

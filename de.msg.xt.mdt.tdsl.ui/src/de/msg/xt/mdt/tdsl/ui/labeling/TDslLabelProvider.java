@@ -9,7 +9,21 @@ import org.eclipse.xtext.xbase.ui.labeling.XbaseLabelProvider;
 import com.google.inject.Inject;
 
 import de.msg.xt.mdt.tdsl.jvmmodel.MetaModelExtensions;
+import de.msg.xt.mdt.tdsl.tDsl.Activity;
+import de.msg.xt.mdt.tdsl.tDsl.ActivityOperation;
+import de.msg.xt.mdt.tdsl.tDsl.Control;
+import de.msg.xt.mdt.tdsl.tDsl.DataType;
+import de.msg.xt.mdt.tdsl.tDsl.EquivalenceClass;
+import de.msg.xt.mdt.tdsl.tDsl.Field;
+import de.msg.xt.mdt.tdsl.tDsl.Operation;
+import de.msg.xt.mdt.tdsl.tDsl.PackageDeclaration;
+import de.msg.xt.mdt.tdsl.tDsl.Predicate;
 import de.msg.xt.mdt.tdsl.tDsl.StatementLine;
+import de.msg.xt.mdt.tdsl.tDsl.TagsDeclaration;
+import de.msg.xt.mdt.tdsl.tDsl.Test;
+import de.msg.xt.mdt.tdsl.tDsl.Toolkit;
+import de.msg.xt.mdt.tdsl.tDsl.Type;
+import de.msg.xt.mdt.tdsl.tDsl.UseCase;
 
 /**
  * Provides labels for a EObjects.
@@ -19,6 +33,7 @@ import de.msg.xt.mdt.tdsl.tDsl.StatementLine;
  */
 public class TDslLabelProvider extends XbaseLabelProvider {
 
+	private static final String THEME = "diamond";
 	@Inject
 	MetaModelExtensions metaModelExtensions;
 
@@ -29,6 +44,62 @@ public class TDslLabelProvider extends XbaseLabelProvider {
 
 	String text(StatementLine line) {
 		return "Line " + metaModelExtensions.getIndexInParentBlock(line);
+	}
+
+	String image(UseCase line) {
+		return THEME + "/database/script_16.gif";
+	}
+
+	String image(PackageDeclaration packDecl) {
+		return "package_obj.png";
+	}
+
+	String image(Activity activity) {
+		return THEME + "/general/window_16.gif";
+	}
+
+	String image(ActivityOperation operation) {
+		return THEME + "/general/gear_16.gif";
+	}
+
+	String image(Field field) {
+		return THEME + "/database/text_field_16.gif";
+	}
+
+	String image(Test test) {
+		return THEME + "/general/check_mark_16.gif";
+	}
+
+	String image(Type type) {
+		return THEME + "/general/sphere_16.gif";
+	}
+
+	String image(DataType dataType) {
+		return THEME + "/database/database_16.gif";
+	}
+
+	String image(EquivalenceClass equivalenceClass) {
+		return THEME + "/general/pyramid_16.gif";
+	}
+
+	String image(Control control) {
+		return THEME + "/database/play_16.gif";
+	}
+
+	String image(Operation operation) {
+		return THEME + "/general/gear_16.gif";
+	}
+
+	String image(Predicate predicate) {
+		return THEME + "/accounting/abacus_16.gif";
+	}
+
+	String image(Toolkit toolkit) {
+		return THEME + "/database/objects_16.gif";
+	}
+
+	String image(TagsDeclaration tagDecl) {
+		return THEME + "/projectManagement/tag_16.gif";
 	}
 
 	/*
