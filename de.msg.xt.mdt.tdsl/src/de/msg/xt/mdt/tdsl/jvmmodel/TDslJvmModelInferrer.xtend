@@ -71,6 +71,7 @@ import java.util.Set
 import de.msg.xt.mdt.base.ControlField
 import de.msg.xt.mdt.base.IEvalutaionGroup
 import javax.xml.bind.annotation.XmlTransient
+import java.util.HashSet
 
 /**
  * <p>Infers a JVM model from the source model.</p> 
@@ -783,15 +784,20 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    			}
    			
    			val tagArrayRef = dataType.newTypeRef(typeof(Tag)).createArrayType
-   			members += dataType.toMethod("getClassTags", tagArrayRef) [
+   			val tagSetRef = dataType.newTypeRef(typeof(Set), dataType.newTypeRef(typeof(Tag)))
+   			members += dataType.toMethod("getClassTags", tagSetRef) [
    				setBody [
-   					tagArrayRef.serialize(dataType, it)
-					it.append("tags = null;").newLine
+   					tagSetRef.serialize(dataType, it)
+					it.append(" tags = new ")
+					dataType.newTypeRef(typeof(HashSet), dataType.newTypeRef(typeof(Tag))).serialize(dataType, it)
+					it.append("();").newLine
 					it.append('''
 						switch (this) {
 							«FOR clazz : dataType.classes»
 								case «clazz.name»:
-									tags = new Tag[] { «FOR tag : clazz.tags SEPARATOR ', '»«tag.enumLiteral_FQN»«ENDFOR» };
+									«FOR tag : clazz.tags»
+										tags.add(«tag.enumLiteral_FQN»);
+									«ENDFOR»
 									break;
 							«ENDFOR»
 						}
@@ -934,7 +940,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 				]
 			]
 			
-			members += dataType.toMethod("getClassTags", dataType.newTypeRef(typeof(Tag)).createArrayType) [
+			members += dataType.toMethod("getClassTags", dataType.newTypeRef(typeof(Set), dataType.newTypeRef(typeof(Tag)))) [
 				it.body = [
 					it.append('''
 						return getEquivalenceClass().getClassTags();''')

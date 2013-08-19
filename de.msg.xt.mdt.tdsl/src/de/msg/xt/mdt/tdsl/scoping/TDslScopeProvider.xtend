@@ -53,6 +53,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import de.msg.xt.mdt.tdsl.tDsl.ParameterAssignment
 import de.msg.xt.mdt.tdsl.tDsl.Assert
+import java.util.HashSet
 
 class TDslScopeProvider extends XbaseScopeProvider {
 	
@@ -378,7 +379,13 @@ class TDslScopeProvider extends XbaseScopeProvider {
 	}			
 	
 	def dispatch List<ConditionalNextActivity> determineExplicitNextActivities(XIfExpression ifExpr) {
-		ifExpr.then?.determineExplicitNextActivities
+		val thenActivities = ifExpr.then?.determineExplicitNextActivities
+		val activities = new HashSet<ConditionalNextActivity>()
+		if (ifExpr.getElse() != null) {
+			activities.addAll(ifExpr.getElse().determineExplicitNextActivities)
+		}
+		activities.addAll(thenActivities)
+		return activities.toList
 	}			
 	
 	def dispatch List<ConditionalNextActivity> determineExplicitNextActivities(XVariableDeclaration varDecl) {

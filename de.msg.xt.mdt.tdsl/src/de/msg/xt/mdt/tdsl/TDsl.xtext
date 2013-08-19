@@ -129,7 +129,7 @@ ParameterInput returns xbase::XExpression:
 
 /*
  * Parameter for a parameter generation. The generator only takes an array of tags.
- * The takes may be specified directly using 'select(tags TAG_A, TAG_B)' or dynamically
+ * The tags may be specified directly using 'select(tags TAG_A, TAG_B)' or dynamically
  * via an expression 'select(someXBaseExpression)'.
  */
 GenerationSelektor returns xbase::XExpression:

@@ -126,7 +126,7 @@ public class SampleTestGenerator implements Generator {
 
 	@Override
 	public <T extends DataType> T generateDataTypeValue(final Class<T> clazz,
-			final String id, final Tag[] tags) {
+			final String id, final Set<Tag> tags) {
 		Stack<EquivalenceClass> remainingValues = remainingValuesPerId.get(id);
 		T dataType = null;
 		try {
@@ -137,7 +137,25 @@ public class SampleTestGenerator implements Generator {
 				determineEquivalenceClassList(remainingValues, dataType);
 				remainingValuesPerId.put(id, remainingValues);
 			}
-			final EquivalenceClass equivalenceClass = remainingValues.pop();
+			EquivalenceClass equivalenceClass = null;
+			if (tags == null) {
+				equivalenceClass = remainingValues.pop();
+			} else {
+				equivalenceClass = findEquivalenceClassMatchingTags(
+						remainingValues.iterator(), tags);
+				if (equivalenceClass != null) {
+					remainingValues.remove(equivalenceClass);
+				} else {
+					Stack<EquivalenceClass> stack = new Stack<EquivalenceClass>();
+					determineEquivalenceClassList(stack, dataType);
+					equivalenceClass = findEquivalenceClassMatchingTags(
+							stack.iterator(), tags);
+					if (equivalenceClass == null) {
+						throw new RuntimeException(
+								"Unable to satisfy test data criteria!");
+					}
+				}
+			}
 			dataType.setEquivalenceClass(equivalenceClass);
 			dataType.setValue(equivalenceClass.getValue());
 			if (remainingValues.isEmpty()) {
@@ -152,6 +170,29 @@ public class SampleTestGenerator implements Generator {
 		LOG.fine("generatedValue[id=\"" + id + "\"]:" + dataType.getValue());
 		addStatistics(id, dataType);
 		return dataType;
+	}
+
+	private EquivalenceClass findEquivalenceClassMatchingTags(
+			Iterator<EquivalenceClass> classIterator, Set<Tag> includeTags) {
+		EquivalenceClass equivClass = null;
+		while (classIterator.hasNext() && equivClass != null) {
+			EquivalenceClass tempClass = classIterator.next();
+			if (checkTagCompliance(tempClass.getClassTags(), includeTags)) {
+				equivClass = tempClass;
+			}
+		}
+		return equivClass;
+	}
+
+	private boolean checkTagCompliance(Set<Tag> classTags, Set<Tag> includeTags) {
+		Iterator<Tag> inclTagIterator = includeTags.iterator();
+		while (inclTagIterator.hasNext()) {
+			Tag includeTag = inclTagIterator.next();
+			if (classTags.contains(includeTag)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private <T extends DataType<Object, EquivalenceClass>> void addStatistics(
@@ -176,6 +217,11 @@ public class SampleTestGenerator implements Generator {
 				remainingValues.add(ec);
 			}
 		}
+	}
+
+	private boolean checkTagCompliance(Set<Tag> tags) {
+		Tag[] tagsArray = new Tag[tags.size()];
+		return checkTagCompliance(tags.toArray(tagsArray));
 	}
 
 	private boolean checkTagCompliance(final Tag[] tags) {

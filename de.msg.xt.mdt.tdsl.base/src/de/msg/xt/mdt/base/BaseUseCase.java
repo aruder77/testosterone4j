@@ -2,8 +2,11 @@ package de.msg.xt.mdt.base;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.bind.annotation.XmlElement;
 
@@ -24,11 +27,17 @@ public class BaseUseCase implements Serializable {
 
 	public <T extends DataType> T getOrGenerateValue(final Class<T> clazz,
 			final String key) {
-		return getOrGenerateValue(clazz, key, null);
+		return getOrGenerateValue(clazz, key, (Set<Tag>) null);
 	}
 
 	public <T extends DataType> T getOrGenerateValue(final Class<T> clazz,
 			final String key, final Tag[] tags) {
+		return getOrGenerateValue(clazz, key,
+				new HashSet<Tag>(Arrays.asList(tags)));
+	}
+
+	public <T extends DataType> T getOrGenerateValue(final Class<T> clazz,
+			final String key, final Set<Tag> tags) {
 		T value = null;
 		if (generatedData.containsKey(key)) {
 			value = (T) generatedData.get(key);

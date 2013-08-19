@@ -26,6 +26,7 @@ import org.eclipse.xtext.xbase.typing.ITypeProvider
 import de.msg.xt.mdt.base.Tag
 import de.msg.xt.mdt.tdsl.tDsl.ParameterAssignment
 import de.msg.xt.mdt.tdsl.tDsl.Parameter
+import java.util.Set
 
 class TDslCompiler extends XbaseCompiler {
 	
@@ -173,7 +174,7 @@ class TDslCompiler extends XbaseCompiler {
 				}
 				if (expr.expression != null) {
 					append(", ")
-					expr.expression.compileAsJavaExpression(it, typeRefs.createArrayType(typeRefs.getTypeForName("Tags", expr)))
+					expr.expression.compileAsJavaExpression(it, expr.newTypeRef(typeof(Set), expr.newTypeRef(typeof(Tag))))
 				}
 				append(")")
 			}
