@@ -385,7 +385,10 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 					}
 				} else {
 					operation.newTypeRef(typeof(Object)).serialize(operation, it)
-					it.append(''' o = contextAdapter.«operation.name»(«FOR param : operation.params SEPARATOR ', '»«param.name».getValue()«ENDFOR»);''').newLine
+					it.append(" o = null;").newLine
+					it.append("if (contextAdapter != null) {").increaseIndentation.newLine
+					it.append(''' o = contextAdapter.«operation.name»(«FOR param : operation.params SEPARATOR ', '»«param.name».getValue()«ENDFOR»);''').decreaseIndentation.newLine
+					it.append("}").newLine
 					if (!voidReturn) {
 						operation.newTypeRef(nextActivityClass).serialize(operation, it)
 						it.append('''
@@ -398,12 +401,15 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 						it.append(")o;").decreaseIndentation.newLine
 						it.append("} else {").increaseIndentation.newLine
 						operation.newTypeRef(nextActivityAdapterClass).serialize(operation, it)
-						it.append(" adapter = injector.getInstance(")
+						it.append(" adapter = null;").newLine
+						it.append("if (contextAdapter != null) {").increaseIndentation.newLine
+						it.append("adapter = injector.getInstance(")
 						operation.newTypeRef(nextActivityAdapterClass).serialize(operation, it)
 						it.append('''
 							.class);
-							adapter.setContext(o);
-							nextActivity = new ''')
+							adapter.setContext(o);''').decreaseIndentation.newLine
+						it.append("}").newLine
+						it.append("nextActivity = new ")
 						operation.newTypeRef(nextActivityClass).serialize(operation, it)
 						it.append("(adapter);").decreaseIndentation.newLine
 						it.append('''
