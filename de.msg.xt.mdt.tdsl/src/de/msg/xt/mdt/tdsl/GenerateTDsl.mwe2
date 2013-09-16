@@ -9,6 +9,7 @@ var fileExtensions = "tdsl"
 var projectName = "de.msg.xt.mdt.tdsl"
 var runtimeProject = "../${projectName}"
 var generateXtendStub = true
+var encoding = "UTF-8"
 
 Workflow {
     bean = StandaloneSetup {
@@ -24,7 +25,15 @@ Workflow {
     }
     
     component = DirectoryCleaner {
+    	directory = "${runtimeProject}/model"
+    }
+    
+    component = DirectoryCleaner {
     	directory = "${runtimeProject}.ui/src-gen"
+    }
+    
+    component = DirectoryCleaner {
+    	directory = "${runtimeProject}.tests/src-gen"
     }
     
     component = Generator {
@@ -33,6 +42,7 @@ Workflow {
     	pathTestProject = "${runtimeProject}.tests"
     	projectNameRt = projectName
     	projectNameUi = "${projectName}.ui"
+    	encoding = encoding
     	language = auto-inject {
     		uri = grammarURI
     
@@ -40,12 +50,7 @@ Workflow {
     		fragment = grammarAccess.GrammarAccessFragment auto-inject {}
     
     		// generates Java API for the generated EPackages
-    		fragment = ecore.EcoreGeneratorFragment auto-inject {
-    		// referencedGenModels = "
-    		//  platform:/resource/org.eclipse.xtext.xbase/model/Xbase.genmodel,
-    		//  platform:/resource/org.eclipse.xtext.common.types/model/JavaVMTypes.genmodel
-    		// "
-    		}
+    		fragment = ecore.EMFGeneratorFragment auto-inject {}
     
     		// the old serialization component
     		// fragment = parseTreeConstructor.ParseTreeConstructorFragment auto-inject {}    

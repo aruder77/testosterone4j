@@ -104,7 +104,7 @@ TagWithCondition:
 ;
 
 OperationMapping:
-	'op' (dataType=[DataType|FQN])? name=[Operation|ID] ('(' (dataTypeMappings+=DataTypeMapping) (',' dataTypeMappings+=DataTypeMapping)* ')')? (nextActivities+=ConditionalNextActivity)*
+	'op' (dataType=[DataType|FQN] | 'void') name=[Operation|FQN] ('(' (dataTypeMappings+=DataTypeMapping) (',' dataTypeMappings+=DataTypeMapping)* ')')? (nextActivities+=ConditionalNextActivity)*
 ;
 
 DataTypeMapping:

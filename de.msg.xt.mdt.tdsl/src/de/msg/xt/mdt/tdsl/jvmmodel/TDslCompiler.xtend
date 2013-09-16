@@ -27,6 +27,7 @@ import de.msg.xt.mdt.base.Tag
 import de.msg.xt.mdt.tdsl.tDsl.ParameterAssignment
 import de.msg.xt.mdt.tdsl.tDsl.Parameter
 import java.util.Set
+import org.eclipse.xtext.xbase.XAbstractFeatureCall
 
 class TDslCompiler extends XbaseCompiler {
 	
@@ -130,6 +131,14 @@ class TDslCompiler extends XbaseCompiler {
     			expr.expression.doInternalToJavaStatement(it, false)
     			decreaseIndentation.newLine.append("}")
     		}
+    		/*XAbstractFeatureCall: {
+    			if (isReferenced && isVariableDeclarationRequired(expr, it)) {
+    				val type = getTypeForVariableDeclaration(expr);
+    				if (type != null) {
+    					super.doInternalToJavaStatement(expr, it, isReferenced)	
+    				}
+    			}    			
+    		}*/
     		default:
     			super.doInternalToJavaStatement(expr, it, isReferenced)
     	}   	
@@ -257,7 +266,7 @@ class TDslCompiler extends XbaseCompiler {
 	def appendParameterValue(ITreeAppendable appendable, DataType datatype, XExpression expr) {
 		val dataTypeName = datatype.class_fqn
 		val expectedType = expr.type
-		val typeMatch = expectedType.type.equals(datatype.newTypeRef(datatype.class_fqn).type)
+		val typeMatch = (expectedType?.type != null) && expectedType.type.equals(datatype.newTypeRef(datatype.class_fqn).type)
 		if (!typeMatch) {
 			appendable.append("new ")
 			datatype.newTypeRef(dataTypeName).serialize(datatype, appendable)
@@ -283,6 +292,9 @@ class TDslCompiler extends XbaseCompiler {
 				appendable.append('''.class, "«parameter.fullyQualifiedName»")''')
 			} else {
 				val expectedType = typeRefs.getTypeForName(dataTypeName, call)
+				if (assignment.value?.type?.type == null || expectedType == null) {
+					System::out.println("NULL value!")
+				}
 				if (!assignment.value.type.type.equals(expectedType.type)) {
 					appendable.append("new ")
 					parameter.newTypeRef(dataTypeName).serialize(parameter, appendable)			

@@ -3,11 +3,108 @@
 */
 package de.msg.xt.mdt.tdsl.ui.outline
 
+import de.msg.xt.mdt.tdsl.tDsl.ActivityOperation
+import de.msg.xt.mdt.tdsl.tDsl.Element
+import de.msg.xt.mdt.tdsl.tDsl.EquivalenceClass
+import de.msg.xt.mdt.tdsl.tDsl.Field
+import de.msg.xt.mdt.tdsl.tDsl.Import
+import de.msg.xt.mdt.tdsl.tDsl.Operation
+import de.msg.xt.mdt.tdsl.tDsl.PackageDeclaration
+import de.msg.xt.mdt.tdsl.tDsl.Predicate
+import de.msg.xt.mdt.tdsl.tDsl.TagsDeclaration
+import de.msg.xt.mdt.tdsl.tDsl.Test
+import de.msg.xt.mdt.tdsl.tDsl.TestModel
+import de.msg.xt.mdt.tdsl.tDsl.Type
+import de.msg.xt.mdt.tdsl.tDsl.UseCase
+import org.eclipse.xtext.ui.editor.outline.IOutlineNode
+import org.eclipse.xtext.ui.editor.outline.impl.DefaultOutlineTreeProvider
+import org.eclipse.xtext.ui.editor.outline.impl.DocumentRootNode
+
 /**
  * Customization of the default outline structure.
  *
  * see http://www.eclipse.org/Xtext/documentation.html#outline
  */
-class TDslOutlineTreeProvider extends org.eclipse.xtext.ui.editor.outline.impl.DefaultOutlineTreeProvider {
-	
+class TDslOutlineTreeProvider extends DefaultOutlineTreeProvider {
+
+	def _createChildren(DocumentRootNode parentNode,
+			TestModel modelElement) {
+		for (PackageDeclaration packageDecl : modelElement.getPackages()) {
+			createNode(parentNode, packageDecl);
+		}
+	}
+
+	def _createChildren(IOutlineNode parentNode,
+			PackageDeclaration packageDecl) {
+		for (Element element : packageDecl.getElements()) {
+			if (!(element instanceof Import)) {
+				createNode(parentNode, element);
+			}
+		}
+	}
+
+	def _createChildren(IOutlineNode parentNode, UseCase modelElement) {
+	}
+
+	def boolean _isLeaf(UseCase modelElement) {
+		return true;
+	}
+
+	def _createChildren(IOutlineNode parentNode,
+			ActivityOperation modelElement) {
+	}
+
+	def boolean _isLeaf(ActivityOperation modelElement) {
+		return true;
+	}
+
+	def _createChildren(IOutlineNode parentNode,
+			Operation modelElement) {
+	}
+
+	def boolean _isLeaf(Operation modelElement) {
+		return true;
+	}
+
+	def _createChildren(IOutlineNode parentNode, Field modelElement) {
+	}
+
+	def boolean _isLeaf(Field modelElement) {
+		return true;
+	}
+
+	def _createChildren(IOutlineNode parentNode,
+			EquivalenceClass modelElement) {
+	}
+
+	def boolean _isLeaf(EquivalenceClass modelElement) {
+		return true;
+	}
+
+	def _createChildren(IOutlineNode parentNode, Test modelElement) {
+	}
+
+	def boolean _isLeaf(Test modelElement) {
+		return true;
+	}
+
+	def _createChildren(IOutlineNode parentNode,
+			Predicate modelElement) {
+	}
+
+	def boolean _isLeaf(Predicate modelElement) {
+		return true;
+	}
+
+	def _createChildren(IOutlineNode parentNode, Type type) {
+	}
+
+	def boolean _isLeaf(Type modelElement) {
+		return true;
+	}
+
+	def Object _text(TagsDeclaration modelElement) {
+		return "Tags";
+	}
+
 }

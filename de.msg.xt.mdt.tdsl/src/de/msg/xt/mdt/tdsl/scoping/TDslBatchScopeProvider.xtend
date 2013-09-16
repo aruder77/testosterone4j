@@ -57,8 +57,9 @@ import java.util.HashSet
 import org.eclipse.xtext.serializer.sequencer.AbstractDelegatingSemanticSequencer
 import org.eclipse.xtext.scoping.impl.AbstractDeclarativeScopeProvider
 import org.eclipse.xtext.xbase.annotations.scoping.XbaseWithAnnotationsScopeProvider
+import org.eclipse.xtext.xbase.annotations.typesystem.XbaseWithAnnotationsBatchScopeProvider
 
-class TDslScopeProvider extends XbaseWithAnnotationsScopeProvider {
+class TDslBatchScopeProvider extends XbaseWithAnnotationsBatchScopeProvider {
 	
 	
     @Inject extension MetaModelExtensions

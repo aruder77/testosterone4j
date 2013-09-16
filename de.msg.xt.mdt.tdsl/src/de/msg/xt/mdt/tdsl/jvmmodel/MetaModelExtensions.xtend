@@ -250,7 +250,10 @@ class MetaModelExtensions {
 		val exprBlock = expr.block
 		val index = expr.indexInParentBlock
 		if (index > 0) {
-			lastStatement = (exprBlock?.expressions?.get(index - 1) as StatementLine)?.statement
+			val expressions = exprBlock?.expressions
+			val offset = index - 1
+			val statement = (expressions?.get(offset)) as StatementLine
+			lastStatement = statement?.statement
 		} else {
 			val parentIndex = exprBlock?.indexInParentBlock
 			if (parentIndex == null || parentIndex == -1) {
@@ -269,7 +272,8 @@ class MetaModelExtensions {
 		val exprBlock = expr.block
 		val index = expr.indexInParentBlock
 		if (index > 0) {
-			lastStatement = (exprBlock?.expressions?.get(index - 1) as StatementLine)?.statement
+			val offset = index - 1
+			lastStatement = (exprBlock?.expressions?.get(offset) as StatementLine)?.statement
 			if (!lastStatement?.containsActivitySwitchingOperation) {
 				return lastStatement?.lastExpressionWithNextActivity
 			}

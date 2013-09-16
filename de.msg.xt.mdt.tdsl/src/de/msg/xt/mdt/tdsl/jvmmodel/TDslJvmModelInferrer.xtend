@@ -1023,6 +1023,8 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    					members += inputParam.toField(inputParam.name, inputParam.newTypeRef(inputParam.dataType.class_fqn)) [
    					it.annotations += inputParam.toAnnotation(typeof(XmlElement))
    					]
+   				} else {
+   					System::out.println("Can't determine use case input parameter type!")
    				}
    			}
    			

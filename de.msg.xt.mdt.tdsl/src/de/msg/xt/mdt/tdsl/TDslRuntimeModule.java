@@ -7,14 +7,16 @@ import org.eclipse.xtext.naming.IQualifiedNameProvider;
 import org.eclipse.xtext.resource.IDefaultResourceDescriptionStrategy;
 import org.eclipse.xtext.scoping.IScopeProvider;
 import org.eclipse.xtext.xbase.compiler.XbaseCompiler;
-import org.eclipse.xtext.xbase.typing.ITypeProvider;
+import org.eclipse.xtext.xbase.scoping.batch.IBatchScopeProvider;
+import org.eclipse.xtext.xbase.typesystem.computation.ITypeComputer;
 
 import de.msg.xt.mdt.tdsl.jvmmodel.TDslCompiler;
 import de.msg.xt.mdt.tdsl.jvmmodel.TDslQualifiedNameProvider;
+import de.msg.xt.mdt.tdsl.scoping.TDslBatchScopeProvider;
 import de.msg.xt.mdt.tdsl.scoping.TDslDefaultResourceDescriptionStrategy;
 import de.msg.xt.mdt.tdsl.scoping.TDslGlobalScopeProvider;
 import de.msg.xt.mdt.tdsl.scoping.TDslScopeProvider;
-import de.msg.xt.mdt.tdsl.typeprovider.TDslTypeProvider;
+import de.msg.xt.mdt.tdsl.typeprovider.TDslTypeComputer;
 
 /**
  * Use this class to register components to be used at runtime / without the
@@ -25,8 +27,8 @@ public class TDslRuntimeModule extends
 		de.msg.xt.mdt.tdsl.AbstractTDslRuntimeModule {
 
 	@Override
-	public Class<? extends ITypeProvider> bindITypeProvider() {
-		return TDslTypeProvider.class;
+	public Class<? extends ITypeComputer> bindITypeComputer() {
+		return TDslTypeComputer.class;
 	}
 
 	public Class<? extends XbaseCompiler> bindXbaseCompiler() {
@@ -36,6 +38,10 @@ public class TDslRuntimeModule extends
 	@Override
 	public Class<? extends IScopeProvider> bindIScopeProvider() {
 		return TDslScopeProvider.class;
+	}
+
+	public Class<? extends IBatchScopeProvider> bindIBatchScopeProvider() {
+		return TDslBatchScopeProvider.class;
 	}
 
 	@Override
