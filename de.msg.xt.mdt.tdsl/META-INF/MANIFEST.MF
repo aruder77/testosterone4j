@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: de.msg.xt.mdt.tdsl
 Bundle-Vendor: My Company
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 0.0.1.qualifier
 Bundle-SymbolicName: de.msg.xt.mdt.tdsl; singleton:=true
 Bundle-ActivationPolicy: lazy
 Require-Bundle: org.eclipse.xtext;visibility:=reexport,
@@ -21,7 +21,7 @@ Require-Bundle: org.eclipse.xtext;visibility:=reexport,
  org.apache.commons.logging;bundle-version="1.0.4",
  org.eclipse.xtend.lib,
  com.google.guava,
- de.msg.xt.mdt.tdsl.base;bundle-version="1.0.0";visibility:=reexport,
+ de.msg.xt.mdt.tdsl.base;bundle-version="0.0.1";visibility:=reexport,
  org.slf4j.api;bundle-version="1.7.2"
 Import-Package: org.apache.log4j,
  org.eclipse.xtext.xbase.lib

@@ -396,8 +396,30 @@
 				</reference>
 			</activeWhen>
 		</handler>
+		<handler
+            class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.xbase.ui.imports.OrganizeImportsHandler"
+            commandId="org.eclipse.xtext.xbase.ui.organizeImports">
+           	<activeWhen>
+				<reference
+					definitionId="de.msg.xt.mdt.tdsl.TDsl.Editor.opened">
+				</reference>
+			</activeWhen>
+        </handler>
 	</extension>
 	<extension point="org.eclipse.ui.menus">
+	    <menuContribution
+            locationURI="popup:#TextEditorContext?after=group.edit">
+             <command
+                 commandId="org.eclipse.xtext.xbase.ui.organizeImports"
+                 style="push"
+                 tooltip="Organize Imports">
+                <visibleWhen checkEnabled="false">
+                    <reference
+                        definitionId="de.msg.xt.mdt.tdsl.TDsl.Editor.opened">
+                    </reference>
+                </visibleWhen>
+            </command>  
+        </menuContribution>
 		<menuContribution
 			locationURI="popup:#TextEditorContext?after=group.open">
 			<command commandId="org.eclipse.xtext.xbase.ui.hierarchy.OpenTypeHierarchy"

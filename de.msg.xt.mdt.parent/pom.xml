@@ -4,6 +4,7 @@
 
 	<groupId>de.msg.xt.mdt</groupId>
 	<artifactId>de.msg.xt.mdt.tdsl.parent</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>BNE3 Client (POM)</name>
 	<description>This is the BNE3 client parent project</description>
@@ -25,6 +26,29 @@
 
 	<repositories>
 		<repository>
+			<id>kepler</id>
+			<layout>p2</layout>
+			<url>http://download.eclipse.org/releases/kepler</url>
+		</repository>
+		<repository>
+			<id>swt-bot</id>
+			<layout>p2</layout>
+			<url>http://download.eclipse.org/technology/swtbot/releases/latest/</url>
+		</repository>
+		<repository>
+			<id>Eclipse-Updates</id>
+			<layout>p2</layout>
+			<url>http://download.eclipse.org/eclipse/updates/4.3</url>
+		</repository>
+		<repository>
+			<id>Itemis</id>
+			<layout>p2</layout>
+			<url>http://download.itemis.com/updates</url>
+		</repository>
+	</repositories>
+
+	<!-- <repositories>
+		<repository>
 			<id>bne3.target</id>
 			<layout>p2</layout>
 			<url>http://libne3ci01.bmwgroup.net:11000/eclipse/com.bmw.bne3.target-3.0.4/</url>
@@ -34,7 +58,7 @@
 			<layout>p2</layout>
 			<url>http://libne3ci01.bmwgroup.net:11000/eclipse/de.msg.xt.mdt.update-site-1.0.0/</url>
 		</repository>
-	</repositories>
+	</repositories> -->
 
 	<build>
 		<defaultGoal>install</defaultGoal>
@@ -67,5 +91,4 @@
 			</plugin>
 		</plugins>
 	</build>
-	<version>0.0.1-SNAPSHOT</version>
 </project>

@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: de.msg.xt.mdt.tdsl.ui
 Bundle-Vendor: My Company
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 0.0.1.qualifier
 Bundle-SymbolicName: de.msg.xt.mdt.tdsl.ui; singleton:=true
 Bundle-ActivationPolicy: lazy
 Require-Bundle: de.msg.xt.mdt.tdsl;visibility:=reexport,

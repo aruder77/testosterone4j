@@ -2,7 +2,7 @@
 <feature
       id="de.msg.xt.mdt.tdsl.sdk"
       label="TDsl SDK Feature "
-      version="1.0.0.qualifier">
+      version="0.0.1.qualifier">
 
    <requires>
       <import feature="org.eclipse.xtext.sdk" version="2.3.1.v201208210947" match="greaterOrEqual"/>
@@ -38,20 +38,6 @@
 
    <plugin
          id="javax.inject"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="com.bmw.bne3.client.uitest.importer"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="com.bmw.smartfaces.model"
          download-size="0"
          install-size="0"
          version="0.0.0"

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/de.msg.xt.mdt.tdsl.runtime.feature_0.0.1.qualifier.jar" id="de.msg.xt.mdt.tdsl.runtime.feature" version="0.0.1.qualifier">
+      <category name="TDsl"/>
+   </feature>
+   <feature url="features/de.msg.xt.mdt.tdsl.sdk_0.0.1.qualifier.jar" id="de.msg.xt.mdt.tdsl.sdk" version="0.0.1.qualifier">
+      <category name="TDsl"/>
+   </feature>
+   <category-def name="TDsl" label="TDsl"/>
+</site>
