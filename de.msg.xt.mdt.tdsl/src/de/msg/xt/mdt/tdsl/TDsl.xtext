@@ -11,7 +11,8 @@ TestModel:
 
 PackageDeclaration:
     'package' name=QualifiedName ('for' sutRef=[Toolkit|FQN])? '{'
-    	(importSection=XImportSection)?
+    	(imports+=Import)*
+    	//importSection=XImportSection?
     	(elements+=Element)*
     '}';
     
@@ -26,6 +27,7 @@ FqnWithWildCard:
 Element:
 	Activity | UseCase | Control | Type | DataType | Test | TagsDeclaration | Toolkit | Predicate
 ;
+
 
 Toolkit:
 	'toolkit' name=ID 'using' 'controls' '{'

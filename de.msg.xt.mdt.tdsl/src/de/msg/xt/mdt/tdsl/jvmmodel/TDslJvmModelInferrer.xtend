@@ -72,6 +72,8 @@ import de.msg.xt.mdt.base.ControlField
 import de.msg.xt.mdt.base.IEvalutaionGroup
 import javax.xml.bind.annotation.XmlTransient
 import java.util.HashSet
+import org.eclipse.xtext.xbase.jvmmodel.IJvmModelAssociator
+import org.eclipse.xtext.xbase.lib.Functions.Function0
 
 /**
  * <p>Infers a JVM model from the source model.</p> 
@@ -102,6 +104,9 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 	@Inject
 	TypesFactory typesFactory;
 	
+	@Inject
+	IJvmModelAssociator associator;
+	
 	def dispatch void infer(PackageDeclaration pack, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
 		
 		for (element : pack.elements/* .filter([!(it instanceof Predicate)] ) */) {
@@ -127,7 +132,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 			]
 		} */
 	}
-
+	
 	def dispatch void infer(Toolkit toolkit, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
 		if (toolkit.activityAdapter_FQN != null) {
 			acceptor.accept(toolkit.toInterface(toolkit.activityAdapter_FQN, [])).initializeLater [
@@ -285,6 +290,13 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				]
    			]
    			
+   			members += activity.toMethod("getInjector", activity.newTypeRef(typeof(Injector))) [
+				setVisibility(JvmVisibility::PROTECTED)
+				body = [
+					it.append("return this.injector;")
+				]
+   			]
+   			
    			members += activity.toMethod("getFields", activity.newTypeRef(typeof(Set), activity.newTypeRef(typeof(ControlField)))) [
    				it.setBody [
    					it.append("java.util.Set set = new java.util.HashSet<ControlField>();").newLine
@@ -384,40 +396,29 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 						it.append(".class);")
 					}
 				} else {
-					operation.newTypeRef(typeof(Object)).serialize(operation, it)
-					it.append(" o = null;").newLine
-					it.append("if (contextAdapter != null) {").increaseIndentation.newLine
-					it.append(''' o = contextAdapter.«operation.name»(«FOR param : operation.params SEPARATOR ', '»«param.name».getValue()«ENDFOR»);''').decreaseIndentation.newLine
-					it.append("}").newLine
-					if (!voidReturn) {
-						operation.newTypeRef(nextActivityClass).serialize(operation, it)
-						it.append('''
-							 nextActivity = null;
-							if (o instanceof ''')
-						operation.newTypeRef(nextActivityClass).serialize(operation, it)
-						it.append(") {").increaseIndentation.newLine
-						it.append("nextActivity = (")
-						operation.newTypeRef(nextActivityClass).serialize(operation, it)
-						it.append(")o;").decreaseIndentation.newLine
-						it.append("} else {").increaseIndentation.newLine
-						operation.newTypeRef(nextActivityAdapterClass).serialize(operation, it)
-						it.append(" adapter = null;").newLine
-						it.append("if (contextAdapter != null) {").increaseIndentation.newLine
-						it.append("adapter = injector.getInstance(")
-						operation.newTypeRef(nextActivityAdapterClass).serialize(operation, it)
-						it.append('''
-							.class);
-							adapter.setContext(o);''').decreaseIndentation.newLine
-						it.append("}").newLine
-						it.append("nextActivity = new ")
-						operation.newTypeRef(nextActivityClass).serialize(operation, it)
-						it.append("(adapter);").decreaseIndentation.newLine
-						it.append('''
+					val function0TypeRef = operation.newTypeRef(Function0, operation.newTypeRef(typeof(Object)))
+					function0TypeRef.serialize(operation, it)
+					it.append(" functionCall = new ")
+					function0TypeRef.serialize(operation, it)
+					it.append('''
+						() {
+							@Override
+							public Object apply() {
+								return contextAdapter.«operation.name»(«FOR param : operation.params SEPARATOR ', '»«param.name».getValue()«ENDFOR»);
 							}
-							return nextActivity;''')					
-					}
+						};
+					''')
+					if (!voidReturn) {
+						it.append("return this.callContextAdapter(functionCall, ")
+						operation.newTypeRef(nextActivityClass).serialize(operation, it)
+						it.append(".class, ")
+						operation.newTypeRef(nextActivityAdapterClass).serialize(operation, it)
+						it.append(".class);")
+					}					
 				}
    			]
+   			if (operation.body != null)
+   				associator.associateLogicalContainer(operation.body, it)
    		]
    	}
    	
@@ -747,6 +748,35 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    			]
    			
    			if (dataType.type?.mappedBy != null) {
+   				
+   				for (clazz: dataType.classes) {
+   					if (clazz.value != null) {
+	   					members += dataType.toMethod(clazz.valueMethod_name, dataType.type.mappedBy) [
+	   						static = true
+   							body = clazz.value
+   						]
+   					} else if (clazz.values != null) {
+   						val expectedType = dataType.newTypeRef(typeof(Iterable), dataType.type.mappedBy)
+   						members += dataType.toMethod(clazz.valueMethod_name, expectedType) [
+	   						static = true
+   							body = clazz.values
+   						]
+   					} else {
+   						members += dataType.toMethod(clazz.valueMethod_name, dataType.type.mappedBy) [
+	   						static = true
+   							body = clazz.valueGenerator
+   						]
+   					}
+   					if (clazz.classPredicate != null) {
+   						val expectedType = dataType.newTypeRef(typeof(Functions$Function1), dataType.type.mappedBy, dataType.newTypeRef(typeof(Boolean)))
+   						members += dataType.toMethod(clazz.classPredicate_name, expectedType) [
+	   						static = true
+   							body = clazz.classPredicate
+   						]
+   					}
+   				}
+   				
+   				
    				members += dataType.toMethod("getValue", dataType.type.mappedBy) [
    					setBody [
 						it.append('''
@@ -760,21 +790,17 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 	        					case «clazz.name»:''').increaseIndentation.newLine
         					if (clazz.value != null) {
         						it.append("value = ")	
-        						val expectedType = dataType.type.mappedBy
-        						xbaseCompiler.compileAsJavaExpression(clazz.value, it, expectedType)
+        						it.append(clazz.valueMethod_name + "()")
         					} else if (clazz.values != null) {
         						dataType.newTypeRef(typeof(Iterable), dataType.type.mappedBy).serialize(dataType, it)
         						it.append(''' «clazz.name.toFirstLower»Iterable = ''')
-        						val expectedType = dataType.newTypeRef(typeof(Iterable), dataType.type.mappedBy)
-        						xbaseCompiler.compileAsJavaExpression(clazz.values, it, expectedType)
+        						it.append(clazz.valueMethod_name + "()")
         						it.append(";").newLine
         						it.append("value = ")
         						dataType.newTypeRef(typeof(TDslHelper)).serialize(dataType, it)
-        						it.append('''.selectRandom(«clazz.name.toFirstLower»Iterable.iterator());''')
+        						it.append('''.selectRandom(«clazz.name.toFirstLower»Iterable.iterator())''')
         					} else if (clazz.valueGenerator != null) {
-        						it.append("value = ")	
-        						val expectedType = dataType.type.mappedBy
-        						xbaseCompiler.compileAsJavaExpression(clazz.valueGenerator, it, expectedType)        						
+        						it.append('''value = «clazz.valueMethod_name»()''')	
         					}
         					
         					it.append('''
@@ -821,18 +847,14 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 					        if (value != null) {''').increaseIndentation.newLine
 					    for (clazz : dataType.classes) {
 					    	if (clazz.value != null) {
-					    		it.append("if (value.equals(")
-						    	xbaseCompiler.compileAsJavaExpression(clazz.value, it, dataType.type.mappedBy)
-					    	    it.append('''
-					        		)) {
-					        			return «clazz.name»;
-					        		}
-					        	''')
+					    		it.append('''
+					    			if (value.equals(«clazz.valueMethod_name»())) {
+					    				return «clazz.name»;
+					    			}''')
 					        } else if (clazz.values != null) {
         						val expectedType = dataType.newTypeRef(typeof(Iterable), dataType.type.mappedBy)
 					        	expectedType.serialize(dataType, it)
-        						it.append(''' «clazz.name.toFirstLower»Iterable = ''')
-        						xbaseCompiler.compileAsJavaExpression(clazz.values, it, expectedType)
+        						it.append(''' «clazz.name.toFirstLower»Iterable = «clazz.valueMethod_name»()''')
         						it.append(";").newLine
         						dataType.newTypeRef(typeof(Iterator), dataType.type.mappedBy).serialize(dataType, it)
         						it.append(''' «clazz.name.toFirstLower»Iterator = «clazz.name.toFirstLower»Iterable.iterator();''')
@@ -843,11 +865,8 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
         								}
         							}''')        						
 					        } else if (clazz.valueGenerator != null) {
-					        	it.append("if (")
-					        	val expectedType = dataType.newTypeRef(typeof(Functions$Function1), dataType.type.mappedBy, dataType.newTypeRef(typeof(Boolean)))
-        						xbaseCompiler.compileAsJavaExpression(clazz.classPredicate, it, expectedType)
 					        	it.append('''
-					        		.apply(value)) {
+					        		if («clazz.classPredicate_name»().apply(value)) {
 					        			return «clazz.name»;
 					        		}''')
 					        }
@@ -855,7 +874,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 					    it.decreaseIndentation.newLine.append('''
 					    	}
 					    	return null;''')
-   					]   				
+   					]   		
    				}
    			]
    		]
@@ -990,9 +1009,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 				val valueTagRef = predicate.newTypeRef(typeof(Set), predicate.newTypeRef(typeof(Tag)))
 				members += predicate.toMethod("predicateFunction", predicate.newTypeRef(typeof(Functions$Function2), fieldTagRef, valueTagRef, predicate.newTypeRef(typeof(Boolean)))) [
 					it.setStatic(true)
-					body = [
-						xbaseCompiler.compile(predicate.body, it, predicate.newTypeRef(typeof(Functions$Function2), fieldTagRef, valueTagRef,  predicate.newTypeRef(typeof(Boolean))))
-					]
+					body = predicate.body
 				]
 				
    			]
@@ -1099,6 +1116,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    						it.append('''return («returnType»)activity;''')
    					}
    				]
+ 				associator.associateLogicalContainer(useCase.block, it)
    			]   			   			
    		]
    	}

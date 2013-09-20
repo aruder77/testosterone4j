@@ -20,6 +20,7 @@ import org.eclipse.xtext.common.types.util.TypeReferences
 import org.eclipse.xtext.xbase.XExpression
 import org.eclipse.xtext.xbase.annotations.typesystem.XbaseWithAnnotationsTypeComputer
 import org.eclipse.xtext.xbase.typesystem.computation.ITypeComputationState
+import de.msg.xt.mdt.tdsl.jvmmodel.NamingExtensions
 
 @Singleton
 class TDslTypeComputer extends XbaseWithAnnotationsTypeComputer {
@@ -52,7 +53,8 @@ class TDslTypeComputer extends XbaseWithAnnotationsTypeComputer {
 	protected def _computeTypes(Assert assert, ITypeComputationState state) {
 		if (assert?.expression == null)
 			state.acceptActualType(getTypeForName(Void::TYPE, state))
-		super.computeTypes(assert?.expression, state)
+		else 
+			computeTypes(assert?.expression, state)
 	}
 	
 	protected def _computeTypes(OperationCall opCall, 
@@ -63,7 +65,9 @@ class TDslTypeComputer extends XbaseWithAnnotationsTypeComputer {
   	
 	protected def _computeTypes(StatementLine expr, 
                     ITypeComputationState state) {
-  		super.computeTypes(expr?.statement, state)
+		if (expr?.statement == null)
+			state.acceptActualType(getTypeForName(Void::TYPE, state))
+  		computeTypes(expr.statement, state)
   	}
   	
 	protected def _computeTypes(GeneratedValueExpression expr, 

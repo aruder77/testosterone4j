@@ -21,6 +21,7 @@ import de.msg.xt.mdt.tdsl.tDsl.PackageDeclaration
 import de.msg.xt.mdt.base.ActivityAdapter
 import de.msg.xt.mdt.tdsl.tDsl.SubUseCaseCall
 import de.msg.xt.mdt.tdsl.tDsl.Predicate
+import de.msg.xt.mdt.tdsl.tDsl.EquivalenceClass
 
 class NamingExtensions {
 	
@@ -118,6 +119,16 @@ class NamingExtensions {
 		val paramName = dataTypeMapping?.name?.name
 		val variableName = (fieldName + '.' + operationName + '.' + paramName).toFieldName
 		variableName
+	}
+	
+	// EquivalenceClass
+	
+	def String valueMethod_name(EquivalenceClass clazz) {
+		"get" + clazz.name.toFirstUpper + "Value"
+	}
+	
+	def String classPredicate_name(EquivalenceClass clazz) {
+		"get" + clazz.name.toFirstUpper + "Predicate"
 	}
 
 	// Field

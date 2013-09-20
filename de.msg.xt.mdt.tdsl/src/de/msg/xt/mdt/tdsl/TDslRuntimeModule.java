@@ -7,6 +7,7 @@ import org.eclipse.xtext.naming.IQualifiedNameProvider;
 import org.eclipse.xtext.resource.IDefaultResourceDescriptionStrategy;
 import org.eclipse.xtext.scoping.IScopeProvider;
 import org.eclipse.xtext.xbase.compiler.XbaseCompiler;
+import org.eclipse.xtext.xbase.featurecalls.IdentifiableSimpleNameProvider;
 import org.eclipse.xtext.xbase.scoping.batch.IBatchScopeProvider;
 import org.eclipse.xtext.xbase.typesystem.computation.ITypeComputer;
 
@@ -15,6 +16,7 @@ import de.msg.xt.mdt.tdsl.jvmmodel.TDslQualifiedNameProvider;
 import de.msg.xt.mdt.tdsl.scoping.TDslBatchScopeProvider;
 import de.msg.xt.mdt.tdsl.scoping.TDslDefaultResourceDescriptionStrategy;
 import de.msg.xt.mdt.tdsl.scoping.TDslGlobalScopeProvider;
+import de.msg.xt.mdt.tdsl.scoping.TDslIdentifiableSimpleNameProvider;
 import de.msg.xt.mdt.tdsl.scoping.TDslScopeProvider;
 import de.msg.xt.mdt.tdsl.typeprovider.TDslTypeComputer;
 
@@ -58,4 +60,10 @@ public class TDslRuntimeModule extends
 	public Class<? extends org.eclipse.xtext.scoping.IGlobalScopeProvider> bindIGlobalScopeProvider() {
 		return TDslGlobalScopeProvider.class;
 	}
+
+	@Override
+	public Class<? extends IdentifiableSimpleNameProvider> bindIdentifiableSimpleNameProvider() {
+		return TDslIdentifiableSimpleNameProvider.class;
+	}
+
 }

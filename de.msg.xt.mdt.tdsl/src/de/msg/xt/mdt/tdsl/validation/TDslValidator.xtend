@@ -13,6 +13,7 @@ import org.eclipse.xtext.common.types.JvmType
 import org.eclipse.xtext.validation.Check
 import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder
 import org.eclipse.xtext.xbase.typing.ITypeProvider
+import org.eclipse.xtext.xbase.XExpression
 
 class TDslValidator extends AbstractTDslValidator {
 	
@@ -24,6 +25,9 @@ class TDslValidator extends AbstractTDslValidator {
 	
 	@Inject extension ITypeProvider
 	@Inject extension JvmTypesBuilder
+
+
+	
 	
 	@Check
 	def checkFirstUpperCaseActivities(Activity act) {
