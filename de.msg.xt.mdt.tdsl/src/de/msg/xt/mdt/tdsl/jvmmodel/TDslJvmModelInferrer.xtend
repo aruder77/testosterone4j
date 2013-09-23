@@ -74,6 +74,8 @@ import javax.xml.bind.annotation.XmlTransient
 import java.util.HashSet
 import org.eclipse.xtext.xbase.jvmmodel.IJvmModelAssociator
 import org.eclipse.xtext.xbase.lib.Functions.Function0
+import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationCall
+import de.msg.xt.mdt.tdsl.tDsl.StatementLine
 
 /**
  * <p>Infers a JVM model from the source model.</p> 
@@ -96,6 +98,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 	
 	@Inject extension NamingExtensions fqn
 	@Inject extension MetaModelExtensions
+	@Inject extension UtilExtensions 
 	
 	
 	@Inject
@@ -341,29 +344,11 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    		if (operation?.name == null) {
    			return null
    		}
-   		var JvmTypeReference returnTypeRef
-   		var Boolean voidReturnType = false
-   		var String nextActivityClassVar 
-   		var String nextActivityAdapterClassVar
-   		if (operation.nextActivities.empty) {
-   			nextActivityClassVar = operation.activity.class_fqn
-   			nextActivityAdapterClassVar = operation.activity.adapterInterface_fqn
-   			returnTypeRef = operation.newTypeRef(nextActivityClassVar)
-   		} else {
-   			val condNext = operation.nextActivities.get(0)
-   			val Activity nextActivity = condNext.next
-   			nextActivityClassVar = nextActivity?.class_fqn
-   			nextActivityAdapterClassVar = nextActivity?.adapterInterface_fqn
-   			if (nextActivityClassVar != null) {
-   				returnTypeRef = operation.newTypeRef(nextActivityClassVar)
-   			} else {
-   				returnTypeRef = operation.newTypeRef(Void::TYPE)
-   				voidReturnType = true
-   			}
-   		}
-   		val voidReturn = voidReturnType
-   		val nextActivityClass = nextActivityClassVar
-   		val nextActivityAdapterClass = nextActivityAdapterClassVar
+   		
+   		val nextActivityClass = operation.returnedActivity?.class_fqn
+   		val nextActivityAdapterClass = operation.returnedActivity?.adapterInterface_fqn
+   		val returnTypeRef = if (nextActivityClass != null) operation.newTypeRef(nextActivityClass) else operation.newTypeRef(Void::TYPE)
+
    		operation.toMethod(operation.name, returnTypeRef) [
   			for (param : operation.params) {
 				if (param?.dataType?.class_fqn != null) {
@@ -371,31 +356,22 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    				}
    			}
    			
-   			it.setBody [
-   				it.append('''
-   				    this.protocol.appendActivityOperationCall(this.getClass().getName(), "«operation.name»", null«appendActivityParameter(operation.params)»);
-				''')
-				if (operation.body != null) {
-   					operation.newTypeRef(typeof(Stack), operation.newTypeRef(typeof(AbstractActivity))).serialize(operation, it);
-   					it.append(" stack = new Stack<AbstractActivity>();").newLine
-					operation.newTypeRef(typeof(AbstractActivity)).serialize(operation, it)
-					it.append(" activity = this;")
-					var expectedReturnType = operation.newTypeRef(Void::TYPE)
-					if (!voidReturn) {
-						expectedReturnType = operation.newTypeRef(typeof(Object))
-					}
-					xbaseCompiler.compile(operation.body, it, expectedReturnType)
-
-					if (!voidReturn) {
-						it.newLine.append("return ");
-						operation.newTypeRef(typeof(TDslHelper)).serialize(operation, it)
-						it.append(".castActivity(injector, activity, ")										
-						operation.newTypeRef(nextActivityClass).serialize(operation, it)
-						it.append(".class, ")
-						operation.newTypeRef(nextActivityAdapterClass).serialize(operation, it)
-						it.append(".class);")
-					}
-				} else {
+   			if (operation.body != null) {
+	   			body = operation.body
+	   			
+	   			for (expression: operation.body.expressions) {
+	   				val stmtLine = expression as StatementLine
+	   				if (stmtLine.statement instanceof ActivityOperationCall) {
+	   					val opCall = stmtLine.statement as ActivityOperationCall
+	   					for (param: opCall.paramAssignment)
+	   						associator.associateLogicalContainer(param.value, it)
+	   				}
+	   			}	
+	   		} else {
+				body = [
+   					it.append('''
+   				    	this.protocol.appendActivityOperationCall(this.getClass().getName(), "«operation.name»", null«appendActivityParameter(operation.params)»);
+					''')
 					val function0TypeRef = operation.newTypeRef(Function0, operation.newTypeRef(typeof(Object)))
 					function0TypeRef.serialize(operation, it)
 					it.append(" functionCall = new ")
@@ -408,17 +384,15 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 							}
 						};
 					''')
-					if (!voidReturn) {
+					if (nextActivityAdapterClass != null) {
 						it.append("return this.callContextAdapter(functionCall, ")
 						operation.newTypeRef(nextActivityClass).serialize(operation, it)
 						it.append(".class, ")
 						operation.newTypeRef(nextActivityAdapterClass).serialize(operation, it)
 						it.append(".class);")
 					}					
-				}
-   			]
-   			if (operation.body != null)
-   				associator.associateLogicalContainer(operation.body, it)
+				]
+	   		}
    		]
    	}
    	

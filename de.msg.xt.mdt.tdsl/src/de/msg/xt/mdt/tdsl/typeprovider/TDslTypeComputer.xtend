@@ -1,7 +1,10 @@
 package de.msg.xt.mdt.tdsl.typeprovider
 
 import com.google.inject.Singleton
+import de.msg.xt.mdt.tdsl.jvmmodel.MetaModelExtensions
 import de.msg.xt.mdt.tdsl.jvmmodel.NamingExtensions
+import de.msg.xt.mdt.tdsl.jvmmodel.UtilExtensions
+import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationBlock
 import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationCall
 import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationParameter
 import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationParameterAssignment
@@ -18,9 +21,13 @@ import javax.inject.Inject
 import org.eclipse.xtext.common.types.JvmTypeReference
 import org.eclipse.xtext.common.types.util.TypeReferences
 import org.eclipse.xtext.xbase.XExpression
+import org.eclipse.xtext.xbase.XVariableDeclaration
 import org.eclipse.xtext.xbase.annotations.typesystem.XbaseWithAnnotationsTypeComputer
+import org.eclipse.xtext.xbase.jvmmodel.IJvmModelAssociations
 import org.eclipse.xtext.xbase.typesystem.computation.ITypeComputationState
-import de.msg.xt.mdt.tdsl.jvmmodel.NamingExtensions
+import org.eclipse.xtext.xbase.typesystem.computation.ITypeExpectation
+import org.eclipse.xtext.xbase.typesystem.conformance.ConformanceHint
+import org.eclipse.xtext.xbase.typesystem.references.AnyTypeReference
 
 @Singleton
 class TDslTypeComputer extends XbaseWithAnnotationsTypeComputer {
@@ -28,6 +35,10 @@ class TDslTypeComputer extends XbaseWithAnnotationsTypeComputer {
 	@Inject TypeReferences typeReferences
 	
 	@Inject extension NamingExtensions
+	@Inject extension MetaModelExtensions
+	@Inject extension UtilExtensions
+	
+	@Inject extension IJvmModelAssociations
 	
 
 	override computeTypes(XExpression expression, ITypeComputationState state) {
@@ -45,6 +56,8 @@ class TDslTypeComputer extends XbaseWithAnnotationsTypeComputer {
 			_computeTypes(expression as SubUseCaseCall, state);
 		} else if(expression instanceof GenerationSelektor) {
 			_computeTypes(expression as GenerationSelektor, state);
+		} else if(expression instanceof ActivityOperationBlock) {
+			_computeTypes(expression as ActivityOperationBlock, state);
 		} else {
 			super.computeTypes(expression, state)
 		}
@@ -68,6 +81,35 @@ class TDslTypeComputer extends XbaseWithAnnotationsTypeComputer {
 		if (expr?.statement == null)
 			state.acceptActualType(getTypeForName(Void::TYPE, state))
   		computeTypes(expr.statement, state)
+  	}
+  	
+  	protected def _computeTypes(ActivityOperationBlock block, ITypeComputationState state) {
+  		var nextActivityClass = block.activityOperation.returnedActivity?.class_fqn
+  		nextActivityClass = null
+  		val returnType = if (nextActivityClass != null) typeReferences.getTypeForName(nextActivityClass, block) else typeReferences.getTypeForName(Void::TYPE, block)
+
+		for (ITypeExpectation expectation: state.getExpectations()) {
+			val expectedType = expectation.getExpectedType();
+			val expressions = block.getExpressions();
+			if (!expressions.isEmpty()) {
+				for(XExpression expression: expressions) {
+					val expressionState = state.withoutExpectation();
+					expressionState.computeTypes(expression);
+					if (expression instanceof XVariableDeclaration) {
+						addLocalToCurrentScope(expression as XVariableDeclaration, state);
+					} else if (expression instanceof StatementLine) {
+						val stmtLine = expression as StatementLine
+						if (stmtLine.statement instanceof XVariableDeclaration) {
+							addLocalToCurrentScope(stmtLine.statement as XVariableDeclaration, state)
+						}
+					}
+				}
+			}
+			expectation.acceptActualType(expectedType, ConformanceHint.CHECKED, ConformanceHint.SUCCESS);
+		}
+
+  		val assignedType = state.converter.toLightweightReference(returnType)
+  		state.acceptActualType(assignedType)
   	}
   	
 	protected def _computeTypes(GeneratedValueExpression expr, 

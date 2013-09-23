@@ -140,6 +140,7 @@
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TDsl.ecore#//UseCase/block"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TDsl.ecore#//UseCase/nextActivity"/>
     </genClasses>
+    <genClasses ecoreClass="TDsl.ecore#//ActivityOperationBlock"/>
     <genClasses ecoreClass="TDsl.ecore#//GenerationSelektor">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference TDsl.ecore#//GenerationSelektor/tags"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TDsl.ecore#//GenerationSelektor/expression"/>

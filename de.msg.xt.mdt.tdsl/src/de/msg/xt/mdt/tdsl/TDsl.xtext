@@ -89,7 +89,12 @@ ActivityOperationParameter:
 ;
 
 ActivityOperation:
-	'op' (returnType=[DataType|FQN])? name=ID ('(' params+=ActivityOperationParameter (',' params+=ActivityOperationParameter)* ')')? (body=UseCaseBlock)? (nextActivities+=ConditionalNextActivity)* 
+	'op' (returnType=[DataType|FQN])? name=ID ('(' params+=ActivityOperationParameter (',' params+=ActivityOperationParameter)* ')')? (body=ActivityOperationBlock)? (nextActivities+=ConditionalNextActivity)* 
+;
+
+ActivityOperationBlock returns xbase::XBlockExpression:
+	{ActivityOperationBlock}
+  	'{' (expressions+=StatementLine)* '}'
 ;
 
 Field:

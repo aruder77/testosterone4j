@@ -28,6 +28,10 @@ import de.msg.xt.mdt.tdsl.tDsl.ParameterAssignment
 import de.msg.xt.mdt.tdsl.tDsl.Parameter
 import java.util.Set
 import org.eclipse.xtext.xbase.XAbstractFeatureCall
+import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationBlock
+import java.util.Stack
+import de.msg.xt.mdt.base.AbstractActivity
+import de.msg.xt.mdt.base.util.TDslHelper
 
 class TDslCompiler extends XbaseCompiler {
 	
@@ -130,6 +134,35 @@ class TDslCompiler extends XbaseCompiler {
     			append("if (this.generator == null) {").increaseIndentation
     			expr.expression.doInternalToJavaStatement(it, false)
     			decreaseIndentation.newLine.append("}")
+    		}
+    		ActivityOperationBlock: {
+    			val nextActivityClass = expr.activityOperation.returnedActivity?.class_fqn
+    			val nextActivityAdapterClass = expr.activityOperation.returnedActivity?.adapterInterface_fqn
+    			
+   				expr.newTypeRef(typeof(Stack), expr.newTypeRef(typeof(AbstractActivity))).serialize(expr, it);
+   				it.append(" stack = new Stack<AbstractActivity>();").newLine
+				expr.newTypeRef(typeof(AbstractActivity)).serialize(expr, it)
+				it.append(" activity = this;")
+				var expectedReturnType = expr.newTypeRef(Void::TYPE)
+				if (nextActivityAdapterClass != null) {
+					expectedReturnType = expr.newTypeRef(typeof(Object))
+				}
+					
+				super.doInternalToJavaStatement(expr, it, false)
+				
+				it.declareVariable(expr, "nextActivity")
+
+				if (nextActivityAdapterClass != null) {
+					expr.newTypeRef(nextActivityClass).serialize(expr, it)
+					it.append(" ")
+					it.append(it.getName(expr)).append(" = ")
+					expr.newTypeRef(typeof(TDslHelper)).serialize(expr, it)
+					it.append(".castActivity(injector, activity, ")										
+					expr.newTypeRef(nextActivityClass).serialize(expr, it)
+					it.append(".class, ")
+					expr.newTypeRef(nextActivityAdapterClass).serialize(expr, it)
+					it.append(".class);")
+				}
     		}
     		/*XAbstractFeatureCall: {
     			if (isReferenced && isVariableDeclarationRequired(expr, it)) {
@@ -292,17 +325,16 @@ class TDslCompiler extends XbaseCompiler {
 				appendable.append('''.class, "«parameter.fullyQualifiedName»")''')
 			} else {
 				val expectedType = typeRefs.getTypeForName(dataTypeName, call)
-				if (assignment.value?.type?.type == null || expectedType == null) {
-					System::out.println("NULL value!")
-				}
-				if (!assignment.value.type.type.equals(expectedType.type)) {
-					appendable.append("new ")
-					parameter.newTypeRef(dataTypeName).serialize(parameter, appendable)			
-					appendable.append("(")
-				}
-				compileAsJavaExpression(assignment.value, appendable, assignment.value.type)
-				if (!assignment.value.type.type.equals(expectedType.type)) {
-					appendable.append(", null)")
+				if (assignment.value?.type?.type != null && expectedType != null) {
+					if (!assignment.value.type.type.equals(expectedType.type)) {
+						appendable.append("new ")
+						parameter.newTypeRef(dataTypeName).serialize(parameter, appendable)			
+						appendable.append("(")
+					}
+					compileAsJavaExpression(assignment.value, appendable, assignment.value.type)
+					if (!assignment.value.type.type.equals(expectedType.type)) {
+						appendable.append(", null)")
+					}
 				}
 			}    		
 			appendable.append(";")
