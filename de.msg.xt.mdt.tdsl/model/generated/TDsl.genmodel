@@ -145,6 +145,7 @@
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference TDsl.ecore#//GenerationSelektor/tags"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TDsl.ecore#//GenerationSelektor/expression"/>
     </genClasses>
+    <genClasses ecoreClass="TDsl.ecore#//UseCaseBlock"/>
     <genClasses ecoreClass="TDsl.ecore#//StatementLine">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TDsl.ecore#//StatementLine/statement"/>
     </genClasses>

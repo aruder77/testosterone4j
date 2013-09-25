@@ -1,26 +1,59 @@
 package de.msg.xt.mdt.tdsl.jvmmodel
 
 import com.google.inject.Inject
+import com.google.inject.Injector
+import de.msg.xt.mdt.base.AbstractActivity
+import de.msg.xt.mdt.base.ActivityAdapter
+import de.msg.xt.mdt.base.ActivityLocator
+import de.msg.xt.mdt.base.BaseUseCase
+import de.msg.xt.mdt.base.ControlField
+import de.msg.xt.mdt.base.EquivalenceClass
+import de.msg.xt.mdt.base.GenerationHelper
+import de.msg.xt.mdt.base.Generator
+import de.msg.xt.mdt.base.IEvalutaionGroup
+import de.msg.xt.mdt.base.ITestProtocol
+import de.msg.xt.mdt.base.Parameters
+import de.msg.xt.mdt.base.TDslParameterized
+import de.msg.xt.mdt.base.Tag
+import de.msg.xt.mdt.base.TestDescriptor
+import de.msg.xt.mdt.base.util.TDslHelper
 import de.msg.xt.mdt.tdsl.tDsl.Activity
+import de.msg.xt.mdt.tdsl.tDsl.ActivityOperation
+import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationCall
+import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationParameter
 import de.msg.xt.mdt.tdsl.tDsl.ConditionalNextActivity
 import de.msg.xt.mdt.tdsl.tDsl.Control
 import de.msg.xt.mdt.tdsl.tDsl.DataType
+import de.msg.xt.mdt.tdsl.tDsl.DataTypeMapping
+import de.msg.xt.mdt.tdsl.tDsl.Element
 import de.msg.xt.mdt.tdsl.tDsl.Field
 import de.msg.xt.mdt.tdsl.tDsl.Operation
 import de.msg.xt.mdt.tdsl.tDsl.OperationCall
 import de.msg.xt.mdt.tdsl.tDsl.PackageDeclaration
 import de.msg.xt.mdt.tdsl.tDsl.Parameter
+import de.msg.xt.mdt.tdsl.tDsl.Predicate
+import de.msg.xt.mdt.tdsl.tDsl.StatementLine
 import de.msg.xt.mdt.tdsl.tDsl.TagsDeclaration
+import de.msg.xt.mdt.tdsl.tDsl.Test
+import de.msg.xt.mdt.tdsl.tDsl.Toolkit
 import de.msg.xt.mdt.tdsl.tDsl.UseCase
 import java.util.Collection
+import java.util.HashSet
+import java.util.Iterator
+import java.util.List
+import java.util.Set
+import java.util.Stack
 import javax.xml.bind.annotation.XmlAttribute
+import javax.xml.bind.annotation.XmlElement
 import javax.xml.bind.annotation.XmlRootElement
+import javax.xml.bind.annotation.XmlTransient
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.jdt.annotation.Nullable
 import org.eclipse.xtext.common.types.JvmAnnotationReference
 import org.eclipse.xtext.common.types.JvmAnnotationType
 import org.eclipse.xtext.common.types.JvmConstructor
 import org.eclipse.xtext.common.types.JvmEnumerationType
+import org.eclipse.xtext.common.types.JvmGenericType
 import org.eclipse.xtext.common.types.JvmOperation
 import org.eclipse.xtext.common.types.JvmType
 import org.eclipse.xtext.common.types.JvmTypeAnnotationValue
@@ -30,52 +63,20 @@ import org.eclipse.xtext.common.types.TypesFactory
 import org.eclipse.xtext.common.types.util.TypeReferences
 import org.eclipse.xtext.naming.IQualifiedNameProvider
 import org.eclipse.xtext.xbase.XExpression
+import org.eclipse.xtext.xbase.compiler.TypeReferenceSerializer
 import org.eclipse.xtext.xbase.compiler.XbaseCompiler
 import org.eclipse.xtext.xbase.compiler.output.ITreeAppendable
 import org.eclipse.xtext.xbase.jvmmodel.AbstractModelInferrer
 import org.eclipse.xtext.xbase.jvmmodel.IJvmDeclaredTypeAcceptor
-import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder
-import org.eclipse.xtext.xbase.lib.Procedures$Procedure1
-import de.msg.xt.mdt.tdsl.tDsl.Test
-import de.msg.xt.mdt.tdsl.tDsl.ActivityOperation
-import de.msg.xt.mdt.tdsl.tDsl.DataTypeMapping
-import java.util.List
-import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationParameter
-import org.eclipse.xtext.common.types.JvmGenericType
-import de.msg.xt.mdt.tdsl.tDsl.Toolkit
-import org.eclipse.xtext.xbase.lib.Functions$Function1
-import org.junit.After
-import org.eclipse.xtext.xbase.compiler.TypeReferenceSerializer
-import com.google.inject.Injector
-import de.msg.xt.mdt.base.ActivityLocator
-import de.msg.xt.mdt.base.ITestProtocol
-import de.msg.xt.mdt.base.AbstractActivity
-import de.msg.xt.mdt.base.TDslParameterized
-import org.junit.runner.RunWith
-import de.msg.xt.mdt.base.TestDescriptor
-import de.msg.xt.mdt.base.EquivalenceClass
-import de.msg.xt.mdt.base.Tag
-import de.msg.xt.mdt.base.BaseUseCase
-import de.msg.xt.mdt.base.Generator
-import de.msg.xt.mdt.base.ActivityAdapter
-import de.msg.xt.mdt.base.Parameters
-import de.msg.xt.mdt.base.GenerationHelper
-import de.msg.xt.mdt.base.util.TDslHelper
-import java.util.Iterator
-import javax.xml.bind.annotation.XmlElement
-import java.util.Stack
-import de.msg.xt.mdt.tdsl.tDsl.Predicate
-import de.msg.xt.mdt.tdsl.tDsl.Element
-import org.eclipse.xtext.xbase.lib.Functions$Function2
-import java.util.Set
-import de.msg.xt.mdt.base.ControlField
-import de.msg.xt.mdt.base.IEvalutaionGroup
-import javax.xml.bind.annotation.XmlTransient
-import java.util.HashSet
 import org.eclipse.xtext.xbase.jvmmodel.IJvmModelAssociator
+import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder
 import org.eclipse.xtext.xbase.lib.Functions.Function0
-import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationCall
-import de.msg.xt.mdt.tdsl.tDsl.StatementLine
+import org.eclipse.xtext.xbase.lib.Functions.Function1
+import org.eclipse.xtext.xbase.lib.Functions.Function2
+import org.eclipse.xtext.xbase.lib.Procedures.Procedure1
+import org.junit.After
+import org.junit.runner.RunWith
+import org.eclipse.xtext.xbase.XBlockExpression
 
 /**
  * <p>Infers a JVM model from the source model.</p> 
@@ -359,14 +360,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    			if (operation.body != null) {
 	   			body = operation.body
 	   			
-	   			for (expression: operation.body.expressions) {
-	   				val stmtLine = expression as StatementLine
-	   				if (stmtLine.statement instanceof ActivityOperationCall) {
-	   					val opCall = stmtLine.statement as ActivityOperationCall
-	   					for (param: opCall.paramAssignment)
-	   						associator.associateLogicalContainer(param.value, it)
-	   				}
-	   			}	
+	   			operation.body.associateChildExpressions(it)	
 	   		} else {
 				body = [
    					it.append('''
@@ -395,6 +389,17 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 	   		}
    		]
    	}
+				
+				def associateChildExpressions(XBlockExpression block, JvmOperation it) {
+					for (expression: block.expressions) {
+						   				val stmtLine = expression as StatementLine
+						   				if (stmtLine.statement instanceof ActivityOperationCall) {
+						   					val opCall = stmtLine.statement as ActivityOperationCall
+						   					for (param: opCall.paramAssignment)
+						   						associator.associateLogicalContainer(param.value, it)
+						   				}
+						   			}
+				}
    	
    	def JvmOperation toActivityDelegationMethod(Operation operation, Field field) {
    		if (field == null || operation == null)
@@ -1090,7 +1095,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    						it.append('''return («returnType»)activity;''')
    					}
    				]
- 				associator.associateLogicalContainer(useCase.block, it)
+   				useCase.block.associateChildExpressions(it)
    			]   			   			
    		]
    	}

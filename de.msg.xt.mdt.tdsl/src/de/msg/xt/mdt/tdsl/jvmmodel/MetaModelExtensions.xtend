@@ -222,6 +222,14 @@ class MetaModelExtensions {
 		}
 	}
 	
+	// UseCase
+	def Activity returnedActivity(UseCase useCase) {
+		if (useCase?.nextActivity?.next != null) 
+			useCase.nextActivity.next
+		else
+			useCase?.initialActivity
+	}
+	
 	
 	// XExpression
 	

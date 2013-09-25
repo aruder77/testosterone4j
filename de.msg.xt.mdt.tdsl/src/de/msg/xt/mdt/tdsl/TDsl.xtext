@@ -167,7 +167,7 @@ UseCase:
 ;
 
 UseCaseBlock returns xbase::XBlockExpression:
-	{xbase::XBlockExpression}
+	{UseCaseBlock}
   	'{' (expressions+=StatementLine)* '}'
 ;
 

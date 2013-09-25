@@ -1,6 +1,10 @@
 package de.msg.xt.mdt.tdsl.jvmmodel
 
+import de.msg.xt.mdt.base.AbstractActivity
+import de.msg.xt.mdt.base.Tag
+import de.msg.xt.mdt.base.util.TDslHelper
 import de.msg.xt.mdt.tdsl.tDsl.Activity
+import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationBlock
 import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationCall
 import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationParameter
 import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationParameterAssignment
@@ -13,25 +17,23 @@ import de.msg.xt.mdt.tdsl.tDsl.GeneratedValueExpression
 import de.msg.xt.mdt.tdsl.tDsl.GenerationSelektor
 import de.msg.xt.mdt.tdsl.tDsl.OperationCall
 import de.msg.xt.mdt.tdsl.tDsl.OperationParameterAssignment
+import de.msg.xt.mdt.tdsl.tDsl.Parameter
+import de.msg.xt.mdt.tdsl.tDsl.ParameterAssignment
 import de.msg.xt.mdt.tdsl.tDsl.StatementLine
 import de.msg.xt.mdt.tdsl.tDsl.SubUseCaseCall
+import de.msg.xt.mdt.tdsl.tDsl.UseCaseBlock
+import java.util.Set
+import java.util.Stack
 import javax.inject.Inject
 import org.eclipse.xtext.common.types.util.TypeReferences
 import org.eclipse.xtext.naming.IQualifiedNameProvider
+import org.eclipse.xtext.xbase.XAbstractFeatureCall
 import org.eclipse.xtext.xbase.XExpression
 import org.eclipse.xtext.xbase.compiler.XbaseCompiler
 import org.eclipse.xtext.xbase.compiler.output.ITreeAppendable
 import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder
 import org.eclipse.xtext.xbase.typing.ITypeProvider
-import de.msg.xt.mdt.base.Tag
-import de.msg.xt.mdt.tdsl.tDsl.ParameterAssignment
-import de.msg.xt.mdt.tdsl.tDsl.Parameter
-import java.util.Set
-import org.eclipse.xtext.xbase.XAbstractFeatureCall
-import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationBlock
-import java.util.Stack
-import de.msg.xt.mdt.base.AbstractActivity
-import de.msg.xt.mdt.base.util.TDslHelper
+import org.eclipse.xtext.xbase.XBlockExpression
 
 class TDslCompiler extends XbaseCompiler {
 	
@@ -136,33 +138,10 @@ class TDslCompiler extends XbaseCompiler {
     			decreaseIndentation.newLine.append("}")
     		}
     		ActivityOperationBlock: {
-    			val nextActivityClass = expr.activityOperation.returnedActivity?.class_fqn
-    			val nextActivityAdapterClass = expr.activityOperation.returnedActivity?.adapterInterface_fqn
-    			
-   				expr.newTypeRef(typeof(Stack), expr.newTypeRef(typeof(AbstractActivity))).serialize(expr, it);
-   				it.append(" stack = new Stack<AbstractActivity>();").newLine
-				expr.newTypeRef(typeof(AbstractActivity)).serialize(expr, it)
-				it.append(" activity = this;")
-				var expectedReturnType = expr.newTypeRef(Void::TYPE)
-				if (nextActivityAdapterClass != null) {
-					expectedReturnType = expr.newTypeRef(typeof(Object))
-				}
-					
-				super.doInternalToJavaStatement(expr, it, false)
-				
-				it.declareVariable(expr, "nextActivity")
-
-				if (nextActivityAdapterClass != null) {
-					expr.newTypeRef(nextActivityClass).serialize(expr, it)
-					it.append(" ")
-					it.append(it.getName(expr)).append(" = ")
-					expr.newTypeRef(typeof(TDslHelper)).serialize(expr, it)
-					it.append(".castActivity(injector, activity, ")										
-					expr.newTypeRef(nextActivityClass).serialize(expr, it)
-					it.append(".class, ")
-					expr.newTypeRef(nextActivityAdapterClass).serialize(expr, it)
-					it.append(".class);")
-				}
+    			compileBlock(expr, it, expr.activityOperation.returnedActivity)
+    		}
+    		UseCaseBlock: {
+    			compileBlock(expr, it, expr.useCase.returnedActivity)
     		}
     		/*XAbstractFeatureCall: {
     			if (isReferenced && isVariableDeclarationRequired(expr, it)) {
@@ -176,6 +155,36 @@ class TDslCompiler extends XbaseCompiler {
     			super.doInternalToJavaStatement(expr, it, isReferenced)
     	}   	
     }
+				
+				protected def compileBlock(XBlockExpression expr, ITreeAppendable it, Activity returnedActivity) {
+					val nextActivityClass = returnedActivity?.class_fqn
+					    			val nextActivityAdapterClass = returnedActivity?.adapterInterface_fqn
+					    			
+					   				expr.newTypeRef(typeof(Stack), expr.newTypeRef(typeof(AbstractActivity))).serialize(expr, it);
+					   				it.append(" stack = new Stack<AbstractActivity>();").newLine
+									expr.newTypeRef(typeof(AbstractActivity)).serialize(expr, it)
+									it.append(" activity = this;")
+									var expectedReturnType = expr.newTypeRef(Void::TYPE)
+									if (nextActivityAdapterClass != null) {
+										expectedReturnType = expr.newTypeRef(typeof(Object))
+									}
+										
+									super.doInternalToJavaStatement(expr, it, false)
+									
+									it.declareVariable(expr, "nextActivity")
+					
+									if (nextActivityAdapterClass != null) {
+										expr.newTypeRef(nextActivityClass).serialize(expr, it)
+										it.append(" ")
+										it.append(it.getName(expr)).append(" = ")
+										expr.newTypeRef(typeof(TDslHelper)).serialize(expr, it)
+										it.append(".castActivity(injector, activity, ")										
+										expr.newTypeRef(nextActivityClass).serialize(expr, it)
+										it.append(".class, ")
+										expr.newTypeRef(nextActivityAdapterClass).serialize(expr, it)
+										it.append(".class);")
+									}
+				}
 
     override protected internalToConvertedExpression(XExpression expr, 
                                                  ITreeAppendable it) {
@@ -189,8 +198,9 @@ class TDslCompiler extends XbaseCompiler {
     			expr.generateEmbeddedParameters(it)
     			append(")") 		
 			}
+			ActivityOperationCall: {				
+			}
 			SubUseCaseCall: {
-				append("should not be possible!")
 			}
 			GenerationSelektor: {
 				val container = expr.eContainer
@@ -229,6 +239,12 @@ class TDslCompiler extends XbaseCompiler {
 			}
 			Assert: {
 				expr.expression.internalToJavaExpression(it)
+			}
+			ActivityOperationBlock: {
+				append("nextActivity")
+			}
+			UseCaseBlock: {
+				append("nextActivity")
 			}
 			
 			default:

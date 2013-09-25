@@ -174,6 +174,7 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="expression" eType="ecore:EClass ../../../org.eclipse.xtext.xbase/model/Xbase.ecore#//XExpression"
         containment="true"/>
   </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="UseCaseBlock" eSuperTypes="../../../org.eclipse.xtext.xbase/model/Xbase.ecore#//XBlockExpression"/>
   <eClassifiers xsi:type="ecore:EClass" name="StatementLine" eSuperTypes="../../../org.eclipse.xtext.xbase/model/Xbase.ecore#//XExpression">
     <eStructuralFeatures xsi:type="ecore:EReference" name="statement" eType="ecore:EClass ../../../org.eclipse.xtext.xbase/model/Xbase.ecore#//XExpression"
         containment="true"/>
