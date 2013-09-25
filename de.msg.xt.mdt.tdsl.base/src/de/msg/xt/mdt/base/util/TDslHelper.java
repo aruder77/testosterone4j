@@ -28,9 +28,12 @@ public class TDslHelper {
 		}
 
 		// cast EditorActivity to PaketEditor
-		final Object o = activity.getAdapter().getContext();
-		final F adapter = injector.getInstance(adapterClass);
-		adapter.setContext(o);
+		F adapter = null;
+		if (activity.getAdapter() != null) {
+			final Object o = activity.getAdapter().getContext();
+			adapter = injector.getInstance(adapterClass);
+			adapter.setContext(o);
+		}
 		T newActivity = null;
 		try {
 			newActivity = activityClass.getConstructor(adapterClass).newInstance(adapter);
