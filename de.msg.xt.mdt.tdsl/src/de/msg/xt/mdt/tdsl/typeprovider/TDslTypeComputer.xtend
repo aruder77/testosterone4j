@@ -77,12 +77,18 @@ class TDslTypeComputer extends XbaseWithAnnotationsTypeComputer {
 	
 	protected def _computeTypes(OperationCall opCall, 
                     ITypeComputationState state) {
+   		val typeName = opCall.operation?.dataType?.class_FQN?.toString
+        if (typeName?.endsWith("StringDT"))
+        	System.out.println("getText")
 		for(expr: opCall.paramAssignment.map [it.value]) {
-			computeTypes(expr, state)
+			state.withNonVoidExpectation.computeTypes(expr)
 		}                    	
                     	
-   		val typeName = opCall.operation?.dataType?.class_FQN?.toString
-   		state.acceptActualType(state.converter.toLightweightReference(typeReferences.getTypeForName(typeName, opCall)))   		
+   		if (typeName != null) {
+   			System.out.println("Typename: " + typeName)
+	   		state.acceptActualType(state.converter.toLightweightReference(typeReferences.getTypeForName(typeName, opCall)))
+	   	} else   		
+			state.acceptActualType(getTypeForName(Void::TYPE, state))
   	}
   	
 	protected def _computeTypes(StatementLine expr, 
@@ -130,7 +136,7 @@ class TDslTypeComputer extends XbaseWithAnnotationsTypeComputer {
 							}
 						}
 					}
-					expectation.acceptActualType(expectedType, ConformanceHint.CHECKED, ConformanceHint.SUCCESS);
+//					expectation.acceptActualType(expectedType, ConformanceHint.CHECKED, ConformanceHint.SUCCESS);
 				}
 			}
   	
@@ -157,9 +163,14 @@ class TDslTypeComputer extends XbaseWithAnnotationsTypeComputer {
 	protected def _computeTypes(ActivityOperationCall opCall, 
                     ITypeComputationState state) {
                     	
-		for(expr: opCall.paramAssignment.map [it.value]) {
-			computeTypes(expr, state)
-		}                    	
+        for (expectation: state.expectations) {
+        	val expectedType = expectation.expectedType
+			for(expr: opCall.paramAssignment.map [it.value]) {
+				state.withNonVoidExpectation.computeTypes(expr)
+			}                 
+			if (expectedType != null)
+				expectation.acceptActualType(expectedType, ConformanceHint.CHECKED, ConformanceHint.SUCCESS);   	
+		}
                     	
    		val typeName = opCall.operation?.returnType?.class_FQN?.toString
    		
@@ -169,7 +180,7 @@ class TDslTypeComputer extends XbaseWithAnnotationsTypeComputer {
    		else 
    			type = typeReferences.getTypeForName(typeName, opCall)
    		
-   		state.acceptActualType(state.converter.toLightweightReference(type))   		
+   		state.acceptActualType(state.converter.toLightweightReference(type), ConformanceHint.SUCCESS)   		
   	}
   	
 	protected def _computeTypes(SubUseCaseCall subUseCaseCall, 

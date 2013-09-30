@@ -1095,7 +1095,8 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
    						it.append('''return («returnType»)activity;''')
    					}
    				]
-   				useCase.block.associateChildExpressions(it)
+//   				useCase.block.associateChildExpressions(it)
+				associator.associateLogicalContainer(useCase.block, it)
    			]   			   			
    		]
    	}

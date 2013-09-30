@@ -341,14 +341,15 @@ class TDslCompiler extends XbaseCompiler {
 				appendable.append('''.class, "«parameter.fullyQualifiedName»")''')
 			} else {
 				val expectedType = typeRefs.getTypeForName(dataTypeName, call)
-				if (assignment.value?.type?.type != null && expectedType != null) {
+				val actualType = assignment.value?.type?.type
+				if (actualType != null && expectedType != null) {
 					if (!assignment.value.type.type.equals(expectedType.type)) {
 						appendable.append("new ")
 						parameter.newTypeRef(dataTypeName).serialize(parameter, appendable)			
 						appendable.append("(")
 					}
 					compileAsJavaExpression(assignment.value, appendable, assignment.value.type)
-					if (!assignment.value.type.type.equals(expectedType.type)) {
+					if (!actualType.equals(expectedType.type)) {
 						appendable.append(", null)")
 					}
 				}
