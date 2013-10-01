@@ -30,7 +30,7 @@ Element:
 
 
 Toolkit:
-	'toolkit' name=ID 'using' 'controls' '{'
+	'toolkit' name=ID 'using' ('controls')? '{'
 		controls+=[Control|FQN] (',' controls+=[Control|FQN])*
 	'}'
 ;
@@ -40,7 +40,7 @@ Type:
 ;
 
 DataType:
-	'datatype' name=ID (default?='default' 'for')? 'type' type=[Type|FQN] '{'
+	'datatype' name=ID (default?='default' ('for')?)? 'type' type=[Type|FQN] '{'
 		(classes+=EquivalenceClass)+
 	'}'
 ;
@@ -70,7 +70,7 @@ Control:
 ;
 
 Operation:
-	'op' (returnType=[Type|FQN])? name=ID ('(' params+=ControlOperationParameter (',' params+=ControlOperationParameter)* ')')? 
+	'op' (returnType=[Type|FQN] | 'void') name=ID ('(' params+=ControlOperationParameter (',' params+=ControlOperationParameter)* ')')? 
 ;
 
 ControlOperationParameter:
@@ -89,7 +89,7 @@ ActivityOperationParameter:
 ;
 
 ActivityOperation:
-	'op' (returnType=[DataType|FQN])? name=ID ('(' params+=ActivityOperationParameter (',' params+=ActivityOperationParameter)* ')')? (body=ActivityOperationBlock)? (nextActivities+=ConditionalNextActivity)* 
+	'op' (returnType=[DataType|FQN] | 'void')? name=ID ('(' params+=ActivityOperationParameter (',' params+=ActivityOperationParameter)* ')')? (body=ActivityOperationBlock)? (nextActivities+=ConditionalNextActivity)* 
 ;
 
 ActivityOperationBlock returns xbase::XBlockExpression:
