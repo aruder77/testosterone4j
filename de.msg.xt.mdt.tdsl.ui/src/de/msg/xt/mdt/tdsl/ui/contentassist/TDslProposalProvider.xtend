@@ -9,6 +9,7 @@ import org.eclipse.xtext.RuleCall
 import de.msg.xt.mdt.tdsl.tDsl.OperationMapping
 import org.eclipse.xtext.ui.editor.contentassist.ContentAssistContext
 import org.eclipse.xtext.ui.editor.contentassist.ICompletionProposalAcceptor
+import org.eclipse.xtext.Keyword
 
 /**
  * see http://www.eclipse.org/Xtext/documentation/latest/xtext.html#contentAssist on how to customize content assistant
@@ -29,4 +30,8 @@ class TDslProposalProvider extends AbstractTDslProposalProvider {
 				.getDisplayString(element, qualifiedNameAsString, shortName);
 	}
 
+	override protected isKeywordWorthyToPropose(Keyword keyword) {
+		true
+	}
+	
 }
