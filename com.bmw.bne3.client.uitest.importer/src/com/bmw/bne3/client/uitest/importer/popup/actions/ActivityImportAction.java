@@ -10,7 +10,11 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.EAttribute;
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
@@ -121,7 +125,9 @@ public class ActivityImportAction implements IObjectActionDelegate {
 			final IFile ifile = workspace.getRoot()
 					.getFileForLocation(location);
 
-			final TestModel model = TDslFactory.eINSTANCE.createTestModel();
+			Resource resource = loadOrCreateResource(file);
+			TestModel model = loadOrCreateTestModel(resource);
+
 			final PackageDeclaration pack = TDslFactory.eINSTANCE
 					.createPackageDeclaration();
 			model.getPackages().add(pack);
@@ -162,6 +168,62 @@ public class ActivityImportAction implements IObjectActionDelegate {
 
 		MessageDialog.openInformation(shell, "Importer",
 				"Activities imported successfully.");
+	}
+
+	private TestModel loadOrCreateTestModel(Resource resource) {
+		TestModel testModel = null;
+		if (resource.getContents().size() > 0)
+			testModel = (TestModel) resource.getContents().get(0);
+		else {
+			testModel = TDslFactory.eINSTANCE.createTestModel();
+			resource.getContents().add(testModel);
+		}
+		return null;
+	}
+
+	private EAttribute getNameEAttribute(EReference ref) {
+		EAttribute nameAttribute = null;
+		EList<EAttribute> attributes = ref.getEReferenceType()
+				.getEAllAttributes();
+		for (EAttribute attribute : attributes) {
+			if (attribute.getName().equalsIgnoreCase("name")) {
+				nameAttribute = attribute;
+				break;
+			}
+		}
+		return nameAttribute;
+	}
+
+	private <T extends EObject> T loadOrCreateElement(EObject parentElement,
+			EReference ref, Class<T> elementClass, String name) {
+		T elem = null;
+		List<EObject> list = (List<EObject>) parentElement.eGet(ref);
+		if (list != null) {
+			for (EObject o : list) {
+				EAttribute nameAttribute = getNameEAttribute(ref);
+				if (o.eGet(nameAttribute).equals(name)) {
+					elem = (T) o;
+					break;
+				}
+			}
+		}
+		if (elem == null) {
+			elem = (T) TDslFactory.eINSTANCE.create(ref.getEReferenceType());
+			list.add(elem);
+		}
+		return elem;
+	}
+
+	private Resource loadOrCreateResource(IFile file) {
+		final ResourceSet rs = provider.get(file.getProject());
+		Resource resource = null;
+		URI url = URI.createPlatformResourceURI(file.getFullPath().toString(),
+				true);
+		if (file.exists())
+			resource = rs.getResource(url, true);
+		else
+			resource = rs.createResource(url);
+		return resource;
 	}
 
 	private void transformToTestModel(final UIDescription description,
