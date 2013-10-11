@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: de.msg.xt.mdt.tdsl.help
+Bundle-SymbolicName: de.msg.xt.mdt.tdsl.help;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: My Company
+Require-Bundle: org.eclipse.help,
+ org.eclipse.xtext.xdoc;bundle-version="0.1.0",
+ org.eclipse.xtext.xdoc.generator;bundle-version="0.1.0",
+ org.eclipse.xtext.xdoc.ui;bundle-version="0.1.0",
+ org.apache.log4j;bundle-version="1.2.15",
+ org.eclipse.xtext.xbase;bundle-version="2.4.3",
+ org.eclipse.xtext.xbase.lib;bundle-version="2.4.3"
+

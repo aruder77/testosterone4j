@@ -1,0 +1,20 @@
+module workflow.GenerateIVPDoc
+
+import org.eclipse.emf.mwe.utils.*
+
+/**
+ * Workflow for generation of pdf documentation.
+ * Requires a reference to the pdflatex executable.
+ *
+ */
+Workflow {
+
+    component = @workflow.XDocGenerator {
+        modelPath = "xdoc"
+        targetDir = "pdfmanual"
+        document = "Model-Driven Testing -- Introducing TDsl"
+		pdfLatex = "pdflatex.exe"
+        // whether to create todo elements or not
+        release = true
+    }
+}
