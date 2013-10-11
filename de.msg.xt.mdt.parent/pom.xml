@@ -18,7 +18,7 @@
 	<module>../de.msg.xt.mdt.tdsl.sdk</module>
 	<module>../de.msg.xt.mdt.tdsl.ui</module>
 	<module>../de.msg.xt.mdt.update-site</module>
-	<module>../de.msg.xt.mdt.tdsl.help</module>
+	
 	</modules>
 
 	<properties>
