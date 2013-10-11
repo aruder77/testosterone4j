@@ -12,5 +12,6 @@ Workflow {
     component = @workflow.XDocHTMLGenerator {
         modelPath = "src/xdoc"
         fileEncoding = "UTF-8"
+        targetDir = "website"
     }
 }
