@@ -16,5 +16,6 @@ Workflow {
 		pdfLatex = "pdflatex.exe"
         // whether to create todo elements or not
         release = true
+        fileEncoding = "UTF-8"
     }
 }

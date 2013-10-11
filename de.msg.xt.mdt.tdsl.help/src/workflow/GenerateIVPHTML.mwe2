@@ -1,0 +1,16 @@
+module workflow.GenerateIVPHTMLDoc
+
+import org.eclipse.emf.mwe.utils.*
+
+/**
+ * Workflow for generation of pdf documentation.
+ * Requires a reference to the pdflatex executable.
+ *
+ */
+Workflow {
+
+    component = @workflow.XDocHTMLGenerator {
+        modelPath = "src/xdoc"
+        fileEncoding = "UTF-8"
+    }
+}
