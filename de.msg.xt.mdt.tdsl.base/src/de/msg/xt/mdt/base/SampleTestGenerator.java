@@ -184,8 +184,9 @@ public class SampleTestGenerator implements Generator {
 		return equivClass;
 	}
 
-	private boolean checkTagCompliance(Set<Tag> classTags, Set<Tag> includeTags) {
-		Iterator<Tag> inclTagIterator = includeTags.iterator();
+	private boolean checkTagCompliance(Set<? extends Tag> classTags,
+			Set<? extends Tag> includeTags) {
+		Iterator<? extends Tag> inclTagIterator = includeTags.iterator();
 		while (inclTagIterator.hasNext()) {
 			Tag includeTag = inclTagIterator.next();
 			if (classTags.contains(includeTag)) {
@@ -219,7 +220,7 @@ public class SampleTestGenerator implements Generator {
 		}
 	}
 
-	private boolean checkTagCompliance(Set<Tag> tags) {
+	private boolean checkTagCompliance(Set<? extends Tag> tags) {
 		Tag[] tagsArray = new Tag[tags.size()];
 		return checkTagCompliance(tags.toArray(tagsArray));
 	}

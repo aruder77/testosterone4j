@@ -31,6 +31,9 @@ import org.eclipse.xtext.xbase.typesystem.references.AnyTypeReference
 import org.eclipse.xtext.xbase.XBlockExpression
 import de.msg.xt.mdt.tdsl.tDsl.UseCaseBlock
 import de.msg.xt.mdt.tdsl.tDsl.UseCase
+import org.eclipse.xtext.xbase.XbaseFactory
+import de.msg.xt.mdt.base.AbstractActivity
+import de.msg.xt.mdt.tdsl.tDsl.CurrentActivityExpression
 
 @Singleton
 class TDslTypeComputer extends XbaseWithAnnotationsTypeComputer {
@@ -63,6 +66,8 @@ class TDslTypeComputer extends XbaseWithAnnotationsTypeComputer {
 			_computeTypes(expression as ActivityOperationBlock, state);
 		} else if(expression instanceof UseCaseBlock) {
 			_computeTypes(expression as UseCaseBlock, state);
+		} else if(expression instanceof CurrentActivityExpression) {
+			_computeTypes(expression as CurrentActivityExpression, state);
 		} else {
 			super.computeTypes(expression, state)
 		}
@@ -203,5 +208,10 @@ class TDslTypeComputer extends XbaseWithAnnotationsTypeComputer {
   				type = typeReferences.getTypeForName(container?.name?.dataType?.class_FQN?.toString, generationSelektor)	
   		}
   		state.acceptActualType(state.converter.toLightweightReference(type))
+  	}
+  	
+  	protected def _computeTypes(CurrentActivityExpression currentActivity, ITypeComputationState state) {
+  		val type = typeof(AbstractActivity)
+  		state.acceptActualType(state.converter.toLightweightReference(typeReferences.getTypeForName(type, currentActivity)))
   	}
 }

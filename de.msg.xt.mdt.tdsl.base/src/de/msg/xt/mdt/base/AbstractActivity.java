@@ -6,7 +6,7 @@ import org.eclipse.xtext.xbase.lib.Functions.Function0;
 
 import com.google.inject.Injector;
 
-public class AbstractActivity {
+public abstract class AbstractActivity implements IEvalutaionGroup {
 
 	protected ActivityAdapter adapter;
 

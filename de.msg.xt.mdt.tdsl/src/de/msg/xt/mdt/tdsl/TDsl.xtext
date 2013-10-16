@@ -186,12 +186,17 @@ VariableDeclaration returns xbase::XVariableDeclaration:
 ;
 
 Expression returns xbase::XExpression:
-	OperationCall | ActivityOperationCall | GeneratedValueExpression | XExpression 
+	OperationCall | ActivityOperationCall | GeneratedValueExpression | CurrentActivityExpression | XExpression 
 ;
 
 GeneratedValueExpression returns xbase::XExpression:
 	{GeneratedValueExpression}
 	'generatedValue' '(' param=[ecore::EObject|FQN] ')'
+;
+
+CurrentActivityExpression returns xbase::XExpression:
+	{CurrentActivityExpression}
+	'currentActivity'
 ;
 
 

@@ -6,7 +6,7 @@ public interface EquivalenceClass {
 
 	Object getValue();
 
-	Set<Tag> getClassTags();
+	Set<? extends Tag> getClassTags();
 
 	String getName();
 }
