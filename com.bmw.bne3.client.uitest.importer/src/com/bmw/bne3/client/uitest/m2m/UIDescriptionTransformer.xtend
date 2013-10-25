@@ -108,11 +108,14 @@ class UIDescriptionTransformer {
 			for (page : node.pages) {
 				if (page.key != null) {
 					val subActivity = page.createActivity(pack)
-					// TODO
 					if (subActivity != null) {
-						val field = factory.createField
-						activity.fields += field
-						field.name = page.label.convertToId.toFirstLower
+						val fieldName = page.label.convertToId
+						var Field field = activity.fields.findFirst[it.name.equals(fieldName)]
+						if (field == null) {
+							field = factory.createField
+							activity.fields += field
+							field.name = page.label.convertToId
+						}
 						field.uniqueId = page.key
 						field.control = findControl(field, "de.msg.xt.mdt.tdsl.swtbot.TabItem")
 						insertFieldOperationMappings(field)
@@ -124,21 +127,25 @@ class UIDescriptionTransformer {
 							pushOperation.nextActivities += condNextAct1			
 							condNextAct1.next = subActivity							
 						
-							val operation = factory.createActivityOperation
-							activity.operations += operation
-							operation.name = (page.key.convertToId + "Page").toFirstLower
+							val operationName = page.key.convertToId + "Page"
+							var operation =  activity.operations.findFirst[it.name.equals(operationName)]
+							if (operation == null) {
+								operation = factory.createActivityOperation
+								activity.operations += operation
+								operation.name = operationName
 						
-							val body = XbaseFactory::eINSTANCE.createXBlockExpression
-							operation.body = body
-							val statement1 = factory.createStatementLine
-							body.expressions += statement1
-							val opCall = factory.createOperationCall
-							statement1.statement = opCall
-							opCall.operation = pushOperation
+								val body = XbaseFactory::eINSTANCE.createXBlockExpression
+								operation.body = body
+								val statement1 = factory.createStatementLine
+								body.expressions += statement1
+								val opCall = factory.createOperationCall
+								statement1.statement = opCall
+								opCall.operation = pushOperation
 						
-							val condNextAct2 = factory.createConditionalNextActivity
-							operation.nextActivities += condNextAct2			
-							condNextAct2.next = subActivity
+								val condNextAct2 = factory.createConditionalNextActivity
+								operation.nextActivities += condNextAct2			
+								condNextAct2.next = subActivity
+							}
 						}
 					}
 				}
@@ -188,35 +195,46 @@ class UIDescriptionTransformer {
 		return activity
 	}
 	
+	def Field findExistingField(Activity activity, FieldNode node) {
+		var field = activity.fields.findFirst[it.uniqueId != null && it.uniqueId.equals(node?.key)]
+		if (field == null)
+			activity.fields.findFirst[it.name != null && it.name.equals(node?.label?.convertToId)]
+		field
+	}
+	
 	
 	def Field createField(FieldNode node, Activity activity) { 
-		// TODO
 		val factory = TDslFactory::eINSTANCE
 		var Field field
 		
 		if (node.key != null && node.key.trim.length != 0) {
-			field = factory.createField
-			activity.fields += field
+			field = activity.findExistingField(node)
+			if (field == null) {
+				field = factory.createField
+				activity.fields += field
+			}
 			
 			field.control = determineControl(node, field)
 
-			field.name = node.label?.convertToId?.toFirstLower
-			if (field.name == null || field.name.trim.equals(""))
-				field.name = node.key.convertToId.toFirstLower		
+			var fieldName = node.label?.convertToId
+			if (fieldName == null || fieldName.trim.equals(""))
+				fieldName = node.key.convertToId
+			if (field.name == null || field.name.empty) 
+				field.name = fieldName		
 			field.uniqueId = node.key
 			
 			if (node.fieldReference?.table != null) {
 				field.uniqueId = node.fieldReference.table.key
 				if (field.name == null || field.name.trim.equals("")) {
 					if (node.fieldReference.table.name != null) 
-						field.name = node.fieldReference.table.name?.convertToId?.toFirstLower
+						field.name = node.fieldReference.table.name?.convertToId
 					else if (node.fieldReference.table.key != null)
-						field.name = node.fieldReference.table.key?.convertToId?.toFirstLower
+						field.name = node.fieldReference.table.key?.convertToId
 				}
 			}
 			
-			val fieldName = field.name
-			var isNotUnique = !activity.fields.filter[it.name.equals(fieldName)].empty
+			val fieldNameVal = fieldName
+			var isNotUnique = !activity.fields.filter[it.name.equals(fieldNameVal)].empty
 			var index = 2
 			while (isNotUnique) {
 				val currentFieldName = fieldName + index
@@ -324,7 +342,7 @@ class UIDescriptionTransformer {
 		var temp = id.trim.replace(' ', '').replaceAll("ß","ss").replace('-','_').replace('.','_').replace('/','_').replace("ä", "ae").replace("ö", "Oe").replace("ü", "ue").replace("Ä", "Ae").replace("Ö", "Oe").replace("Ü", "Ue").replace('\"','').replace("(","").replace(")", "").replace("!", "").replace(",", "")
 		if (temp.length > 0 && !Character::isLetter(temp.charAt(0)))
 			temp = "f" + temp
-		return temp
+		return temp?.toFirstLower
 	}
 	
 	
