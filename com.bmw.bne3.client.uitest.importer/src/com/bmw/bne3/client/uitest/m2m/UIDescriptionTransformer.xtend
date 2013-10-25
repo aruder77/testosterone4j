@@ -87,7 +87,6 @@ class UIDescriptionTransformer {
 	 * SpacerField		=> Label
 	 */
 	def transform(UIDescription descr, PackageDeclaration pack, EditorNode editorNode) {
-		
 		editorNode.createActivity(pack)				
 	}
 	
@@ -96,17 +95,20 @@ class UIDescriptionTransformer {
 		
 		var Activity activity = null
 		if (node?.key != null && node.key.trim.length != 0) {
-			activity = factory.createActivity
-			pack.elements += activity
-		
-			activity.name = node.key.convertToId.toFirstUpper
-	
-			activity.parent = findEObjectRef(activity, TDslPackage$Literals::ACTIVITY__PARENT, "com.bmw.bne3.client.uitest.activities.EditorActivity") as Activity
-		
+			val activityName = node.key.convertToId.toFirstUpper
+			
+			activity = pack.elements.filter(typeof(Activity)).findFirst[it.name?.equals(activityName)]
+			if (activity == null) {
+				activity = factory.createActivity
+				pack.elements += activity
+				activity.name = activityName
+				activity.parent = findEObjectRef(activity, TDslPackage$Literals::ACTIVITY__PARENT, "com.bmw.bne3.client.uitest.activities.EditorActivity") as Activity
+			}
+			
 			for (page : node.pages) {
 				if (page.key != null) {
 					val subActivity = page.createActivity(pack)
-					
+					// TODO
 					if (subActivity != null) {
 						val field = factory.createField
 						activity.fields += field
@@ -155,13 +157,16 @@ class UIDescriptionTransformer {
 	def dispatch Activity createActivity(PageNode page, PackageDeclaration pack) {
 		val factory = TDslFactory::eINSTANCE
 		var Activity activity
-		if (page?.key != null && page.key.trim.length != 0) { 
-			activity = factory.createActivity
-			pack.elements += activity
-			activity.name = page.editor.key.convertToId.toFirstUpper + "_" + page.key.convertToId
+		if (page?.key != null && page.key.trim.length != 0) {
+			val activityName = page.editor.key.convertToId.toFirstUpper + "_" + page.key.convertToId
+			activity = pack.elements.filter(typeof(Activity)).findFirst[it.name.equals(activityName)]
+			if (activity == null) { 
+				activity = factory.createActivity
+				pack.elements += activity
+				activity.name = activityName 
+				activity.parent = findEObjectRef(activity, TDslPackage$Literals::ACTIVITY__PARENT, "com.bmw.bne3.client.uitest.activities.PageActivity") as Activity
+			}
 			activity.setUniqueId(page.key)
-			activity.parent = findEObjectRef(activity, TDslPackage$Literals::ACTIVITY__PARENT, "com.bmw.bne3.client.uitest.activities.PageActivity") as Activity
-			
 			
 			val fields = EcoreUtil2::getAllContentsOfType(page, typeof(FieldNode))
 			
@@ -169,13 +174,15 @@ class UIDescriptionTransformer {
 				createField(field, activity)
 			}
 			
-			val operation = factory.createActivityOperation
-			activity.operations += operation
-			operation.name = "returnToEditor"
-			operation.body = XbaseFactory::eINSTANCE.createXBlockExpression
-			val condNextAct = factory.createConditionalNextActivity
-			operation.nextActivities += condNextAct
-			condNextAct.returnToLastActivity = true
+			if(activity.operations.filter[it.name.equals("returnToEditor")].empty) {
+				val operation = factory.createActivityOperation
+				activity.operations += operation
+				operation.name = "returnToEditor"
+				operation.body = XbaseFactory::eINSTANCE.createXBlockExpression
+				val condNextAct = factory.createConditionalNextActivity
+				operation.nextActivities += condNextAct
+				condNextAct.returnToLastActivity = true
+			}
 		}
 		
 		return activity
@@ -183,6 +190,7 @@ class UIDescriptionTransformer {
 	
 	
 	def Field createField(FieldNode node, Activity activity) { 
+		// TODO
 		val factory = TDslFactory::eINSTANCE
 		var Field field
 		

@@ -128,25 +128,17 @@ public class ActivityImportAction implements IObjectActionDelegate {
 			Resource resource = loadOrCreateResource(file);
 			TestModel model = loadOrCreateTestModel(resource);
 
-			final PackageDeclaration pack = TDslFactory.eINSTANCE
-					.createPackageDeclaration();
-			model.getPackages().add(pack);
-
 			String namespace = ifile.getName().substring(0,
 					ifile.getName().length() - 4);
-			pack.setName(BASE_PACKAGE + "." + namespace.toLowerCase());
-			Import imp = TDslFactory.eINSTANCE.createImport();
-			imp.setImportedNamespace("de.msg.xt.mdt.tdsl.swtbot.*");
-			pack.getImports().add(imp);
-			Import imp2 = TDslFactory.eINSTANCE.createImport();
-			imp2.setImportedNamespace("de.msg.xt.mdt.tdsl.basictypes.*");
-			pack.getImports().add(imp2);
-			Import imp3 = TDslFactory.eINSTANCE.createImport();
-			imp3.setImportedNamespace("com.bmw.bne3.client.uitest.datatypes.*");
-			pack.getImports().add(imp3);
-			Import imp4 = TDslFactory.eINSTANCE.createImport();
-			imp4.setImportedNamespace("com.bmw.bne3.client.uitest.activities.*");
-			pack.getImports().add(imp4);
+			String packageName = BASE_PACKAGE + "." + namespace.toLowerCase();
+			PackageDeclaration pack = loadOrCreateElement(model,
+					TDslPackage.Literals.TEST_MODEL__PACKAGES,
+					PackageDeclaration.class, packageName);
+
+			addImport(pack, "de.msg.xt.mdt.tdsl.swtbot.*");
+			addImport(pack, "de.msg.xt.mdt.tdsl.basictypes.*");
+			addImport(pack, "com.bmw.bne3.client.uitest.datatypes.*");
+			addImport(pack, "com.bmw.bne3.client.uitest.activities.*");
 
 			if (fn != null) {
 				writeToFile(ifile, model);
@@ -157,7 +149,7 @@ public class ActivityImportAction implements IObjectActionDelegate {
 			Toolkit toolkit = (Toolkit) scope
 					.getSingleElement(
 							transformer
-									.fqnForName("com.bmw.bne3.client.uitest.activities.Stdtoolkit"))
+									.fqnForName("com.bmw.bne3.client.uitest.bnetoolkit.Stdtoolkit"))
 					.getEObjectOrProxy();
 			pack.setSutRef(toolkit);
 
@@ -168,6 +160,17 @@ public class ActivityImportAction implements IObjectActionDelegate {
 
 		MessageDialog.openInformation(shell, "Importer",
 				"Activities imported successfully.");
+	}
+
+	private void addImport(PackageDeclaration pack, String string) {
+		for (Import imp : pack.getImports()) {
+			if (imp.getImportedNamespace().equals(string)) {
+				return;
+			}
+		}
+		Import imp = TDslFactory.eINSTANCE.createImport();
+		imp.setImportedNamespace(string);
+		pack.getImports().add(imp);
 	}
 
 	private TestModel loadOrCreateTestModel(Resource resource) {
