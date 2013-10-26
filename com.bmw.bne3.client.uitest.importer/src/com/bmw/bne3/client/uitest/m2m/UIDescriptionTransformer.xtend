@@ -134,7 +134,7 @@ class UIDescriptionTransformer {
 								activity.operations += operation
 								operation.name = operationName
 						
-								val body = XbaseFactory::eINSTANCE.createXBlockExpression
+								val body = TDslFactory.eINSTANCE.createActivityOperationBlock
 								operation.body = body
 								val statement1 = factory.createStatementLine
 								body.expressions += statement1

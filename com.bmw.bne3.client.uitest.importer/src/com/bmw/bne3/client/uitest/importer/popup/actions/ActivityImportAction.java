@@ -125,7 +125,7 @@ public class ActivityImportAction implements IObjectActionDelegate {
 			final IFile ifile = workspace.getRoot()
 					.getFileForLocation(location);
 
-			Resource resource = loadOrCreateResource(file);
+			Resource resource = loadOrCreateResource(ifile);
 			TestModel model = loadOrCreateTestModel(resource);
 
 			String namespace = ifile.getName().substring(0,
@@ -181,7 +181,7 @@ public class ActivityImportAction implements IObjectActionDelegate {
 			testModel = TDslFactory.eINSTANCE.createTestModel();
 			resource.getContents().add(testModel);
 		}
-		return null;
+		return testModel;
 	}
 
 	private EAttribute getNameEAttribute(EReference ref) {
@@ -201,9 +201,9 @@ public class ActivityImportAction implements IObjectActionDelegate {
 			EReference ref, Class<T> elementClass, String name) {
 		T elem = null;
 		List<EObject> list = (List<EObject>) parentElement.eGet(ref);
+		EAttribute nameAttribute = getNameEAttribute(ref);
 		if (list != null) {
 			for (EObject o : list) {
-				EAttribute nameAttribute = getNameEAttribute(ref);
 				if (o.eGet(nameAttribute).equals(name)) {
 					elem = (T) o;
 					break;
@@ -212,6 +212,7 @@ public class ActivityImportAction implements IObjectActionDelegate {
 		}
 		if (elem == null) {
 			elem = (T) TDslFactory.eINSTANCE.create(ref.getEReferenceType());
+			elem.eSet(nameAttribute, name);
 			list.add(elem);
 		}
 		return elem;
