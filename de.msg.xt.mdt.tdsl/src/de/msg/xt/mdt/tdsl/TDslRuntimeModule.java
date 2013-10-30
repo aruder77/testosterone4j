@@ -3,6 +3,7 @@
  */
 package de.msg.xt.mdt.tdsl;
 
+import org.eclipse.xtext.conversion.IValueConverterService;
 import org.eclipse.xtext.naming.IQualifiedNameProvider;
 import org.eclipse.xtext.resource.IDefaultResourceDescriptionStrategy;
 import org.eclipse.xtext.scoping.IScopeProvider;
@@ -12,6 +13,7 @@ import org.eclipse.xtext.xbase.scoping.batch.IBatchScopeProvider;
 import org.eclipse.xtext.xbase.scoping.batch.ImplicitlyImportedTypes;
 import org.eclipse.xtext.xbase.typesystem.computation.ITypeComputer;
 
+import de.msg.xt.mdt.tdsl.converter.TDslValueConverterService;
 import de.msg.xt.mdt.tdsl.jvmmodel.TDslCompiler;
 import de.msg.xt.mdt.tdsl.jvmmodel.TDslQualifiedNameProvider;
 import de.msg.xt.mdt.tdsl.scoping.TDslBatchScopeProvider;
@@ -70,6 +72,11 @@ public class TDslRuntimeModule extends
 
 	public Class<? extends ImplicitlyImportedTypes> bindImplicitlyImportedTypes() {
 		return TDslImplicitlyImportedTypes.class;
+	}
+
+	@Override
+	public Class<? extends org.eclipse.xtext.conversion.IValueConverterService> bindIValueConverterService() {
+		return (Class<? extends IValueConverterService>) TDslValueConverterService.class;
 	}
 
 }

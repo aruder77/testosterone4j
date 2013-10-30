@@ -1,9 +1,19 @@
 package com.bmw.bne3.client.uitest.importer.popup.actions;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IWorkspace;
@@ -130,7 +140,7 @@ public class ActivityImportAction implements IObjectActionDelegate {
 
 			String namespace = ifile.getName().substring(0,
 					ifile.getName().length() - 4);
-			String packageName = BASE_PACKAGE + "." + namespace.toLowerCase();
+			String packageName = BASE_PACKAGE;
 			PackageDeclaration pack = loadOrCreateElement(model,
 					TDslPackage.Literals.TEST_MODEL__PACKAGES,
 					PackageDeclaration.class, packageName);
@@ -138,7 +148,6 @@ public class ActivityImportAction implements IObjectActionDelegate {
 			addImport(pack, "de.msg.xt.mdt.tdsl.swtbot.*");
 			addImport(pack, "de.msg.xt.mdt.tdsl.basictypes.*");
 			addImport(pack, "com.bmw.bne3.client.uitest.datatypes.*");
-			addImport(pack, "com.bmw.bne3.client.uitest.activities.*");
 
 			if (fn != null) {
 				writeToFile(ifile, model);
@@ -247,9 +256,17 @@ public class ActivityImportAction implements IObjectActionDelegate {
 			resource.getContents().add(model);
 		}
 		try {
-			resource.save(new FileOutputStream(file.getLocation().toString()),
-					SaveOptions.newBuilder().format().getOptions()
-							.toOptionsMap());
+			FileOutputStream fout = new FileOutputStream(file.getLocation()
+					.toString());
+
+			ByteArrayOutputStream bout = new ByteArrayOutputStream();
+			resource.save(bout, SaveOptions.newBuilder().format().getOptions()
+					.toOptionsMap());
+
+			performPostProcessing(new ByteArrayInputStream(bout.toByteArray()),
+					fout);
+
+			fout.close();
 		} catch (final FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (final IOException e) {
@@ -278,6 +295,39 @@ public class ActivityImportAction implements IObjectActionDelegate {
 		 * resource.getContents().get(0)).getProcedure()
 		 * .get(0).add((DiagramDialog ) obj); } }); }
 		 */
+	}
+
+	private void performPostProcessing(InputStream in, OutputStream out) {
+		// due to XText bug
+		Map<String, String> replaceMap = new HashMap<String, String>();
+		replaceMap.put("_#_", ".");
+		processStream(in, out, replaceMap);
+	}
+
+	private void processStream(InputStream in, OutputStream out,
+			Map<String, String> replaceMap) {
+		try {
+			final BufferedReader reader = new BufferedReader(
+					new InputStreamReader(in, "UTF-8"));
+			final StringBuffer sb = new StringBuffer();
+			String line = reader.readLine();
+			while (line != null) {
+				String currentLine = line;
+				for (final Entry<String, String> entry : replaceMap.entrySet()) {
+					currentLine = currentLine.replaceAll(entry.getKey(),
+							entry.getValue());
+				}
+				sb.append(currentLine + "\n");
+				line = reader.readLine();
+			}
+			reader.close();
+
+			OutputStreamWriter ow = new OutputStreamWriter(out);
+			ow.write(sb.toString());
+			ow.close();
+		} catch (final IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private IFile getSelectedFile() {

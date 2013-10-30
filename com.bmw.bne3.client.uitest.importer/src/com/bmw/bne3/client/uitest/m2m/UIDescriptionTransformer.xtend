@@ -185,7 +185,7 @@ class UIDescriptionTransformer {
 				val operation = factory.createActivityOperation
 				activity.operations += operation
 				operation.name = "returnToEditor"
-				operation.body = XbaseFactory::eINSTANCE.createXBlockExpression
+				operation.body = TDslFactory.eINSTANCE.createActivityOperationBlock
 				val condNextAct = factory.createConditionalNextActivity
 				operation.nextActivities += condNextAct
 				condNextAct.returnToLastActivity = true

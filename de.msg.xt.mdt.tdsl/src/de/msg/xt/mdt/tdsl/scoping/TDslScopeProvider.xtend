@@ -238,7 +238,9 @@ class TDslScopeProvider extends XbaseWithAnnotationsScopeProvider {
 					logger.warn("Could not resolve control for field " + field.name)
 					throw new ScopingException("Could not resolve control for field " + field.name)
 				}
-				Scopes::scopeFor(operations)
+				Scopes::scopeFor(operations, [
+					QualifiedName::create(it.name)
+				], IScope::NULLSCOPE)
 			} else 
 				IScope::NULLSCOPE
 		} else if (reference == TDslPackage::eINSTANCE.dataTypeMapping_Name) {

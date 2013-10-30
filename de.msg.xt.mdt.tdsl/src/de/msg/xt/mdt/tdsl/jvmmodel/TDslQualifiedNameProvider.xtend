@@ -11,6 +11,9 @@ import javax.inject.Inject
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.xtext.naming.QualifiedName
 import org.eclipse.xtext.xbase.scoping.XbaseQualifiedNameProvider
+import org.eclipse.xtext.EcoreUtil2
+import org.eclipse.emf.ecore.impl.EObjectImpl
+import de.msg.xt.mdt.tdsl.tDsl.impl.OperationMappingImpl
 
 class TDslQualifiedNameProvider extends XbaseQualifiedNameProvider {
 	
@@ -27,7 +30,8 @@ class TDslQualifiedNameProvider extends XbaseQualifiedNameProvider {
 			val opMap = obj as OperationMapping
 			val names = new ArrayList<String>
 			names.addAll(opMap?.field?.fullyQualifiedName?.segments)
-			val opName = opMap.toString
+			val operation = (opMap as OperationMappingImpl).basicGetName
+			val opName = if (operation == null || operation.eIsProxy) opMap.toString else operation.name
 			names.add(opName)
 			QualifiedName::create(names)
 		} else if (obj instanceof OperationCall) {
