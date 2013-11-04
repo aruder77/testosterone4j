@@ -1,32 +1,29 @@
 package com.bmw.bne3.client.uitest.m2m
 
-import de.msg.xt.mdt.tdsl.tDsl.TestModel
-import com.bmw.smartfaces.model.UIDescription
-import de.msg.xt.mdt.tdsl.tDsl.TDslFactory
-import org.eclipse.xtext.EcoreUtil2
-import com.bmw.smartfaces.model.Folder
 import com.bmw.smartfaces.model.EditorNode
-import de.msg.xt.mdt.tdsl.tDsl.Activity
-import com.bmw.smartfaces.model.PageNode
-import de.msg.xt.mdt.tdsl.jvmmodel.MetaModelExtensions
-import de.msg.xt.mdt.tdsl.tDsl.PackageDeclaration
 import com.bmw.smartfaces.model.FieldNode
-import de.msg.xt.mdt.tdsl.tDsl.Field
-import de.msg.xt.mdt.tdsl.tDsl.Control
+import com.bmw.smartfaces.model.Folder
+import com.bmw.smartfaces.model.PageNode
+import com.bmw.smartfaces.model.UIDescription
+import de.msg.xt.mdt.tdsl.jvmmodel.MetaModelExtensions
 import de.msg.xt.mdt.tdsl.jvmmodel.NamingExtensions
-import javax.inject.Inject
-import org.eclipse.xtext.scoping.IScopeProvider
-import de.msg.xt.mdt.tdsl.tDsl.TDslPackage
-import org.eclipse.xtext.naming.QualifiedName
-import org.eclipse.emf.ecore.EObject
-import org.eclipse.xtext.scoping.IGlobalScopeProvider
+import de.msg.xt.mdt.tdsl.tDsl.Activity
 import de.msg.xt.mdt.tdsl.tDsl.Control
-import de.msg.xt.mdt.tdsl.tDsl.Import
-import java.util.HashMap
+import de.msg.xt.mdt.tdsl.tDsl.Field
 import de.msg.xt.mdt.tdsl.tDsl.Operation
 import de.msg.xt.mdt.tdsl.tDsl.OperationMapping
-import org.eclipse.xtext.xbase.XbaseFactory
+import de.msg.xt.mdt.tdsl.tDsl.PackageDeclaration
+import de.msg.xt.mdt.tdsl.tDsl.TDslFactory
+import de.msg.xt.mdt.tdsl.tDsl.TDslPackage
+import java.util.HashMap
+import java.util.HashSet
+import javax.inject.Inject
+import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.EReference
+import org.eclipse.xtext.EcoreUtil2
+import org.eclipse.xtext.naming.QualifiedName
+import org.eclipse.xtext.scoping.IScopeProvider
+import java.util.Set
 
 class UIDescriptionTransformer {
 	
@@ -102,7 +99,7 @@ class UIDescriptionTransformer {
 				activity = factory.createActivity
 				pack.elements += activity
 				activity.name = activityName
-				activity.parent = findEObjectRef(activity, TDslPackage$Literals::ACTIVITY__PARENT, "com.bmw.bne3.client.uitest.activities.EditorActivity") as Activity
+				activity.parent = findEObjectRef(activity, TDslPackage.Literals::ACTIVITY__PARENT, "com.bmw.bne3.client.uitest.activities.EditorActivity") as Activity
 			}
 			
 			for (page : node.pages) {
@@ -123,9 +120,11 @@ class UIDescriptionTransformer {
 						var OperationMapping pushOperation = null
 						if (!pushOperations.empty) {
 							pushOperation = pushOperations.head
-							val condNextAct1 = factory.createConditionalNextActivity
-							pushOperation.nextActivities += condNextAct1			
-							condNextAct1.next = subActivity							
+							if (pushOperation.nextActivities.empty) {
+								val condNextAct1 = factory.createConditionalNextActivity
+								pushOperation.nextActivities += condNextAct1			
+								condNextAct1.next = subActivity			
+							}				
 						
 							val operationName = page.key.convertToId + "Page"
 							var operation =  activity.operations.findFirst[it.name.equals(operationName)]
@@ -165,20 +164,21 @@ class UIDescriptionTransformer {
 		val factory = TDslFactory::eINSTANCE
 		var Activity activity
 		if (page?.key != null && page.key.trim.length != 0) {
-			val activityName = page.editor.key.convertToId.toFirstUpper + "_" + page.key.convertToId
-			activity = pack.elements.filter(typeof(Activity)).findFirst[it.name.equals(activityName)]
+			val activityName = page.editor.key.convertToId.toFirstUpper + "_" + page.key.convertToId.toFirstUpper
+			activity = pack.elements.filter(typeof(Activity)).findFirst[it.name.equalsIgnoreCase(activityName)]
 			if (activity == null) { 
 				activity = factory.createActivity
 				pack.elements += activity
 				activity.name = activityName 
-				activity.parent = findEObjectRef(activity, TDslPackage$Literals::ACTIVITY__PARENT, "com.bmw.bne3.client.uitest.activities.PageActivity") as Activity
+				activity.parent = findEObjectRef(activity, TDslPackage.Literals::ACTIVITY__PARENT, "com.bmw.bne3.client.uitest.activities.PageActivity") as Activity
 			}
 			activity.setUniqueId(page.key)
 			
 			val fields = EcoreUtil2::getAllContentsOfType(page, typeof(FieldNode))
 			
+			val fieldNames = new HashSet<String>()
 			for (field : fields) {
-				createField(field, activity)
+				createField(field, activity, fieldNames)
 			}
 			
 			if(activity.operations.filter[it.name.equals("returnToEditor")].empty) {
@@ -195,52 +195,59 @@ class UIDescriptionTransformer {
 		return activity
 	}
 	
-	def Field findExistingField(Activity activity, FieldNode node) {
-		var field = activity.fields.findFirst[it.uniqueId != null && it.uniqueId.equals(node?.key)]
+	def Field findExistingField(Activity activity, String uniqueId, String label) {
+		var field = activity.fields.findFirst[it.uniqueId != null && it.uniqueId.equals(uniqueId)]
 		if (field == null)
-			activity.fields.findFirst[it.name != null && it.name.equals(node?.label?.convertToId)]
+			field = activity.fields.findFirst[it.name != null && it.name.equals(label)]
 		field
 	}
 	
 	
-	def Field createField(FieldNode node, Activity activity) { 
+	def Field createField(FieldNode node, Activity activity, Set<String> fieldNames) { 
 		val factory = TDslFactory::eINSTANCE
 		var Field field
 		
 		if (node.key != null && node.key.trim.length != 0) {
-			field = activity.findExistingField(node)
-			if (field == null) {
-				field = factory.createField
-				activity.fields += field
-			}
-			
-			field.control = determineControl(node, field)
 
 			var fieldName = node.label?.convertToId
 			if (fieldName == null || fieldName.trim.equals(""))
 				fieldName = node.key.convertToId
-			if (field.name == null || field.name.empty) 
-				field.name = fieldName		
-			field.uniqueId = node.key
+				
+			var fieldUniqueId = node.key
 			
 			if (node.fieldReference?.table != null) {
-				field.uniqueId = node.fieldReference.table.key
-				if (field.name == null || field.name.trim.equals("")) {
+				fieldUniqueId = node.fieldReference.table.key
+				if (fieldName == null || fieldName.trim.equals("")) {
 					if (node.fieldReference.table.name != null) 
-						field.name = node.fieldReference.table.name?.convertToId
+						fieldName = node.fieldReference.table.name?.convertToId
 					else if (node.fieldReference.table.key != null)
-						field.name = node.fieldReference.table.key?.convertToId
+						fieldName = node.fieldReference.table.key?.convertToId
 				}
 			}
 			
-			val fieldNameVal = fieldName
-			var isNotUnique = !activity.fields.filter[it.name.equals(fieldNameVal)].empty
-			var index = 2
-			while (isNotUnique) {
-				val currentFieldName = fieldName + index
-				isNotUnique = !activity.fields.filter[it.name.equals(currentFieldName)].empty
-				index = index + 1
+			field = activity.findExistingField(fieldUniqueId, fieldName)
+			if (field == null) {
+				field = factory.createField
+				activity.fields += field
 			}
+			if (field.name == null || field.name.empty) 
+				field.name = fieldName	
+
+			field.uniqueId = fieldUniqueId
+			
+			field.control = determineControl(node, field)
+
+			if (fieldNames.contains(field.name)) {
+				var index = 2
+				var indexedFieldName = field.name + index
+				while (fieldNames.contains(indexedFieldName)) {
+					index = index + 1
+					indexedFieldName = field.name + index
+				}
+				field.name = indexedFieldName
+			}
+			fieldNames.add(field.name)
+				 
 			
 			if (field.control == null) {
 				createControl(node, field)
@@ -279,7 +286,7 @@ class UIDescriptionTransformer {
 	}
 	
 	def Control findControl(Field field, String name) {
-		val scope = scopeProvider.getScope(field, TDslPackage$Literals::FIELD__CONTROL)
+		val scope = scopeProvider.getScope(field, TDslPackage.Literals::FIELD__CONTROL)
 		scope.getSingleElement(name.fqnForName)?.EObjectOrProxy as Control
 	}
 
@@ -289,7 +296,7 @@ class UIDescriptionTransformer {
 	}
 	
 	def Control determineControl(FieldNode node, Field field) { 
-		val scope = scopeProvider.getScope(field, TDslPackage$Literals::FIELD__CONTROL)
+		val scope = scopeProvider.getScope(field, TDslPackage.Literals::FIELD__CONTROL)
 		if (node.factory != null) {
 			val controlName = mapFactoryToControlName(node.factory.classname)
 			if (controlName == null)
@@ -348,12 +355,12 @@ class UIDescriptionTransformer {
 	
 	def insertFieldOperationMappings(Field field) {
 		val controlOperations = field.getControl().getOperations();
-		val opMappings = new HashMap<Operation, OperationMapping>();
+		val opMappings = new HashMap<String, OperationMapping>();
 		for (opMapping : field.getOperations()) {
-			opMappings.put(opMapping.getName(), opMapping);
+			opMappings.put(opMapping.getName().name, opMapping);
 		}
 		for (op : controlOperations) {
-			if (!opMappings.containsKey(op)) {
+			if (!opMappings.containsKey(op.name)) {
 				insertMappingForOperation(field, op);
 			}
 		}

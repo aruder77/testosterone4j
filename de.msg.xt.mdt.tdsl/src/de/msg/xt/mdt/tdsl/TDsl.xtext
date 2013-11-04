@@ -221,7 +221,7 @@ AFQN:
 
 OperationCall returns xbase::XExpression:
 	{OperationCall}
-	operation=[OperationMapping|AFQN] ('(' (paramAssignment+=OperationParameterAssignment) (',' paramAssignment+=OperationParameterAssignment)* ')')?
+	operation=[OperationMapping|OFQN] ('(' (paramAssignment+=OperationParameterAssignment) (',' paramAssignment+=OperationParameterAssignment)* ')')?
 ;
 
 ActivityOperationCall returns xbase::XExpression:

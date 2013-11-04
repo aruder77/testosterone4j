@@ -12,4 +12,5 @@ Require-Bundle: org.eclipse.ui,
  de.msg.xt.mdt.tdsl,
  org.eclipse.core.runtime;bundle-version="3.8.0",
  de.msg.xt.mdt.tdsl.ui,
- org.eclipse.xtext.ui;bundle-version="2.3.1"
+ org.eclipse.xtext.ui;bundle-version="2.3.1",
+ com.bmw.bne3.client.uitests.validation;bundle-version="1.0.0"

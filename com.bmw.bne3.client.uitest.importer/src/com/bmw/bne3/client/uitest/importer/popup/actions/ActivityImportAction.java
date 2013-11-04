@@ -127,8 +127,10 @@ public class ActivityImportAction implements IObjectActionDelegate {
 
 		for (Object o : resultList) {
 			EditorNode editorNode = (EditorNode) o;
-			String fileName = fn + "/"
-					+ transformer.convertToId(editorNode.getLabel()) + ".tdsl";
+			String fileName = fn
+					+ "/"
+					+ transformer.convertToId(editorNode.getLabel())
+							.toUpperCase() + ".tdsl";
 
 			final IWorkspace workspace = ResourcesPlugin.getWorkspace();
 			final IPath location = Path.fromOSString(fileName);
@@ -232,10 +234,7 @@ public class ActivityImportAction implements IObjectActionDelegate {
 		Resource resource = null;
 		URI url = URI.createPlatformResourceURI(file.getFullPath().toString(),
 				true);
-		if (file.exists())
-			resource = rs.getResource(url, true);
-		else
-			resource = rs.createResource(url);
+		resource = rs.getResource(url, true);
 		return resource;
 	}
 
