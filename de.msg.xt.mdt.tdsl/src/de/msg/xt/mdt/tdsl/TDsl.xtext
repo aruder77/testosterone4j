@@ -78,7 +78,7 @@ ControlOperationParameter:
 ;
     
 Activity:
-	'activity' name=ID ('identifiedBy' uniqueId=STRING)? ('extends' parent=[Activity|FQN])? '{'
+	'activity' name=ID ('identifiedBy' uniqueId=STRING)? ('subActivity' 'of' containingActivity=[Activity|FQN])? ('extends' parent=[Activity|FQN])? '{'
 		(fields+=Field)*
 		(operations+=ActivityOperation)*
 	'}'

@@ -13,20 +13,6 @@ import org.eclipse.xtext.common.types.JvmType
 import org.eclipse.xtext.validation.Check
 import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder
 import org.eclipse.xtext.xbase.typing.ITypeProvider
-import org.eclipse.xtext.xbase.XExpression
-import org.eclipse.core.runtime.Platform
-import org.eclipse.core.runtime.IExtensionRegistry
-import org.eclipse.core.runtime.IConfigurationElement
-import org.eclipse.emf.ecore.EValidator
-import org.eclipse.core.runtime.CoreException
-import org.eclipse.core.runtime.ISafeRunnable
-import java.util.ArrayList
-import java.util.List
-import org.eclipse.emf.ecore.EDataType
-import org.eclipse.emf.common.util.DiagnosticChain
-import java.util.Map
-import org.eclipse.emf.ecore.EObject
-import org.eclipse.emf.ecore.EClass
 
 class TDslValidator extends AbstractTDslValidator {
 
@@ -43,7 +29,7 @@ class TDslValidator extends AbstractTDslValidator {
 	@Check
 	def checkFirstUpperCaseActivities(Activity act) {
 		if (act.name != null && !act.name.toFirstUpper.equals(act.name)) {
-			error("Activity names must start with an uppercase letter.", TDslPackage$Literals::ACTIVITY__NAME)
+			error("Activity names must start with an uppercase letter.", TDslPackage.Literals::ACTIVITY__NAME)
 		}
 	}
 
@@ -67,7 +53,7 @@ class TDslValidator extends AbstractTDslValidator {
 			if (!missingMappings.empty) {
 				error(
 					'''An operation mapping must be defined for operations «FOR m : missingMappings SEPARATOR ", "»'«m»'«ENDFOR»''',
-					TDslPackage$Literals::FIELD__OPERATIONS, UNSUFFICIENT_OPERATION_MAPPINGS);
+					TDslPackage.Literals::FIELD__OPERATIONS, UNSUFFICIENT_OPERATION_MAPPINGS);
 
 			}
 		}
@@ -78,7 +64,7 @@ class TDslValidator extends AbstractTDslValidator {
 		if (field?.parentActivity?.toolkit != null && !field.parentActivity.toolkit.controls.contains(field.control) &&
 			field.control?.name != null) {
 			error("The control '" + field.control.name + "' is not included in the current toolkit!",
-				TDslPackage$Literals::FIELD__CONTROL, CONTROL_NOT_IN_TOOLKIT, field.control.name)
+				TDslPackage.Literals::FIELD__CONTROL, CONTROL_NOT_IN_TOOLKIT, field.control.name)
 		}
 	}
 
@@ -94,7 +80,7 @@ class TDslValidator extends AbstractTDslValidator {
 				error(
 					"Value of parameter " + assignment.name.name.name + " must be either " + expectedDataType.simpleName +
 						" or " + expectedType.simpleName + ", but was " + exprType.simpleName + "!",
-					TDslPackage$Literals::OPERATION_PARAMETER_ASSIGNMENT__VALUE);
+					TDslPackage.Literals::OPERATION_PARAMETER_ASSIGNMENT__VALUE);
 			}
 		}
 	}
@@ -111,7 +97,7 @@ class TDslValidator extends AbstractTDslValidator {
 				error(
 					"Value of parameter " + assignment.name.name + " must be either " + expectedDataType.simpleName +
 						" or " + expectedType.simpleName + ", but was " + exprType.simpleName + "!",
-					TDslPackage$Literals::ACTIVITY_OPERATION_PARAMETER_ASSIGNMENT__VALUE);
+					TDslPackage.Literals::ACTIVITY_OPERATION_PARAMETER_ASSIGNMENT__VALUE);
 			}
 		}
 	}
@@ -128,7 +114,7 @@ class TDslValidator extends AbstractTDslValidator {
 				error(
 					"Value of parameter " + assignment.name.name + " must be either " + expectedDataType.simpleName +
 						" or " + expectedType.simpleName + ", but was " + exprType.simpleName + "!",
-					TDslPackage$Literals::PARAMETER_ASSIGNMENT__VALUE);
+					TDslPackage.Literals::PARAMETER_ASSIGNMENT__VALUE);
 			}
 		}
 	}

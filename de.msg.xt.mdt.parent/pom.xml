@@ -10,8 +10,8 @@
 	<description>This is the BNE3 client parent project</description>
 
 	<modules>
-	<!-- <module>../com.bmw.bne3.client.uitest.feature</module> -->
-	<!-- <module>../../bne3/com.bmw.smartfaces.model</module> -->
+	
+	
 	<module>../de.msg.xt.mdt.tdsl</module>
 	<module>../de.msg.xt.mdt.tdsl.base</module>
 	<module>../de.msg.xt.mdt.tdsl.runtime.feature</module>
