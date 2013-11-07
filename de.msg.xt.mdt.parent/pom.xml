@@ -19,6 +19,7 @@
 	<module>../de.msg.xt.mdt.tdsl.ui</module>
 	<module>../de.msg.xt.mdt.update-site</module>
 	
+	<module>../de.msg.xt.mdt.tdsl.help</module>
 	</modules>
 
 	<properties>
@@ -46,6 +47,11 @@
 			<id>Itemis</id>
 			<layout>p2</layout>
 			<url>http://download.itemis.com/updates</url>
+		</repository>
+		<repository>
+			<id>xDoc</id>
+			<layout>p2</layout>
+			<url>http://xt.msg.de/taskdev/updates/xDoc</url>
 		</repository>
 	</repositories>
 
