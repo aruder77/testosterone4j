@@ -1,0 +1,61 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" >
+<title>Einführung</title>
+
+<link href="book.css" rel="stylesheet" type="text/css">
+<link href="code.css" rel="stylesheet" type="text/css">
+<link rel="home" href="ivp.html" title="">
+</head>
+<body>
+<a name="einfuehrung"></a>
+<h1>Einführung</h1>
+<p>
+Das automatisierte Testen von Anwendungen mit graphischen Benutzeroberflächen wird häufig mit großer Skepsis betrachtet, 
+hauptsächlich aus Sorge vor hohen Aufwänden zur Erstellung und Wartung der automatisierten Tests. 
+Dabei ist eine frühzeitige Erkennung von Fehlern für eine effektive und kostengünstige Behebung bekanntermaßen essenziell. 
+Automatisierte Tests können in zeitlich kurzen Abständen wiederholt ausgeführt werden und erleichtern damit erheblich die 
+Suche nach der Fehlerursache, da die Anzahl der möglichen problematischen Änderungen entsprechend gering ist.
+Jedoch kann sich die Wartung der Testskripte als ziemlich aufwändig erweisen. 
+Ziel dieses Artikels ist es, einen Ansatz vorzustellen, bei dem durch Verwendung von Abstraktionen und 
+modellgetriebenen Entwicklungsmethoden diese Aufwände minimiert werden können.
+</p>
+<a name="einordnung"></a>
+<h2>Einordnung</h2>
+<p>
+Die grafischen Benutzeroberflächen von betrieblichen Informationssystemen bestehen oft aus duzenden Masken, 
+welche die fachlichen Anwendungsfälle realisieren. Es ist eine Herausforderung diese fachlichen Abläufe während 
+der gesamten Systementwicklungszeit wiederholt effizient zu testen, da Masken im Laufe eines Projekts Änderungen unterworfen sind. 
+Die Automatisierung von Tests trägt zwar dazu bei, Tests jederzeit wiederholbar zu machen, jedoch muss ein Weg gefunden werden, 
+der den Anpassungsaufwand für die Testfall-Skripte aufgrund fachlicher oder technischer Änderungen über die Projektlaufzeit hinweg, 
+in Grenzen hält.
+</p>
+<p>
+Der Artikel fokussiert sich auf das Testen von maskenorientierten Anwendungen auf System-Ebene, d.h. aus Benutzersicht 
+und nach fachlichen Anforderungen. Dabei wird das System als Black-Box betrachtet und über die Benutzeroberfläche bedient. 
+Der vorgestellte Ansatz wurde für den Test einer Rich-Client Applikation entwickelt, lässt sich aber sehr leicht auch auf 
+Web-Clients übertragen.
+</p>
+<p>
+Unit- und Integrationstests, sowie Last- und Performancetests werden aus Platzgründen hier nicht weiter beleuchtet.
+</p>
+<a name="ziel"></a>
+<h2>Ziel</h2>
+<p>
+Ziel des hier vorgestellten Ansatzes ist es, eine effiziente, toolgestützte Spezifikation von
+UI-Tests zu ermöglichen, unter Verwendung von modellgetriebenen Entwicklungsmethoden.
+</p>
+<p>
+Die Modelle sollen dabei verwendet werden können um mit Hilfe eines Generators Testfälle abzuleiten,
+die automatisiert ausführbar sind.
+</p>
+<p>
+Sowohl die Modelle als auch der Testfall-Generator sollen dabei unabhängig vom verwendeten Automatisierungs-Framework
+sein, so dass Technologieabhängig das richtige Werkzeug gewählt werden kann.
+</p>
+<p>
+Die generierten Tests sollen sowohl Abläufe als auch die zugehörigen Testdaten enthalten. Dabei ist es
+wichtig, dass Abhängigkeiten von Testdaten berücksichtigt werden.
+</p>
+</body>
+</html>

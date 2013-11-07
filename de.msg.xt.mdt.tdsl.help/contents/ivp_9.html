@@ -1,0 +1,86 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" >
+<title>Generierung von Testfällen</title>
+
+<link href="book.css" rel="stylesheet" type="text/css">
+<link href="code.css" rel="stylesheet" type="text/css">
+<link rel="home" href="ivp.html" title="">
+</head>
+<body>
+<a name="generierung"></a>
+<h1>Generierung von Testfällen</h1>
+<p>
+Das Modell wird direkt beim Speichern in entsprechende Java-Klassen übersetzt. Die Übersetzung erfolgt
+dabei sehr direkt, d.h. für Controls werden Control-Interfaces, für Activities Activity-Klassen, für Use-Cases Use-Case-Klassen und für
+Tests JUnit-Test-Klassen angelegt.
+</p>
+<a name="testdaten"></a>
+<h2>Generierung von Test-Daten</h2>
+<p>
+Damit die Tests ausgeführt werden können, müssen zunächst die Test-Daten vom Testfall-Generator erzeugt
+werden. Dies geschieht durch die Ausführung der JUnit-Tests mit dem System-Property "generate=true".
+Ist dieses Property bei der Ausführung der JUnit-Tests gesetzt, so werden vor der Test-Ausführung die
+Test-Daten entsprechend der Abdeckungs-Kriterien generiert und in Dateien geschrieben. Bei weiteren Läufen
+der JUnit-Tests werden diese Dateien dann ausgelesen und die Tests ausgeführt.
+</p>
+<a name="anbindungTestAutomatisierung"></a>
+<h2>Anbindung an Test-Automatisierungs-Framework</h2>
+<p>
+Bisher ist unser Modell wie auch die generierten Java-Klassen völlig unabhängig von der zu verwendenden
+Technologie zur Ausführung der Tests. TDsl ist so flexibel dass praktisch jedes Test-Automatisierungs-Framework
+angebunden oder jede Art von Testskripten generiert werden kann.
+</p>
+<p>
+Dabei können die generierten Java-Klassen auf zwei unterschiedliche Art und Weise verwendet werden.
+</p>
+<p>
+<ul>
+	<li>
+		Die Ausführung der generierten JUnit-Tests führt direkt die Test-Automatisierungs-Befehle gegen
+			eine zu testende Anwendung aus. Dies funktioniert jedoch nur, wenn das Test-Automatisierungs-Framework
+			Java-basiert ist und die Ausführung als JUnit-Test erlaubt. Beispiele hierfür sind SWT-Bot oder auch
+			der Selenium Web-Driver.
+	</li>
+	<li>
+		Die Ausführung der generierten JUnit-Tests führt noch keine Test aus, sondern erzeugt Test-Skript-Dokumente
+			die von der eigentlichen Test-Automatisierungs-Lösung interpretiert und ausgeführt wird. Auch eine
+			manuelle Ausführung ist natürlich denkbar.
+	</li>
+</ul>
+</p>
+<p>
+Das ist deshalb möglich, weil zur eigentlichen Ausführung der Control- oder Activity-Operationen an extern
+zu implementierende Klassen delegiert wird.  
+Die Implementierung dieser wird im Folgenden kurz erläutert.
+</p>
+<a name="controlImplementierung"></a>
+<h3>Implementierung der Controls</h3>
+<p>
+Aus einem Control Modellelement wird keine konkrete Klasse generiert, sondern nur ein Java-Interface
+mit den entsprechenden Methoden. Für das konkrete zu verwendende Test-Framework müssen diese Interfaces
+implementiert werden. 
+</p>
+<p>
+Je nachdem welche der oben beschriebenen Methoden verwendet wird, wird in der Implementierung der Control-Methoden
+entweder die UI direkt über das Test-Automatisierungs-Framework stimuliert oder es wird nur ein entsprechendes
+Skript-Snippet zur späteren Ausführung in eine Datei geschrieben.
+</p>
+<a name="activityAdapter"></a>
+<h3>Activity-Adapter</h3>
+<p>
+Für die Implementierung der Activity-Operationen wird ein ähnlicher Ansatz verfolgt. Für jede Activity,
+die eigene Activity-Operationen besitzt, wird zusätzlich zur Activity-Klasse ein Activity-Adapter Interface
+generiert. Dieses Interface ist analog zu den Controls adaptiert auf das jeweilige Test-Automatisierungs-Framework
+zu implementieren.
+</p>
+<a name="tdslmodule"></a>
+<h3>Anbindung der Implementierungs-Klassen</h3>
+<p>
+Nachdem sämtliche Control- und ActivityAdapter-Implementierungen ausprogrammiert sind, müssen diese noch
+entsprechend angebunden werden. Dies erfolgt in TDsl durch Dependency Injection mit Hilfe von Google
+Guice. Dazu muss in der Klasse <span class="inlinecode">TDslModule</span> ein entsprechendes Binding etabliert werden. Für jedes
+Control- und ActivityAdapter-Interface muss eine Implementierung gebunden sein.
+</p>
+</body>
+</html>
