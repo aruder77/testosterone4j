@@ -17,6 +17,10 @@ public interface ITestProtocol {
 
 	void appendSummary();
 
+	void increaseIndentation();
+
+	void decreaseIndentation();
+
 	public void openGenerationFile();
 
 	public void closeGenerationFile();

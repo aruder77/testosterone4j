@@ -9,6 +9,8 @@ import java.util.logging.Logger;
 
 public class SimpleTestProtocol implements ITestProtocol {
 
+	private static final int INDENT_STEP = 4;
+
 	String testId;
 
 	private PrintWriter printWriter;
@@ -24,6 +26,8 @@ public class SimpleTestProtocol implements ITestProtocol {
 
 	private boolean generationMode = false;
 
+	private int indent = 0;
+
 	public SimpleTestProtocol(final String testId) {
 		this.testId = testId;
 	}
@@ -37,7 +41,11 @@ public class SimpleTestProtocol implements ITestProtocol {
 
 	@Override
 	public void append(final String str) {
-		log(str);
+		StringBuffer sb = new StringBuffer();
+		for (int i = 0; i < indent; i++) {
+			sb.append(' ');
+		}
+		log(sb.toString() + str);
 	}
 
 	@Override
@@ -152,6 +160,16 @@ public class SimpleTestProtocol implements ITestProtocol {
 			Object[] values) {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public void increaseIndentation() {
+		indent = indent + INDENT_STEP;
+	}
+
+	@Override
+	public void decreaseIndentation() {
+		indent = indent - INDENT_STEP;
 	}
 
 }
