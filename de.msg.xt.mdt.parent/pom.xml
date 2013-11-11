@@ -10,16 +10,16 @@
 	<description>This is the BNE3 client parent project</description>
 
 	<modules>
-	
-	
-	<module>../de.msg.xt.mdt.tdsl</module>
-	<module>../de.msg.xt.mdt.tdsl.base</module>
-	<module>../de.msg.xt.mdt.tdsl.runtime.feature</module>
-	<module>../de.msg.xt.mdt.tdsl.sdk</module>
-	<module>../de.msg.xt.mdt.tdsl.ui</module>
-	<module>../de.msg.xt.mdt.update-site</module>
-	
-	<module>../de.msg.xt.mdt.tdsl.help</module>
+
+
+		<module>../de.msg.xt.mdt.tdsl</module>
+		<module>../de.msg.xt.mdt.tdsl.base</module>
+		<module>../de.msg.xt.mdt.tdsl.runtime.feature</module>
+		<module>../de.msg.xt.mdt.tdsl.sdk</module>
+		<module>../de.msg.xt.mdt.tdsl.ui</module>
+		<module>../de.msg.xt.mdt.update-site</module>
+
+		<module>../de.msg.xt.mdt.tdsl.help</module>
 	</modules>
 
 	<properties>
@@ -48,11 +48,6 @@
 			<layout>p2</layout>
 			<url>http://download.itemis.com/updates</url>
 		</repository>
-		<repository>
-			<id>xDoc</id>
-			<layout>p2</layout>
-			<url>http://xt.msg.de/taskdev/updates/xDoc</url>
-		</repository>
 	</repositories>
 
 	<pluginRepositories>
@@ -68,19 +63,11 @@
 			<url>http://build.eclipse.org/common/xtend/maven/</url>
 		</pluginRepository>
 	</pluginRepositories>
-	
-	<!-- <repositories>
-		<repository>
-			<id>bne3.target</id>
-			<layout>p2</layout>
-			<url>http://libne3ci01.bmwgroup.net:11000/eclipse/com.bmw.bne3.target-3.0.4/</url>
-		</repository>
-		<repository>
-			<id>xt.mdt</id>
-			<layout>p2</layout>
-			<url>http://libne3ci01.bmwgroup.net:11000/eclipse/de.msg.xt.mdt.update-site-1.0.0/</url>
-		</repository>
-	</repositories> -->
+
+	<!-- <repositories> <repository> <id>bne3.target</id> <layout>p2</layout> 
+		<url>http://libne3ci01.bmwgroup.net:11000/eclipse/com.bmw.bne3.target-3.0.4/</url> 
+		</repository> <repository> <id>xt.mdt</id> <layout>p2</layout> <url>http://libne3ci01.bmwgroup.net:11000/eclipse/de.msg.xt.mdt.update-site-1.0.0/</url> 
+		</repository> </repositories> -->
 
 	<build>
 		<defaultGoal>install</defaultGoal>
@@ -109,7 +96,7 @@
 					</environments>
 				</configuration>
 			</plugin>
-			
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-clean-plugin</artifactId>
@@ -137,7 +124,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
-		
+
 		<pluginManagement>
 			<plugins>
 				<plugin>
@@ -250,7 +237,8 @@
 						</dependency>
 					</dependencies>
 				</plugin>
-				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+				<!--This plugin's configuration is used to store Eclipse m2e settings 
+					only. It has no influence on the Maven build itself. -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
 					<artifactId>lifecycle-mapping</artifactId>
@@ -302,6 +290,31 @@
 				</plugin>
 			</plugins>
 		</pluginManagement>
-		
+
 	</build>
+
+	<profiles>
+		<profile>
+			<id>xt</id>
+
+			<repositories>
+				<repository>
+					<id>xDoc</id>
+					<layout>p2</layout>
+					<url>http://xt.msg.de/taskdev/updates/xDoc</url>
+				</repository>
+			</repositories>
+		</profile>
+		<profile>
+			<id>testosterone4j</id>
+
+			<repositories>
+				<repository>
+					<id>xDoc</id>
+					<layout>p2</layout>
+					<url>http:/testosterone4j/updates/xDoc/latest</url>
+				</repository>
+			</repositories>
+		</profile>
+	</profiles>
 </project>
