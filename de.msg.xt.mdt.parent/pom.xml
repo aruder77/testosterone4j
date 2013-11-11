@@ -312,7 +312,7 @@
 				<repository>
 					<id>xDoc</id>
 					<layout>p2</layout>
-					<url>http:/testosterone4j/updates/xDoc/latest</url>
+					<url>http:/testosterone4j.org/updates/xDoc/latest</url>
 				</repository>
 			</repositories>
 		</profile>
