@@ -22,36 +22,34 @@ public abstract class AbstractActivity implements IEvalutaionGroup {
 		return adapter;
 	}
 
-	protected <T, E extends ActivityAdapter> T callContextAdapter(
-			Function0<Object> call, Class<T> expectedResultType,
-			Class<E> adapterClass) {
+	protected <T, E extends ActivityAdapter> T callContextAdapter(final Function0<Object> call,
+			final Class<T> expectedResultType, final Class<E> adapterClass) {
 		Object o = null;
 		if (adapter != null) {
 			o = call.apply();
 		}
 		T nextActivity = null;
-		if (expectedResultType.isAssignableFrom(o.getClass())) {
+		if ((o != null) && expectedResultType.isAssignableFrom(o.getClass())) {
 			nextActivity = (T) o;
 		} else {
 			E adapter = null;
-			if (adapter != null) {
+			if ((adapterClass != null) && (this.adapter != null)) {
 				adapter = getInjector().getInstance(adapterClass);
 				adapter.setContext(o);
 			}
 			try {
-				nextActivity = expectedResultType.getConstructor(adapterClass)
-						.newInstance(adapter);
-			} catch (InstantiationException e) {
+				nextActivity = expectedResultType.getConstructor(adapterClass).newInstance(adapter);
+			} catch (final InstantiationException e) {
 				e.printStackTrace();
-			} catch (IllegalAccessException e) {
+			} catch (final IllegalAccessException e) {
 				e.printStackTrace();
-			} catch (IllegalArgumentException e) {
+			} catch (final IllegalArgumentException e) {
 				e.printStackTrace();
-			} catch (InvocationTargetException e) {
+			} catch (final InvocationTargetException e) {
 				e.printStackTrace();
-			} catch (NoSuchMethodException e) {
+			} catch (final NoSuchMethodException e) {
 				e.printStackTrace();
-			} catch (SecurityException e) {
+			} catch (final SecurityException e) {
 				e.printStackTrace();
 			}
 		}
@@ -59,8 +57,7 @@ public abstract class AbstractActivity implements IEvalutaionGroup {
 	}
 
 	protected Injector getInjector() {
-		throw new UnsupportedOperationException(
-				"getInjector() must be implemented by implementing classes!");
+		throw new UnsupportedOperationException("getInjector() must be implemented by implementing classes!");
 	}
 
 }
