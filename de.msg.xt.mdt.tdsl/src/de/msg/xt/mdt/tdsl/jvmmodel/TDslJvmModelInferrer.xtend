@@ -363,16 +363,19 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 							() {
 								@Override
 								public Object apply() {
-									return contextAdapter.«operation.name»(«FOR param : operation.params SEPARATOR ', '»«param.name».getValue()«ENDFOR»);
+									return contextAdapter != null ? contextAdapter.«operation.name»(«FOR param : operation.params SEPARATOR ', '»«param.name».getValue()«ENDFOR») : null;
 								}
 							};
 						''')
 					if (nextActivityAdapterClass != null) {
-						it.append("return this.callContextAdapter(functionCall, ")
+						it.append("return ")
+						it.append("this.callContextAdapter(functionCall, ")
 						operation.newTypeRef(nextActivityClass).serialize(operation, it)
 						it.append(".class, ")
 						operation.newTypeRef(nextActivityAdapterClass).serialize(operation, it)
 						it.append(".class);")
+					} else {
+						it.append("functionCall.apply();")
 					}
 				]
 			}
