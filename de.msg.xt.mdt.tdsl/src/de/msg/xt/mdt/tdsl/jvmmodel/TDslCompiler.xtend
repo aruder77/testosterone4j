@@ -111,17 +111,20 @@ class TDslCompiler extends XbaseCompiler {
 				}
 			}
 			SubUseCaseCall: {
+				newLine
+				expr.newTypeRef(expr.useCase.class_fqn).serialize(expr, it)
+				val useCaseVariable = declareVariable(expr, expr.variableName)
+				append(''' «useCaseVariable» = getOrGenerateSubUseCase(''')
+				expr.newTypeRef(expr.useCase.class_fqn).serialize(expr, it)
+				append(".class, \"" + expr.readableUniqueKey + "\");")
 				for (param : expr.paramAssignment) {
 					newLine
-					append('''«expr.useCase.subUseCaseGetter».set«param.name.name.toFirstUpper»(''')
+					append('''«useCaseVariable».set«param.name.name.toFirstUpper»(''')
 					appendParameterValue(it, param.name.dataType, param.value)
 					append(");")
 				}
 				newLine
-				expr.newTypeRef(expr.useCase.class_fqn).serialize(expr, it)
-				append(''' «expr.variableName» = «expr.useCase.subUseCaseGetter»;''')
-				newLine
-				append('''«expr.variableName».execute((''')
+				append('''«useCaseVariable».execute((''')
 				expr.newTypeRef(expr.useCase.initialActivity.class_FQN.toString).serialize(expr, it)
 				append(''')currentActivity);''')
 			}
@@ -263,20 +266,21 @@ class TDslCompiler extends XbaseCompiler {
 
 	def dispatch appendGeneratedValueExpression(OperationCall lastExpression,
 		GeneratedValueExpression generatedValueExpr, ITreeAppendable appendable) {
-		val variableName = lastExpression.
-			getVariableNameForOperationCallParameter(generatedValueExpr.param as DataTypeMapping)
+		val dataTypeMapping = generatedValueExpr.param as DataTypeMapping
+		val variableName = new Pair<OperationCall, DataTypeMapping>(lastExpression, dataTypeMapping).getVarName(appendable)
 		appendable.append(variableName)
 	}
 
 	def dispatch appendGeneratedValueExpression(ActivityOperationCall lastExpression,
 		GeneratedValueExpression generatedValueExpr, ITreeAppendable appendable) {
-		val variableName = generatedValueExpr.param.fullyQualifiedName.toString.toFieldName
+		val activityOperationParam = generatedValueExpr.param as ActivityOperationParameter
+		val variableName = new Pair<ActivityOperationCall, ActivityOperationParameter>(lastExpression, activityOperationParam).getVarName(appendable)
 		appendable.append(variableName)
 	}
 
 	def dispatch appendGeneratedValueExpression(SubUseCaseCall lastExpression,
 		GeneratedValueExpression generatedValueExpr, ITreeAppendable appendable) {
-		val variableName = lastExpression.variableName
+		val variableName = lastExpression.getVarName(appendable)
 		val getterName = (generatedValueExpr.param as Parameter).name.getterName
 		appendable.append('''«variableName».«getterName»()''')
 	}
@@ -292,11 +296,12 @@ class TDslCompiler extends XbaseCompiler {
 			val dataTypeName = mapping.datatype.class_fqn
 			appendable.newLine
 			mapping.newTypeRef(dataTypeName).serialize(mapping, appendable)
-			appendable.append(''' «call.getVariableNameForOperationCallParameter(mapping)» = ''')
+			val varName = appendable.declareVariable(new Pair<OperationCall, DataTypeMapping>(call, mapping), mapping.preferredVariableName)
+			appendable.append(''' «varName» = ''')
 			if (assignment == null) {
 				appendable.append("getOrGenerateValue(")
 				mapping.newTypeRef(dataTypeName).serialize(mapping, appendable)
-				appendable.append('''.class, "«call.getVariableNameForOperationCallParameter(mapping)»")''')
+				appendable.append('''.class, "«call.readableUniqueKey(mapping)»")''')
 			} else {
 				appendParameterValue(appendable, mapping.datatype, assignment.value)
 			}
@@ -312,7 +317,7 @@ class TDslCompiler extends XbaseCompiler {
 			if (assignment == null) {
 				appendable.append("getOrGenerateValue(")
 				mapping.newTypeRef(dataTypeName).serialize(mapping, appendable)
-				appendable.append('''.class, "«call.getVariableNameForOperationCallParameter(mapping)»")''')
+				appendable.append('''.class, "«new Pair<OperationCall, DataTypeMapping>(call, mapping).getVarName(appendable)»")''')
 			} else {
 				appendParameterValue(appendable, mapping.datatype, assignment.value)
 			}
@@ -343,8 +348,10 @@ class TDslCompiler extends XbaseCompiler {
 			val assignment = findAssignment(call, parameter)
 			val dataTypeName = parameter.dataType.class_fqn
 			appendable.newLine
+			val proposedName = call.operation.name + parameter.name?.toFirstUpper
+			val variableName = appendable.declareVariable(new Pair<ActivityOperationCall, ActivityOperationParameter>(call, parameter), proposedName)
 			parameter.newTypeRef(dataTypeName).serialize(parameter, appendable)
-			appendable.append(''' «parameter.fullyQualifiedName.toString.toFieldName» = ''')
+			appendable.append(''' «variableName» = ''')
 			if (assignment == null) {
 				appendable.append("getOrGenerateValue(")
 				parameter.newTypeRef(dataTypeName).serialize(parameter, appendable)
@@ -373,8 +380,10 @@ class TDslCompiler extends XbaseCompiler {
 			val assignment = findAssignment(call, parameter)
 			val dataTypeName = parameter.dataType.class_fqn
 			appendable.newLine
+			val proposedName = call.useCase.name?.toFirstLower + parameter.name?.toFirstUpper
+			val variableName = appendable.declareVariable(new Pair<SubUseCaseCall, Parameter>(call, parameter), proposedName)
 			parameter.newTypeRef(dataTypeName).serialize(parameter, appendable)
-			appendable.append(''' «parameter.fullyQualifiedName.toString.toFieldName» = ''')
+			appendable.append(''' «proposedName» = ''')
 			if (assignment == null) {
 				appendable.append("getOrGenerateValue(")
 				parameter.newTypeRef(dataTypeName).serialize(parameter, appendable)
@@ -397,12 +406,11 @@ class TDslCompiler extends XbaseCompiler {
 
 	def appendParameter(ActivityOperationCall call, ITreeAppendable appendable) {
 		appendable.append(
-			'''«FOR parameter : call.operation.params SEPARATOR ', '»«parameter.fullyQualifiedName.toString.toFieldName»«ENDFOR»''')
+			'''«FOR parameter : call.operation.params SEPARATOR ', '»«new Pair<ActivityOperationCall, ActivityOperationParameter>(call, parameter).getVarName(appendable)»«ENDFOR»''')
 	}
 
 	def appendParameter(OperationCall call, ITreeAppendable appendable) {
-		val params = '''«FOR parameter : call.operation.dataTypeMappings SEPARATOR ', '»«call.
-			getVariableNameForOperationCallParameter(parameter)»«ENDFOR»'''
+		val params = '''«FOR parameter : call.operation.dataTypeMappings SEPARATOR ', '»«new Pair<OperationCall, DataTypeMapping>(call, parameter).getVarName(appendable)»«ENDFOR»'''
 		appendable.append(params)
 	}
 

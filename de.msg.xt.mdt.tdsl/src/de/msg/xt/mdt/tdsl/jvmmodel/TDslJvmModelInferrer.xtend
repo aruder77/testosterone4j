@@ -100,6 +100,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 	@Inject extension NamingExtensions fqn
 	@Inject extension MetaModelExtensions
 	@Inject extension UtilExtensions
+	@Inject extension SerialVersionUID
 
 	@Inject
 	XbaseCompiler xbaseCompiler
@@ -111,10 +112,13 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 	IJvmModelAssociator associator;
 
 	def dispatch void infer(PackageDeclaration pack, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
-
-		for (element : pack.elements/* .filter([!(it instanceof Predicate)] ) */) {
-			element.infer(acceptor, isPreIndexingPhase)
-		}
+		//if (!isPreIndexingPhase) {
+			if (pack.name.equals("com.bmw.bne3.client.uitest.bnetoolkit"))
+				System.out.println("inferring package " + pack.name + " preIndexingPhase: " + isPreIndexingPhase)
+			for (element : pack.elements/* .filter([!(it instanceof Predicate)] ) */) {
+				element.infer(acceptor, isPreIndexingPhase)
+			}
+		//}
 
 	/*		val predicates = pack.elements.filter(typeof(Predicate))
 		if (!predicates.empty) { 
@@ -153,7 +157,10 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 	}
 
 	def activityAdapterParentClass(Activity activity) {
-		activity?.parent?.adapterInterface_fqn ?: activity?.toolkit?.activityAdapter_FQN
+		var clazz = activity?.parent?.adapterInterface_fqn 
+		if (clazz == null)
+			clazz = activity?.toolkit?.activityAdapter_FQN
+		clazz
 	}
 
 	def dispatch void infer(Activity activity, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
@@ -162,8 +169,9 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 		if (activity.needsOwnActivityAdapter && activity.adapterInterface_fqn != null) {
 			activityAdapterClassVar = activity.toInterface(activity.adapterInterface_fqn)[]
 			acceptor.accept(activityAdapterClassVar).initializeLater [
-				if (activity.activityAdapterParentClass != null)
-					superTypes += activity.newTypeRef(activity.activityAdapterParentClass)
+				val activityAdapterParentClass = activity.activityAdapterParentClass
+				if (activityAdapterParentClass != null) 
+					superTypes += activity.newTypeRef(activityAdapterParentClass)
 				for (activityMethod : activity.operations) {
 					if (activityMethod.name != null && activityMethod.body == null) {
 						members += activityMethod.toMethod(activityMethod.name,
@@ -179,14 +187,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 				}
 			]
 		}
-
-		var JvmTypeReference typeRef = null
-		if (activityAdapterClassVar == null) {
-			typeRef = activity.newTypeRef(activity.adapterInterface_fqn)
-		} else {
-			typeRef = newTypeRef(activityAdapterClassVar)
-		}
-		val activityAdapterClassRef = typeRef
+		val activityAdapterClassVal = activityAdapterClassVar
 
 		if (activity.class_FQN == null)
 			return
@@ -194,6 +195,16 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 		val activityClass = activity.toClass(activity.class_FQN)
 		acceptor.accept(activityClass).initializeLater(
 			[
+				var JvmTypeReference typeRef = null
+				if (activityAdapterClassVal == null) {
+					typeRef = activity.newTypeRef(activity.adapterInterface_fqn)
+				} else {
+					typeRef = newTypeRef(activityAdapterClassVal)
+				}
+				val activityAdapterClassRef = typeRef
+				
+				
+				
 				val superClass = activity.superClass_ref
 				if (superClass != null)
 					superTypes += superClass
@@ -857,7 +868,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 					setFinal(true)
 					setStatic(true)
 					it.setInitializer [
-						it.append(System::currentTimeMillis + "L")
+						it.append(dataType.calcSerialVersionUID + "L")
 					]
 				]
 				members += dataType.toField("_value", dataType.type?.mappedBy) [
@@ -998,7 +1009,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 				setFinal(true)
 				setStatic(true)
 				it.setInitializer [
-					it.append(System::currentTimeMillis + "L")
+					it.append(useCase.calcSerialVersionUID + "L")
 				]
 			]
 			for (inputParam : useCase.inputParameter) {
@@ -1021,10 +1032,10 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 					for (inputParam : useCase.inputParameter) {
 						newLine
 						if (inputParam?.dataType?.class_fqn != null) {
-							it.append(
-								'''
-								this.«inputParam.name» = this.getOrGenerateValue(«inputParam.dataType.class_fqn».class, "«inputParam.
-									fullyQualifiedName.toString»");''')
+							it.append('''this.«inputParam.name» = this.getOrGenerateValue(''')
+							inputParam.newTypeRef(inputParam.dataType.class_fqn).serialize(inputParam, it)
+							it.append('''.class, "«inputParam.fullyQualifiedName.toString»");''')
+							newLine
 						}
 					}
 				]

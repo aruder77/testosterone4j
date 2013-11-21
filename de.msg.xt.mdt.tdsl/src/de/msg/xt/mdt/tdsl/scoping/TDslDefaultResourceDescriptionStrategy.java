@@ -31,6 +31,7 @@ import de.msg.xt.mdt.tdsl.tDsl.StatementLine;
 import de.msg.xt.mdt.tdsl.tDsl.TagWithCondition;
 import de.msg.xt.mdt.tdsl.tDsl.TagsDeclaration;
 import de.msg.xt.mdt.tdsl.tDsl.Test;
+import de.msg.xt.mdt.tdsl.tDsl.Toolkit;
 
 public class TDslDefaultResourceDescriptionStrategy extends
 		DefaultResourceDescriptionStrategy implements
@@ -76,6 +77,8 @@ public class TDslDefaultResourceDescriptionStrategy extends
 			return false;
 		} else if (eObject instanceof StatementLine) {
 			return false;
+		} else if (eObject instanceof Toolkit) {
+			return super.createEObjectDescriptions(eObject, acceptor);
 		} else {
 			return super.createEObjectDescriptions(eObject, acceptor);
 		}

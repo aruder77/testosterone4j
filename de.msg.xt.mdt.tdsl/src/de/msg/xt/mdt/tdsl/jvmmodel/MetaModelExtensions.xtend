@@ -175,9 +175,9 @@ class MetaModelExtensions {
 	
 	def Toolkit getToolkit(PackageDeclaration pack) {
 		val sut = pack?.elements?.filter(typeof(Toolkit))?.last
-		if (sut == null)
+		if (sut == null) {
 			pack?.sutRef
-		else 
+		} else 
 			sut
 	}
 	

@@ -1,27 +1,28 @@
 package de.msg.xt.mdt.tdsl.jvmmodel
 
+import de.msg.xt.mdt.base.AbstractActivity
 import de.msg.xt.mdt.tdsl.tDsl.Activity
 import de.msg.xt.mdt.tdsl.tDsl.Control
 import de.msg.xt.mdt.tdsl.tDsl.DataType
 import de.msg.xt.mdt.tdsl.tDsl.DataTypeMapping
+import de.msg.xt.mdt.tdsl.tDsl.EquivalenceClass
 import de.msg.xt.mdt.tdsl.tDsl.Field
 import de.msg.xt.mdt.tdsl.tDsl.Operation
+import de.msg.xt.mdt.tdsl.tDsl.OperationCall
+import de.msg.xt.mdt.tdsl.tDsl.PackageDeclaration
+import de.msg.xt.mdt.tdsl.tDsl.Predicate
+import de.msg.xt.mdt.tdsl.tDsl.SubUseCaseCall
+import de.msg.xt.mdt.tdsl.tDsl.Tag
+import de.msg.xt.mdt.tdsl.tDsl.TagsDeclaration
 import de.msg.xt.mdt.tdsl.tDsl.Toolkit
 import de.msg.xt.mdt.tdsl.tDsl.UseCase
 import javax.inject.Inject
+import org.eclipse.emf.ecore.EObject
+import org.eclipse.xtext.common.types.JvmTypeReference
 import org.eclipse.xtext.naming.IQualifiedNameProvider
 import org.eclipse.xtext.naming.QualifiedName
-import de.msg.xt.mdt.tdsl.tDsl.TagsDeclaration
-import de.msg.xt.mdt.tdsl.tDsl.Tag
-import org.eclipse.xtext.common.types.JvmTypeReference
 import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder
-import de.msg.xt.mdt.base.AbstractActivity
-import org.eclipse.emf.ecore.EObject
-import de.msg.xt.mdt.tdsl.tDsl.PackageDeclaration
-import de.msg.xt.mdt.base.ActivityAdapter
-import de.msg.xt.mdt.tdsl.tDsl.SubUseCaseCall
-import de.msg.xt.mdt.tdsl.tDsl.Predicate
-import de.msg.xt.mdt.tdsl.tDsl.EquivalenceClass
+import de.msg.xt.mdt.tdsl.tDsl.GeneratedValueExpression
 
 class NamingExtensions {
 	
@@ -113,11 +114,19 @@ class NamingExtensions {
 	
 	// DataTypeMapping
 	
-	def String generatedValueLocalVariableName(DataTypeMapping dataTypeMapping) {
-		val fieldName = dataTypeMapping?.operationMapping?.field?.fullyQualifiedName?.toString
+	def String readableUniqueKey(OperationCall call, DataTypeMapping dataTypeMapping) {
+		val callIndex = call.useCasePath
+		val fieldName = dataTypeMapping?.operationMapping?.field?.name
 		val operationName = dataTypeMapping?.operationMapping?.name?.name
 		val paramName = dataTypeMapping?.name?.name
-		val variableName = (fieldName + '.' + operationName + '.' + paramName).toFieldName
+		val variableName = callIndex + ":" + fieldName + '.' + operationName + '.' + paramName
+		variableName
+	}
+	
+	def String preferredVariableName(DataTypeMapping dataTypeMapping) {
+		val fieldName = dataTypeMapping?.operationMapping?.field?.name
+		val paramName = dataTypeMapping?.name?.name
+		val variableName = (fieldName + '.' + paramName).toFieldName
 		variableName
 	}
 	
@@ -149,6 +158,7 @@ class NamingExtensions {
 		field?.name + "Field"
 	}
 	
+	
 
 	// PackageDeclaration
 	
@@ -167,12 +177,17 @@ class NamingExtensions {
 	// SubUseCaseCall
 	
 	def variableName(SubUseCaseCall call) {
-		(call?.useCase?.name + "_" + call?.useCasePath)?.toFieldName
+		call?.useCase?.name?.toFirstLower
+	}
+	
+	def readableUniqueKey(SubUseCaseCall call) {
+		call.useCasePath + "." + call.useCase.name
 	}
 	
 	// SUT
 	
 	def String activityAdapter_FQN(Toolkit toolkit) {
+		
 		toolkit?.fullyQualifiedName?.toString + "ActivityAdapter"
 	}
 	
