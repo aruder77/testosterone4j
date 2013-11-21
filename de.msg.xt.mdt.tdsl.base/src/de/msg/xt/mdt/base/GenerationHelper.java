@@ -20,14 +20,15 @@ public class GenerationHelper {
 
 		final File f = new File(fileName);
 
-		if (!f.exists()) {
+		// if (!f.exists()) {
+		if (true) {
 			testCases = generateTestCases(generator, testClass, f);
-		}
-
-		try {
-			testCases = readSerialization(testClass, f);
-		} catch (Exception ex) {
-			testCases = generateTestCases(generator, testClass, f);
+		} else {
+			try {
+				testCases = readSerialization(testClass, f);
+			} catch (Exception ex) {
+				testCases = generateTestCases(generator, testClass, f);
+			}
 		}
 		final List<Object[]> testCaseConfig = new ArrayList<Object[]>();
 		int i = 1;
