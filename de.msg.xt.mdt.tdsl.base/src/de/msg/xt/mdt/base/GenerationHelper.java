@@ -45,12 +45,12 @@ public class GenerationHelper {
 		activeGeneration = true;
 		testCases = generate(generator, testClass);
 		activeGeneration = false;
-		try {
+		/* try {
 			writeSerialization(testCases, testClass, f);
 		} catch (final IOException e) {
 			throw new RuntimeException(
 					"Cannot write generated test data to file!", e);
-		}
+		}*/
 		return testCases;
 	}
 

@@ -385,10 +385,11 @@ class TDslBatchScopeProvider extends XbaseWithAnnotationsBatchScopeProvider {
 	def dispatch List<ConditionalNextActivity> determineExplicitNextActivities(XIfExpression ifExpr) {
 		val thenActivities = ifExpr.then?.determineExplicitNextActivities
 		val activities = new HashSet<ConditionalNextActivity>()
+		if (thenActivities != null)
+			activities.addAll(thenActivities.filter [it != null])
 		if (ifExpr.getElse() != null) {
 			activities.addAll(ifExpr.getElse().determineExplicitNextActivities.filter [it != null])
 		}
-		activities.addAll(thenActivities.filter [it != null])
 		return activities.toList
 	}			
 	

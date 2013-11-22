@@ -11,25 +11,25 @@
 <a name="pageObjects"></a>
 <h1>PageObject Pattern</h1>
 <p>
-Initial von Google für Web-Oberflächen entwickelt, versucht es den Testautomatisierungscode der fachlichen Funktionalitäten 
+Initial von Google fÃ¼r Web-OberflÃ¤chen entwickelt, versucht es den Testautomatisierungscode der fachlichen FunktionalitÃ¤ten 
 einer (Web-)Seite in einem sog. PageObject zu kapseln. Die Idee ist dabei Folgende:
 </p>
 <p>
 <ul>
 	<li>
-		Für jede Seite der Anwendung wird eine PageObject-Klasse erstellt.
+		FÃ¼r jede Seite der Anwendung wird eine PageObject-Klasse erstellt.
 	</li>
 	<li>
-		Das PageObject bietet Methoden für die fachliche Funktionalität, die ein Benutzer für eine bestimmte Seite ausführen kann.
-				 Die Implementierung der Methoden enthält den Testautomatisierungscode zur Ausführung der entsprechenden Funktion.
+		Das PageObject bietet Methoden fÃ¼r die fachliche FunktionalitÃ¤t, die ein Benutzer fÃ¼r eine bestimmte Seite ausfÃ¼hren kann.
+				 Die Implementierung der Methoden enthÃ¤lt den Testautomatisierungscode zur AusfÃ¼hrung der entsprechenden Funktion.
 	</li>
 	<li>
 		Navigiert eine fachliche Funktion auf eine neue Seite, liefert die entsprechende PageObject-Methode ein PageObject 
-				 der neuen Seite zurück.
+				 der neuen Seite zurÃ¼ck.
 	</li>
 	<li>
-		Die eigentlichen Testskripte, die Abläufe der Anwendungsfälle testen, verwenden die Testautomatisierungs-Bibliotheken 
-				 nicht mehr direkt, sondern werden ausschließlich gegen die PageObjects entwickelt.
+		Die eigentlichen Testskripte, die AblÃ¤ufe der AnwendungsfÃ¤lle testen, verwenden die Testautomatisierungs-Bibliotheken 
+				 nicht mehr direkt, sondern werden ausschlieÃŸlich gegen die PageObjects entwickelt.
 	</li>
 </ul>
 </p>

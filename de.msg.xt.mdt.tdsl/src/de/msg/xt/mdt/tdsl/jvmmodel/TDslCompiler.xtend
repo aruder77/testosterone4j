@@ -10,15 +10,16 @@ import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationParameter
 import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationParameterAssignment
 import de.msg.xt.mdt.tdsl.tDsl.Assert
 import de.msg.xt.mdt.tdsl.tDsl.ControlOperationParameter
+import de.msg.xt.mdt.tdsl.tDsl.CurrentActivityExpression
 import de.msg.xt.mdt.tdsl.tDsl.DataType
 import de.msg.xt.mdt.tdsl.tDsl.DataTypeMapping
 import de.msg.xt.mdt.tdsl.tDsl.Field
 import de.msg.xt.mdt.tdsl.tDsl.GeneratedValueExpression
 import de.msg.xt.mdt.tdsl.tDsl.GenerationSelektor
+import de.msg.xt.mdt.tdsl.tDsl.InnerBlock
 import de.msg.xt.mdt.tdsl.tDsl.OperationCall
 import de.msg.xt.mdt.tdsl.tDsl.OperationParameterAssignment
 import de.msg.xt.mdt.tdsl.tDsl.Parameter
-import de.msg.xt.mdt.tdsl.tDsl.ParameterAssignment
 import de.msg.xt.mdt.tdsl.tDsl.StatementLine
 import de.msg.xt.mdt.tdsl.tDsl.SubUseCaseCall
 import de.msg.xt.mdt.tdsl.tDsl.UseCaseBlock
@@ -27,14 +28,13 @@ import java.util.Stack
 import javax.inject.Inject
 import org.eclipse.xtext.common.types.util.TypeReferences
 import org.eclipse.xtext.naming.IQualifiedNameProvider
-import org.eclipse.xtext.xbase.XAbstractFeatureCall
+import org.eclipse.xtext.xbase.XBlockExpression
 import org.eclipse.xtext.xbase.XExpression
 import org.eclipse.xtext.xbase.compiler.XbaseCompiler
 import org.eclipse.xtext.xbase.compiler.output.ITreeAppendable
 import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder
+import org.eclipse.xtext.xbase.lib.Pair
 import org.eclipse.xtext.xbase.typing.ITypeProvider
-import org.eclipse.xtext.xbase.XBlockExpression
-import de.msg.xt.mdt.tdsl.tDsl.CurrentActivityExpression
 
 class TDslCompiler extends XbaseCompiler {
 
@@ -145,6 +145,9 @@ class TDslCompiler extends XbaseCompiler {
 			UseCaseBlock: {
 				compileBlock(expr, it, expr.useCase.returnedActivity)
 			}
+			InnerBlock: {
+				compileInnerBlock(expr, it)
+			}
 			CurrentActivityExpression: {
 			}
 			/*XAbstractFeatureCall: {
@@ -158,6 +161,10 @@ class TDslCompiler extends XbaseCompiler {
 			default:
 				super.doInternalToJavaStatement(expr, it, isReferenced)
 		}
+	}
+	
+	protected def compileInnerBlock(XBlockExpression expr, ITreeAppendable it) {
+		super.doInternalToJavaStatement(expr, it, false)
 	}
 
 	protected def compileBlock(XBlockExpression expr, ITreeAppendable it, Activity returnedActivity) {
@@ -251,6 +258,8 @@ class TDslCompiler extends XbaseCompiler {
 			}
 			UseCaseBlock: {
 				append("nextActivity")
+			}
+			InnerBlock: {
 			}
 			CurrentActivityExpression: {
 				append("currentActivity")

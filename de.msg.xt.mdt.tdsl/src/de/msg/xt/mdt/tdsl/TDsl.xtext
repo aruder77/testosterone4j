@@ -200,12 +200,18 @@ CurrentActivityExpression returns xbase::XExpression:
 ;
 
 
-IfExpression returns xbase::XExpression:
+IfExpression returns xbase::XIfExpression:
 	{xbase::XIfExpression}
 	'if' '(' if=Expression ')'
-	then=UseCaseBlock
-	('else' else=UseCaseBlock)?
+	then=InnerBlock
+	('else' else=InnerBlock)?
 ;
+
+InnerBlock returns xbase::XBlockExpression:
+	{InnerBlock}
+  	'{' (expressions+=StatementLine)* '}'
+;
+
 
 
 FQN:
@@ -226,12 +232,16 @@ AFQN:
 
 OperationCall returns xbase::XExpression:
 	{OperationCall}
-	operation=[OperationMapping|OFQN] ('(' (paramAssignment+=OperationParameterAssignment) (',' paramAssignment+=OperationParameterAssignment)* ')')?
+	operation=[OperationMapping|OFQN] ('(' (paramAssignment+=OperationParameterAssignment) (',' paramAssignment+=OperationParameterAssignment)* ')')? (expectation=ActivityExpectation)?
 ;
 
 ActivityOperationCall returns xbase::XExpression:
 	{ActivityOperationCall}
-	operation=[ActivityOperation|AFQN] ('(' (paramAssignment+=ActivityOperationParameterAssignment) (',' paramAssignment+=ActivityOperationParameterAssignment)* ')')?
+	operation=[ActivityOperation|AFQN] ('(' (paramAssignment+=ActivityOperationParameterAssignment) (',' paramAssignment+=ActivityOperationParameterAssignment)* ')')? (expectation=ActivityExpectation)?
+;
+
+ActivityExpectation:
+	'expect' activity=[Activity|FQN] 'if' '(' guard=Expression ')' ifBlock=InnerBlock ('else' 'if' '(' elseIfGuard=Expression ')' elseIfblock+=InnerBlock)* ('else' elseBlock=InnerBlock)?
 ;
 
 SubUseCaseCall returns xbase::XExpression:

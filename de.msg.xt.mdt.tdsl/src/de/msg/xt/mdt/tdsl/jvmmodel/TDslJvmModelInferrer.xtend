@@ -112,13 +112,10 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 	IJvmModelAssociator associator;
 
 	def dispatch void infer(PackageDeclaration pack, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
-		//if (!isPreIndexingPhase) {
-			if (pack.name.equals("com.bmw.bne3.client.uitest.bnetoolkit"))
-				System.out.println("inferring package " + pack.name + " preIndexingPhase: " + isPreIndexingPhase)
+			println("inferring package " + pack.name + " preIndexingPhase: " + isPreIndexingPhase)
 			for (element : pack.elements/* .filter([!(it instanceof Predicate)] ) */) {
 				element.infer(acceptor, isPreIndexingPhase)
 			}
-		//}
 
 	/*		val predicates = pack.elements.filter(typeof(Predicate))
 		if (!predicates.empty) { 

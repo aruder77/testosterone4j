@@ -11,11 +11,11 @@
 <a name="useCases"></a>
 <h1>Spezifikation der Use-Cases</h1>
 <p>
-Nachdem die Benutzeroberfläche in Form von Activities erfolgreich modelliert ist, können nun die Use-Cases
+Nachdem die BenutzeroberflÃ¤che in Form von Activities erfolgreich modelliert ist, kÃ¶nnen nun die Use-Cases
 der Anwendung komfortabel durch den TDsl-Editor spezifiziert werden. 
 </p>
 <p>
-Der Rumpf eines Use-Cases sieht folgendermaßen aus:
+Der Rumpf eines Use-Cases sieht folgendermaÃŸen aus:
 </p>
 <p>
 <div class="literallayout">
@@ -33,11 +33,11 @@ Der Rumpf eines Use-Cases sieht folgendermaßen aus:
 </p>
 <p>
 <em>OpenDocument</em> ist der eindeutige Name des UseCases. Mit <span class="inlinecode"><span class="keyword">initial</span></span> wird die Activity benannt,
-die als Ausgangs-Activity des Use-Cases dient. Das optionale Schlüsselwort <span class="inlinecode">=&gt;</span> gibt die Activity
-an mit der der Use-Case endet. Standardmäßig wird hierfür die Ausgangs-Activity angenommen.
+die als Ausgangs-Activity des Use-Cases dient. Das optionale SchlÃ¼sselwort <span class="inlinecode">=&gt;</span> gibt die Activity
+an mit der der Use-Case endet. StandardmÃ¤ÃŸig wird hierfÃ¼r die Ausgangs-Activity angenommen.
 </p>
 <p>
-Innerhalb des Use-Case Blocks können beliebig viele <em>Statements</em> abgesetzt werden. Die verschiedenen
+Innerhalb des Use-Case Blocks kÃ¶nnen beliebig viele <em>Statements</em> abgesetzt werden. Die verschiedenen
 Arten von <em>Statements</em> werden in den folgenden Sektionen vorgestellt.
 </p>
 <p>
@@ -63,23 +63,23 @@ Der Typ des Parameters muss hierbei ein spezifizierter #<span class="inlinecode"
 <a name="controlOperationCalls"></a>
 <h2>Aufruf von Operationen</h2>
 <p>
-In erster Linie ist natürlich der Aufruf von Operationen der Activities und deren Felder von Interesse.
+In erster Linie ist natÃ¼rlich der Aufruf von Operationen der Activities und deren Felder von Interesse.
 Der Aufruf einer Operation erfolgt durch das Voranstellen von <span class="inlinecode">#</span> gefolgt durch entweder
 <ul>
 	<li>
 		dem Namen der Activity-Operation, oder
 	</li>
 	<li>
-		dem Namen des Fields und anschließendem Namen der Control-Operation, getrennt durch einen Punkt.
+		dem Namen des Fields und anschlieÃŸendem Namen der Control-Operation, getrennt durch einen Punkt.
 	</li>
 </ul>
 </p>
 <p>
-Anschließend können noch die Parameter der Operation zugewiesen werden. Da jeder Parameter nur optional
+AnschlieÃŸend kÃ¶nnen noch die Parameter der Operation zugewiesen werden. Da jeder Parameter nur optional
 angegeben werden muss, muss jedoch die Zuweisung durch explizite Angabe des Parameternamens erfolgen.
 </p>
 <p>
-Beispiele für den Aufruf von Operationen sind:
+Beispiele fÃ¼r den Aufruf von Operationen sind:
 </p>
 <p>
 <div class="literallayout">
@@ -108,20 +108,20 @@ oder als Activity-Operation
 </div>
 </p>
 <p>
-Als Wert für einen Parameter kann dabei eine beliebiger Xtend-Ausdruck angegeben werden, so dass hier
-die volle Mächtigkeit von Xtend/Java zur Verfügung steht! Dabei kann natürlich auch auf die Use-Case
+Als Wert fÃ¼r einen Parameter kann dabei eine beliebiger Xtend-Ausdruck angegeben werden, so dass hier
+die volle MÃ¤chtigkeit von Xtend/Java zur VerfÃ¼gung steht! Dabei kann natÃ¼rlich auch auf die Use-Case
 Parameter oder Variablen (siehe <a href="ivp_7.html#variables" title="Go to &quot;Variablen&quot;" >section variables</a>) zugegriffen werden.
 </p>
 <p>
-Falls ein oder mehrere Parameter einer Operation beim Aufruf nicht angegeben werden, wählt der Testdaten-Generator
-einen Wert anhand der spezifizierten Äquivalenzklassen-Angaben des entsprechenden Datentyps. Die Strategie
-bei der Wahl des Wertes hängt von den beim Test angegebenen Coverage-Kriterien ab (siehe <a href="ivp_8.html#tests" title="Go to &quot;Anlage von Tests&quot;" >section tests</a>). 
+Falls ein oder mehrere Parameter einer Operation beim Aufruf nicht angegeben werden, wÃ¤hlt der Testdaten-Generator
+einen Wert anhand der spezifizierten Ã„quivalenzklassen-Angaben des entsprechenden Datentyps. Die Strategie
+bei der Wahl des Wertes hÃ¤ngt von den beim Test angegebenen Coverage-Kriterien ab (siehe <a href="ivp_8.html#tests" title="Go to &quot;Anlage von Tests&quot;" >section tests</a>). 
 </p>
 <a name="subUseCaseCalls"></a>
 <h2>Aufruf von anderen Use-Cases</h2>
 <p>
-Um maximale Wiederverwendung zu fördern können Use-Cases andere Use-Cases aufrufen. Dies erfolgt über
-das Schlüsselwort <span class="inlinecode"><span class="keyword">call</span></span>.
+Um maximale Wiederverwendung zu fÃ¶rdern kÃ¶nnen Use-Cases andere Use-Cases aufrufen. Dies erfolgt Ã¼ber
+das SchlÃ¼sselwort <span class="inlinecode"><span class="keyword">call</span></span>.
 </p>
 <p>
 <div class="literallayout">
@@ -134,18 +134,18 @@ das Schlüsselwort <span class="inlinecode"><span class="keyword">call</span></sp
 </div>
 </p>
 <p>
-Die Übergabe eventueller Use-Case Parameter erfolgt analog der Parameter-Übergabe bei Operationen. 
+Die Ãœbergabe eventueller Use-Case Parameter erfolgt analog der Parameter-Ãœbergabe bei Operationen. 
 </p>
 <a name="variables"></a>
 <h2>Variablen</h2>
 <p>
-Oft ist es sinnvoll Werte für den späteren Zugriff in Variablen zu speichern. Dies erfolgt über die Schlüsselwörter
-<span class="inlinecode">val</span>, für finale (nicht veränderbare) Variablen, und <span class="inlinecode">var</span>, für veränderbare Variablen. Der
+Oft ist es sinnvoll Werte fÃ¼r den spÃ¤teren Zugriff in Variablen zu speichern. Dies erfolgt Ã¼ber die SchlÃ¼sselwÃ¶rter
+<span class="inlinecode">val</span>, fÃ¼r finale (nicht verÃ¤nderbare) Variablen, und <span class="inlinecode">var</span>, fÃ¼r verÃ¤nderbare Variablen. Der
 Typ der Variablen muss nur angegeben werden wenn der Typ nicht durch einen angegebenen Ausdruck abgeleitet
 werden kann.
 </p>
 <p>
-Als Werte für Variablen können beliebige Xtend-Ausdrücke sowie Aufrufe von Operationen mit Rückgabewert
+Als Werte fÃ¼r Variablen kÃ¶nnen beliebige Xtend-AusdrÃ¼cke sowie Aufrufe von Operationen mit RÃ¼ckgabewert
 verwendet werden.
 </p>
 <p>
@@ -166,7 +166,7 @@ someString&nbsp;=&nbsp;<span class="string">"TDsl&nbsp;sucks!"</span>.replace(<s
 <a name="ifElse"></a>
 <h2>Bedingte Verzweigungen</h2>
 <p>
-Auch bedingte Verzweigungen sind in TDsl natürlich möglich. Die Syntax folgt der Java/Xtend Syntax:
+Auch bedingte Verzweigungen sind in TDsl natÃ¼rlich mÃ¶glich. Die Syntax folgt der Java/Xtend Syntax:
 </p>
 <p>
 <div class="literallayout">
@@ -191,16 +191,16 @@ Auch bedingte Verzweigungen sind in TDsl natürlich möglich. Die Syntax folgt der
 </div>
 </p>
 <p>
-Die <span class="inlinecode"><span class="keyword">else</span>&nbsp;<span class="keyword">if</span></span> und <span class="inlinecode"><span class="keyword">else</span></span> Zweige sind wie üblich optional.
+Die <span class="inlinecode"><span class="keyword">else</span>&nbsp;<span class="keyword">if</span></span> und <span class="inlinecode"><span class="keyword">else</span></span> Zweige sind wie Ã¼blich optional.
 </p>
 <p>
-In jedem Zweig können wiederum alle TDsl Statements dieses Kapitels verwendet werden.
+In jedem Zweig kÃ¶nnen wiederum alle TDsl Statements dieses Kapitels verwendet werden.
 </p>
 <a name="expressions"></a>
 <h2>Einbettung von Xtend Code</h2>
 <p>
-An jeder Stelle des Use-Cases kann beliebiger Xtend-Code eingebettet werden. Damit steht die volle Mächtigkeit
-von Xtend/Java zur Verfügung. Der Xtend-Code muss in eckige Klammern eingefasst werden.
+An jeder Stelle des Use-Cases kann beliebiger Xtend-Code eingebettet werden. Damit steht die volle MÃ¤chtigkeit
+von Xtend/Java zur VerfÃ¼gung. Der Xtend-Code muss in eckige Klammern eingefasst werden.
 </p>
 <p>
 Beispiel:
@@ -224,20 +224,20 @@ Beispiel:
 </div>
 </p>
 <p>
-Auch in dem eingebettetem Code stehen die Parameter und Variablen des Use-Cases zur Verfügung.
+Auch in dem eingebettetem Code stehen die Parameter und Variablen des Use-Cases zur VerfÃ¼gung.
 </p>
 <a name="asserts"></a>
 <h2>Verifikation von Ergebnissen</h2>
 <p>
-Die Verifikation von bestimmten Prüfpunkten ist stark abhängig vom verwendeten Test-Automatisierungs-Framework.
-Deshalb gibt es in TDsl dafür keine explizite Unterstützung. Die Verifikation kann aber leicht Implementierungs-abhängig
+Die Verifikation von bestimmten PrÃ¼fpunkten ist stark abhÃ¤ngig vom verwendeten Test-Automatisierungs-Framework.
+Deshalb gibt es in TDsl dafÃ¼r keine explizite UnterstÃ¼tzung. Die Verifikation kann aber leicht Implementierungs-abhÃ¤ngig
 als Xtend-Code realisiert werden.
 </p>
 <p>
-Wichtig ist jedoch, dass dem verifizierenden Xtend-Code-Block das Schlüsselwort <span class="inlinecode"><span class="keyword">assert</span></span> vorangestellt
+Wichtig ist jedoch, dass dem verifizierenden Xtend-Code-Block das SchlÃ¼sselwort <span class="inlinecode"><span class="keyword">assert</span></span> vorangestellt
 wird um TDsl bewusst zu machen dass es sich hier um verifizierenden Code handelt. Dies ist deshalb wichtig
-weil bei der Testfall-Generierung die Testfälle quasi <em>"trocken"</em> durchlaufen werden und die <span class="inlinecode"><span class="keyword">assert</span></span>s
-hier übersprungen werden müssen.
+weil bei der Testfall-Generierung die TestfÃ¤lle quasi <em>"trocken"</em> durchlaufen werden und die <span class="inlinecode"><span class="keyword">assert</span></span>s
+hier Ã¼bersprungen werden mÃ¼ssen.
 </p>
 <p>
 <div class="literallayout">

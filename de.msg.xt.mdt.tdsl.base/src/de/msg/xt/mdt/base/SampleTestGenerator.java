@@ -175,7 +175,7 @@ public class SampleTestGenerator implements Generator {
 	private EquivalenceClass findEquivalenceClassMatchingTags(
 			Iterator<EquivalenceClass> classIterator, Set<Tag> includeTags) {
 		EquivalenceClass equivClass = null;
-		while (classIterator.hasNext() && equivClass != null) {
+		while (classIterator.hasNext() && equivClass == null) {
 			EquivalenceClass tempClass = classIterator.next();
 			if (checkTagCompliance(tempClass.getClassTags(), includeTags)) {
 				equivClass = tempClass;
