@@ -119,7 +119,7 @@ DataTypeMapping:
 ;
 
 ConditionalNextActivity:
-	'=>' (next=[Activity|FQN] | returnToLastActivity?='returnToLastActivity')
+	'=>' ((usually?='usually')? (next=[Activity|FQN]) | returnToLastActivity?='returnToLastActivity')
 ;
 
 Parameter:

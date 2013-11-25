@@ -11,11 +11,22 @@ class UtilExtensions {
 	
 	// ActivityOperation
 	
+	/**
+	 * returns the following activity for the given ActivityOperation.
+	 * This is either the currentActivity, if no next activity is specified,
+	 * or the explicitly specified next activity, if concretely named, 
+	 * or null, if 'returnToLastActivity' or 'usually' is used.
+	 */
 	def Activity returnedActivity(ActivityOperation operation) {
    		if (operation.nextActivities.empty)
    			operation.activity
-   		else 
-   			operation.nextActivities.get(0)?.next
+   		else { 
+   			val condNextAct = operation.nextActivities.get(0)
+   			if (!condNextAct.usually && condNextAct.next != null)
+   				operation.nextActivities.get(0)?.next
+   			else 
+   				null	
+   		}
    	}
 	
 	

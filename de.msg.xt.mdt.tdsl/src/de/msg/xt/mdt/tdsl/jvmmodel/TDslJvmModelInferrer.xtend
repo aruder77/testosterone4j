@@ -332,6 +332,20 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 				}
 			])
 	}
+	
+	/*
+	 * Calculates the return type of an activity operation in an activity. 
+	 * If the activity operation leads to a new activity (explicitly, not with e.g. returnToLastActivity), it returns a reference to the new activity.
+	 * void otherwise.
+	 */
+	def JvmTypeReference returnTypeRef(ActivityOperation activityOperation) {
+		val nextActivityClass = activityOperation.returnedActivity?.class_fqn
+		if (nextActivityClass != null)
+			activityOperation.newTypeRef(nextActivityClass)
+		else
+			activityOperation.newTypeRef(Void::TYPE)
+				
+	}
 
 	def JvmOperation toActivityOperation(ActivityOperation operation) {
 		if (operation?.name == null) {
@@ -340,12 +354,8 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 
 		val nextActivityClass = operation.returnedActivity?.class_fqn
 		val nextActivityAdapterClass = operation.returnedActivity?.adapterInterface_fqn
-		val returnTypeRef = if (nextActivityClass != null)
-				operation.newTypeRef(nextActivityClass)
-			else
-				operation.newTypeRef(Void::TYPE)
 
-		operation.toMethod(operation.name, returnTypeRef) [
+		operation.toMethod(operation.name, operation.returnTypeRef) [
 			for (param : operation.params) {
 				if (param?.dataType?.class_fqn != null) {
 					it.parameters += param.toParameter(param.name, param.newTypeRef(param.dataType.class_fqn))
@@ -425,8 +435,9 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 					if (operation.returnType == null) {
 						val nextActivities = opMapping?.nextActivities
 						var Activity nextActivity = null
+						var ConditionalNextActivity condNextAct = null
 						if (nextActivities != null && !nextActivities.empty) {
-							val condNextAct = nextActivities.get(0)
+							condNextAct = nextActivities.get(0)
 							if (condNextAct != null) {
 								nextActivity = (condNextAct as ConditionalNextActivity).next
 							}
@@ -444,8 +455,14 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 								«field.control.fqn» fieldControl = «field.fieldGetterName»();
 								if (fieldControl != null) {
 									fieldControl.«operation.name»(«mapParameters(field, operation)»);
-								}
-								return «IF nextActivity == null»this«ELSE»«nextActivity.class_SimpleName».find()«ENDIF»;''')
+								}''').newLine
+							if (nextActivity != null && !condNextAct.usually) {
+								it.append('''
+									return «nextActivity.class_SimpleName».find();''')
+							} else if (condNextAct == null) {
+								it.append('''
+									return this;''')
+							}
 						}
 					} else {
 						if (opMapping != null) {
@@ -482,6 +499,13 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 			""
 	}
 
+	/**
+	 * Calculates the return type of an activity field operation.
+	 * Returns null if field or operation is null.
+	 * If the operation returns a value (type value), returns the corresponding datatype of the operation mapping.
+	 * If not, a reference to the new activity is returned. This could be the current activity or, if nextActivities contains
+	 * a new activity, the new activity.
+	 */
 	def JvmTypeReference returnTypeFieldOperation(Field field, Operation operation) {
 		if (field == null || operation == null)
 			return null
@@ -493,10 +517,12 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 			if (opMapping == null) {
 				currentActivityType
 			} else {
-				if (opMapping?.nextActivities?.empty || opMapping?.nextActivities?.get(0)?.next?.class_fqn == null) {
+				if (opMapping?.nextActivities?.empty) {
 					currentActivityType
+				} else if (opMapping?.nextActivities?.get(0).returnToLastActivity || opMapping?.nextActivities?.get(0).returnToLastActivity) {
+					field.newTypeRef(Void.TYPE)
 				} else {
-					field.newTypeRef(opMapping.nextActivities.get(0).next.class_fqn)
+					field.newTypeRef(opMapping.nextActivities.get(0).next?.class_fqn)
 				}
 			}
 		} else {
