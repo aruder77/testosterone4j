@@ -685,6 +685,8 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 								this.useCase.run();
 								this.protocol.append("Test OK");
 							} catch (java.lang.RuntimeException ex) {
+								this.protocol.append("Test FAILED!");
+								this.protocol.append(ex.getMessage());
 								throw ex;
 							} finally {
 								this.protocol.appendSummary();
