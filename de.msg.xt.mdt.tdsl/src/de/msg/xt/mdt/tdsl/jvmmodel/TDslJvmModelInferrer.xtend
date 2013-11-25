@@ -485,7 +485,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 	}
 
 	def String appendParameter(List<DataTypeMapping> mappings) {
-		'''«FOR mapping : mappings», «mapping?.name?.name».getValue().toString()«ENDFOR»'''
+		'''«FOR mapping : mappings», «mapping?.name?.name».getValue() != null ? «mapping?.name?.name».getValue().toString() : "null"«ENDFOR»'''
 	}
 
 	def String appendActivityParameter(List<ActivityOperationParameter> mappings) {
