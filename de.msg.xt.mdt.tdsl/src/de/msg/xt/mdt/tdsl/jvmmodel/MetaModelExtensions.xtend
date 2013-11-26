@@ -41,6 +41,7 @@ import de.msg.xt.mdt.tdsl.tDsl.Tag
 import de.msg.xt.mdt.tdsl.tDsl.InnerBlock
 import de.msg.xt.mdt.tdsl.tDsl.ActivityExpectation
 import org.eclipse.internal.xtend.expression.ast.IfExpression
+import org.eclipse.xtext.xbase.XIfExpression
 
 /**
  * Convenience meta-model extensions. Please order by Metamodel-Class and alphabetically!
@@ -163,6 +164,7 @@ class MetaModelExtensions {
 		val expectation = block.eContainer as ActivityExpectation
 		expectation.activity
 	}
+	
 	
 	// OperationCall
 	
@@ -369,9 +371,13 @@ class MetaModelExtensions {
 	
 	def XExpression activitySwitchingOperation(XExpression expr) {
 		var XExpression operation = null
-		if (expr instanceof InnerBlock && (expr as InnerBlock).ex)
+		
+		// these are the real activity switching operations. Return them immediately.
 		if (expr instanceof OperationCall || expr instanceof ActivityOperationCall || expr instanceof SubUseCaseCall)
 			return expr
+
+		// other blocks may contain activity switching operations. In that case, the
+		/*
 		val opCalls = EcoreUtil2::getAllContentsOfType(expr, typeof(OperationCall))
 		if (!opCalls.empty) {
 			operation = opCalls.get(0)
@@ -385,7 +391,7 @@ class MetaModelExtensions {
 			val subUseCaseCalls = EcoreUtil2::getAllContentsOfType(expr, typeof(SubUseCaseCall))	
 			if (!subUseCaseCalls.empty)
 				operation = subUseCaseCalls.get(0)		
-		}
+		}*/
 		operation
 	}
 	

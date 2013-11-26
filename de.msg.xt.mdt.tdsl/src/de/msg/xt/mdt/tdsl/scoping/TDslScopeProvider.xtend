@@ -5,14 +5,18 @@ import de.msg.xt.mdt.tdsl.tDsl.Activity
 import de.msg.xt.mdt.tdsl.tDsl.ActivityOperation
 import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationCall
 import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationParameterAssignment
+import de.msg.xt.mdt.tdsl.tDsl.ConditionalNextActivity
 import de.msg.xt.mdt.tdsl.tDsl.DataTypeMapping
 import de.msg.xt.mdt.tdsl.tDsl.Field
 import de.msg.xt.mdt.tdsl.tDsl.GeneratedValueExpression
+import de.msg.xt.mdt.tdsl.tDsl.InnerBlock
 import de.msg.xt.mdt.tdsl.tDsl.OperationCall
 import de.msg.xt.mdt.tdsl.tDsl.OperationMapping
 import de.msg.xt.mdt.tdsl.tDsl.OperationParameterAssignment
+import de.msg.xt.mdt.tdsl.tDsl.ParameterAssignment
 import de.msg.xt.mdt.tdsl.tDsl.StatementLine
 import de.msg.xt.mdt.tdsl.tDsl.SubUseCaseCall
+import de.msg.xt.mdt.tdsl.tDsl.TDslFactory
 import de.msg.xt.mdt.tdsl.tDsl.TDslPackage
 import de.msg.xt.mdt.tdsl.tDsl.UseCase
 import java.util.ArrayList
@@ -25,99 +29,19 @@ import org.eclipse.xtext.EcoreUtil2
 import org.eclipse.xtext.naming.QualifiedName
 import org.eclipse.xtext.scoping.IScope
 import org.eclipse.xtext.scoping.Scopes
-import org.eclipse.xtext.xbase.XBlockExpression
 import org.eclipse.xtext.xbase.XExpression
-import org.eclipse.xtext.xbase.XIfExpression
 import org.eclipse.xtext.xbase.XVariableDeclaration
-import org.eclipse.xtext.xbase.scoping.LocalVariableScopeContext
-import org.eclipse.xtext.xbase.scoping.XbaseScopeProvider
-import org.eclipse.xtext.resource.EObjectDescription
-import org.eclipse.xtext.scoping.IGlobalScopeProvider
-import org.eclipse.emf.ecore.resource.Resource
-import java.util.StringTokenizer
-import de.msg.xt.mdt.tdsl.tDsl.TDslFactory
-import org.eclipse.emf.ecore.InternalEObject
-import org.eclipse.emf.common.util.URI
-import org.eclipse.xtext.scoping.impl.SimpleScope
-import com.google.common.collect.Iterables
-import java.util.Collection
-import org.eclipse.xtext.resource.IEObjectDescription
-import org.eclipse.emf.ecore.EClass
-import org.eclipse.xtext.util.CancelIndicator
-import de.msg.xt.mdt.tdsl.tDsl.ConditionalNextActivity
-import de.msg.xt.mdt.tdsl.tDsl.StatementLine
-import de.msg.xt.mdt.tdsl.tDsl.StatementLine
-import org.eclipse.emf.ecore.util.EcoreUtil
-import de.msg.xt.mdt.tdsl.tDsl.SubUseCaseCall
+import org.eclipse.xtext.xbase.annotations.scoping.XbaseWithAnnotationsScopeProvider
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import de.msg.xt.mdt.tdsl.tDsl.ParameterAssignment
-import de.msg.xt.mdt.tdsl.tDsl.Assert
-import java.util.HashSet
-import org.eclipse.xtext.serializer.sequencer.AbstractDelegatingSemanticSequencer
-import org.eclipse.xtext.scoping.impl.AbstractDeclarativeScopeProvider
-import org.eclipse.xtext.xbase.annotations.scoping.XbaseWithAnnotationsScopeProvider
-import de.msg.xt.mdt.tdsl.tDsl.InnerBlock
 
 class TDslScopeProvider extends XbaseWithAnnotationsScopeProvider {
 	
 	
     @Inject extension MetaModelExtensions
     
-    @Inject
-    IGlobalScopeProvider globalScopeProvider
-    
     Logger logger = LoggerFactory::getLogger(typeof(TDslScopeProvider))
 
-	/*override protected createLocalVarScope(IScope parentScope, LocalVariableScopeContext scopeContext) {
-		if (scopeContext != null && scopeContext.context != null) {
-			val context = scopeContext.context
-			if (context instanceof StatementLine) {
-				val useCaseBlock = EcoreUtil2::getContainerOfType(context, typeof(XBlockExpression))
-				var IScope pScope = parentScope
-				if (scopeContext.canSpawnForContainer())
-					pScope = createLocalVarScope(parentScope, scopeContext.spawnForContainer());
-				
-				val localVars = new ArrayList<XExpression>()
-				val statementLine = EcoreUtil2::getContainerOfType(context, typeof(StatementLine))
-				val indexInBlock = statementLine.indexInParentBlock
-				for (expr : useCaseBlock.expressions.subList(0, indexInBlock)) {
-					val line = expr as StatementLine
-					if (line?.statement instanceof XVariableDeclaration) {
-						localVars.add(line.statement)
-					}
-				}
-				return Scopes::scopeFor(localVars, pScope)
-			} else if (context instanceof UseCase) {
-				
-			}
-		}
-		
-		return super.createLocalVarScope(parentScope, scopeContext)
-	}*/
-    
-//    override IScope createLocalVarScope(Object context,
-//            IScope parentScope) {
-//        val pScope = super.createLocalVarScopeForJvmOperation(context,
-//                parentScope);
-// 
-//        // retrieve the AST element associated to the method
-//        // created by our model inferrer
-//        val sourceElement = associations.getPrimarySourceElement(context);
-//        if (sourceElement instanceof UseCase) {
-//            val operation = sourceElement as UseCase;
-//            return createLocalScopeForX(operation.getOutput(),
-//                    pScope);
-//        }
-// 
-//        return pScope;
-//    }
-//    
-//    
-//    def JvmType getJvmType(UseCase useCase) {
-//        useCase.jvmElements.filter(typeof(JvmType)).head
-//    }
-    
 	override getScope(EObject context, EReference reference) {
 		try {
 		if (reference == TDslPackage::eINSTANCE.operationParameterAssignment_Name) {
@@ -392,46 +316,12 @@ class TDslScopeProvider extends XbaseWithAnnotationsScopeProvider {
 		Collections::singletonList(nextActivity)
 	}			
 	
-	def dispatch List<ConditionalNextActivity> determineExplicitNextActivities(XIfExpression ifExpr) {
-		val thenActivities = ifExpr.then?.determineExplicitNextActivities
-		val activities = new HashSet<ConditionalNextActivity>()
-		if (thenActivities != null)
-			activities.addAll(thenActivities.filter [it != null])
-		if (ifExpr.getElse() != null) {
-			activities.addAll(ifExpr.getElse().determineExplicitNextActivities.filter [it != null])
-		}
-		return activities.toList
-	}			
-	
 	def dispatch List<ConditionalNextActivity> determineExplicitNextActivities(XVariableDeclaration varDecl) {
 		varDecl.right?.determineExplicitNextActivities
 	}			
 	
-	def dispatch List<ConditionalNextActivity> determineExplicitNextActivities(Assert assert) {
-		return Collections::emptyList
-	}
-	
-	def dispatch List<ConditionalNextActivity> determineExplicitNextActivities(XBlockExpression blockExpr) {
-		if (blockExpr.expressions.empty)
-			return Collections::emptyList
-		var index = blockExpr.expressions.size - 1
-		var currentExpression = blockExpr.expressions.last
-		while (index >= 0 && currentExpression.determineExplicitNextActivities.empty) {
-			currentExpression = blockExpr.expressions.get(index)
-			index = index - 1
-		}
-		if (index >= 0) {
-			return currentExpression.determineExplicitNextActivities
-		} else {
-			return Collections::emptyList 
-		}
-	}			
-	
 	def dispatch List<ConditionalNextActivity> determineExplicitNextActivities(XExpression expr) {
-		/*if (expr.containsActivitySwitchingOperation)
-			expr.activitySwitchingOperation.determineExplicitNextActivities
-		else */ 
-			Collections::emptyList
+		Collections::emptyList
 	}
 	
 	def lastActivitySwitchingExpression(XExpression expr, boolean startWithCurrent) {
@@ -457,9 +347,19 @@ class TDslScopeProvider extends XbaseWithAnnotationsScopeProvider {
 		val currentTime = System::currentTimeMillis
 		var nestedCounter = 0
 		logger.info(currentTime + " CurrentActivities for " + expr.useCasePath)
-		var lastExpression = expr?.lastActivitySwitchingExpression(expr instanceof StatementLine || expr instanceof InnerBlock)
+		var lastExpression = expr?.lastActivitySwitchingExpression(expr instanceof StatementLine)
 
 		val returnList = new ArrayList<Activity> 
+
+		// handle ActivityExpectation blocks
+		if (expr instanceof InnerBlock) {
+			val innerBlock = expr as InnerBlock
+			if (innerBlock.activityExpectationBlock) {
+				returnList.add(innerBlock.expectedActivity)
+				return returnList				
+			}
+		}
+
 		while (lastExpression != null && returnList.empty) {
 			val nextActivities = lastExpression.determineExplicitNextActivities	
 			if (nextActivities != null) {
