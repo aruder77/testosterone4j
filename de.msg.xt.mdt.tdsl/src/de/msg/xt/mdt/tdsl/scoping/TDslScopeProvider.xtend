@@ -57,6 +57,7 @@ import java.util.HashSet
 import org.eclipse.xtext.serializer.sequencer.AbstractDelegatingSemanticSequencer
 import org.eclipse.xtext.scoping.impl.AbstractDeclarativeScopeProvider
 import org.eclipse.xtext.xbase.annotations.scoping.XbaseWithAnnotationsScopeProvider
+import de.msg.xt.mdt.tdsl.tDsl.InnerBlock
 
 class TDslScopeProvider extends XbaseWithAnnotationsScopeProvider {
 	
@@ -238,9 +239,7 @@ class TDslScopeProvider extends XbaseWithAnnotationsScopeProvider {
 					logger.warn("Could not resolve control for field " + field.name)
 					throw new ScopingException("Could not resolve control for field " + field.name)
 				}
-				Scopes::scopeFor(operations, [
-					QualifiedName::create(it.name)
-				], IScope::NULLSCOPE)
+				Scopes::scopeFor(operations)
 			} else 
 				IScope::NULLSCOPE
 		} else if (reference == TDslPackage::eINSTANCE.dataTypeMapping_Name) {
@@ -368,6 +367,16 @@ class TDslScopeProvider extends XbaseWithAnnotationsScopeProvider {
 		nextActivities
 	}			
 	
+	def dispatch List<ConditionalNextActivity> determineExplicitNextActivities(InnerBlock innerBlock) throws ScopingException {
+		if (innerBlock.activityExpectationBlock) {
+			val condNextAct = TDslFactory::eINSTANCE.createConditionalNextActivity
+			condNextAct.next = innerBlock.expectedActivity
+			Collections::singletonList(condNextAct)
+		} else {
+			(innerBlock.eContainer as XExpression).determineExplicitNextActivities
+		}
+	}
+	
 	def dispatch List<ConditionalNextActivity> determineExplicitNextActivities(SubUseCaseCall call) throws ScopingException {
 		val useCase = call?.useCase
 		var nextActivity = useCase?.nextActivity
@@ -386,10 +395,11 @@ class TDslScopeProvider extends XbaseWithAnnotationsScopeProvider {
 	def dispatch List<ConditionalNextActivity> determineExplicitNextActivities(XIfExpression ifExpr) {
 		val thenActivities = ifExpr.then?.determineExplicitNextActivities
 		val activities = new HashSet<ConditionalNextActivity>()
+		if (thenActivities != null)
+			activities.addAll(thenActivities.filter [it != null])
 		if (ifExpr.getElse() != null) {
-			activities.addAll(ifExpr.getElse().determineExplicitNextActivities)
+			activities.addAll(ifExpr.getElse().determineExplicitNextActivities.filter [it != null])
 		}
-		activities.addAll(thenActivities)
 		return activities.toList
 	}			
 	
@@ -447,7 +457,7 @@ class TDslScopeProvider extends XbaseWithAnnotationsScopeProvider {
 		val currentTime = System::currentTimeMillis
 		var nestedCounter = 0
 		logger.info(currentTime + " CurrentActivities for " + expr.useCasePath)
-		var lastExpression = expr?.lastActivitySwitchingExpression(expr instanceof StatementLine)
+		var lastExpression = expr?.lastActivitySwitchingExpression(expr instanceof StatementLine || expr instanceof InnerBlock)
 
 		val returnList = new ArrayList<Activity> 
 		while (lastExpression != null && returnList.empty) {

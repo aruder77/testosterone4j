@@ -232,16 +232,16 @@ AFQN:
 
 OperationCall returns xbase::XExpression:
 	{OperationCall}
-	operation=[OperationMapping|OFQN] ('(' (paramAssignment+=OperationParameterAssignment) (',' paramAssignment+=OperationParameterAssignment)* ')')? (expectation=ActivityExpectation)?
+	operation=[OperationMapping|OFQN] ('(' (paramAssignment+=OperationParameterAssignment) (',' paramAssignment+=OperationParameterAssignment)* ')')? (expectation+=ActivityExpectation)*
 ;
 
 ActivityOperationCall returns xbase::XExpression:
 	{ActivityOperationCall}
-	operation=[ActivityOperation|AFQN] ('(' (paramAssignment+=ActivityOperationParameterAssignment) (',' paramAssignment+=ActivityOperationParameterAssignment)* ')')? (expectation=ActivityExpectation)?
+	operation=[ActivityOperation|AFQN] ('(' (paramAssignment+=ActivityOperationParameterAssignment) (',' paramAssignment+=ActivityOperationParameterAssignment)* ')')? (expectation+=ActivityExpectation)*
 ;
 
 ActivityExpectation:
-	'expect' activity=[Activity|FQN] 'if' '(' guard=Expression ')' ifBlock=InnerBlock ('else' 'if' '(' elseIfGuard=Expression ')' elseIfblock+=InnerBlock)* ('else' elseBlock=InnerBlock)?
+	'expect' activity=[Activity|FQN] 'if' '(' guard=Expression ')' block=InnerBlock
 ;
 
 SubUseCaseCall returns xbase::XExpression:

@@ -58,6 +58,7 @@ import org.eclipse.xtext.serializer.sequencer.AbstractDelegatingSemanticSequence
 import org.eclipse.xtext.scoping.impl.AbstractDeclarativeScopeProvider
 import org.eclipse.xtext.xbase.annotations.scoping.XbaseWithAnnotationsScopeProvider
 import org.eclipse.xtext.xbase.annotations.typesystem.XbaseWithAnnotationsBatchScopeProvider
+import de.msg.xt.mdt.tdsl.tDsl.InnerBlock
 
 class TDslBatchScopeProvider extends XbaseWithAnnotationsBatchScopeProvider {
 	
@@ -366,6 +367,16 @@ class TDslBatchScopeProvider extends XbaseWithAnnotationsBatchScopeProvider {
 		}
 		nextActivities
 	}			
+	
+	def dispatch List<ConditionalNextActivity> determineExplicitNextActivities(InnerBlock innerBlock) throws ScopingException {
+		if (innerBlock.activityExpectationBlock) {
+			val condNextAct = TDslFactory::eINSTANCE.createConditionalNextActivity
+			condNextAct.next = innerBlock.expectedActivity
+			Collections::singletonList(condNextAct)
+		} else {
+			(innerBlock.eContainer as XExpression).determineExplicitNextActivities
+		}
+	}
 	
 	def dispatch List<ConditionalNextActivity> determineExplicitNextActivities(SubUseCaseCall call) throws ScopingException {
 		val useCase = call?.useCase

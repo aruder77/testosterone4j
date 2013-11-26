@@ -38,6 +38,9 @@ import de.msg.xt.mdt.tdsl.tDsl.PackageDeclaration
 import org.eclipse.emf.ecore.InternalEObject
 import de.msg.xt.mdt.tdsl.tDsl.TagsDeclaration
 import de.msg.xt.mdt.tdsl.tDsl.Tag
+import de.msg.xt.mdt.tdsl.tDsl.InnerBlock
+import de.msg.xt.mdt.tdsl.tDsl.ActivityExpectation
+import org.eclipse.internal.xtend.expression.ast.IfExpression
 
 /**
  * Convenience meta-model extensions. Please order by Metamodel-Class and alphabetically!
@@ -139,6 +142,27 @@ class MetaModelExtensions {
 		if (field?.uniqueId == null) field?.fullyQualifiedName else field.uniqueId
 	}
 	
+	
+	// InnerBlock
+	
+	def boolean isActivityExpectationBlock(InnerBlock block) {
+		block?.eContainer instanceof ActivityExpectation
+	}
+	
+	def boolean isIfThenBlock(InnerBlock block) {
+		(block?.eContainer instanceof IfExpression) && ((block.eContainer as IfExpression).thenPart == block)
+	}
+	
+	def boolean isIfElseBlock(InnerBlock block) {
+		(block?.eContainer instanceof IfExpression) && ((block.eContainer as IfExpression).elsePart == block)
+	}
+	
+	def Activity expectedActivity(InnerBlock block) {
+		if (!block.activityExpectationBlock)
+			return null
+		val expectation = block.eContainer as ActivityExpectation
+		expectation.activity
+	}
 	
 	// OperationCall
 	
@@ -262,6 +286,8 @@ class MetaModelExtensions {
 			val offset = index - 1
 			val statement = (expressions?.get(offset)) as StatementLine
 			lastStatement = statement?.statement
+		} else if (exprBlock instanceof InnerBlock) {
+			return exprBlock
 		} else {
 			val parentIndex = exprBlock?.indexInParentBlock
 			if (parentIndex == null || parentIndex == -1) {
@@ -343,6 +369,7 @@ class MetaModelExtensions {
 	
 	def XExpression activitySwitchingOperation(XExpression expr) {
 		var XExpression operation = null
+		if (expr instanceof InnerBlock && (expr as InnerBlock).ex)
 		if (expr instanceof OperationCall || expr instanceof ActivityOperationCall || expr instanceof SubUseCaseCall)
 			return expr
 		val opCalls = EcoreUtil2::getAllContentsOfType(expr, typeof(OperationCall))
