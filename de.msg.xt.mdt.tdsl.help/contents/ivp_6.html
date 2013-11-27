@@ -11,50 +11,50 @@
 <a name="uistruktur"></a>
 <h1>Beschreibung der UI-Struktur</h1>
 <p>
-Die Struktur der BenutzeroberflÃ¤che muss einmalig, in der Regel parallel zur Entwicklung der BenutzeroberflÃ¤che,
-modelliert werden und dient dann als Ausgangsbasis fÃ¼r die Spezifikation der Use-Cases und Tests.
+Die Struktur der Benutzeroberfläche muss einmalig, in der Regel parallel zur Entwicklung der Benutzeroberfläche,
+modelliert werden und dient dann als Ausgangsbasis für die Spezifikation der Use-Cases und Tests.
 </p>
 <p>
-Da die Spezifikation von Tests bei TDsl im Fokus steht, beschrÃ¤nkt sich die Beschreibung der UI ausschlieÃŸlich
-auf die Informationen die fÃ¼r die Spezifikation der Tests sowie die Automatisierung notwendig sind.
+Da die Spezifikation von Tests bei TDsl im Fokus steht, beschränkt sich die Beschreibung der UI ausschließlich
+auf die Informationen die für die Spezifikation der Tests sowie die Automatisierung notwendig sind.
 </p>
 <p>
-Im Wesentlichen mÃ¼ssen folgende Informationen festgehalten werden:
+Im Wesentlichen müssen folgende Informationen festgehalten werden:
 </p>
 <p>
 <ul>
 	<li>
-		In welche "Seiten" die BenutzeroberflÃ¤che gegliedert ist (in TDsl-Jargon <em>Activities</em>)
+		In welche "Seiten" die Benutzeroberfläche gegliedert ist (in TDsl-Jargon <em>Activities</em>)
 	</li>
 	<li>
-		Welche BenutzeroberflÃ¤chen-Elemente (<em>Controls</em>) auf dieser Seite vorhanden sind
+		Welche Benutzeroberflächen-Elemente (<em>Controls</em>) auf dieser Seite vorhanden sind
 	</li>
 	<li>
 		Welche <em>Operationen</em> von den Controls angeboten werden
 	</li>
 	<li>
-		Welche <em>Datentypen</em> von den Operationen verwendet werden (als Parameter und RÃ¼ckgabewert)
+		Welche <em>Datentypen</em> von den Operationen verwendet werden (als Parameter und Rückgabewert)
 	</li>
 	<li>
-		Welche Ã¼bergreifenden Operationen von der Seite selbst angeboten werden
+		Welche übergreifenden Operationen von der Seite selbst angeboten werden
 	</li>
 </ul>
 </p>
 <a name="datentypen"></a>
 <h2>Datentypen</h2>
 <p>
-ZunÃ¤chst mÃ¼ssen die fachlichen Datentypen der Anwendung und deren Ã„quivalenzklassen modelliert werden.
-Damit der Testfall-Generator fÃ¼r jede beliebige Eingabe entscheiden kann was fÃ¼r ein Wert als Eingabe-Datum
-verwendet werden darf, mÃ¼ssen wir ihm in Form einer Datentyp-Deklaration diese bekannt machen. 
+Zunächst müssen die fachlichen Datentypen der Anwendung und deren Äquivalenzklassen modelliert werden.
+Damit der Testfall-Generator für jede beliebige Eingabe entscheiden kann was für ein Wert als Eingabe-Datum
+verwendet werden darf, müssen wir ihm in Form einer Datentyp-Deklaration diese bekannt machen. 
 </p>
 <p>
-Dabei wird nach dem Ã„quivalenzklassen-Prinzip vorgegangen. Eine Ã„quivalenzklasse ist eine Klasse von
-(Eingabe-)Werten, fÃ¼r die von der zu testenden Anwendung gleiches Verhalten vom Test-Designer erwartet wird.
-Dies erfolgt unter der Annahme dass es sinnvoll ist zumindest einen Wert aus jeder Ã„quivalenzklasse zu
+Dabei wird nach dem Äquivalenzklassen-Prinzip vorgegangen. Eine Äquivalenzklasse ist eine Klasse von
+(Eingabe-)Werten, für die von der zu testenden Anwendung gleiches Verhalten vom Test-Designer erwartet wird.
+Dies erfolgt unter der Annahme dass es sinnvoll ist zumindest einen Wert aus jeder Äquivalenzklasse zu
 testen.
 </p>
 <p>
-Ein Beispiel fÃ¼r die Deklaration eines TDsl-Datentyps sieht folgendermaÃŸen aus:
+Ein Beispiel für die Deklaration eines TDsl-Datentyps sieht folgendermaßen aus:
 </p>
 <p>
 <div class="literallayout">
@@ -92,24 +92,24 @@ Auch der technische Datentyp muss TDsl bekannt gemacht werden.
 </div>
 </p>
 <p>
-Da fÃ¼r die Generierung der TestfÃ¤lle Java verwendet wird, muss durch die Angabe von <span class="inlinecode"><span class="keyword">mappedBy</span></span>
-angegeben werden auf was fÃ¼r einen Java-Datentyp der Typ abgebildet wird.
+Da für die Generierung der Testfälle Java verwendet wird, muss durch die Angabe von <span class="inlinecode"><span class="keyword">mappedBy</span></span>
+angegeben werden auf was für einen Java-Datentyp der Typ abgebildet wird.
 </p>
 <p>
-Obiges Beispiel demonstriert die Verwendung von Ã„quivalenzklassen, im Allgemeinen sollten jedoch fÃ¼r
+Obiges Beispiel demonstriert die Verwendung von Äquivalenzklassen, im Allgemeinen sollten jedoch für
 Datentypen wirklich die fachliche Datentypen der Anwendung verwendet werden, beispielsweise <em>Seriennummer</em>,
 <em>Baujahr</em> oder <em>Postleitzahl</em>. 
 </p>
 <a name="controls"></a>
 <h2>Controls</h2>
 <p>
-Als nÃ¤chstes werden die Benutzerelemente der Anwendung modelliert. Dies muss nur einmalig pro verwendetem
-UI-Toolkit durchgefÃ¼hrt werden, nicht fÃ¼r jede zu testende Anwendung. Dieser Schritt ist erforderlich,
+Als nächstes werden die Benutzerelemente der Anwendung modelliert. Dies muss nur einmalig pro verwendetem
+UI-Toolkit durchgeführt werden, nicht für jede zu testende Anwendung. Dieser Schritt ist erforderlich,
 da TDsl mit jedem beliebigen Testautomatisierungsframework und jedem beliebigen UI-Toolkit verwendet
 werden kann.
 </p>
 <p>
-Ein Beispiel fÃ¼r die modellierung eines Controls ist Foldendes:
+Ein Beispiel für die modellierung eines Controls ist Foldendes:
 </p>
 <p>
 <div class="literallayout">
@@ -136,7 +136,7 @@ Beispiel wird ein Control <em>TextControl</em> definiert, das drei Operationen b
 <p>
 <ul>
 	<li>
-		die Operation <em>getText</em>, die den aktuellen String-Wert des Controls zurÃ¼ckliefert
+		die Operation <em>getText</em>, die den aktuellen String-Wert des Controls zurückliefert
 	</li>
 	<li>
 		die Operation <em>setText</em>, die den Wert <em>str</em> im Control setzt
@@ -147,12 +147,12 @@ Beispiel wird ein Control <em>TextControl</em> definiert, das drei Operationen b
 </ul>
 </p>
 <p>
-So kÃ¶nnen und mÃ¼ssen sÃ¤mtliche von der Anwendung verwendete UI-Controls mit ihren Operationen in TDsl
-modelliert werden. NatÃ¼rlich ist auch die verwendung von mehreren Parametern (durch Komma getrennt) pro
-Operation mÃ¶glich.
+So können und müssen sämtliche von der Anwendung verwendete UI-Controls mit ihren Operationen in TDsl
+modelliert werden. Natürlich ist auch die verwendung von mehreren Parametern (durch Komma getrennt) pro
+Operation möglich.
 </p>
 <p>
-Ein Beispiel fÃ¼r ein komplexeres Control wie zum Beispiel einer Tabelle sieht wie folgt aus:
+Ein Beispiel für ein komplexeres Control wie zum Beispiel einer Tabelle sieht wie folgt aus:
 </p>
 <p>
 <div class="literallayout">
@@ -165,15 +165,15 @@ Ein Beispiel fÃ¼r ein komplexeres Control wie zum Beispiel einer Tabelle sieht w
 <a name="activities"></a>
 <h2>Activities</h2>
 <p>
-<em>Activities</em> beschreiben die "Seiten" der BenutzeroberflÃ¤che. Was genau eine Seite darstellt obliegt
+<em>Activities</em> beschreiben die "Seiten" der Benutzeroberfläche. Was genau eine Seite darstellt obliegt
 dem Test-Designer. Eine Activity kann dabei eine komplette Seite einer Web-Anwendung darstellen oder
 aber auch nur einen Teil davon. Wichtig ist, dass die Anwendung disjunkt in Activities zerlegt wird.
 </p>
 <a name="fields"></a>
 <h3>Fields</h3>
 <p>
-Auf jeder Activity (Seite) befinden sich Instanzen von Controls (<em>Fields</em>), Ã¼ber die der Benutzer seine
-Interaktion mit der Anwendung durchfÃ¼hrt, beispielsweise das Eintragen eines Datums in ein Textfeld,
+Auf jeder Activity (Seite) befinden sich Instanzen von Controls (<em>Fields</em>), über die der Benutzer seine
+Interaktion mit der Anwendung durchführt, beispielsweise das Eintragen eines Datums in ein Textfeld,
 oder das Klicken auf einen Button.
 </p>
 <p>
@@ -231,35 +231,35 @@ Eine Activity wird wie folgt in TDsl spezifiziert:
 </div>
 </p>
 <p>
-Die Activity <em>LoginPage</em> besitzt drei Eingabeelemente (Fields): zwei Textfelder fÃ¼r Benutzername und
+Die Activity <em>LoginPage</em> besitzt drei Eingabeelemente (Fields): zwei Textfelder für Benutzername und
 Passwort und einen Login-Button. Die drei Elemente werden jeweils durch eine <em>Field</em>-Definition beschrieben.
 </p>
 <p>
 Das erste Field wird durch <em>userName</em> innerhalb der Seite eindeutig identifiziert. Der String nach dem
-SchlÃ¼sselwort identifiedBy <em>"key.userName"</em> gibt eine ID an, mit Hilfe dessen das Test-Automatisierungsframework
-das Control auf der Seite finden und identifizieren kann. In der Regel ist es dafÃ¼r nÃ¶tig diese ID bei
+Schlüsselwort identifiedBy <em>"key.userName"</em> gibt eine ID an, mit Hilfe dessen das Test-Automatisierungsframework
+das Control auf der Seite finden und identifizieren kann. In der Regel ist es dafür nötig diese ID bei
 der Implementierung der Anwendung im Control zu hinterlegen.
 </p>
 <p>
 Das <em>control</em>-keyword gibt an um welches Control es sich bei diesem Eingabeelement handelt. 
 </p>
 <p>
-Im darauf folgendem Block mÃ¼ssen nun sÃ¤mtliche Operationen des Controls spezifisch fÃ¼r dieses Feld wiederholt
-deklariert werden. Das ist aus zwei GrÃ¼nden wichtig:
+Im darauf folgendem Block müssen nun sämtliche Operationen des Controls spezifisch für dieses Feld wiederholt
+deklariert werden. Das ist aus zwei Gründen wichtig:
 </p>
 <p>
 <ol>
 	<li>
-		FÃ¼r sÃ¤mtliche (technische) Datentypen von Operations-Parametern und RÃ¼ckgabewerte mÃ¼ssen fÃ¼r dieses
-			spezifische Feld der passende fachliche Datentyp angegeben werden. Der fachliche Datentyp kann fÃ¼r
-			jedes Feld ein anderer sein, deshalb muss dieses Mapping fÃ¼r jedes Feld angegeben werden. Im obigen
-			Beispiel ist der Datentyp fÃ¼r get-/setText des Feldes "userName" UserNameDT, wÃ¤hrend der Datentyp
-			fÃ¼r das Feld "password" PasswordDT betrÃ¤gt.
+		Für sämtliche (technische) Datentypen von Operations-Parametern und Rückgabewerte müssen für dieses
+			spezifische Feld der passende fachliche Datentyp angegeben werden. Der fachliche Datentyp kann für
+			jedes Feld ein anderer sein, deshalb muss dieses Mapping für jedes Feld angegeben werden. Im obigen
+			Beispiel ist der Datentyp für get-/setText des Feldes "userName" UserNameDT, während der Datentyp
+			für das Feld "password" PasswordDT beträgt.
 	</li>
 	<li>
-		Der Aufruf einer Operation eines bestimmten BenutzeroberflÃ¤chen-Elements kann einen Ãœbergang zu
-			einer anderen Seite auslÃ¶sen. Dies kann in TDsl durch die Verwendung des Operators <em>=&gt;</em> modelliert
-			werden, dem die nachfolgende Activity angegeben wird. Im obigen Beispiel fÃ¼hrt ein Klick auf den 
+		Der Aufruf einer Operation eines bestimmten Benutzeroberflächen-Elements kann einen Übergang zu
+			einer anderen Seite auslösen. Dies kann in TDsl durch die Verwendung des Operators <em>=&gt;</em> modelliert
+			werden, dem die nachfolgende Activity angegeben wird. Im obigen Beispiel führt ein Klick auf den 
 			loginButton zur Activity <em>OverviewPage</em>.
 	</li>
 </ol>
@@ -268,7 +268,7 @@ deklariert werden. Das ist aus zwei GrÃ¼nden wichtig:
 <h3>Activity-Operationen</h3>
 <p>
 Oft ist es sinnvoll mehrere Einzeloperationen auf UI-Elementen (Fields) zu einer fachlichen Operation
-der Activity zusammenzufassen. Ein Beispiel hierfÃ¼r zeigt folgendes Listing.
+der Activity zusammenzufassen. Ein Beispiel hierfür zeigt folgendes Listing.
 </p>
 <p>
 <div class="literallayout">
@@ -303,9 +303,9 @@ der Activity zusammenzufassen. Ein Beispiel hierfÃ¼r zeigt folgendes Listing.
 </p>
 <p>
 Es wird eine Operation <em>login</em> deklariert, die Benutzername und Passwort entgegennimmt und den Anmeldevorgang
-vornimmt. Dabei verwendet die Operation die Control-Operationen um den Vorgang durchzufÃ¼hren. Die Syntax
-und die MÃ¶glichkeiten des Operations-Inhalts entspricht denen von Use-Case BlÃ¶cken, die im folgenden
-Kapitel nÃ¤her vorgestellt wird. Als Resultat der Operation wird zur <em>OperviewPage</em> verzweigt. Wichtig
+vornimmt. Dabei verwendet die Operation die Control-Operationen um den Vorgang durchzuführen. Die Syntax
+und die Möglichkeiten des Operations-Inhalts entspricht denen von Use-Case Blöcken, die im folgenden
+Kapitel näher vorgestellt wird. Als Resultat der Operation wird zur <em>OperviewPage</em> verzweigt. Wichtig
 dabei ist, dass der letzte Aufruf der Operation zur gleichen Activity verzweigt wie die Operation selbst. 
 </p>
 </body>

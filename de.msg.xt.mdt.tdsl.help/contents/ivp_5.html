@@ -17,26 +17,26 @@ Obwohl das PageObject-Pattern bereits eine komfortable und redundanzarme Art ber
 Tests zu erstellen, gibt es noch Verbesserungspotential.
 </p>
 <p>
-Die Erstellung von PageObjects ist ein bischen mÃ¼hsam, obwohl diese einen groÃŸen Anteil an schematischem
-Code beinhalten. Es wÃ¤re hier schÃ¶n, eine effizientere MÃ¶glichkeit zu haben PageObjects zu erstellen.
+Die Erstellung von PageObjects ist ein bischen mühsam, obwohl diese einen großen Anteil an schematischem
+Code beinhalten. Es wäre hier schön, eine effizientere Möglichkeit zu haben PageObjects zu erstellen.
 </p>
 <p>
-Des Weiteren werden die eigentlichen TestfÃ¤lle als JUnit-Test in Java geschrieben, was zum einen den
-Vorteil der MÃ¤chtigkeit von Java bietet, jedoch fÃ¼r die Spezifikation von fachlichen Tests auch hinderlich
+Des Weiteren werden die eigentlichen Testfälle als JUnit-Test in Java geschrieben, was zum einen den
+Vorteil der Mächtigkeit von Java bietet, jedoch für die Spezifikation von fachlichen Tests auch hinderlich
 sein kann. Die Spezifikation von fachlichen Tests werden oft von Fachexperten ohne Entwicklungshintergrund
-durchgefÃ¼hrt und sind deshalb nicht vertraut mit der fÃ¼r ein Testskript relativ komplexen Java-Syntax.
+durchgeführt und sind deshalb nicht vertraut mit der für ein Testskript relativ komplexen Java-Syntax.
 </p>
 <p>
-AuÃŸerdem bieten PageObjects keinen Ansatz fÃ¼r Testdaten. NatÃ¼rlich kÃ¶nnen jede beliebige Testdaten in
-die PageObjects eingesteuert werden, eine LÃ¶sung fÃ¼r eine clevere Generierung von Testdaten bieten sie
+Außerdem bieten PageObjects keinen Ansatz für Testdaten. Natürlich können jede beliebige Testdaten in
+die PageObjects eingesteuert werden, eine Lösung für eine clevere Generierung von Testdaten bieten sie
 jedoch nicht. 
 </p>
 <a name="modellgetriebenerAnsatz"></a>
 <h2>Modellierung mit TDsl</h2>
 <p>
 Mit <em>modellgetrieben</em> ist in diesem Artikel nicht die Verwendung von graphischen Modellen, wie etwa
-UML- oder BPM-Modelle gemeint, sondern textuelle Modelle in Form einer DomÃ¤nenspezifischen Sprache <em>TDsl</em>. Mit
-dieser Sprache wird die BenutzeroberflÃ¤che durch die EinfÃ¼hrung von Test-relevanten Abstraktionen modelliert.
+UML- oder BPM-Modelle gemeint, sondern textuelle Modelle in Form einer Domänenspezifischen Sprache <em>TDsl</em>. Mit
+dieser Sprache wird die Benutzeroberfläche durch die Einführung von Test-relevanten Abstraktionen modelliert.
 </p>
 <p>
 Die Idee hinter TDsl wird in den folgenden Kapiteln vorgestellt.
@@ -47,7 +47,7 @@ zwei Teile getrennt wird.
 <ol>
 	<li>
 		Die Beschreibung der UI-Struktur
-				Hier werden Datentypen, UI-Controls und Activities (TDsl-Bezeichnung fÃ¼r PageObjects) modelliert.
+				Hier werden Datentypen, UI-Controls und Activities (TDsl-Bezeichnung für PageObjects) modelliert.
 	</li>
 	<li>
 		Spezifikation der Use-Cases und Tests

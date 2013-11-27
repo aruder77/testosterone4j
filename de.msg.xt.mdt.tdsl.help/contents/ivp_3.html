@@ -13,49 +13,49 @@
 <a name="captureReplay"></a>
 <h2>Capture-/Replay Tools</h2>
 <p>
-Sehr hÃ¤ufig werden fÃ¼r die Automatisierung von BenutzeroberflÃ¤chen-Tests sogenannte Capture-/Replay Tools eingesetzt. 
-Wie der Name bereits suggeriert, bieten diese Tools die komfortable MÃ¶glichkeit fachliche AnwendungsfÃ¤lle (Use Cases) einmalig, 
-durch ganz regulÃ¤re Bedienung der Anwendung aufnehmen zu kÃ¶nnen. SpÃ¤ter kann der aufgezeichnete Ablauf auf Knopfdruck beliebig oft
+Sehr häufig werden für die Automatisierung von Benutzeroberflächen-Tests sogenannte Capture-/Replay Tools eingesetzt. 
+Wie der Name bereits suggeriert, bieten diese Tools die komfortable Möglichkeit fachliche Anwendungsfälle (Use Cases) einmalig, 
+durch ganz reguläre Bedienung der Anwendung aufnehmen zu können. Später kann der aufgezeichnete Ablauf auf Knopfdruck beliebig oft
 wiedergegeben werden.
 </p>
 <p>
-Basis dieser Tools ist dabei immer eine Testskript-Sprache, sowie mÃ¤chtige Bibliotheksfunktionen zur Erkennung, Stimulation und 
-Analyse von BenutzeroberflÃ¤chen-Elementen (Controls). Die AufnahmemÃ¶glichkeit ist dann lediglich eine Zusatzfunktion, 
-bei der die durchgefÃ¼hrten Benutzeraktionen auf den Controls erkannt und in Form eines Testskripts aufzeichnet werden.
+Basis dieser Tools ist dabei immer eine Testskript-Sprache, sowie mächtige Bibliotheksfunktionen zur Erkennung, Stimulation und 
+Analyse von Benutzeroberflächen-Elementen (Controls). Die Aufnahmemöglichkeit ist dann lediglich eine Zusatzfunktion, 
+bei der die durchgeführten Benutzeraktionen auf den Controls erkannt und in Form eines Testskripts aufzeichnet werden.
 </p>
 <p>
-Die Vorteile der Capture-/Replay Tools sind erst einmal sehr verlockend. Die Erstellung der Testskripts beschrÃ¤nkt sich 
+Die Vorteile der Capture-/Replay Tools sind erst einmal sehr verlockend. Die Erstellung der Testskripts beschränkt sich 
 lediglich auf das einmalige Durchklicken des entsprechenden Anwendungsfalls und kann auch von entwicklungsfernen Personen 
-mit rein fachlichem Knowhow durchgefÃ¼hrt werden. 
+mit rein fachlichem Knowhow durchgeführt werden. 
 </p>
 <p>
-Die Aufnahme von Use Cases mit Hilfe dieser Tools hat jedoch fÃ¼r die Wartung der Testskripte ein gravierendes, konzeptionelles Problem.
+Die Aufnahme von Use Cases mit Hilfe dieser Tools hat jedoch für die Wartung der Testskripte ein gravierendes, konzeptionelles Problem.
 </p>
 <a name="redundanz"></a>
 <h2>Das Problem der Redundanz</h2>
 <p>
-AnwendungsfÃ¤lle beinhalten hÃ¤ufig sich wiederholende Sequenzen in der BenutzeroberflÃ¤che, wie beispielsweise das Ã–ffnen 
-eines HauptgeschÃ¤ftsobjekts, die Selektion eines Subdatenbestands und die Freigabe dieser Daten zur Bearbeitung usw.
+Anwendungsfälle beinhalten häufig sich wiederholende Sequenzen in der Benutzeroberfläche, wie beispielsweise das Öffnen 
+eines Hauptgeschäftsobjekts, die Selektion eines Subdatenbestands und die Freigabe dieser Daten zur Bearbeitung usw.
 </p>
 <p>
-Werden bestimmte Masken oder Dialoge von mehreren Use Cases angesprochen und zeichnet man die zugehÃ¶rigen AblÃ¤ufe mit 
-Capture/Replay-Tools auf, so enthalten die dazugehÃ¶renden, proprietÃ¤ren Tool-Skripte viele redundante Codeanteile. 
+Werden bestimmte Masken oder Dialoge von mehreren Use Cases angesprochen und zeichnet man die zugehörigen Abläufe mit 
+Capture/Replay-Tools auf, so enthalten die dazugehörenden, proprietären Tool-Skripte viele redundante Codeanteile. 
 </p>
 <p>
-Diese Anteile bestehen hauptsÃ¤chlich aus Code zur Identifikation und Stimulation der beteiligten GUI-Bedienelemente. 
-Da innerhalb eines Ablaufs bestimmte GUI-Elemente (z.B. MenÃ¼s, Listauswahlen, etc.) in der Regel mehrmals vorkommen, 
-erkennt man in den Codeanteilen viele sich wiederholende oder sehr Ã¤hnliche Zeilen.
+Diese Anteile bestehen hauptsächlich aus Code zur Identifikation und Stimulation der beteiligten GUI-Bedienelemente. 
+Da innerhalb eines Ablaufs bestimmte GUI-Elemente (z.B. Menüs, Listauswahlen, etc.) in der Regel mehrmals vorkommen, 
+erkennt man in den Codeanteilen viele sich wiederholende oder sehr ähnliche Zeilen.
 </p>
 <p>
-Das daraus resultierende Problem ist die Wartbarkeit der Testskripte. Eine kleine Ã„nderung in der Anwendung 
-(z.B. Umbenennen eines GUI-Controls) fÃ¼hrt zu mehreren fehlgeschlagenen TestfÃ¤llen, was leider oft erst zur Laufzeit erkannt wird. 
-Testmitarbeiter zeichnen dann entweder die AblÃ¤ufe neu auf oder passen die vorhandenen Testskripte manuell an. 
+Das daraus resultierende Problem ist die Wartbarkeit der Testskripte. Eine kleine Änderung in der Anwendung 
+(z.B. Umbenennen eines GUI-Controls) führt zu mehreren fehlgeschlagenen Testfällen, was leider oft erst zur Laufzeit erkannt wird. 
+Testmitarbeiter zeichnen dann entweder die Abläufe neu auf oder passen die vorhandenen Testskripte manuell an. 
 Diese manuelle Korrektur kostet zwar weniger Aufwand, als eine komplette Neuaufzeichnung, aber, wegen der zahleichen 
-Redundanzen in den Skripten, meistens immer noch mehr, als die verursachende Ã„nderung (GUI-Control-Umbenennung) selbst.
+Redundanzen in den Skripten, meistens immer noch mehr, als die verursachende Änderung (GUI-Control-Umbenennung) selbst.
 </p>
 <p>
-Wenn Testskripte im realen Projektleben eine Chance haben sollen, wÃ¤hrend der Entwicklung der Anwendung aktuell zu bleiben, 
-muss der Prozess fÃ¼r ihre Aktualisierung mÃ¶glichst einfach sein. Gleiches gilt fÃ¼r die TestfalldurchfÃ¼hrung.
+Wenn Testskripte im realen Projektleben eine Chance haben sollen, während der Entwicklung der Anwendung aktuell zu bleiben, 
+muss der Prozess für ihre Aktualisierung möglichst einfach sein. Gleiches gilt für die Testfalldurchführung.
 </p>
 </body>
 </html>
