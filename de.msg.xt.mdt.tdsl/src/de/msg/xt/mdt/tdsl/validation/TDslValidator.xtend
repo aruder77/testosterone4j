@@ -52,7 +52,7 @@ class TDslValidator extends AbstractTDslValidator {
 			}
 			if (!missingMappings.empty) {
 				error(
-					'''An operation mapping must be defined for operations «FOR m : missingMappings SEPARATOR ", "»'«m»'«ENDFOR»''',
+					'''An operation mapping must be defined for operations «FOR m : missingMappings SEPARATOR ", "»'«m»'«ENDFOR».''',
 					TDslPackage.Literals::FIELD__OPERATIONS, UNSUFFICIENT_OPERATION_MAPPINGS);
 
 			}
@@ -74,6 +74,7 @@ class TDslValidator extends AbstractTDslValidator {
 			assignment.name.datatype.type?.mappedBy?.type != null) {
 			val JvmType expectedDataType = assignment.newTypeRef(assignment.name.datatype.class_FQN.toString).type
 			val JvmType expectedType = assignment.name.datatype.type.mappedBy.type
+			val assignmentValueType = assignment?.value.type
 			val JvmType exprType = assignment?.value.type.type
 			if (!exprType.equals(expectedDataType) && !exprType.equals(expectedType) &&
 				!expectedType.isCompatible(exprType)) {

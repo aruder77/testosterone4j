@@ -29,6 +29,10 @@ class BasicTestSetupTest {
 					op void search
 				}
 				
+				control Button {
+					op void push
+				}
+				
 				toolkit Stdtoolkit using controls {
 					TextControl
 				}				
@@ -52,6 +56,7 @@ class BasicTestSetupTest {
 					}
 					op refresh
 					op operation1
+					op append(StringDT appendStr)
 					op openEditor => EditorActivity 
 				}
 				
@@ -73,6 +78,10 @@ class BasicTestSetupTest {
 					#shortName.setText
 					#saveAndClose
 				}
+				
+				useCase SampleTestUseCaseWithActivitySwitch initial ViewActivity {
+					#openEditor
+				} => EditorActivity
 				
 				test SampleTestUseCaseTest generator de.msg.xt.mdt.base.SampleTestGenerator useCase SampleTestUseCase
 			'''
@@ -295,6 +304,46 @@ class BasicTestSetupTest {
 					#shortName.setText
 					#saveAndClose
 				}
+			}
+		'''.parse.assertNoErrors				
+	}
+
+	@Test
+	def void test_801_UseCaseDefinitionWithActivitySwitch() {
+		'''
+			package tdsl.testpackage {
+				
+				type String mappedBy String
+				
+				datatype StringDT type String {
+					class shortString classValue "shortString"
+				}
+
+				control TextControl {
+					op void setText(String str)
+					op String getText
+				}
+				
+				toolkit Stdtoolkit using controls {
+					TextControl
+				}				
+				
+				activity ViewActivity {
+					op openEditor => EditorActivity 
+				}
+				
+				activity EditorActivity {
+					field shortName control TextControl {
+						op void setText(StringDT str)
+						op StringDT getText
+					}
+					
+					op saveAndClose
+				}
+				
+				useCase SampleTestUseCaseWithActivitySwitch initial ViewActivity {
+					#openEditor
+				} => EditorActivity
 			}
 		'''.parse.assertNoErrors				
 	}

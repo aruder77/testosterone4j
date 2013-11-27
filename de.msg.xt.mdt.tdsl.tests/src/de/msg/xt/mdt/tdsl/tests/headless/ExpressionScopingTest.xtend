@@ -1,4 +1,4 @@
-package de.msg.xt.mdt.tdsl.tests.headless.usecase.parser
+package de.msg.xt.mdt.tdsl.tests.headless
 
 import de.msg.xt.mdt.tdsl.TDslInjectorProvider
 import de.msg.xt.mdt.tdsl.tDsl.TestModel
@@ -54,6 +54,13 @@ class ExpressionScopingTest {
 					#searchField.search
 					''',
 					"#refreshSearch",
+					''''''		
+			])
+			add(#[	"testSubUseCaseCallActivitySwitch",
+					'''
+					call SampleTestUseCaseWithActivitySwitch
+					''',
+					"#saveAndClose",
 					''''''		
 			])
 			add(#[	"testInitialActivityFallback",

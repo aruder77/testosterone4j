@@ -7,7 +7,7 @@ import org.eclipse.xtext.junit4.InjectWith
 import org.junit.Test
 import org.junit.runner.RunWith
 import de.msg.xt.mdt.tdsl.tests.XtextParameterized.Parameters
-import de.msg.xt.mdt.tdsl.tests.headless.usecase.parser.ExpressionScopingTest
+import de.msg.xt.mdt.tdsl.tests.headless.ExpressionScopingTest
 import de.msg.xt.mdt.tdsl.tests.XtextParameterized.Parameter
 
 @RunWith(XtextParameterized)
