@@ -77,6 +77,7 @@ import org.eclipse.xtext.xbase.lib.Procedures.Procedure1
 import org.junit.After
 import org.junit.runner.RunWith
 import org.eclipse.xtext.xbase.XBlockExpression
+import de.msg.xt.mdt.tdsl.tDsl.ActivityExpectation
 
 /**
  * <p>Infers a JVM model from the source model.</p> 
@@ -407,6 +408,10 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 				val opCall = stmtLine.statement as ActivityOperationCall
 				for (param : opCall.paramAssignment)
 					associator.associateLogicalContainer(param.value, it)
+			} else if (stmtLine.statement instanceof ActivityExpectation) {
+				val actExp = stmtLine.statement as ActivityExpectation
+				associator.associateLogicalContainer(actExp.guard, it)
+				associator.associateLogicalContainer(actExp.block, it)
 			}
 		}
 	}
@@ -1123,6 +1128,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 							it.append('''return («returnType»)currentActivity;''')
 						}
 					]
+					associateChildExpressions(useCase.block, it)
 					associator.associateLogicalContainer(useCase.block, it)
 
 				}

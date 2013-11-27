@@ -35,6 +35,7 @@ import org.eclipse.xtext.xbase.typesystem.computation.ITypeComputationState
 import org.eclipse.xtext.xbase.typesystem.computation.ITypeExpectation
 import org.eclipse.xtext.xbase.typesystem.conformance.ConformanceHint
 import de.msg.xt.mdt.base.Tag
+import de.msg.xt.mdt.tdsl.tDsl.ActivityExpectation
 
 @Singleton
 class TDslTypeComputer extends XbaseWithAnnotationsTypeComputer {
@@ -70,6 +71,8 @@ class TDslTypeComputer extends XbaseWithAnnotationsTypeComputer {
 			_computeTypes(expression as CurrentActivityExpression, state);
 		} else if (expression instanceof InnerBlock) {
 			_computeTypes(expression as InnerBlock, state);
+		} else if (expression instanceof ActivityExpectation) {
+			_computeTypes(expression as ActivityExpectation, state);
 		} else {
 			if(expression != null) super.computeTypes(expression, state)
 		}
@@ -119,6 +122,16 @@ class TDslTypeComputer extends XbaseWithAnnotationsTypeComputer {
 		val returnType = typeReferences.getTypeForName(Void::TYPE, block)
 
 		computeBlockExpressionTypes(state, block)
+
+		val assignedType = state.converter.toLightweightReference(returnType)
+		state.acceptActualType(assignedType)
+	}
+
+	protected def _computeTypes(ActivityExpectation actExp, ITypeComputationState state) {
+		val returnType = typeReferences.getTypeForName(Void::TYPE, actExp)
+
+		computeTypes(actExp.guard, state.withoutExpectation) // withExpectation(state.converter.toLightweightReference(typeReferences.getTypeForName(Boolean, actExp))))
+		computeBlockExpressionTypes(state, actExp.block)
 
 		val assignedType = state.converter.toLightweightReference(returnType)
 		state.acceptActualType(assignedType)

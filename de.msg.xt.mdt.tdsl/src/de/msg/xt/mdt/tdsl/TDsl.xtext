@@ -177,7 +177,7 @@ StatementLine returns xbase::XExpression:
 ;
 
 Statement returns xbase::XExpression:
-	SubUseCaseCall | OperationCall | ActivityOperationCall | VariableDeclaration | IfExpression | '[' XAssignment ']' | Assert //| CompoundStatement
+	SubUseCaseCall | OperationCall | ActivityOperationCall | VariableDeclaration | IfExpression | '[' XAssignment ']' | Assert | ActivityExpectation //| CompoundStatement
 ;
 
 VariableDeclaration returns xbase::XVariableDeclaration:
@@ -232,15 +232,16 @@ AFQN:
 
 OperationCall returns xbase::XExpression:
 	{OperationCall}
-	operation=[OperationMapping|OFQN] ('(' (paramAssignment+=OperationParameterAssignment) (',' paramAssignment+=OperationParameterAssignment)* ')')? (expectation+=ActivityExpectation)*
+	operation=[OperationMapping|OFQN] ('(' (paramAssignment+=OperationParameterAssignment) (',' paramAssignment+=OperationParameterAssignment)* ')')? 
 ;
 
 ActivityOperationCall returns xbase::XExpression:
 	{ActivityOperationCall}
-	operation=[ActivityOperation|AFQN] ('(' (paramAssignment+=ActivityOperationParameterAssignment) (',' paramAssignment+=ActivityOperationParameterAssignment)* ')')? (expectation+=ActivityExpectation)*
+	operation=[ActivityOperation|AFQN] ('(' (paramAssignment+=ActivityOperationParameterAssignment) (',' paramAssignment+=ActivityOperationParameterAssignment)* ')')? 
 ;
 
-ActivityExpectation:
+ActivityExpectation returns xbase::XExpression:
+	{ActivityExpectation}
 	'expect' activity=[Activity|FQN] 'if' '(' guard=Expression ')' block=InnerBlock
 ;
 

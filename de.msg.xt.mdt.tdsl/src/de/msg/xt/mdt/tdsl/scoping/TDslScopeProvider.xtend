@@ -439,7 +439,7 @@ class TDslScopeProvider extends XbaseWithAnnotationsScopeProvider {
 	}
 
 	def boolean isAlreadyFilledActivitySwitchingExpression(XExpression expression) {
-		expression instanceof StatementLine /* || switch expression {
+		expression instanceof StatementLine /*|| switch expression {
 			ActivityOperationCall: {
 					val op = expression.eGet(TDslPackage.Literals.ACTIVITY_OPERATION_CALL__OPERATION, false) as EObject
 					op != null && !op.eIsProxy && expression.activityOperation != null
@@ -453,7 +453,7 @@ class TDslScopeProvider extends XbaseWithAnnotationsScopeProvider {
 					useCase != null && !useCase.eIsProxy
 				}
 			default: false
-		}*/
+		} */
 	}
 
 }

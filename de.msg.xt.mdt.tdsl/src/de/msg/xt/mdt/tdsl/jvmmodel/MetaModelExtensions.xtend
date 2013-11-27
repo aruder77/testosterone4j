@@ -377,7 +377,7 @@ class MetaModelExtensions {
 			return expr
 
 		// other blocks may contain activity switching operations. In that case, the
-		/*
+		
 		val opCalls = EcoreUtil2::getAllContentsOfType(expr, typeof(OperationCall))
 		if (!opCalls.empty) {
 			operation = opCalls.get(0)
@@ -391,7 +391,7 @@ class MetaModelExtensions {
 			val subUseCaseCalls = EcoreUtil2::getAllContentsOfType(expr, typeof(SubUseCaseCall))	
 			if (!subUseCaseCalls.empty)
 				operation = subUseCaseCalls.get(0)		
-		}*/
+		}
 		operation
 	}
 	
