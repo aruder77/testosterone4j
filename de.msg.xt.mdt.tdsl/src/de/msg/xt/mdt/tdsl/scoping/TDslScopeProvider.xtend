@@ -157,18 +157,17 @@ class TDslScopeProvider extends XbaseWithAnnotationsScopeProvider {
 			} else if (reference == TDslPackage::eINSTANCE.operationCall_Operation ||
 				reference == TDslPackage::eINSTANCE.activityOperationCall_Operation) {
 				val XExpression opCall = context as XExpression
+				val millis = System::currentTimeMillis
+				logger.debug(millis + " getScope " + opCall.useCasePath + " activityOperationCall/operationCall_Operation")
 				val nextActivities = opCall.currentActivities
+				var IScope scope = null
 				if (reference == TDslPackage::eINSTANCE.operationCall_Operation) {
-					val millis = System::currentTimeMillis
-					logger.debug(millis + " getScope " + opCall.useCasePath + " operationCall_Operation")
 					val operations = new ArrayList<OperationMapping>
 					for (activity : nextActivities) {
 						operations.addAll(activity.fieldOperations)
 					}
-					logger.debug(millis + " getScope finished " + opCall.useCasePath + " operationCall_Operation")
-					calculatesScopes(operations)
+					scope = calculatesScopes(operations)
 				} else {
-					logger.debug("getScope " + opCall.useCasePath + " activityOperationCall_Operation")
 					val activityOperations = new ArrayList<ActivityOperation>()
 					for (activity : nextActivities) {
 						activityOperations.addAll(activity.allOperations)
@@ -178,11 +177,13 @@ class TDslScopeProvider extends XbaseWithAnnotationsScopeProvider {
 							"ActivityOperation could not be resolved: " + opCall.useCasePath +
 								" activtiyOperationCall_Operation")
 					}
-					Scopes::scopeFor(activityOperations.filter[it.name != null],
+					scope = Scopes::scopeFor(activityOperations.filter[it.name != null],
 						[
 							QualifiedName::create("#" + it.name)
 						], IScope::NULLSCOPE)
 				}
+				logger.debug(millis + " getScope finished " + opCall.useCasePath + " activityOperationCall/operationCall_Operation")
+				scope
 			} else if (reference == TDslPackage::eINSTANCE.operationMapping_Name) {
 				var Field field
 				if (context instanceof OperationMapping) {
@@ -439,9 +440,18 @@ class TDslScopeProvider extends XbaseWithAnnotationsScopeProvider {
 
 	def boolean isAlreadyFilledActivitySwitchingExpression(XExpression expression) {
 		expression instanceof StatementLine /* || switch expression {
-			ActivityOperationCall: expression.activityOperation != null
-			OperationCall: expression.operation != null
-			SubUseCaseCall: expression.useCase != null
+			ActivityOperationCall: {
+					val op = expression.eGet(TDslPackage.Literals.ACTIVITY_OPERATION_CALL__OPERATION, false) as EObject
+					op != null && !op.eIsProxy && expression.activityOperation != null
+				}
+			OperationCall: {
+					val op = expression.eGet(TDslPackage.Literals.OPERATION_CALL__OPERATION, false) as EObject
+					op != null && !op.eIsProxy
+				}
+			SubUseCaseCall: {
+					val useCase = expression.eGet(TDslPackage.Literals.SUB_USE_CASE_CALL__USE_CASE, false) as EObject
+					useCase != null && !useCase.eIsProxy
+				}
 			default: false
 		}*/
 	}
