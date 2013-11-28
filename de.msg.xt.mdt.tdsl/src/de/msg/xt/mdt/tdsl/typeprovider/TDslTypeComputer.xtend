@@ -109,8 +109,10 @@ class TDslTypeComputer extends XbaseWithAnnotationsTypeComputer {
 
 	protected def _computeTypes(UseCaseBlock block, ITypeComputationState state) {
 		var String nextActivityClass = (block.eContainer as UseCase).returnedActivity?.class_fqn
-		val returnType = if(nextActivityClass != null) typeReferences.getTypeForName(nextActivityClass, block) else typeReferences.
-				getTypeForName(Void::TYPE, block)
+		val returnType = if (nextActivityClass != null)
+				typeReferences.getTypeForName(nextActivityClass, block)
+			else
+				typeReferences.getTypeForName(Void::TYPE, block)
 
 		computeBlockExpressionTypes(state, block)
 
@@ -130,7 +132,8 @@ class TDslTypeComputer extends XbaseWithAnnotationsTypeComputer {
 	protected def _computeTypes(ActivityExpectation actExp, ITypeComputationState state) {
 		val returnType = typeReferences.getTypeForName(Void::TYPE, actExp)
 
-		computeTypes(actExp.guard, state.withoutExpectation) // withExpectation(state.converter.toLightweightReference(typeReferences.getTypeForName(Boolean, actExp))))
+		computeTypes(actExp.guard,
+			state.withRootExpectation(state.converter.toLightweightReference(typeReferences.getTypeForName(Boolean, actExp))))
 		computeBlockExpressionTypes(state, actExp.block)
 
 		val assignedType = state.converter.toLightweightReference(returnType)
@@ -139,8 +142,10 @@ class TDslTypeComputer extends XbaseWithAnnotationsTypeComputer {
 
 	protected def _computeTypes(ActivityOperationBlock block, ITypeComputationState state) {
 		var nextActivityClass = block.activityOperation.returnedActivity?.class_fqn
-		val returnType = if(nextActivityClass != null) typeReferences.getTypeForName(nextActivityClass, block) else typeReferences.
-				getTypeForName(Void::TYPE, block)
+		val returnType = if (nextActivityClass != null)
+				typeReferences.getTypeForName(nextActivityClass, block)
+			else
+				typeReferences.getTypeForName(Void::TYPE, block)
 
 		computeBlockExpressionTypes(state, block)
 
@@ -148,31 +153,21 @@ class TDslTypeComputer extends XbaseWithAnnotationsTypeComputer {
 		state.acceptActualType(assignedType)
 	}
 
-
-//	protected override _computeTypes(XIfExpression expr, ITypeComputationState state) {
-//		super._computeTypes(expr, state)
-//	}
-
 	protected def computeBlockExpressionTypes(ITypeComputationState state, XBlockExpression block) {
-		for (ITypeExpectation expectation : state.getExpectations()) {
-			val expectedType = expectation.getExpectedType();
-			val expressions = block.getExpressions();
-			if (!expressions.isEmpty()) {
-				for (XExpression expression : expressions) {
-					val expressionState = state.withoutExpectation();
-					expressionState.computeTypes(expression);
-					if (expression instanceof XVariableDeclaration) {
-						addLocalToCurrentScope(expression as XVariableDeclaration, state);
-					} else if (expression instanceof StatementLine) {
-						val stmtLine = expression as StatementLine
-						if (stmtLine.statement instanceof XVariableDeclaration) {
-							addLocalToCurrentScope(stmtLine.statement as XVariableDeclaration, state)
-						}
+		val expressions = block.getExpressions();
+		if (!expressions.isEmpty()) {
+			for (XExpression expression : expressions) {
+				val expressionState = state.withoutExpectation();
+				expressionState.computeTypes(expression);
+				if (expression instanceof XVariableDeclaration) {
+					addLocalToCurrentScope(expression as XVariableDeclaration, state);
+				} else if (expression instanceof StatementLine) {
+					val stmtLine = expression as StatementLine
+					if (stmtLine.statement instanceof XVariableDeclaration) {
+						addLocalToCurrentScope(stmtLine.statement as XVariableDeclaration, state)
 					}
 				}
 			}
-
-		//					expectation.acceptActualType(expectedType, ConformanceHint.CHECKED, ConformanceHint.SUCCESS);
 		}
 	}
 
@@ -228,7 +223,7 @@ class TDslTypeComputer extends XbaseWithAnnotationsTypeComputer {
 
 	protected def _computeTypes(GenerationSelektor generationSelektor, ITypeComputationState state) {
 		computeTypes(generationSelektor.expression, state.withNonVoidExpectation)
-		
+
 		val container = generationSelektor.eContainer
 		var JvmTypeReference type
 		switch container {

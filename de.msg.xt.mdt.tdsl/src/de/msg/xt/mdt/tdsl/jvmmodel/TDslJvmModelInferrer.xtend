@@ -404,14 +404,14 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 	def associateChildExpressions(XBlockExpression block, JvmOperation it) {
 		for (expression : block.expressions) {
 			val stmtLine = expression as StatementLine
-			if (stmtLine.statement instanceof ActivityOperationCall) {
+			/*if (stmtLine.statement instanceof ActivityOperationCall) {
 				val opCall = stmtLine.statement as ActivityOperationCall
 				for (param : opCall.paramAssignment)
 					associator.associateLogicalContainer(param.value, it)
-			} else if (stmtLine.statement instanceof ActivityExpectation) {
+			} else*/ if (stmtLine.statement instanceof ActivityExpectation) {
 				val actExp = stmtLine.statement as ActivityExpectation
 				associator.associateLogicalContainer(actExp.guard, it)
-				associator.associateLogicalContainer(actExp.block, it)
+				//associator.associateLogicalContainer(actExp.block, it)
 			}
 		}
 	}
@@ -1128,7 +1128,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 							it.append('''return («returnType»)currentActivity;''')
 						}
 					]
-					associateChildExpressions(useCase.block, it)
+					//associateChildExpressions(useCase.block, it)
 					associator.associateLogicalContainer(useCase.block, it)
 
 				}

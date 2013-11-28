@@ -9,10 +9,14 @@ import de.msg.xt.mdt.tdsl.tDsl.OperationParameterAssignment
 import de.msg.xt.mdt.tdsl.tDsl.ParameterAssignment
 import de.msg.xt.mdt.tdsl.tDsl.TDslPackage
 import javax.inject.Inject
+import org.eclipse.emf.ecore.EObject
+import org.eclipse.emf.ecore.EStructuralFeature
 import org.eclipse.xtext.common.types.JvmType
 import org.eclipse.xtext.validation.Check
+import org.eclipse.xtext.xbase.XExpression
 import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder
 import org.eclipse.xtext.xbase.typing.ITypeProvider
+import de.msg.xt.mdt.tdsl.tDsl.ActivityExpectation
 
 class TDslValidator extends AbstractTDslValidator {
 
@@ -131,4 +135,15 @@ class TDslValidator extends AbstractTDslValidator {
 			return true
 		return false
 	}
+	
+	override protected isValueExpectedRecursive(XExpression expr) {
+		val feature = expr.eContainingFeature()
+		val container = expr.eContainer()
+		
+		if (container instanceof ActivityExpectation && feature == TDslPackage.Literals.ACTIVITY_EXPECTATION__GUARD)
+			true
+		else 
+			super.isValueExpectedRecursive(expr)
+	}
+
 }

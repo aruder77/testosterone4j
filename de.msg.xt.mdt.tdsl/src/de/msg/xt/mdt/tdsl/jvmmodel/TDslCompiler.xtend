@@ -35,6 +35,7 @@ import org.eclipse.xtext.xbase.compiler.output.ITreeAppendable
 import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder
 import org.eclipse.xtext.xbase.lib.Pair
 import org.eclipse.xtext.xbase.typing.ITypeProvider
+import de.msg.xt.mdt.tdsl.tDsl.ActivityExpectation
 
 class TDslCompiler extends XbaseCompiler {
 
@@ -150,6 +151,12 @@ class TDslCompiler extends XbaseCompiler {
 			}
 			CurrentActivityExpression: {
 			}
+			ActivityExpectation: {
+				val valName = it.declareVariable(expr.guard, "expectation")
+				append('''boolean «valName» = ''')
+				expr.guard.internalToJavaStatement(it, true)
+				append(';').newLine
+			}
 			/*XAbstractFeatureCall: {
     			if (isReferenced && isVariableDeclarationRequired(expr, it)) {
     				val type = getTypeForVariableDeclaration(expr);
@@ -263,6 +270,9 @@ class TDslCompiler extends XbaseCompiler {
 			}
 			CurrentActivityExpression: {
 				append("currentActivity")
+			}
+			ActivityExpectation: {
+				append(expr.guard.getVarName(it))
 			}
 			default:
 				super.internalToConvertedExpression(expr, it)
