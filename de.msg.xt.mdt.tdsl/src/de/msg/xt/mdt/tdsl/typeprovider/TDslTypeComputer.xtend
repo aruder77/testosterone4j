@@ -213,8 +213,8 @@ class TDslTypeComputer extends XbaseWithAnnotationsTypeComputer {
 	}
 
 	protected def _computeTypes(SubUseCaseCall subUseCaseCall, ITypeComputationState state) {
-		for (expr : subUseCaseCall.paramAssignment.map[it.value]) {
-			computeTypes(expr, state)
+		for (expr : subUseCaseCall.paramAssignment.map[value]) {
+			state.withNonVoidExpectation.computeTypes(expr)
 		}
 
 		state.acceptActualType(
