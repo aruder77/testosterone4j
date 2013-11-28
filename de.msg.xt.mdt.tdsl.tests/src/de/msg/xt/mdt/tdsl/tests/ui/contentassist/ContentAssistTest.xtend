@@ -9,6 +9,7 @@ import org.junit.runner.RunWith
 import de.msg.xt.mdt.tdsl.tests.XtextParameterized.Parameters
 import de.msg.xt.mdt.tdsl.tests.headless.ExpressionScopingTest
 import de.msg.xt.mdt.tdsl.tests.XtextParameterized.Parameter
+import de.msg.xt.mdt.tdsl.tests.headless.LocalScopingTest
 
 @RunWith(XtextParameterized)
 @InjectWith(TDslUiInjectorProvider)
@@ -16,7 +17,7 @@ class ContentAssistTest extends MyAbstractContentAssistTest {
 	
 	@Parameters(name="{0}")
 	def public static Iterable<Object[]> parameters() {
-		ExpressionScopingTest.parameters
+		ExpressionScopingTest.parameters + LocalScopingTest.parameters
 	}
 	
 	@Parameter(0)
@@ -34,7 +35,7 @@ class ContentAssistTest extends MyAbstractContentAssistTest {
 	@Test
 	def void inUseCase() {
 		val builder = newBuilder.append(BasicTestSetupTest.BASIC_TEST_PREAMBLE).append('''
-			useCase SampleUseCase initial ViewActivity {
+			useCase SampleUseCase(StringDT param) initial ViewActivity {
 		''')
 		
 		builder.append(preamble.toString).assertProposal(expression)
@@ -52,9 +53,10 @@ class ContentAssistTest extends MyAbstractContentAssistTest {
 				}
 				op refresh
 				op operation1
+				op append(StringDT appendStr)
 				op openEditor => EditorActivity 
 				
-				op activityOperation {
+				op activityOperation(StringDT param) {
 		''')
 		
 		builder.append(preamble.toString).assertProposal(expression)

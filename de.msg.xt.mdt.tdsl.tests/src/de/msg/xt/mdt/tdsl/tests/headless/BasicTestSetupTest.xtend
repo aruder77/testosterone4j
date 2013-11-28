@@ -83,6 +83,10 @@ class BasicTestSetupTest {
 					#openEditor
 				} => EditorActivity
 				
+				useCase SampleTestUseCaseWithParameter(StringDT param) initial ViewActivity {
+					#refresh
+				}
+				
 				test SampleTestUseCaseTest generator de.msg.xt.mdt.base.SampleTestGenerator useCase SampleTestUseCase
 			'''
 	
