@@ -365,7 +365,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 			if (operation.body != null) {
 				body = operation.body
 
-				operation.body.associateChildExpressions(it)
+				//operation.body.associateChildExpressions(it)
 			} else {
 				body = [
 					it.append(
