@@ -36,6 +36,7 @@ import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder
 import org.eclipse.xtext.xbase.lib.Pair
 import org.eclipse.xtext.xbase.typing.ITypeProvider
 import de.msg.xt.mdt.tdsl.tDsl.ActivityExpectation
+import de.msg.xt.mdt.tdsl.tDsl.ParameterAssignment
 
 class TDslCompiler extends XbaseCompiler {
 
@@ -119,9 +120,10 @@ class TDslCompiler extends XbaseCompiler {
 				expr.newTypeRef(expr.useCase.class_fqn).serialize(expr, it)
 				append(".class, \"" + expr.readableUniqueKey + "\");")
 				for (param : expr.paramAssignment) {
+					val paramAssignment = param as ParameterAssignment
 					newLine
-					append('''«useCaseVariable».set«param.name.name.toFirstUpper»(''')
-					appendParameterValue(it, param.name.dataType, param.value)
+					append('''«useCaseVariable».set«paramAssignment.name.name.toFirstUpper»(''')
+					appendParameterValue(it, paramAssignment.name.dataType, paramAssignment.value)
 					append(");")
 				}
 				newLine
@@ -311,7 +313,7 @@ class TDslCompiler extends XbaseCompiler {
 
 	def generateParameters(OperationCall call, ITreeAppendable appendable) {
 		for (mapping : call.operation.dataTypeMappings) {
-			val assignment = findAssignment(call, mapping.name)
+			val assignment = findAssignment(call, mapping.name) as OperationParameterAssignment
 			val dataTypeName = mapping.datatype.class_fqn
 			appendable.newLine
 			mapping.newTypeRef(dataTypeName).serialize(mapping, appendable)
@@ -331,7 +333,7 @@ class TDslCompiler extends XbaseCompiler {
 	def generateEmbeddedParameters(OperationCall call, ITreeAppendable appendable) {
 		var i = 1
 		for (mapping : call.operation.dataTypeMappings) {
-			val assignment = findAssignment(call, mapping.name)
+			val assignment = findAssignment(call, mapping.name) as OperationParameterAssignment
 			val dataTypeName = mapping.datatype.class_fqn
 			if (assignment == null) {
 				appendable.append("getOrGenerateValue(")
@@ -364,7 +366,7 @@ class TDslCompiler extends XbaseCompiler {
 
 	def generateParameters(ActivityOperationCall call, ITreeAppendable appendable) {
 		for (parameter : call.operation.params) {
-			val assignment = findAssignment(call, parameter)
+			val assignment = findAssignment(call, parameter) as ActivityOperationParameterAssignment
 			val dataTypeName = parameter.dataType.class_fqn
 			appendable.newLine
 			val proposedName = call.operation.name + parameter.name?.toFirstUpper
@@ -396,7 +398,7 @@ class TDslCompiler extends XbaseCompiler {
 
 	def generateParameters(SubUseCaseCall call, ITreeAppendable appendable) {
 		for (parameter : call.useCase.inputParameter) {
-			val assignment = findAssignment(call, parameter)
+			val assignment = findAssignment(call, parameter) as ParameterAssignment
 			val dataTypeName = parameter.dataType.class_fqn
 			appendable.newLine
 			val proposedName = call.useCase.name?.toFirstLower + parameter.name?.toFirstUpper
@@ -435,7 +437,8 @@ class TDslCompiler extends XbaseCompiler {
 
 	def findAssignment(ActivityOperationCall call, ActivityOperationParameter param) {
 		for (assignment : call.paramAssignment) {
-			if (assignment.name.equals(param)) {
+			val paramAssignment = assignment as ActivityOperationParameterAssignment
+			if (paramAssignment.name.equals(param)) {
 				return assignment
 			}
 		}
@@ -444,7 +447,8 @@ class TDslCompiler extends XbaseCompiler {
 
 	def findAssignment(OperationCall call, ControlOperationParameter param) {
 		for (assignment : call.paramAssignment) {
-			if (assignment.name.name.equals(param)) {
+			val paramAssignment = assignment as OperationParameterAssignment
+			if (paramAssignment.name.name.equals(param)) {
 				return assignment
 			}
 		}
@@ -453,7 +457,8 @@ class TDslCompiler extends XbaseCompiler {
 
 	def findAssignment(SubUseCaseCall call, Parameter param) {
 		for (assignment : call.paramAssignment) {
-			if (assignment.name.equals(param)) {
+			val paramAssignment = assignment as ParameterAssignment
+			if (paramAssignment.name.equals(param)) {
 				return assignment
 			}
 		}

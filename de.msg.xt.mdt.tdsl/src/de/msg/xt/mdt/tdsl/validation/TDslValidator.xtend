@@ -142,6 +142,12 @@ class TDslValidator extends AbstractTDslValidator {
 		
 		if (container instanceof ActivityExpectation && feature == TDslPackage.Literals.ACTIVITY_EXPECTATION__GUARD)
 			true
+		else if (container instanceof OperationParameterAssignment && feature == TDslPackage.Literals.OPERATION_PARAMETER_ASSIGNMENT__VALUE)
+			true
+		else if (container instanceof ActivityOperationParameterAssignment && feature == TDslPackage.Literals.ACTIVITY_OPERATION_PARAMETER_ASSIGNMENT__VALUE)
+			true
+		else if (container instanceof ParameterAssignment && feature == TDslPackage.Literals.PARAMETER_ASSIGNMENT__VALUE)
+			true
 		else 
 			super.isValueExpectedRecursive(expr)
 	}

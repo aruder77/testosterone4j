@@ -29,11 +29,18 @@ import org.eclipse.xtext.EcoreUtil2
 import org.eclipse.xtext.naming.QualifiedName
 import org.eclipse.xtext.scoping.IScope
 import org.eclipse.xtext.scoping.Scopes
+import org.eclipse.xtext.xbase.XBlockExpression
 import org.eclipse.xtext.xbase.XExpression
 import org.eclipse.xtext.xbase.XVariableDeclaration
 import org.eclipse.xtext.xbase.annotations.scoping.XbaseWithAnnotationsScopeProvider
+import org.eclipse.xtext.xbase.scoping.LocalVariableScopeContext
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.eclipse.xtext.xbase.scoping.XbaseScopeProvider.LocalVariableAcceptor
+import org.eclipse.xtext.xbase.scoping.featurecalls.IValidatedEObjectDescription
+import org.eclipse.xtext.xbase.validation.IssueCodes
+import org.eclipse.emf.ecore.resource.Resource
+import org.eclipse.xtext.xbase.scoping.DelegatingScope
 
 class TDslScopeProvider extends XbaseWithAnnotationsScopeProvider {
 
@@ -467,5 +474,56 @@ class TDslScopeProvider extends XbaseWithAnnotationsScopeProvider {
 			default: false
 		} */
 	}
+	
+	
+	override IScope createSimpleFeatureCallScope(EObject context, EReference reference, Resource resource, boolean includeCurrentBlock, int idx) {
+		val implicitFeaturesAndStatics = new DelegatingScope(IScope.NULLSCOPE);
+		val actualContext = if (context != null && context.eContainer instanceof StatementLine) context.eContainer else context
+		val scopeContext = createLocalVariableScopeContext(actualContext, reference, includeCurrentBlock, idx);
+		val localVariableScope = createLocalVarScope(implicitFeaturesAndStatics, scopeContext);
+		val scopeForImplicitFeatures = createImplicitFeatureCallScope(actualContext, resource, IScope.NULLSCOPE, localVariableScope);
+		implicitFeaturesAndStatics.setDelegate(scopeForImplicitFeatures);
+		return localVariableScope;
+	}
+	
+	
+	
+	/**
+	 * The customization is necessary since all our expressions are wrapped in a StatementLine and not directly in a 
+	 * XBlockExpression.
+	 */
+/* 	override protected createLocalVarScope(LocalVariableAcceptor acceptor, LocalVariableScopeContext scopeContext) {
+		val context = scopeContext.getContext();
+		if (context.eContainer() instanceof StatementLine) {
+			val stmtLine = context.eContainer()
+			super.createLocalVarScope()
+		} else {
+			super.createLocalVarScope(acceptor, scopeContext)
+		}
+	} */
+	
+	override createLocalVarScopeForBlock(
+			XBlockExpression block, int indexOfContextExpressionInBlock,
+			boolean referredFromClosure, LocalVariableAcceptor acceptor) {
+		val descriptions = new ArrayList<IValidatedEObjectDescription>
+		for (i: 0..indexOfContextExpressionInBlock) {
+			var expression = block.getExpressions().get(i);
+			if (expression instanceof StatementLine)
+				expression = (expression as StatementLine).statement
+			if (expression instanceof XVariableDeclaration) {
+				val varDecl = expression as XVariableDeclaration
+				if (varDecl.getName() != null) {
+					val desc = createLocalVarDescription(varDecl);
+					if (referredFromClosure && varDecl.isWriteable())
+						desc.setIssueCode(IssueCodes.INVALID_MUTABLE_VARIABLE_ACCESS);
+					descriptions.add(desc);
+				}
+			}
+		}
+		if (descriptions.isEmpty())
+			return;
+		acceptor.accept("XBlockExpression", descriptions);
+	}
+	
 
 }

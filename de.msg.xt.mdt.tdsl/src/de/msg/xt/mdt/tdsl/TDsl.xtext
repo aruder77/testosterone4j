@@ -126,7 +126,8 @@ Parameter:
 	dataType=[DataType|FQN] name=ID	
 ;
 
-ParameterAssignment:
+ParameterAssignment returns xbase::XExpression:
+	{ParameterAssignment}
 	name=[Parameter|FQN] '=' value=XExpression
 ;
 
@@ -144,11 +145,13 @@ GenerationSelektor returns xbase::XExpression:
 	'select' ('(' (('tags' tags+=[Tag|ID] (',' tags+=[Tag|ID])*) | expression=XExpression) ')' )?
 ;
 
-OperationParameterAssignment:
+OperationParameterAssignment returns xbase::XExpression:
+	{OperationParameterAssignment}
 	name=[DataTypeMapping|FQN] '=' value=ParameterInput
 ;
 
-ActivityOperationParameterAssignment:
+ActivityOperationParameterAssignment returns xbase::XExpression:
+	{ActivityOperationParameterAssignment}
 	name=[ActivityOperationParameter|FQN] '=' value=ParameterInput
 ;
 
@@ -242,7 +245,7 @@ ActivityOperationCall returns xbase::XExpression:
 
 ActivityExpectation returns xbase::XExpression:
 	{ActivityExpectation}
-	'expect' activity=[Activity|FQN] 'if' '(' guard=Expression ')' block=InnerBlock
+	'expect' activity=[Activity|FQN] 'if' '(' guard=XExpression ')' block=InnerBlock
 ;
 
 SubUseCaseCall returns xbase::XExpression:

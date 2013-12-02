@@ -5,6 +5,7 @@ import de.msg.xt.mdt.base.AbstractActivity
 import de.msg.xt.mdt.tdsl.jvmmodel.MetaModelExtensions
 import de.msg.xt.mdt.tdsl.jvmmodel.NamingExtensions
 import de.msg.xt.mdt.tdsl.jvmmodel.UtilExtensions
+import de.msg.xt.mdt.tdsl.tDsl.ActivityExpectation
 import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationBlock
 import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationCall
 import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationParameter
@@ -18,6 +19,7 @@ import de.msg.xt.mdt.tdsl.tDsl.InnerBlock
 import de.msg.xt.mdt.tdsl.tDsl.OperationCall
 import de.msg.xt.mdt.tdsl.tDsl.OperationParameterAssignment
 import de.msg.xt.mdt.tdsl.tDsl.Parameter
+import de.msg.xt.mdt.tdsl.tDsl.ParameterAssignment
 import de.msg.xt.mdt.tdsl.tDsl.StatementLine
 import de.msg.xt.mdt.tdsl.tDsl.SubUseCaseCall
 import de.msg.xt.mdt.tdsl.tDsl.UseCase
@@ -27,15 +29,11 @@ import org.eclipse.xtext.common.types.JvmTypeReference
 import org.eclipse.xtext.common.types.util.TypeReferences
 import org.eclipse.xtext.xbase.XBlockExpression
 import org.eclipse.xtext.xbase.XExpression
-import org.eclipse.xtext.xbase.XIfExpression
 import org.eclipse.xtext.xbase.XVariableDeclaration
 import org.eclipse.xtext.xbase.annotations.typesystem.XbaseWithAnnotationsTypeComputer
 import org.eclipse.xtext.xbase.jvmmodel.IJvmModelAssociations
 import org.eclipse.xtext.xbase.typesystem.computation.ITypeComputationState
-import org.eclipse.xtext.xbase.typesystem.computation.ITypeExpectation
 import org.eclipse.xtext.xbase.typesystem.conformance.ConformanceHint
-import de.msg.xt.mdt.base.Tag
-import de.msg.xt.mdt.tdsl.tDsl.ActivityExpectation
 
 @Singleton
 class TDslTypeComputer extends XbaseWithAnnotationsTypeComputer {
@@ -87,14 +85,11 @@ class TDslTypeComputer extends XbaseWithAnnotationsTypeComputer {
 
 	protected def _computeTypes(OperationCall opCall, ITypeComputationState state) {
 		val typeName = opCall.operation?.dataType?.class_FQN?.toString
-		if (typeName?.endsWith("StringDT"))
-			System.out.println("getText")
-		for (expr : opCall.paramAssignment.map[it.value]) {
+		for (expr : opCall.paramAssignment.map[(it as OperationParameterAssignment).value]) {
 			state.withNonVoidExpectation.computeTypes(expr)
 		}
 
 		if (typeName != null) {
-			System.out.println("Typename: " + typeName)
 			state.acceptActualType(
 				state.converter.toLightweightReference(typeReferences.getTypeForName(typeName, opCall)))
 		} else
@@ -132,8 +127,9 @@ class TDslTypeComputer extends XbaseWithAnnotationsTypeComputer {
 	protected def _computeTypes(ActivityExpectation actExp, ITypeComputationState state) {
 		val returnType = typeReferences.getTypeForName(Void::TYPE, actExp)
 
-		computeTypes(actExp.guard,
-			state.withRootExpectation(state.converter.toLightweightReference(typeReferences.getTypeForName(Boolean, actExp))))
+		state.withNonVoidExpectation.computeTypes(actExp.guard)
+
+		//state.withRootExpectation(state.converter.toLightweightReference(typeReferences.getTypeForName(Boolean, actExp))))
 		computeBlockExpressionTypes(state, actExp.block)
 
 		val assignedType = state.converter.toLightweightReference(returnType)
@@ -154,17 +150,19 @@ class TDslTypeComputer extends XbaseWithAnnotationsTypeComputer {
 	}
 
 	protected def computeBlockExpressionTypes(ITypeComputationState state, XBlockExpression block) {
-		val expressions = block.getExpressions();
-		if (!expressions.isEmpty()) {
-			for (XExpression expression : expressions) {
-				val expressionState = state.withoutExpectation();
-				expressionState.computeTypes(expression);
-				if (expression instanceof XVariableDeclaration) {
-					addLocalToCurrentScope(expression as XVariableDeclaration, state);
-				} else if (expression instanceof StatementLine) {
-					val stmtLine = expression as StatementLine
-					if (stmtLine.statement instanceof XVariableDeclaration) {
-						addLocalToCurrentScope(stmtLine.statement as XVariableDeclaration, state)
+		if (block != null) {
+			val expressions = block.getExpressions();
+			if (!expressions.isEmpty()) {
+				for (XExpression expression : expressions) {
+					val expressionState = state.withoutExpectation();
+					expressionState.computeTypes(expression);
+					if (expression instanceof XVariableDeclaration) {
+						addLocalToCurrentScope(expression as XVariableDeclaration, state);
+					} else if (expression instanceof StatementLine) {
+						val stmtLine = expression as StatementLine
+						if (stmtLine.statement instanceof XVariableDeclaration) {
+							addLocalToCurrentScope(stmtLine.statement as XVariableDeclaration, state)
+						}
 					}
 				}
 			}
@@ -194,7 +192,7 @@ class TDslTypeComputer extends XbaseWithAnnotationsTypeComputer {
 
 		for (expectation : state.expectations) {
 			val expectedType = expectation.expectedType
-			for (expr : opCall.paramAssignment.map[it.value]) {
+			for (expr : opCall.paramAssignment.map[(it as ActivityOperationParameterAssignment).value]) {
 				state.withNonVoidExpectation.computeTypes(expr)
 			}
 			if (expectedType != null)
@@ -213,7 +211,7 @@ class TDslTypeComputer extends XbaseWithAnnotationsTypeComputer {
 	}
 
 	protected def _computeTypes(SubUseCaseCall subUseCaseCall, ITypeComputationState state) {
-		for (expr : subUseCaseCall.paramAssignment.map[value]) {
+		for (expr : subUseCaseCall.paramAssignment.map[(it as ParameterAssignment).value]) {
 			state.withNonVoidExpectation.computeTypes(expr)
 		}
 
