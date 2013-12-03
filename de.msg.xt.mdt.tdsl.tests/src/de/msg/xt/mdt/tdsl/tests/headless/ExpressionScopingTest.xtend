@@ -5,7 +5,6 @@ import de.msg.xt.mdt.tdsl.tDsl.TestModel
 import de.msg.xt.mdt.tdsl.tests.XtextParameterized
 import de.msg.xt.mdt.tdsl.tests.XtextParameterized.Parameter
 import de.msg.xt.mdt.tdsl.tests.XtextParameterized.Parameters
-import de.msg.xt.mdt.tdsl.tests.headless.BasicTestSetupTest
 import java.util.ArrayList
 import javax.inject.Inject
 import org.eclipse.xtext.junit4.InjectWith
@@ -221,4 +220,30 @@ class ExpressionScopingTest {
 		}
 		'''.parse.assertNoErrors
 	}	
+	
+	@Test
+	def void inInnerBlock() {
+		'''
+		«BasicTestSetupTest.BASIC_TEST_PREAMBLE»
+			
+			activity SampleTestActivity {
+				
+				field searchField control TextControl {
+					op void setText(StringDT str)
+					op StringDT getText
+					op void search => SearchResult
+				}
+				op refresh
+				op operation1
+				op openEditor => EditorActivity 
+				
+				op activityOperation {
+					if (true) {
+						«preamble + expression + suffix»
+					}
+				}
+			}
+		}
+		'''.parse.assertNoErrors
+	}
 }

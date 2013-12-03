@@ -62,5 +62,14 @@ class ContentAssistTest extends MyAbstractContentAssistTest {
 		builder.append(preamble.toString).assertProposal(expression)
 	}
 	
+	@Test
+	def void inInnerBlock() {
+		val builder = newBuilder.append(BasicTestSetupTest.BASIC_TEST_PREAMBLE).append('''
+			useCase SampleUseCase(StringDT param) initial ViewActivity {
+				if (true) {
+		''')
+		
+		builder.append(preamble.toString).assertProposal(expression)
+	}
 }
 	

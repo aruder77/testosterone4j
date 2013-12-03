@@ -52,6 +52,16 @@ class LocalScopingTest {
 					.value == "abc") {
 					}'''
 			])
+			add(#[	"testParamAvailableInIfBlock", 
+					'''
+					if (true) {
+						val blockVar =  
+					''', 
+					"param",
+					'''
+					.value
+					}'''
+			])
 			add(#[	"testParamAvailableInAssert", 
 					'''
 					assert [ println( 
@@ -117,6 +127,16 @@ class LocalScopingTest {
 					"localVar",
 					'''
 					 == "abc") {
+					}'''
+			])
+			add(#[	"testLocalVariableAvailableInIfBlock", 
+					'''
+					val localVar = "Hello, world"
+					if (true) {
+						val blockVar =  
+					''', 
+					"localVar",
+					'''
 					}'''
 			])
 			add(#[	"testLocalVariableAvailableInAssert", 
@@ -211,5 +231,21 @@ class LocalScopingTest {
 			}
 		}
 		'''.parse.assertNoErrors
-	}	
+	}
+	
+	@Test
+	def void inInnerBlock() {
+		'''
+		«BasicTestSetupTest.BASIC_TEST_PREAMBLE»
+			
+			useCase SampleUseCase(StringDT param) initial ViewActivity {
+				if (true) {
+					«preamble + expression + suffix»
+				}
+			}
+		}
+		'''.parse.assertNoErrors
+	}
+	
+		
 }
