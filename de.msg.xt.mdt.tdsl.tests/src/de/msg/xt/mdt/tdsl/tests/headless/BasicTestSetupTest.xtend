@@ -14,81 +14,186 @@ import org.junit.runner.RunWith
 @InjectWith(TDslInjectorProvider)
 class BasicTestSetupTest {
 	
-	public static val BASIC_TEST_PREAMBLE = '''
-			package tdsl.testpackage {
-				
-				type String mappedBy String
-				
-				datatype StringDT type String {
-					class shortString classValue "shortString"
-				}
+	static def packageEnvelope(CharSequence body) 
+	'''
+		«TEST_PACKAGE» {
+			«body»
+		}
+	'''
+	
+	public static val TEST_PACKAGE = '''
+		package tdsl.testpackage
+	'''
+	
+	public static val STRING_TYPE = '''
+		type String mappedBy String
+	'''
+	
+	public static val STRINGDT_DATATYPE = '''
+		datatype StringDT type String {
+			class shortString classValue "shortString"
+		}	
+	'''
+	
+	public static val INVALID_EMPTY_TAGS = '''
+		tags {
+			Empty, Invalid
+		}				
+	'''
+	
+	public static val TEXTCONTROL_CONTROL = '''
+		control TextControl {
+			op void setText(String str)
+			op String getText
+			op void search
+		}
+	'''
 
-				control TextControl {
-					op void setText(String str)
-					op String getText
-					op void search
-				}
-				
-				control Button {
-					op void push
-				}
-				
-				toolkit Stdtoolkit using controls {
-					TextControl
-				}				
-				
-				activity EditorActivity {
-					field shortName control TextControl {
-						op void setText(StringDT str)
-						op StringDT getText
-						op void search
-					}
-					
-					op openDialog => DialogActivity
-					op saveAndClose => usually ViewActivity
-				}
-				
-				activity ViewActivity {
-					field searchField control TextControl {
-						op void setText(StringDT str)
-						op StringDT getText
-						op void search => SearchResult
-					}
-					op refresh
-					op operation1
-					op append(StringDT appendStr)
-					op openEditor => EditorActivity 
-				}
-				
-				activity SearchResult {
-					op refreshSearch
-				}	
-				
-				activity DialogActivity {
-					field dialogTextField control TextControl {
-						op void setText(StringDT str)
-						op StringDT getText
-						op void search => SearchResult
-					}
-					op ok => ViewActivity
-					op cancel => returnToLastActivity
-				}
-				
-				useCase SampleTestUseCase initial EditorActivity {
-					#shortName.setText
-					#saveAndClose
-				}
-				
-				useCase SampleTestUseCaseWithActivitySwitch initial ViewActivity {
-					#openEditor
-				} => EditorActivity
-				
-				useCase SampleTestUseCaseWithParameter(StringDT param) initial ViewActivity {
-					#refresh
-				}
-				
-				test SampleTestUseCaseTest generator de.msg.xt.mdt.base.SampleTestGenerator useCase SampleTestUseCase
-			'''
+	public static val BUTTON_CONTROL = '''
+		control Button {
+			op void push
+		}
+	'''
+	
+	public static val STDTOOLKIT_TOOLKIT = '''
+		toolkit Stdtoolkit using controls {
+			TextControl
+		}				
+	'''
+	
+	public static val SIMPLE_EDITOR_ACTIVITY = '''
+		activity EditorActivity {
+			field shortName control TextControl {
+				op void setText(StringDT str)
+				op StringDT getText
+				op void search
+			}
+			
+			op saveAndClose
+		}
+	'''
+	
+	public static val EDITOR_ACTIVITY = '''
+		activity EditorActivity {
+			field shortName control TextControl {
+				op void setText(StringDT str)
+				op StringDT getText
+				op void search
+			}
+			
+			op openDialog => DialogActivity
+			op saveAndClose => usually ViewActivity
+		}
+	'''
+	
+	public static val SIMPLE_VIEW_ACTIVITY = '''
+		activity ViewActivity {
+			field searchField control TextControl {
+				op void setText(StringDT str)
+				op StringDT getText
+				op void search
+			}
+			op refresh
+			op openEditor => EditorActivity 
+		}
+	'''
+
+	public static val VIEW_ACTIVITY = '''
+		activity ViewActivity {
+			field searchField control TextControl {
+				op void setText(StringDT str)
+				op StringDT getText
+				op void search => SearchResult
+			}
+			op refresh
+			op operation1
+			op append(StringDT appendStr)
+			op openEditor => EditorActivity 
+		}
+	'''
+	
+	public static val SEARCH_RESULT_ACTIVITY = '''
+		activity SearchResult {
+			op refreshSearch
+		}	
+	'''
+	
+	public static val SIMPLE_DIALOG_ACTIVITY = '''
+		activity DialogActivity {
+			field dialogTextField control TextControl {
+				op void setText(StringDT str)
+				op StringDT getText
+				op void search
+			}
+			op cancel => returnToLastActivity
+		}
+	'''
+	
+	public static val DIALOG_ACTIVITY = '''
+		activity DialogActivity {
+			field dialogTextField control TextControl {
+				op void setText(StringDT str)
+				op StringDT getText
+				op void search => SearchResult
+			}
+			op ok => ViewActivity
+			op cancel => returnToLastActivity
+		}
+	'''
+	
+	public static val SAMPLE_TEST_USECASE = '''
+		useCase SampleTestUseCase initial EditorActivity {
+			#shortName.setText
+			#saveAndClose
+		}
+	'''
+	
+	public static val SAMPLE_TEST_USECASE_WITH_ACTIVITY_SWITCH = '''
+		useCase SampleTestUseCaseWithActivitySwitch initial ViewActivity {
+			#openEditor
+		} => EditorActivity
+	'''
+	
+	public static val SAMPLE_TEST_USECASE_WITH_PARAMETER = '''
+		useCase SampleTestUseCaseWithParameter(StringDT param) initial ViewActivity {
+			#refresh
+		}
+	'''
+	
+	public static val SAMPLE_TEST_USECASE_TEST = '''
+		test SampleTestUseCaseTest generator de.msg.xt.mdt.base.SampleTestGenerator useCase SampleTestUseCase
+	'''
+	
+	
+	public static val BASIC_TEST_PREAMBLE = '''
+		«TEST_PACKAGE» {
+			
+			«STRING_TYPE»
+		
+			«STRINGDT_DATATYPE»
+		
+			«TEXTCONTROL_CONTROL»
+		
+			«BUTTON_CONTROL»
+		
+			«STDTOOLKIT_TOOLKIT»
+		
+			«EDITOR_ACTIVITY»
+
+			«VIEW_ACTIVITY»
+		
+			«SEARCH_RESULT_ACTIVITY»
+		
+			«DIALOG_ACTIVITY»
+		
+			«SAMPLE_TEST_USECASE»
+		
+			«SAMPLE_TEST_USECASE_WITH_ACTIVITY_SWITCH»
+		
+			«SAMPLE_TEST_USECASE_WITH_PARAMETER»
+		
+			«SAMPLE_TEST_USECASE_TEST»
+	'''
 	
 	@Inject extension ParseHelper<TestModel>
 	@Inject extension ValidationTestHelper
@@ -96,299 +201,156 @@ class BasicTestSetupTest {
 	@Test
 	def void test_100_PackageDefinition() {
 		'''
-			package tdsl.testpackage {
+			«TEST_PACKAGE» {
 			}
 		'''.parse.assertNoErrors
 	}
 	
 	@Test
 	def void test_200_TypeDefinition() {
-		'''
-			package tdsl.testpackage {
-				
-				type String mappedBy String
-			}
-		'''.parse.assertNoErrors
+		packageEnvelope('''
+			«STRING_TYPE»
+		''').parse.assertNoErrors
 	}
 	
 	@Test
 	def void test_300_DataTypeDefinition() {
-		'''
-			package tdsl.testpackage {
-				
-				type String mappedBy String
-				
-				datatype StringDT type String {
-					class shortString classValue "shortString"
-				}
-			}
-		'''.parse.assertNoErrors		
+		packageEnvelope('''
+			«STRING_TYPE»
+			
+			«STRINGDT_DATATYPE»
+		''').parse.assertNoErrors		
 	}
 	
 	@Test
 	def void test_400_TagDefinition() {
-		'''
-			package tdsl.testpackage {
-
-				tags {
-					Empty, Invalid
-				}				
-			}
-		'''.parse.assertNoErrors				
+		packageEnvelope('''
+			«INVALID_EMPTY_TAGS»
+		''').parse.assertNoErrors				
 	}
 	
 	@Test
 	def void test_500_ControlDefinition() {
-		'''
-			package tdsl.testpackage {
-				
-				type String mappedBy String
-
-				control TextControl {
-					op void setText(String str)
-					op String getText
-				}				
-			}
-		'''.parse.assertNoErrors				
+		packageEnvelope('''
+			«STRING_TYPE»
+			
+			«TEXTCONTROL_CONTROL»
+		''').parse.assertNoErrors				
 	}
 	
 	@Test
 	def void test_600_ToolkitDefinition() {
-		'''
-			package tdsl.testpackage {
-				
-				type String mappedBy String
-
-				control TextControl {
-					op void setText(String str)
-					op String getText
-				}
-				
-				control Button {
-					op void push
-				}
-				
-				toolkit Stdtoolkit using controls {
-					TextControl, Button
-				}				
-			}
-		'''.parse.assertNoErrors				
+		packageEnvelope('''
+			«STRING_TYPE»
+			
+			«TEXTCONTROL_CONTROL»
+			
+			«STDTOOLKIT_TOOLKIT»
+		''').parse.assertNoErrors				
 	}
 	
 	@Test
 	def void test_700_ActivityDefinition() {
-		'''
-			package tdsl.testpackage {
-				
-				type String mappedBy String
-				
-				datatype StringDT type String {
-					class shortString classValue "shortString"
-				}
-
-				control TextControl {
-					op void setText(String str)
-					op String getText
-				}
-				
-				toolkit Stdtoolkit using controls {
-					TextControl
-				}				
-				
-				activity EditorActivity {
-					field shortName control TextControl {
-						op void setText(StringDT str)
-						op StringDT getText
-					}
-					
-					op saveAndClose
-				}
-			}
-		'''.parse.assertNoErrors				
+		packageEnvelope('''
+			«STRING_TYPE»
+			
+			«STRINGDT_DATATYPE»
+			
+			«TEXTCONTROL_CONTROL»
+			
+			«STDTOOLKIT_TOOLKIT»
+			
+			«SIMPLE_EDITOR_ACTIVITY»
+		''').parse.assertNoErrors				
 	}
 	
 	@Test
 	def void test_701_ActivityDefinitionWithNavigation() {
-		'''
-			package tdsl.testpackage {
-				
-				type String mappedBy String
-				
-				datatype StringDT type String {
-					class shortString classValue "shortString"
-				}
-
-				control TextControl {
-					op void setText(String str)
-					op String getText
-				}
-				
-				toolkit Stdtoolkit using controls {
-					TextControl
-				}				
-				
-				activity EditorActivity {
-					field shortName control TextControl {
-						op void setText(StringDT str)
-						op StringDT getText
-					}
-					
-					op saveAndClose => ViewActivity
-				}
-				
-				activity ViewActivity {
-					field searchField control TextControl {
-						op void setText(StringDT str)
-						op StringDT getText
-					}
-					op refresh
-					op openEditor => EditorActivity 
-				}	
-			}			
-		'''.parse.assertNoErrors
+		packageEnvelope('''
+			«STRING_TYPE»
+			
+			«STRINGDT_DATATYPE»
+			
+			«TEXTCONTROL_CONTROL»
+			
+			«STDTOOLKIT_TOOLKIT»
+			
+			«EDITOR_ACTIVITY»
+			
+			«SIMPLE_DIALOG_ACTIVITY»
+			
+			«SIMPLE_VIEW_ACTIVITY»
+		''').parse.assertNoErrors
 	}
 	
 	@Test
 	def void test_701_ActivityDefinitionWithReturnToLastActivity() {
-		'''
-			package tdsl.testpackage {
-				
-				type String mappedBy String
-				
-				datatype StringDT type String {
-					class shortString classValue "shortString"
-				}
-
-				control TextControl {
-					op void setText(String str)
-					op String getText
-				}
-				
-				toolkit Stdtoolkit using controls {
-					TextControl
-				}				
-				
-				activity DialogActivity {
-					op cancel => returnToLastActivity
-				}	
-			}			
-		'''.parse.assertNoErrors
+		packageEnvelope('''
+			«STRING_TYPE»
+			
+			«STRINGDT_DATATYPE»
+			
+			«TEXTCONTROL_CONTROL»
+			
+			«STDTOOLKIT_TOOLKIT»
+			
+			«SIMPLE_DIALOG_ACTIVITY»
+		''').parse.assertNoErrors
 	}
 	
 	@Test
 	def void test_800_UseCaseDefinition() {
-		'''
-			package tdsl.testpackage {
-				
-				type String mappedBy String
-				
-				datatype StringDT type String {
-					class shortString classValue "shortString"
-				}
-
-				control TextControl {
-					op void setText(String str)
-					op String getText
-				}
-				
-				toolkit Stdtoolkit using controls {
-					TextControl
-				}				
-				
-				activity EditorActivity {
-					field shortName control TextControl {
-						op void setText(StringDT str)
-						op StringDT getText
-					}
-					
-					op saveAndClose
-				}
-				
-				useCase SampleTestUseCase initial EditorActivity {
-					#shortName.setText
-					#saveAndClose
-				}
-			}
-		'''.parse.assertNoErrors				
+		packageEnvelope('''
+			«STRING_TYPE»
+			
+			«STRINGDT_DATATYPE»
+			
+			«TEXTCONTROL_CONTROL»
+			
+			«STDTOOLKIT_TOOLKIT»
+			
+			«SIMPLE_EDITOR_ACTIVITY»
+			
+			«SAMPLE_TEST_USECASE»
+		''').parse.assertNoErrors
 	}
 
 	@Test
 	def void test_801_UseCaseDefinitionWithActivitySwitch() {
-		'''
-			package tdsl.testpackage {
-				
-				type String mappedBy String
-				
-				datatype StringDT type String {
-					class shortString classValue "shortString"
-				}
-
-				control TextControl {
-					op void setText(String str)
-					op String getText
-				}
-				
-				toolkit Stdtoolkit using controls {
-					TextControl
-				}				
-				
-				activity ViewActivity {
-					op openEditor => EditorActivity 
-				}
-				
-				activity EditorActivity {
-					field shortName control TextControl {
-						op void setText(StringDT str)
-						op StringDT getText
-					}
-					
-					op saveAndClose
-				}
-				
-				useCase SampleTestUseCaseWithActivitySwitch initial ViewActivity {
-					#openEditor
-				} => EditorActivity
-			}
-		'''.parse.assertNoErrors				
+		packageEnvelope('''
+			«STRING_TYPE»
+			
+			«STRINGDT_DATATYPE»
+			
+			«TEXTCONTROL_CONTROL»
+			
+			«STDTOOLKIT_TOOLKIT»
+			
+			«SIMPLE_EDITOR_ACTIVITY»
+			
+			«SIMPLE_VIEW_ACTIVITY»
+			
+			«SAMPLE_TEST_USECASE_WITH_ACTIVITY_SWITCH»
+		''').parse.assertNoErrors
 	}
 
 	@Test
 	def void test_900_TestDefinition() {
-		'''
-			package tdsl.testpackage {
-				
-				type String mappedBy String
-				
-				datatype StringDT type String {
-					class shortString classValue "shortString"
-				}
-
-				control TextControl {
-					op void setText(String str)
-					op String getText
-				}
-				
-				toolkit Stdtoolkit using controls {
-					TextControl
-				}				
-				
-				activity EditorActivity {
-					field shortName control TextControl {
-						op void setText(StringDT str)
-						op StringDT getText
-					}
-					
-					op saveAndClose
-				}
-				
-				useCase SampleTestUseCase initial EditorActivity {
-					#shortName.setText
-					#saveAndClose
-				}
-				
-				test SampleTestUseCaseTest generator de.msg.xt.mdt.base.SampleTestGenerator useCase SampleTestUseCase
-			}
-		'''.parse.assertNoErrors				
+		packageEnvelope('''
+			«STRING_TYPE»
+			
+			«STRINGDT_DATATYPE»
+			
+			«TEXTCONTROL_CONTROL»
+			
+			«STDTOOLKIT_TOOLKIT»
+			
+			«SIMPLE_EDITOR_ACTIVITY»
+			
+			«SAMPLE_TEST_USECASE»
+			
+			«SAMPLE_TEST_USECASE_TEST»
+		''').parse.assertNoErrors
 	}
 	
 	@Test
