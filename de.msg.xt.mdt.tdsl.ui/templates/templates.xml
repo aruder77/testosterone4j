@@ -4,16 +4,16 @@
 <template id="activity" autoinsert="true" context="de.msg.xt.mdt.tdsl.TDsl.Element" deleted="false" description="Insert a new activity" enabled="true" name="activity">activity ${name} identifiedBy ${uniqueId} extends ${parent:CrossReference(Activity.parent)} {
 	${cursor}
 }</template>
-<template id="assertEquals" autoinsert="true" context="de.msg.xt.mdt.tdsl.TDsl.Assert" deleted="false" description="Insert an assert equals" enabled="true" name="assertEquals">assert [ org::junit::Assert::assertEquals(${value1}, ${value2}) ]</template>
+<template id="assertEquals" autoinsert="true" context="de.msg.xt.mdt.tdsl.TDsl.Assert" deleted="false" description="Insert an assert equals" enabled="true" name="assertEquals">assert [ assertEquals(${value1}, ${value2}) ]</template>
 <template id="assignGenerated" autoinsert="true" context="de.msg.xt.mdt.tdsl.TDsl.Statement" deleted="false" description="assign a generated value" enabled="true" name="assignGenerated">val ${name} = generatedValue(${param})</template>
 <template id="classGeneratedValues" autoinsert="true" context="de.msg.xt.mdt.tdsl.TDsl.EquivalenceClass" deleted="false" description="Insert class with generated values" enabled="true" name="classGeneratedValues">class ${name} valueGenerator ${expression} classPredicate ${predicate}</template>
-<template id="classValue" autoinsert="true" context="de.msg.xt.mdt.tdsl.TDsl.EquivalenceClass" deleted="false" description="Insert a class with a value" enabled="true" name="classValue">class ${name} value ${classValue}</template>
-<template id="classValues" autoinsert="true" context="de.msg.xt.mdt.tdsl.TDsl.EquivalenceClass" deleted="false" description="Insert a class with multiple values" enabled="true" name="classValues">class ${name} values newArrayList(${cursor})</template>
+<template id="classValue" autoinsert="true" context="de.msg.xt.mdt.tdsl.TDsl.EquivalenceClass" deleted="false" description="Insert a class with a value" enabled="true" name="classValue">class ${name} classValue ${classValue}</template>
+<template id="classValues" autoinsert="true" context="de.msg.xt.mdt.tdsl.TDsl.EquivalenceClass" deleted="false" description="Insert a class with multiple values" enabled="true" name="classValues">class ${name} classValues #[${cursor}]</template>
 <template id="control" autoinsert="true" context="de.msg.xt.mdt.tdsl.TDsl.Control" deleted="false" description="Insert a control" enabled="true" name="control">control ${name} {
 	${cursor}
 }</template>
 <template id="datatype" autoinsert="true" context="de.msg.xt.mdt.tdsl.TDsl.DataType" deleted="false" description="Insert a datatype" enabled="true" name="datatype">datatype ${name} type ${type:CrossReference(DataType.type)} {
-	class ${className} value ${cursor}
+	class ${className} classValue ${cursor}
 }</template>
 <template id="field" autoinsert="true" context="de.msg.xt.mdt.tdsl.TDsl.Field" deleted="false" description="Insert new field stub" enabled="true" name="field">field ${fieldName} identifiedBy ${uniqueId} control ${control:CrossReference(Field.control)}</template>
 <template id="ifElse" autoinsert="true" context="de.msg.xt.mdt.tdsl.TDsl.Statement" deleted="false" description="Insert if-else" enabled="true" name="ifElse">if (${expression}) {
