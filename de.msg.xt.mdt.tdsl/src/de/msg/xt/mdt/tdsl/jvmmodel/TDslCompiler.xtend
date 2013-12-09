@@ -143,10 +143,10 @@ class TDslCompiler extends XbaseCompiler {
 				decreaseIndentation.newLine.append("}")
 			}
 			ActivityOperationBlock: {
-				compileBlock(expr, it, expr.activityOperation.returnedActivity)
+				compileBlock(expr, it, expr.activityOperation.returnedActivity, true)
 			}
 			UseCaseBlock: {
-				compileBlock(expr, it, expr.useCase.returnedActivity)
+				compileBlock(expr, it, expr.useCase.returnedActivity, false)
 			}
 			InnerBlock: {
 				compileInnerBlock(expr, it)
@@ -176,7 +176,7 @@ class TDslCompiler extends XbaseCompiler {
 		super.doInternalToJavaStatement(expr, it, false)
 	}
 
-	protected def compileBlock(XBlockExpression expr, ITreeAppendable it, Activity returnedActivity) {
+	protected def compileBlock(XBlockExpression expr, ITreeAppendable it, Activity returnedActivity, boolean useGenerics) {
 		val nextActivityClass = returnedActivity?.class_fqn
 		val nextActivityAdapterClass = returnedActivity?.adapterInterface_fqn
 
@@ -195,15 +195,22 @@ class TDslCompiler extends XbaseCompiler {
 		it.declareVariable(expr, "nextActivity")
 
 		if (nextActivityAdapterClass != null) {
-			expr.newTypeRef(nextActivityClass).serialize(expr, it)
+			if (useGenerics)
+				it.append("T")
+			else
+				expr.newTypeRef(nextActivityClass).serialize(expr, it)
 			it.append(" ")
 			it.append(it.getName(expr)).append(" = ")
 			expr.newTypeRef(typeof(TDslHelper)).serialize(expr, it)
 			it.append(".castActivity(injector, currentActivity, ")
-			expr.newTypeRef(nextActivityClass).serialize(expr, it)
-			it.append(".class, ")
-			expr.newTypeRef(nextActivityAdapterClass).serialize(expr, it)
-			it.append(".class);")
+			if (useGenerics) {
+				it.append("activityClass, adapterClass);")
+			} else {
+				expr.newTypeRef(nextActivityClass).serialize(expr, it)
+				it.append(".class, ")
+				expr.newTypeRef(nextActivityAdapterClass).serialize(expr, it)
+				it.append(".class);")
+			}
 		}
 	}
 
