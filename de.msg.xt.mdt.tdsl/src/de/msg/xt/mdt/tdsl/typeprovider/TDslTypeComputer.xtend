@@ -137,15 +137,19 @@ class TDslTypeComputer extends XbaseWithAnnotationsTypeComputer {
 	}
 
 	protected def _computeTypes(ActivityOperationBlock block, ITypeComputationState state) {
-		var nextActivityClass = block.activityOperation.returnedActivity?.class_fqn
-		val returnType = if (nextActivityClass != null)
-				typeReferences.getTypeForName(nextActivityClass, block)
-			else
-				typeReferences.getTypeForName(Void::TYPE, block)
+		val expectedType = state.expectations.filter[expectedType != null].head.expectedType
+		var returnType = typeReferences.getTypeForName(AbstractActivity, block)
+//		var nextActivityClass = block.activityOperation.returnedActivity?.class_fqn
+//		val returnType = if (nextActivityClass != null)
+//				typeReferences.getTypeForName(nextActivityClass, block)
+//			else
+//				typeReferences.getTypeForName(Void::TYPE, block)
 
 		computeBlockExpressionTypes(state, block)
 
-		val assignedType = state.converter.toLightweightReference(returnType)
+		var assignedType = state.converter.toLightweightReference(returnType)
+		if (expectedType != null)
+			assignedType = expectedType
 		state.acceptActualType(assignedType)
 	}
 

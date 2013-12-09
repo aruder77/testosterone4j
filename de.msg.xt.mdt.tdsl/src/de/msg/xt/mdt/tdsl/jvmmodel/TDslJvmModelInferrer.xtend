@@ -78,6 +78,7 @@ import org.junit.After
 import org.junit.runner.RunWith
 import org.eclipse.xtext.xbase.XBlockExpression
 import de.msg.xt.mdt.tdsl.tDsl.ActivityExpectation
+import org.eclipse.xtext.common.types.JvmTypeParameter
 
 /**
  * <p>Infers a JVM model from the source model.</p> 
@@ -330,6 +331,8 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 				}
 				for (operation : activity.operations) {
 					members += operation.toActivityOperation()
+					if (operation.returnedActivity?.class_fqn != null) 
+						members += operation.toActivityOperationDelegation()
 				}
 			])
 	}
@@ -356,12 +359,38 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 		val nextActivityClass = operation.returnedActivity?.class_fqn
 		val nextActivityAdapterClass = operation.returnedActivity?.adapterInterface_fqn
 
-		operation.toMethod(operation.name, operation.returnTypeRef) [
+		val JvmTypeParameter activityTypeParam = TypesFactory::eINSTANCE.createJvmTypeParameter => [
+			name = "T"
+			constraints += TypesFactory.eINSTANCE.createJvmUpperBound => [
+				typeReference = operation.newTypeRef(AbstractActivity)
+			]
+		]
+		val JvmTypeParameter adapterTypeParam = TypesFactory::eINSTANCE.createJvmTypeParameter => [
+			name = "E"
+			constraints += TypesFactory.eINSTANCE.createJvmUpperBound => [
+				typeReference = operation.newTypeRef(ActivityAdapter)
+			]
+		]
+		val activityTypeParamRef = references.createTypeRef(activityTypeParam)
+		val adapterTypeParamRef = references.createTypeRef(adapterTypeParam)
+		val clazzActivityTypeParamRef = operation.newTypeRef(Class, activityTypeParamRef)
+		val clazzAdapterTypeParamRef = operation.newTypeRef(Class, adapterTypeParamRef)
+
+		val returnType = if (nextActivityClass == null) operation.returnTypeRef else activityTypeParamRef
+
+		operation.toMethod(operation.name, returnType) [
 			for (param : operation.params) {
 				if (param?.dataType?.class_fqn != null) {
 					it.parameters += param.toParameter(param.name, param.newTypeRef(param.dataType.class_fqn))
 				}
 			}
+			if (nextActivityClass != null) {
+				it.typeParameters += activityTypeParam
+				it.typeParameters += adapterTypeParam
+				it.parameters += operation.toParameter("activityClass", clazzActivityTypeParamRef)
+				it.parameters += operation.toParameter("adapterClass", clazzAdapterTypeParamRef)
+			}
+			
 			if (operation.body != null) {
 				body = operation.body
 			} else {
@@ -386,11 +415,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 						''')
 					if (nextActivityAdapterClass != null) {
 						it.append("return ")
-						it.append("this.callContextAdapter(functionCall, ")
-						operation.newTypeRef(nextActivityClass).serialize(operation, it)
-						it.append(".class, ")
-						operation.newTypeRef(nextActivityAdapterClass).serialize(operation, it)
-						it.append(".class);")
+						it.append("this.callContextAdapter(functionCall, activityClass, adapterClass);")
 					} else {
 						it.append("functionCall.apply();")
 					}
@@ -399,6 +424,36 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 		]
 	}
 
+	def JvmOperation toActivityOperationDelegation(ActivityOperation operation) {
+		if (operation?.name == null) {
+			return null
+		}
+
+		val nextActivityClass = operation.returnedActivity?.class_fqn
+		val nextActivityAdapterClass = operation.returnedActivity?.adapterInterface_fqn
+
+		operation.toMethod(operation.name, operation.returnTypeRef) [
+			for (param : operation.params) {
+				if (param?.dataType?.class_fqn != null) {
+					it.parameters += param.toParameter(param.name, param.newTypeRef(param.dataType.class_fqn))
+				}
+			}
+				body = [
+					if (nextActivityAdapterClass != null) {
+						it.append("return ")
+					}
+					it.append('''this.«operation.name»(''')
+					if (!operation.params.empty) {
+						it.append('''«FOR param: operation.params SEPARATOR ','»«param.name»«ENDFOR», ''')
+					}
+					operation.newTypeRef(nextActivityClass).serialize(operation, it)
+					it.append(".class, ")
+					operation.newTypeRef(nextActivityAdapterClass).serialize(operation, it)
+					it.append(".class);")
+					
+				]
+		]
+	}
 	def associateChildExpressions(XBlockExpression block, JvmOperation it) {
 		for (expression : block.expressions) {
 			val stmtLine = expression as StatementLine
@@ -891,7 +946,6 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 				superTypes += dataType.newTypeRef(typeof(de.msg.xt.mdt.base.DataType), dataType.type.mappedBy,
 					newTypeRef(equivalenceClass))
 				superTypes += dataType.newTypeRef(typeof(de.msg.xt.mdt.base.BaseDataType))
-				annotations += dataType.toAnnotation(typeof(XmlRootElement))
 				members += dataType.toField("serialVersionUID", dataType.newTypeRef(typeof(long))) [
 					setFinal(true)
 					setStatic(true)
@@ -900,10 +954,8 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 					]
 				]
 				members += dataType.toField("_value", dataType.type?.mappedBy) [
-					annotations += dataType.toAnnotation(typeof(XmlAttribute))
 				]
 				members += dataType.toField("_equivalenceClass", newTypeRef(equivalenceClass)) [
-					annotations += dataType.toAnnotation(typeof(XmlAttribute))
 				]
 				members += dataType.toConstructor [
 					setVisibility(JvmVisibility::PUBLIC)
@@ -1032,7 +1084,6 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 		acceptor.accept(useCaseClass).initializeLater [
 			it.superTypes += useCase.newTypeRef(typeof(BaseUseCase))
 			it.superTypes += useCase.newTypeRef(typeof(Runnable))
-			it.annotations += useCase.toAnnotation(typeof(XmlRootElement))
 			members += useCase.toField("serialVersionUID", useCase.newTypeRef(typeof(long))) [
 				setFinal(true)
 				setStatic(true)
@@ -1043,7 +1094,6 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 			for (inputParam : useCase.inputParameter) {
 				if (inputParam.name != null && inputParam?.dataType?.class_fqn != null) {
 					members += inputParam.toField(inputParam.name, inputParam.newTypeRef(inputParam.dataType.class_fqn)) [
-						it.annotations += inputParam.toAnnotation(typeof(XmlElement))
 					]
 				} else {
 					System::out.println("Can't determine use case input parameter type!")

@@ -22,8 +22,9 @@ public abstract class AbstractActivity implements IEvalutaionGroup {
 		return adapter;
 	}
 
-	protected <T, E extends ActivityAdapter> T callContextAdapter(final Function0<Object> call,
-			final Class<T> expectedResultType, final Class<E> adapterClass) {
+	protected <T extends AbstractActivity, E extends ActivityAdapter> T callContextAdapter(
+			final Function0<Object> call, final Class<T> expectedResultType,
+			final Class<E> adapterClass) {
 		Object o = null;
 		if (adapter != null) {
 			o = call.apply();
@@ -34,11 +35,17 @@ public abstract class AbstractActivity implements IEvalutaionGroup {
 		} else {
 			E adapter = null;
 			if ((adapterClass != null) && (this.adapter != null)) {
-				adapter = getInjector().getInstance(adapterClass);
-				adapter.setContext(o);
+				if (o == null) {
+					adapter = getInjector().getInstance(ActivityLocator.class)
+							.find(expectedResultType, adapterClass);
+				} else {
+					adapter = getInjector().getInstance(adapterClass);
+					adapter.setContext(o);
+				}
 			}
 			try {
-				nextActivity = expectedResultType.getConstructor(adapterClass).newInstance(adapter);
+				nextActivity = expectedResultType.getConstructor(adapterClass)
+						.newInstance(adapter);
 			} catch (final InstantiationException e) {
 				e.printStackTrace();
 			} catch (final IllegalAccessException e) {
@@ -57,7 +64,8 @@ public abstract class AbstractActivity implements IEvalutaionGroup {
 	}
 
 	protected Injector getInjector() {
-		throw new UnsupportedOperationException("getInjector() must be implemented by implementing classes!");
+		throw new UnsupportedOperationException(
+				"getInjector() must be implemented by implementing classes!");
 	}
 
 }
