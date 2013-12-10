@@ -112,6 +112,30 @@ class MetaModelExtensions {
 		operation?.eContainer as Activity
 	}
 	
+	
+	// ActivityOperationCall
+	
+	def boolean isSwitchingToNewActivity(ActivityOperationCall call) {
+		!call?.operation?.nextActivities.filter[next != null].empty
+	}
+	
+	def boolean isReturningToPreviousActivity(ActivityOperationCall call) {
+		!call?.operation?.nextActivities.filter[returnToLastActivity].empty
+	}
+	
+	def ActivityExpectation expectation(ActivityOperationCall call) {
+		val nextStmt = call?.nextStatement 
+		if (nextStmt instanceof ActivityExpectation)
+			nextStmt as ActivityExpectation
+		else
+			null
+	}
+	
+	def boolean hasExpectStatement(ActivityOperationCall call) {
+		call.expectation != null
+	}
+	
+	
 	// DataTypeMapping
 	def getOperationMapping(DataTypeMapping dataTypeMapping) {
 		dataTypeMapping?.eContainer as OperationMapping
@@ -301,6 +325,20 @@ class MetaModelExtensions {
 		return lastStatement			
 	}
 	
+	def XExpression nextStatement(XExpression expr) {
+		val exprBlock = expr.block
+		val myIndex = expr.indexInParentBlock
+		if (myIndex > 0 && (exprBlock.expressions.size > (myIndex + 1))) {
+			val nextExpression = exprBlock.expressions.get(myIndex + 1)
+			if (nextExpression instanceof StatementLine) 
+				(nextExpression as StatementLine).statement
+			else
+				nextExpression
+		} else {
+			null
+		}
+	}
+	
 	def XExpression lastExpressionWithNextActivity(XExpression expr) {
 		if (expr == null)
 			return null
@@ -375,9 +413,12 @@ class MetaModelExtensions {
 		// these are the real activity switching operations. Return them immediately.
 		if (expr instanceof OperationCall || expr instanceof ActivityOperationCall || expr instanceof SubUseCaseCall)
 			return expr
+			
+		// expect blocks also switch operations. Return immediately.
+		if (expr instanceof InnerBlock && (expr as InnerBlock).activityExpectationBlock) 
+			return expr
 
 		// other blocks may contain activity switching operations. In that case, the
-		
 		val opCalls = EcoreUtil2::getAllContentsOfType(expr, typeof(OperationCall))
 		if (!opCalls.empty) {
 			operation = opCalls.get(0)

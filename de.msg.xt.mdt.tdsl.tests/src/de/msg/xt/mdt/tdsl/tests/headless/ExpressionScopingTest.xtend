@@ -159,6 +159,16 @@ class ExpressionScopingTest {
 					"#refreshSearch",
 					'''}'''		
 			])
+			add(#[	"testReturnToLastActivitInExpect",
+					'''
+					#openEditor
+					#saveAndClose
+					expect DialogActivity if (true) {
+						#cancel
+					''',
+					"#saveAndClose",
+					'''}'''
+			])
 			add(#[	"testAfterXExpression",
 					'''
 					[ println(":-)") ]
@@ -177,6 +187,17 @@ class ExpressionScopingTest {
 					'''
 					#openEditor
 					#openDialog
+					#cancel
+					''',
+					"#saveAndClose",
+					''''''		
+			])
+			add(#[	"testNestedReturnToLastActivity",
+					'''
+					#openEditor
+					#openDialog
+					#dialogTextField.search
+					#ok
 					#cancel
 					''',
 					"#saveAndClose",

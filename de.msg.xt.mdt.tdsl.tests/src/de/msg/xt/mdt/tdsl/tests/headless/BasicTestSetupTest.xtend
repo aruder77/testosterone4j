@@ -62,6 +62,7 @@ class BasicTestSetupTest {
 				
 				activity SearchResult {
 					op refreshSearch
+					op ok => returnToLastActivity
 				}	
 				
 				activity DialogActivity {

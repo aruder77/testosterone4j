@@ -41,6 +41,7 @@ import org.eclipse.xtext.xbase.scoping.featurecalls.IValidatedEObjectDescription
 import org.eclipse.xtext.xbase.validation.IssueCodes
 import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.xtext.xbase.scoping.DelegatingScope
+import de.msg.xt.mdt.tdsl.tDsl.ActivityExpectation
 
 class TDslScopeProvider extends XbaseWithAnnotationsScopeProvider {
 
@@ -409,15 +410,6 @@ class TDslScopeProvider extends XbaseWithAnnotationsScopeProvider {
 
 		val returnList = new ArrayList<Activity>
 
-		// handle ActivityExpectation blocks
-		if (expr instanceof InnerBlock) {
-			val innerBlock = expr as InnerBlock
-			if (innerBlock.activityExpectationBlock) {
-				returnList.add(innerBlock.expectedActivity)
-				return returnList
-			}
-		}
-
 		while (lastExpression != null && returnList.empty) {
 			val nextActivities = lastExpression.determineExplicitNextActivities
 			if (nextActivities != null) {
@@ -430,6 +422,10 @@ class TDslScopeProvider extends XbaseWithAnnotationsScopeProvider {
 							returnList.add(nextActivity.next)
 						else {
 							nestedCounter = nestedCounter - 1
+							// jump one more backwards if ActivityExpectation, since expression before expect belongs to expect
+							if (lastExpression instanceof InnerBlock && (lastExpression as InnerBlock).activityExpectationBlock) {
+								lastExpression = lastExpression.lastActivitySwitchingExpression(false)	
+							}
 							lastExpression = lastExpression.lastActivitySwitchingExpression(false)
 						}
 					}
@@ -456,7 +452,7 @@ class TDslScopeProvider extends XbaseWithAnnotationsScopeProvider {
 	}
 
 	def boolean isAlreadyFilledActivitySwitchingExpression(XExpression expression) {
-		expression instanceof StatementLine
+		expression instanceof StatementLine || expression instanceof InnerBlock
 
 	/*|| switch expression {
 			ActivityOperationCall: {

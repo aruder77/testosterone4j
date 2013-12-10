@@ -4,6 +4,7 @@ import de.msg.xt.mdt.base.AbstractActivity
 import de.msg.xt.mdt.base.Tag
 import de.msg.xt.mdt.base.util.TDslHelper
 import de.msg.xt.mdt.tdsl.tDsl.Activity
+import de.msg.xt.mdt.tdsl.tDsl.ActivityExpectation
 import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationBlock
 import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationCall
 import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationParameter
@@ -20,6 +21,7 @@ import de.msg.xt.mdt.tdsl.tDsl.InnerBlock
 import de.msg.xt.mdt.tdsl.tDsl.OperationCall
 import de.msg.xt.mdt.tdsl.tDsl.OperationParameterAssignment
 import de.msg.xt.mdt.tdsl.tDsl.Parameter
+import de.msg.xt.mdt.tdsl.tDsl.ParameterAssignment
 import de.msg.xt.mdt.tdsl.tDsl.StatementLine
 import de.msg.xt.mdt.tdsl.tDsl.SubUseCaseCall
 import de.msg.xt.mdt.tdsl.tDsl.UseCaseBlock
@@ -35,8 +37,6 @@ import org.eclipse.xtext.xbase.compiler.output.ITreeAppendable
 import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder
 import org.eclipse.xtext.xbase.lib.Pair
 import org.eclipse.xtext.xbase.typing.ITypeProvider
-import de.msg.xt.mdt.tdsl.tDsl.ActivityExpectation
-import de.msg.xt.mdt.tdsl.tDsl.ParameterAssignment
 
 class TDslCompiler extends XbaseCompiler {
 
@@ -90,26 +90,42 @@ class TDslCompiler extends XbaseCompiler {
 				}
 			}
 			ActivityOperationCall: {
+				/*
+				 * - generate parameter
+				 * [stack.push(currentActivity);]  		// when explicit next activtiy
+				 * if (<expectBed1>) {					// when expect statement after current
+				 * 		[currentActivity = //when explicit next activtiy] ((MainWindow)currentActivity).openEthernetNavigator(params..., <expected Activity>, <expected Adapter>);
+				 * } else {								
+				 * 		[currentActivity = //when explicit next activtiy] ((MainWindow)currentActivity).openEthernetNavigator(params...); 
+				 * 		[currentActivity = stack.pop();]	// when returnToLastActivity
+				 * }									// when expect statement
+				 */
 				expr.generateParameters(it)
 				newLine
-				var returnToPreviousActivity = false
-				if (!expr.operation.nextActivities.empty) {
-					val nextActivity = expr.operation.nextActivities.get(0)
-					if (nextActivity.next != null) {
-						append("stack.push(currentActivity);").newLine
-						append("currentActivity = ")
-					} else if (nextActivity.returnToLastActivity) {
-						returnToPreviousActivity = true
-					}
+				if (expr.isSwitchingToNewActivity) {
+					append("stack.push(currentActivity);").newLine
 				}
-				append("((")
-				expr.newTypeRef((expr.operation.eContainer as Activity).class_FQN.toString).serialize(expr, it)
-				append(''')currentActivity).«expr.operation.name»(''')
-				appendParameter(expr, it)
-				append(");")
-				if (returnToPreviousActivity) {
+				val expect = expr.expectation
+				if (expect != null) {
+					expect.guard.doInternalToJavaStatement(it, true)
+					append("if (")
+					expect.guard.internalToConvertedExpression(it, expect.guard.newTypeRef(Boolean))
+					append(") {").increaseIndentation.newLine
+					appendActivityOperationCall(expr, it, expect.activity)
+					expect.block.doInternalToJavaStatement(it, false)
+					
+					decreaseIndentation.newLine
+					append("} else {").increaseIndentation.newLine			
+				}
+				appendActivityOperationCall(expr, it, null)
+				if (expr.returningToPreviousActivity) {
 					newLine
 					append("currentActivity = stack.pop();")
+				}
+				
+				if (expect != null) {
+					decreaseIndentation.newLine
+					append("}")
 				}
 			}
 			SubUseCaseCall: {
@@ -154,10 +170,10 @@ class TDslCompiler extends XbaseCompiler {
 			CurrentActivityExpression: {
 			}
 			ActivityExpectation: {
-				val valName = it.declareVariable(expr.guard, "expectation")
-				append('''boolean «valName» = ''')
-				expr.guard.internalToJavaStatement(it, true)
-				append(';').newLine
+//				val valName = it.declareVariable(expr.guard, "expectation")
+//				append('''boolean «valName» = ''')
+//				expr.guard.internalToJavaStatement(it, true)
+//				append(';').newLine
 			}
 			/*XAbstractFeatureCall: {
     			if (isReferenced && isVariableDeclarationRequired(expr, it)) {
@@ -170,6 +186,25 @@ class TDslCompiler extends XbaseCompiler {
 			default:
 				super.doInternalToJavaStatement(expr, it, isReferenced)
 		}
+	}
+	
+	protected def appendActivityOperationCall(ActivityOperationCall expr, ITreeAppendable it, Activity expectedActivity) {
+		if (expr.isSwitchingToNewActivity) {
+			append("currentActivity = ")
+		} 
+		append("((")
+		expr.newTypeRef((expr.operation.eContainer as Activity).class_FQN.toString).serialize(expr, it)
+		append(''')currentActivity).«expr.operation.name»(''')
+		appendParameter(expr, it)
+		if (expectedActivity != null) {
+			if (!expr.operation.params.empty)
+				append(", ")
+			expr.newTypeRef(expectedActivity.class_FQN.toString).serialize(expr, it)
+			append(".class, ")
+			expr.newTypeRef(expectedActivity.adapterInterface_fqn.toString).serialize(expr, it)
+			append(".class")
+		}
+		append(");")
 	}
 	
 	protected def compileInnerBlock(XBlockExpression expr, ITreeAppendable it) {
@@ -281,7 +316,7 @@ class TDslCompiler extends XbaseCompiler {
 				append("currentActivity")
 			}
 			ActivityExpectation: {
-				append(expr.guard.getVarName(it))
+				//append(expr.guard.getVarName(it))
 			}
 			default:
 				super.internalToConvertedExpression(expr, it)
