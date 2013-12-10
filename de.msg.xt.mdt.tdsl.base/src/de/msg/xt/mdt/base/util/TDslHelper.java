@@ -1,5 +1,6 @@
 package de.msg.xt.mdt.base.util;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -51,5 +52,25 @@ public class TDslHelper {
 			e.printStackTrace();
 		}
 		return (E) newActivity;
+	}
+	
+	public static <T extends AbstractActivity> String extractId(Class<T> activityClass) {
+		String id = null;
+		try {
+			Field idField = activityClass.getDeclaredField("ID");
+			id = (String) idField.get(null);
+			if (id != null && id.trim().isEmpty()) {
+				id = null;
+			}
+		} catch (NoSuchFieldException e) {
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		}
+		return id;
 	}
 }

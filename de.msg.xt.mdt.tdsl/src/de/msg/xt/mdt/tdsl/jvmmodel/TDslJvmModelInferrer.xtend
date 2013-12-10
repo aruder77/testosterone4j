@@ -211,6 +211,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 				members += activity.toField("ID", activity.newTypeRef(typeof(String))) [
 					it.setStatic(true)
 					it.setFinal(true)
+					it.setVisibility(JvmVisibility.PUBLIC)
 					it.setInitializer [
 						it.append('''"«activity.identifier»"''')
 					]
@@ -415,7 +416,9 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 						''')
 					if (nextActivityAdapterClass != null) {
 						it.append("return ")
-						it.append("this.callContextAdapter(functionCall, activityClass, adapterClass);")
+						it.append("this.callContextAdapter(functionCall, ")
+						operation.newTypeRef(TDslHelper).serialize(operation, it)
+						it.append(".extractId(activityClass), activityClass, adapterClass);")
 					} else {
 						it.append("functionCall.apply();")
 					}

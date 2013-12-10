@@ -58,7 +58,8 @@ class MetaModelExtensions {
 	// Activity 
 	
 	def identifier(Activity activity) { 
-		if (activity?.uniqueId == null) activity?.fullyQualifiedName else activity?.uniqueId
+		//if (activity?.uniqueId == null) activity?.fullyQualifiedName else 
+		activity?.uniqueId
 	}	
 	
 	def getPackageDeclaration(Activity activity) {

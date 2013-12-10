@@ -37,6 +37,7 @@ import org.eclipse.xtext.xbase.compiler.output.ITreeAppendable
 import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder
 import org.eclipse.xtext.xbase.lib.Pair
 import org.eclipse.xtext.xbase.typing.ITypeProvider
+import de.msg.xt.mdt.base.GenerationHelper
 
 class TDslCompiler extends XbaseCompiler {
 
@@ -154,7 +155,9 @@ class TDslCompiler extends XbaseCompiler {
 			}
 			Assert: {
 				newLine
-				append("if (this.generator == null) {").increaseIndentation
+				append("if (!")
+				expr.newTypeRef(GenerationHelper).serialize(expr, it)
+				append(".activeGeneration) {").increaseIndentation
 				expr.expression.doInternalToJavaStatement(it, false)
 				decreaseIndentation.newLine.append("}")
 			}

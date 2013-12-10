@@ -6,6 +6,8 @@ import org.eclipse.xtext.xbase.lib.Functions.Function0;
 
 import com.google.inject.Injector;
 
+import de.msg.xt.mdt.base.util.TDslHelper;
+
 public abstract class AbstractActivity implements IEvalutaionGroup {
 
 	protected ActivityAdapter adapter;
@@ -23,28 +25,39 @@ public abstract class AbstractActivity implements IEvalutaionGroup {
 	}
 
 	protected <T extends AbstractActivity, E extends ActivityAdapter> T callContextAdapter(
-			final Function0<Object> call, final Class<T> expectedResultType,
+			final Function0<Object> call, final String expectedId, final Class<T> expectedActivity,
 			final Class<E> adapterClass) {
 		Object o = null;
+		boolean exceptionOccured = false;
 		if (adapter != null) {
-			o = call.apply();
+			try {
+				o = call.apply();
+			} catch (RuntimeException ex) {
+				ex.printStackTrace();
+				exceptionOccured = true;
+			}
 		}
 		T nextActivity = null;
-		if ((o != null) && expectedResultType.isAssignableFrom(o.getClass())) {
+		if ((o != null) && expectedActivity.isAssignableFrom(o.getClass())) {
 			nextActivity = (T) o;
 		} else {
 			E adapter = null;
 			if ((adapterClass != null) && (this.adapter != null)) {
-				if (o == null) {
+				if (o != null && !(o instanceof IActivityContext)) {
+					throw new RuntimeException("context object must implement IActivityContext!");
+				}
+				IActivityContext context = (IActivityContext)o;
+				
+				if (context == null || context.getId() == null || exceptionOccured || (expectedId != null && !context.getId().equals(expectedId))) {
 					adapter = getInjector().getInstance(ActivityLocator.class)
-							.find(expectedResultType, adapterClass);
+							.find(expectedActivity, adapterClass);
 				} else {
 					adapter = getInjector().getInstance(adapterClass);
 					adapter.setContext(o);
 				}
 			}
 			try {
-				nextActivity = expectedResultType.getConstructor(adapterClass)
+				nextActivity = expectedActivity.getConstructor(adapterClass)
 						.newInstance(adapter);
 			} catch (final InstantiationException e) {
 				e.printStackTrace();
