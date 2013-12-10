@@ -1,6 +1,7 @@
 package de.msg.xt.mdt.tdsl.jvmmodel
 
 import de.msg.xt.mdt.base.AbstractActivity
+import de.msg.xt.mdt.base.GenerationHelper
 import de.msg.xt.mdt.base.Tag
 import de.msg.xt.mdt.base.util.TDslHelper
 import de.msg.xt.mdt.tdsl.tDsl.Activity
@@ -11,7 +12,6 @@ import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationParameter
 import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationParameterAssignment
 import de.msg.xt.mdt.tdsl.tDsl.Assert
 import de.msg.xt.mdt.tdsl.tDsl.ControlOperationParameter
-import de.msg.xt.mdt.tdsl.tDsl.CurrentActivityExpression
 import de.msg.xt.mdt.tdsl.tDsl.DataType
 import de.msg.xt.mdt.tdsl.tDsl.DataTypeMapping
 import de.msg.xt.mdt.tdsl.tDsl.Field
@@ -37,7 +37,6 @@ import org.eclipse.xtext.xbase.compiler.output.ITreeAppendable
 import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder
 import org.eclipse.xtext.xbase.lib.Pair
 import org.eclipse.xtext.xbase.typing.ITypeProvider
-import de.msg.xt.mdt.base.GenerationHelper
 
 class TDslCompiler extends XbaseCompiler {
 
@@ -170,8 +169,6 @@ class TDslCompiler extends XbaseCompiler {
 			InnerBlock: {
 				compileInnerBlock(expr, it)
 			}
-			CurrentActivityExpression: {
-			}
 			ActivityExpectation: {
 //				val valName = it.declareVariable(expr.guard, "expectation")
 //				append('''boolean «valName» = ''')
@@ -220,8 +217,7 @@ class TDslCompiler extends XbaseCompiler {
 
 		expr.newTypeRef(typeof(Stack), expr.newTypeRef(typeof(AbstractActivity))).serialize(expr, it);
 		it.append(" stack = new Stack<AbstractActivity>();").newLine
-		expr.newTypeRef(typeof(AbstractActivity)).serialize(expr, it)
-		it.append(" currentActivity = this; 	// the current activity")
+		it.append("currentActivity = this; 	// the current activity")
 		it.declareVariable("activity", "activity")
 		var expectedReturnType = expr.newTypeRef(Void::TYPE)
 		if (nextActivityAdapterClass != null) {
@@ -314,9 +310,6 @@ class TDslCompiler extends XbaseCompiler {
 				append("nextActivity")
 			}
 			InnerBlock: {
-			}
-			CurrentActivityExpression: {
-				append("currentActivity")
 			}
 			ActivityExpectation: {
 				//append(expr.guard.getVarName(it))

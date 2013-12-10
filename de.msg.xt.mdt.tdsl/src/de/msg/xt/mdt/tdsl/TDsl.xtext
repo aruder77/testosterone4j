@@ -189,19 +189,13 @@ VariableDeclaration returns xbase::XVariableDeclaration:
 ;
 
 Expression returns xbase::XExpression:
-	OperationCall | ActivityOperationCall | GeneratedValueExpression | CurrentActivityExpression | XExpression 
+	OperationCall | ActivityOperationCall | GeneratedValueExpression | XExpression 
 ;
 
 GeneratedValueExpression returns xbase::XExpression:
 	{GeneratedValueExpression}
 	'generatedValue' '(' param=[ecore::EObject|FQN] ')'
 ;
-
-CurrentActivityExpression returns xbase::XExpression:
-	{CurrentActivityExpression}
-	'currentActivity'
-;
-
 
 IfExpression returns xbase::XIfExpression:
 	{xbase::XIfExpression}

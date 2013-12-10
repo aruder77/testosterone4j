@@ -261,6 +261,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 								controlFieldName»«ENDFOR»}''')
 					]
 				]
+				members += activity.toField("currentActivity", activity.newTypeRef(AbstractActivity))			
 				members += activity.toMethod("find", newTypeRef(activityClass)) [
 					it.setStatic(true)
 					setBody [
@@ -1094,6 +1095,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 					it.append(useCase.calcSerialVersionUID + "L")
 				]
 			]
+			members += useCase.toField("currentActivity", useCase.newTypeRef(AbstractActivity))
 			for (inputParam : useCase.inputParameter) {
 				if (inputParam.name != null && inputParam?.dataType?.class_fqn != null) {
 					members += inputParam.toField(inputParam.name, inputParam.newTypeRef(inputParam.dataType.class_fqn)) [

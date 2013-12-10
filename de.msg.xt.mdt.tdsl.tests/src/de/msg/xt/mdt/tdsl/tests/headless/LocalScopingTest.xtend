@@ -193,6 +193,12 @@ class LocalScopingTest {
 					'''
 					 == "abc") {}'''
 			])
+			add(#[	"testCurrentActivityInVariableDeclaration", 
+					'''
+					val localVar = currentActivity.''', 
+					"adapter",
+					''''''
+			])
 		]
 	}
 	

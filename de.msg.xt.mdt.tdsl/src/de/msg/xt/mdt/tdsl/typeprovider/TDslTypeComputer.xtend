@@ -11,7 +11,6 @@ import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationCall
 import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationParameter
 import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationParameterAssignment
 import de.msg.xt.mdt.tdsl.tDsl.Assert
-import de.msg.xt.mdt.tdsl.tDsl.CurrentActivityExpression
 import de.msg.xt.mdt.tdsl.tDsl.DataTypeMapping
 import de.msg.xt.mdt.tdsl.tDsl.GeneratedValueExpression
 import de.msg.xt.mdt.tdsl.tDsl.GenerationSelektor
@@ -65,8 +64,6 @@ class TDslTypeComputer extends XbaseWithAnnotationsTypeComputer {
 			_computeTypes(expression as ActivityOperationBlock, state);
 		} else if (expression instanceof UseCaseBlock) {
 			_computeTypes(expression as UseCaseBlock, state);
-		} else if (expression instanceof CurrentActivityExpression) {
-			_computeTypes(expression as CurrentActivityExpression, state);
 		} else if (expression instanceof InnerBlock) {
 			_computeTypes(expression as InnerBlock, state);
 		} else if (expression instanceof ActivityExpectation) {
@@ -235,11 +232,5 @@ class TDslTypeComputer extends XbaseWithAnnotationsTypeComputer {
 				type = typeReferences.getTypeForName(container?.name?.dataType?.class_FQN?.toString, generationSelektor)
 		}
 		state.acceptActualType(state.converter.toLightweightReference(type))
-	}
-
-	protected def _computeTypes(CurrentActivityExpression currentActivity, ITypeComputationState state) {
-		val type = typeof(AbstractActivity)
-		state.acceptActualType(
-			state.converter.toLightweightReference(typeReferences.getTypeForName(type, currentActivity)))
 	}
 }
