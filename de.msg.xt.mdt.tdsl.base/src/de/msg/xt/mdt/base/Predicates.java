@@ -10,7 +10,7 @@ public class Predicates {
 		try {
 			Method evaluateMethod = predicateClass.getMethod("evaluate",
 					ControlField.class);
-			return (Boolean) evaluateMethod.invoke(field);
+			return (Boolean) evaluateMethod.invoke(null, field);
 		} catch (IllegalArgumentException e) {
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {

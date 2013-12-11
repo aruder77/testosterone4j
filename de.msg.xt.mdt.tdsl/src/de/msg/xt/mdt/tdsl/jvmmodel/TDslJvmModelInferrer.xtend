@@ -699,6 +699,8 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 							it.append(''' {«FOR tag : test.excludeTags SEPARATOR ","»«tag.enumLiteral_FQN»«ENDFOR»});''').
 								newLine
 						}
+						it.append('''generator.setMinTestCases(«test.minNumber»);''').newLine
+						it.append('''generator.setMaxTestCases(«test.maxNumber»);''').newLine
 						if (test.useCase?.class_fqn != null) {
 							it.append(
 								'''
@@ -1170,8 +1172,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 						useCase.newTypeRef(typeof(Stack), useCase.newTypeRef(typeof(AbstractActivity))).
 							serialize(useCase, it);
 						it.append(" stack = new Stack<AbstractActivity>();").newLine
-						useCase.newTypeRef(typeof(AbstractActivity)).serialize(useCase, it)
-						it.append(" currentActivity = initialActivity;")
+						it.append("this.currentActivity = initialActivity;")
 						it.declareVariable(initialActivityParam, "currentActivity")
 						for (statement : useCase.block.expressions) {
 							xbaseCompiler.compile(statement, it, statement.newTypeRef(Void::TYPE), null)

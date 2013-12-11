@@ -13,4 +13,8 @@ public interface Generator {
 	void setTags(Tag[] tags);
 
 	void setExcludeTags(Tag[] excludeTags);
+
+	void setMinTestCases(int min);
+
+	void setMaxTestCases(int max);
 }

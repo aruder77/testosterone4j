@@ -41,12 +41,17 @@ public class SampleTestGenerator implements Generator {
 
 	private Set<Tag> excludeTags;
 
+	private int minTestCases = 1;
+
+	private int maxTestCases = 1000;
+
 	@Override
 	public <E extends Runnable> List<E> generate(final Class<E> clazz) {
 		final List<E> testCases = new ArrayList<E>();
 		int idx = 1;
 		protocol.openGenerationFile();
-		while (!unsatisfiedCoverageIds.isEmpty() || testCases.isEmpty()) {
+		while ((!unsatisfiedCoverageIds.isEmpty() || testCases.size() < minTestCases)
+				&& testCases.size() < maxTestCases) {
 			try {
 				final Constructor<E> constructor = clazz
 						.getConstructor(Generator.class);
@@ -278,5 +283,23 @@ public class SampleTestGenerator implements Generator {
 		tags = null;
 		this.excludeTags = new HashSet<Tag>();
 		this.excludeTags.addAll(Arrays.asList(excludeTags));
+	}
+
+	public int getMinTestCases() {
+		return minTestCases;
+	}
+
+	@Override
+	public void setMinTestCases(int minTestCases) {
+		this.minTestCases = minTestCases > 0 ? minTestCases : 1;
+	}
+
+	public int getMaxTestCases() {
+		return maxTestCases;
+	}
+
+	@Override
+	public void setMaxTestCases(int maxTestCases) {
+		this.maxTestCases = maxTestCases > 0 ? maxTestCases : 1000;
 	}
 }
