@@ -202,7 +202,7 @@ class TDslCompiler extends XbaseCompiler {
 			expr.newTypeRef(expectedActivity.class_FQN.toString).serialize(expr, it)
 			append(".class, ")
 			expr.newTypeRef(expectedActivity.adapterInterface_fqn.toString).serialize(expr, it)
-			append(".class")
+			append(".class, true")
 		}
 		append(");")
 	}

@@ -391,6 +391,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 				it.typeParameters += adapterTypeParam
 				it.parameters += operation.toParameter("activityClass", clazzActivityTypeParamRef)
 				it.parameters += operation.toParameter("adapterClass", clazzAdapterTypeParamRef)
+				it.parameters += operation.toParameter("expectIrregularNextActivity", operation.newTypeRef(boolean))
 			}
 			
 			if (operation.body != null) {
@@ -419,7 +420,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 						it.append("return ")
 						it.append("this.callContextAdapter(functionCall, ")
 						operation.newTypeRef(TDslHelper).serialize(operation, it)
-						it.append(".extractId(activityClass), activityClass, adapterClass);")
+						it.append(".extractId(activityClass), activityClass, adapterClass, expectIrregularNextActivity);")
 					} else {
 						it.append("functionCall.apply();")
 					}
@@ -453,7 +454,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 					operation.newTypeRef(nextActivityClass).serialize(operation, it)
 					it.append(".class, ")
 					operation.newTypeRef(nextActivityAdapterClass).serialize(operation, it)
-					it.append(".class);")
+					it.append(".class, false);")
 					
 				]
 		]

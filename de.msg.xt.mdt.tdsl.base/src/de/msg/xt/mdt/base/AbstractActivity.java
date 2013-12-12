@@ -24,17 +24,37 @@ public abstract class AbstractActivity implements IEvalutaionGroup {
 		return adapter;
 	}
 
+	/**
+	 * Makes the call to the activity adapter and converts the {@link Object} returned to the expected activity.
+	 * If the adapter returned object is already an {@link AbstractActivity}, it is returned directly.
+	 * Otherwise, it is considered to be a context object for the activity adapter and wrapped in
+	 * an appropriate adapter and activity by this method. The expected activity and adapter class must be
+	 * given to this method as parameters. 
+	 * If the given expectedId is not null, it is verified that the context object returned by the adapter
+	 * matches this id. If not, the context object is ignored and the expected activity is looked for using
+	 * {@link ActivityLocator}.
+	 * 
+	 * @param call			a callback to make the actual call to the activity adapter
+	 * @param expectedId	the id of the activity expected as next activity for the call
+	 * @param expectedActivity	the class of the activity expected as next activity 
+	 * @param adapterClass	the adapter class of the activity expected as next activity
+	 * @return the next activity 
+	 */
 	protected <T extends AbstractActivity, E extends ActivityAdapter> T callContextAdapter(
 			final Function0<Object> call, final String expectedId, final Class<T> expectedActivity,
-			final Class<E> adapterClass) {
+			final Class<E> adapterClass, boolean expectIrregularNextActivity) {
 		Object o = null;
-		boolean exceptionOccured = false;
+		RuntimeException exception = null;
 		if (adapter != null) {
 			try {
 				o = call.apply();
 			} catch (RuntimeException ex) {
-				ex.printStackTrace();
-				exceptionOccured = true;
+				if (expectIrregularNextActivity) {
+					// expect exception in this case, do nothing
+					o = null;
+				} else {
+					throw ex;
+				}
 			}
 		}
 		T nextActivity = null;
@@ -48,7 +68,7 @@ public abstract class AbstractActivity implements IEvalutaionGroup {
 				}
 				IActivityContext context = (IActivityContext)o;
 				
-				if (context == null || context.getId() == null || exceptionOccured || (expectedId != null && !context.getId().equals(expectedId))) {
+				if (context == null || context.getId() == null || expectIrregularNextActivity || (expectedId != null && !context.getId().equals(expectedId))) {
 					adapter = getInjector().getInstance(ActivityLocator.class)
 							.find(expectedActivity, adapterClass);
 				} else {
