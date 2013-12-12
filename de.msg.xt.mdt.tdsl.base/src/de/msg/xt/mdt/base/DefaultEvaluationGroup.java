@@ -3,7 +3,7 @@ package de.msg.xt.mdt.base;
 import java.util.HashSet;
 import java.util.Set;
 
-public class DefaultEvaluationGroup implements IEvalutaionGroup {
+public class DefaultEvaluationGroup implements IEvaluationGroup {
 
 	private final Set<ControlField> fields;
 
@@ -14,6 +14,13 @@ public class DefaultEvaluationGroup implements IEvalutaionGroup {
 	public DefaultEvaluationGroup(Set<ControlField> fields) {
 		super();
 		this.fields = fields;
+	}
+
+	public DefaultEvaluationGroup(IEvaluationGroup... groups) {
+		this();
+		for (IEvaluationGroup group: groups) {
+			addAll(group.getFields());
+		}
 	}
 
 	public void addField(ControlField field) {

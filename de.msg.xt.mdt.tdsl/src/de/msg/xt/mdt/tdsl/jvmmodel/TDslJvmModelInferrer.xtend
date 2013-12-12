@@ -10,7 +10,6 @@ import de.msg.xt.mdt.base.ControlField
 import de.msg.xt.mdt.base.EquivalenceClass
 import de.msg.xt.mdt.base.GenerationHelper
 import de.msg.xt.mdt.base.Generator
-import de.msg.xt.mdt.base.IEvalutaionGroup
 import de.msg.xt.mdt.base.ITestProtocol
 import de.msg.xt.mdt.base.Parameters
 import de.msg.xt.mdt.base.TDslParameterized
@@ -79,6 +78,7 @@ import org.junit.runner.RunWith
 import org.eclipse.xtext.xbase.XBlockExpression
 import de.msg.xt.mdt.tdsl.tDsl.ActivityExpectation
 import org.eclipse.xtext.common.types.JvmTypeParameter
+import de.msg.xt.mdt.base.IEvaluationGroup
 
 /**
  * <p>Infers a JVM model from the source model.</p> 
@@ -207,7 +207,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 				val superClass = activity.superClass_ref
 				if (superClass != null)
 					superTypes += superClass
-				superTypes += activity.newTypeRef(typeof(IEvalutaionGroup))
+				superTypes += activity.newTypeRef(typeof(IEvaluationGroup))
 				members += activity.toField("ID", activity.newTypeRef(typeof(String))) [
 					it.setStatic(true)
 					it.setFinal(true)

@@ -8,7 +8,7 @@ import com.google.inject.Injector;
 
 import de.msg.xt.mdt.base.util.TDslHelper;
 
-public abstract class AbstractActivity implements IEvalutaionGroup {
+public abstract class AbstractActivity implements IEvaluationGroup {
 
 	protected ActivityAdapter adapter;
 

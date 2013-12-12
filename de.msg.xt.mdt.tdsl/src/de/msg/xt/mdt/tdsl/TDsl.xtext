@@ -181,7 +181,7 @@ StatementLine returns xbase::XExpression:
 ;
 
 Statement returns xbase::XExpression:
-	SubUseCaseCall | OperationCall | ActivityOperationCall | VariableDeclaration | IfExpression | '[' XAssignment ']' | Assignment | Assert | ActivityExpectation //| CompoundStatement
+	SubUseCaseCall | OperationCall | ActivityOperationCall | VariableDeclaration | IfExpression | '[' XAssignment ']' | Assert | ActivityExpectation //| CompoundStatement
 ;
 
 VariableDeclaration returns xbase::XVariableDeclaration:

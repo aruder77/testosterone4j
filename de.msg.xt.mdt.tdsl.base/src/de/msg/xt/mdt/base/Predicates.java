@@ -2,11 +2,12 @@ package de.msg.xt.mdt.base;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Predicates {
 
-	private static boolean evaluatePredicate(Class<?> predicateClass,
-			ControlField field) {
+	private static boolean evaluatePredicate(ControlField field, Class<?> predicateClass) {
 		try {
 			Method evaluateMethod = predicateClass.getMethod("evaluate",
 					ControlField.class);
@@ -25,22 +26,36 @@ public class Predicates {
 		return false;
 	}
 
-	public static boolean all(Class<?> predicateClass, IEvalutaionGroup group) {
+	public static boolean all(IEvaluationGroup group, Class<?> predicateClass) {
 		for (ControlField field : group.getFields()) {
-			if (!evaluatePredicate(predicateClass, field)) {
+			if (!evaluatePredicate(field, predicateClass)) {
 				return false;
 			}
 		}
 		return true;
 	}
 
-	public static boolean atLeastOne(Class<?> predicateClass,
-			IEvalutaionGroup group) {
+	public static boolean atLeastOne(IEvaluationGroup group, Class<?> predicateClass) {
 		for (ControlField field : group.getFields()) {
-			if (evaluatePredicate(predicateClass, field)) {
+			if (evaluatePredicate(field, predicateClass)) {
 				return true;
 			}
 		}
 		return false;
+	}
+	
+	public static Set<ControlField> fieldValuesWithTag(IEvaluationGroup group, Tag tag) {
+		Set<ControlField> fields = new HashSet<ControlField>();
+		for (ControlField field: group.getFields()) {
+			DataType<?,? extends EquivalenceClass> lastEnteredValue = field.getLastEnteredValue();
+			if (lastEnteredValue != null && lastEnteredValue.getEquivalenceClass().getClassTags().contains(tag)) {
+				fields.add(field);
+			}
+		}
+		return fields;
+	}
+	
+	public static boolean hasFieldValueWithTag(IEvaluationGroup group, Tag tag) {
+		return !fieldValuesWithTag(group, tag).isEmpty();
 	}
 }

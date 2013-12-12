@@ -12,7 +12,13 @@ class TDslImplicitlyImportedTypes extends ImplicitlyImportedTypes {
 		val list = new ArrayList<Class<?>>()
 		list.addAll(super.staticImportClasses)
 		list.add(typeof(Assert))
-		list.add(typeof(Predicates))
 		list
 	}		
+	
+	override protected getExtensionClasses() {
+		val list = super.extensionClasses
+		list.add(Predicates)
+		list
+	}
+
 }

@@ -30,7 +30,7 @@
 <template id="tags" autoinsert="true" context="de.msg.xt.mdt.tdsl.TDsl.TagsDeclaration" deleted="false" description="Insert a tags declaration" enabled="true" name="tags">tags {
 	${cursor}
 }</template>
-<template id="test" autoinsert="true" context="de.msg.xt.mdt.tdsl.TDsl.Element" deleted="false" description="Insert a test" enabled="true" name="test">test ${name} generator ${generator} useCase ${useCase}</template>
+<template id="test" autoinsert="true" context="de.msg.xt.mdt.tdsl.TDsl.Element" deleted="false" description="Insert a test" enabled="true" name="test">test ${name} generator de.msg.xt.mdt.base.SampleTestGenerator useCase ${useCase}</template>
 <template id="toolkit" autoinsert="true" context="de.msg.xt.mdt.tdsl.TDsl.Element" deleted="false" description="Insert a toolkit" enabled="true" name="toolkit">toolkit ${name} {
 	${cursor}
 }</template>
@@ -38,5 +38,5 @@
 <template id="useCase" autoinsert="true" context="de.msg.xt.mdt.tdsl.TDsl.Element" deleted="false" description="Insert a use case" enabled="true" name="useCase">useCase ${name} initial ${useCase} {
 	${cursor}
 }</template>
-
+<template id="predicate" autoinsert="true" context="de.msg.xt.mdt.tdsl.TDsl.Element" deleted="false" description="Insert a tag predicate" enabled="true" name="predicate">predicate ${name} [java.util.Set&lt;de.msg.xt.mdt.base.Tag&gt; fieldTags, java.util.Set&lt;de.msg.xt.mdt.base.Tag&gt; classTags | ${cursor} ]</template>
 </templates>
