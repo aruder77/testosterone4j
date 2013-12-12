@@ -2,6 +2,7 @@ grammar de.msg.xt.mdt.tdsl.TDsl with org.eclipse.xtext.xbase.Xbase
 
 generate tDsl "http://www.msg.de/xt/mdt/tdsl/TDsl"
 import 'http://www.eclipse.org/xtext/xbase/Xbase' as xbase
+import "http://www.eclipse.org/xtext/common/JavaVMTypes" as types
 import 'http://www.eclipse.org/emf/2002/Ecore' as ecore
 
 
@@ -180,7 +181,7 @@ StatementLine returns xbase::XExpression:
 ;
 
 Statement returns xbase::XExpression:
-	SubUseCaseCall | OperationCall | ActivityOperationCall | VariableDeclaration | IfExpression | '[' XAssignment ']' | Assert | ActivityExpectation //| CompoundStatement
+	SubUseCaseCall | OperationCall | ActivityOperationCall | VariableDeclaration | IfExpression | '[' XAssignment ']' | Assignment | Assert | ActivityExpectation //| CompoundStatement
 ;
 
 VariableDeclaration returns xbase::XVariableDeclaration:
@@ -195,6 +196,10 @@ Expression returns xbase::XExpression:
 GeneratedValueExpression returns xbase::XExpression:
 	{GeneratedValueExpression}
 	'generatedValue' '(' param=[ecore::EObject|FQN] ')'
+;
+
+Assignment returns xbase::XExpression:
+	{XAssignment} feature=[types::JvmIdentifiableElement|FeatureCallID] OpSingleAssign value=Expression
 ;
 
 IfExpression returns xbase::XIfExpression:
