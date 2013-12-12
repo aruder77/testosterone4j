@@ -28,7 +28,8 @@ class TDslFormatter extends AbstractDeclarativeFormatter {
 		c.setAutoLinewrap(120);
 
 		val access = getGrammarAccess() as TDslGrammarAccess
-		c.setLinewrap(0, 1, 2).before(access.getSL_COMMENTRule());
+		c.setLinewrap(2, 2, 2).before(access.getSL_COMMENTRule());
+		c.setLinewrap(1,1,1).after(access.getSL_COMMENTRule());
 		c.setLinewrap(0, 1, 2).before(access.getML_COMMENTRule());
 		c.setLinewrap(0, 1, 1).after(access.getML_COMMENTRule());
 
@@ -71,7 +72,7 @@ class TDslFormatter extends AbstractDeclarativeFormatter {
 		c.setLinewrap().after(access.getTypeRule());
 		c.setLinewrap().after(access.getEquivalenceClassRule());
 		c.setLinewrap().after(access.getOperationRule());
-		c.setLinewrap().after(access.getActivityOperationRule());
+		c.setLinewrap(2).after(access.getActivityOperationRule());
 		c.setLinewrap(2).after(access.getFieldRule());
 		c.setLinewrap().after(access.getOperationMappingRule());
 
