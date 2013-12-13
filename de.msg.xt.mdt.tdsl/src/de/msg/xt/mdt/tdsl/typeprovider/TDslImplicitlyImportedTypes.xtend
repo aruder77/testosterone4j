@@ -5,6 +5,7 @@ import java.util.ArrayList
 import org.eclipse.xtext.xbase.scoping.batch.ImplicitlyImportedTypes
 import org.junit.Assert
 import de.msg.xt.mdt.base.Predicates
+import de.msg.xt.mdt.base.RandomExtensions
 
 class TDslImplicitlyImportedTypes extends ImplicitlyImportedTypes {
 	
@@ -18,6 +19,7 @@ class TDslImplicitlyImportedTypes extends ImplicitlyImportedTypes {
 	override protected getExtensionClasses() {
 		val list = super.extensionClasses
 		list.add(Predicates)
+		list.add(RandomExtensions)
 		list
 	}
 
