@@ -252,28 +252,28 @@ Eine Activity wird wie folgt in TDsl spezifiziert:
 
 code[tdsl][
 activity LoginPage {
-
-	field userName identifiedBy "key.userName" control TextControl {
-		op UserNameDT getText
-		op setText(UserNameDT str)
-		op BooleanDT isEnabled
-	}
-	
-	field password identifiedBy "key.password" control TextControl {
-		op PasswordDT getText
-		op setText(PasswordDT str)
-		op BooleanDT isEnabled
-	}
-	
-	field loginButton identifiedBy "key.login" control ButtonControl {
-		op click => OverviewPage
-	} 
-	
-	op login(UserNameDT userName, PasswordDT password) {
-		#userName.setText(str = userName)
-		#password.setText(str = password)
-		#loginButton.click
-	} => OverviewPage
+    
+    field userName identifiedBy "key.userName" control TextControl {
+        op UserNameDT getText
+        op setText(UserNameDT str)
+        op BooleanDT isEnabled
+    }
+    
+    field password identifiedBy "key.password" control TextControl {
+        op PasswordDT getText
+        op setText(PasswordDT str)
+        op BooleanDT isEnabled
+    }
+    
+    field loginButton identifiedBy "key.login" control ButtonControl {
+        op click => OverviewPage
+    }
+    
+    op login(UserNameDT userName, PasswordDT password) {
+        #userName.setText(str = userName)
+        #password.setText(str = password)
+        #loginButton.click
+    } => OverviewPage
 }
 ]
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
 <toc topic="contents/ivp.html" label="Model-Driven Testing -- Introducing TDsl" >
-	<topic href="contents/ivp_2.html#einfuehrung" label="EinfÃ¼hrung" >
+	<topic href="contents/ivp_2.html#einfuehrung" label="Einführung" >
 		<topic href="contents/ivp_2.html#einordnung" label="Einordnung" >
 		</topic>
 		<topic href="contents/ivp_2.html#ziel" label="Ziel" >
@@ -48,7 +48,7 @@
 	</topic>
 	<topic href="contents/ivp_8.html#tests" label="Anlage von Tests" >
 	</topic>
-	<topic href="contents/ivp_9.html#generierung" label="Generierung von TestfÃ¤llen" >
+	<topic href="contents/ivp_9.html#generierung" label="Generierung von Testfällen" >
 		<topic href="contents/ivp_9.html#testdaten" label="Generierung von Test-Daten" >
 		</topic>
 		<topic href="contents/ivp_9.html#anbindungTestAutomatisierung" label="Anbindung an Test-Automatisierungs-Framework" >

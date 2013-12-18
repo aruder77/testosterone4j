@@ -16,6 +16,8 @@ Workflow {
 		pdfLatex = "pdflatex.exe"
         // whether to create todo elements or not
         release = true
-        fileEncoding = "UTF-8"
+        
+        // this is the OUTPUT file encoding. Must be "ISO-8859-1" for latex.
+        fileEncoding = "ISO-8859-1"
     }
 }
