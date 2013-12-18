@@ -1,0 +1,22 @@
+1.) Eclipse laden und Testosterone4j installieren
+
+Wenn Ihr Testosterone4j selbst ausprobieren wollt, braucht Ihr dazu ein Eclipse Kepler SR1 (4.3.1).
+
+Testosterone4j könnt Ihr über folgende Update-Site in Euer Eclipse installieren:
+http://xt.msg.de/taskdev/updates/latest
+Einfach unter Help->Install new Software...->Add obiges Repository hinzufügen und anschließend die Kategorie "TDsl" anhaken und installieren.
+
+Alternativ könnt Ihr unter http://xt.msg.de/taskdev/xteclipse/ die XT Eclipse Distribution inklusive Testosterone4j herunterladen und verwenden.
+
+2.) Workspace aufsetzen
+
+Öffnet Euer Eclipse und gebt eine frische Workspace Eurer Wahl an. Den Showcase importiert Ihr am besten indem Ihr mit
+File->Import...->Team->Team Project Set auswählt und folgendes Team Project Set angebt: http://xt.msg.de/taskdev/contactsdemo/ContactsDemo.psf
+Ihr bekommt damit direkt aus dem git Repository die drei Projekte des Showcases in Euren Workspace.
+
+3.) Loslegen
+
+Die Beispiel-Applikation startet Ihr mit dem Launcher "XT-Contacts Windows.launch" im Projekt "de.msg.xt.eclipse.contactsdemo".
+Die modellierten Tests findet Ihr im Projekt "de.msg.xt.eclipse.contactsdemo.tests" im Verzeichnis "model".
+Ausführen könnt Ihr alle Beispiel-Testfälle mit dem Launcher "ExecuteTests Windows.launch" im gleichen Projekt.
+Die anderen zwei Projekte enthalten ein paar Basis-Modelle, die Projekt-unabhängig verwendet werden können und modellierte Controls und Datentypen beinhalten.

@@ -346,13 +346,21 @@ die Operation <em>isEnabled</em>, die ermittelt ob das Control gerade aktiviert 
 modelliert werden. Natürlich ist auch die verwendung von mehreren Parametern (durch Komma getrennt) pro
 Operation möglich.
 </p>
-<p>Ein Beispiel für ein komplexeres Control wie zum Beispiel einer Tabelle sieht wie folgt aus:
+<p>Ein Beispiel für ein komplexeres Control wie zum Beispiel eines Tree-Controls sieht wie folgt aus:
 </p>
 <p>
 <div class="literallayout">
 <div class="incode">
 <p class="code">
-</p>
+<span class="keyword">control</span>&nbsp;TreeControl&nbsp;{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">op</span>&nbsp;void&nbsp;selectNode(String&nbsp;nodePath)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">op</span>&nbsp;void&nbsp;doubleClickNode(String&nbsp;nodePath)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">op</span>&nbsp;Boolean&nbsp;isEnabled<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">op</span>&nbsp;void&nbsp;invokeContextMenu(String&nbsp;nodePath,&nbsp;String&nbsp;contextMenuEntry)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">op</span>&nbsp;Boolean&nbsp;isContextMenuEnabled(String&nbsp;nodePath,&nbsp;String&nbsp;contextMenuEntry)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">op</span>&nbsp;Boolean&nbsp;hasChildNode(String&nbsp;nodePath,&nbsp;String&nbsp;nodePattern,&nbsp;Boolean&nbsp;recursive)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">op</span>&nbsp;void&nbsp;setIgnoreSuffixPattern(String&nbsp;suffixPattern)<br />
+}</p>
 </div>
 </div>
 
@@ -589,12 +597,12 @@ angegeben werden muss, muss jedoch die Zuweisung durch explizite Angabe des Para
 <p>Als Wert für einen Parameter kann dabei eine beliebiger Xtend-Ausdruck angegeben werden, so dass hier
 die volle Mächtigkeit von Xtend/Java zur Verfügung steht! Dabei kann natürlich auch auf die Use-Case
 Parameter oder Variablen (siehe 
-<a href="#variables">org.eclipse.xtext.xdoc.xdoc.impl.SectionImpl@5511fae9 (name: variables)</a>) zugegriffen werden.
+<a href="#variables">org.eclipse.xtext.xdoc.xdoc.impl.SectionImpl@3fde1ed4 (name: variables)</a>) zugegriffen werden.
 </p>
 <p>Falls ein oder mehrere Parameter einer Operation beim Aufruf nicht angegeben werden, wählt der Testdaten-Generator
 einen Wert anhand der spezifizierten Äquivalenzklassen-Angaben des entsprechenden Datentyps. Die Strategie
 bei der Wahl des Wertes hängt von den beim Test angegebenen Coverage-Kriterien ab (siehe 
-<a href="#tests">org.eclipse.xtext.xdoc.xdoc.impl.ChapterImpl@2704427b (name: tests)</a>). 
+<a href="#tests">org.eclipse.xtext.xdoc.xdoc.impl.ChapterImpl@4b4c6cdb (name: tests)</a>). 
 </p>
 
 
