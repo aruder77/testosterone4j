@@ -12,7 +12,7 @@
 <h1>Spezifikation der Use-Cases</h1>
 <p>
 Nachdem die Benutzeroberfläche in Form von Activities erfolgreich modelliert ist, können nun die Use-Cases
-der Anwendung komfortabel durch den TDsl-Editor spezifiziert werden. 
+der Anwendung komfortabel durch den Testosterone4j-Editor spezifiziert werden. 
 </p>
 <p>
 Der Rumpf eines Use-Cases sieht folgendermaßen aus:
@@ -157,7 +157,7 @@ Beispiele:
 <br/>
 <span class="keyword">var</span>&nbsp;String&nbsp;someString
 <br/>
-someString&nbsp;=&nbsp;<span class="string">"TDsl&nbsp;sucks!"</span>.replace(<span class="string">"su"</span>,&nbsp;<span class="string">"ro"</span>)&nbsp;
+someString&nbsp;=&nbsp;<span class="string">"Testosterone4j&nbsp;sucks!"</span>.replace(<span class="string">"su"</span>,&nbsp;<span class="string">"ro"</span>)&nbsp;
 <br/>
 </p>
 </div>
@@ -194,7 +194,7 @@ Auch bedingte Verzweigungen sind in TDsl natürlich möglich. Die Syntax folgt der
 Die <span class="inlinecode"><span class="keyword">else</span>&nbsp;<span class="keyword">if</span></span> und <span class="inlinecode"><span class="keyword">else</span></span> Zweige sind wie üblich optional.
 </p>
 <p>
-In jedem Zweig können wiederum alle TDsl Statements dieses Kapitels verwendet werden.
+In jedem Zweig können wiederum alle Testosterone4j Statements dieses Kapitels verwendet werden.
 </p>
 <a name="expressions"></a>
 <h2>Einbettung von Xtend Code</h2>
@@ -230,12 +230,12 @@ Auch in dem eingebettetem Code stehen die Parameter und Variablen des Use-Cases 
 <h2>Verifikation von Ergebnissen</h2>
 <p>
 Die Verifikation von bestimmten Prüfpunkten ist stark abhängig vom verwendeten Test-Automatisierungs-Framework.
-Deshalb gibt es in TDsl dafür keine explizite Unterstützung. Die Verifikation kann aber leicht Implementierungs-abhängig
+Deshalb gibt es in Testosterone4j dafür keine explizite Unterstützung. Die Verifikation kann aber leicht Implementierungs-abhängig
 als Xtend-Code realisiert werden.
 </p>
 <p>
 Wichtig ist jedoch, dass dem verifizierenden Xtend-Code-Block das Schlüsselwort <span class="inlinecode"><span class="keyword">assert</span></span> vorangestellt
-wird um TDsl bewusst zu machen dass es sich hier um verifizierenden Code handelt. Dies ist deshalb wichtig
+wird um Testosterone4j bewusst zu machen dass es sich hier um verifizierenden Code handelt. Dies ist deshalb wichtig
 weil bei der Testfall-Generierung die Testfälle quasi <em>"trocken"</em> durchlaufen werden und die <span class="inlinecode"><span class="keyword">assert</span></span>s
 hier übersprungen werden müssen.
 </p>
@@ -243,13 +243,13 @@ hier übersprungen werden müssen.
 <div class="literallayout">
 <div class="incode">
 <p class="code">
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;inputUserName&nbsp;=&nbsp;<span class="string">"Peter&nbsp;Pan"</span>
+<span class="keyword">val</span>&nbsp;inputUserName&nbsp;=&nbsp;<span class="string">"Peter&nbsp;Pan"</span>
 <br/>
-&nbsp;&nbsp;&nbsp;&nbsp;#userName.setText(str=inputUserName)
+#userName.setText(str=inputUserName)
 <br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;actualUserName&nbsp;=&nbsp;#userName.getText
+<span class="keyword">val</span>&nbsp;actualUserName&nbsp;=&nbsp;#userName.getText
 <br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">assert</span>&nbsp;[&nbsp;org.junit.Assert::assertEquals(inputUserName,&nbsp;actualUserName)&nbsp;]
+<span class="keyword">assert</span>&nbsp;[&nbsp;org.junit.Assert::assertEquals(inputUserName,&nbsp;actualUserName)&nbsp;]
 <br/>
 </p>
 </div>

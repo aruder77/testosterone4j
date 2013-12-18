@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
-<toc topic="contents/ivp.html" label="Model-Driven Testing -- Introducing TDsl" >
+<toc topic="contents/ivp.html" label="Model-Driven Testing -- Introducing Testosterone4j" >
 	<topic href="contents/ivp_2.html#einfuehrung" label="Einführung" >
 		<topic href="contents/ivp_2.html#einordnung" label="Einordnung" >
 		</topic>
@@ -17,7 +17,7 @@
 	<topic href="contents/ivp_5.html#ansatz" label="Modellgetriebener Ansatz" >
 		<topic href="contents/ivp_5.html#problem" label="Das Problem" >
 		</topic>
-		<topic href="contents/ivp_5.html#modellgetriebenerAnsatz" label="Modellierung mit TDsl" >
+		<topic href="contents/ivp_5.html#modellgetriebenerAnsatz" label="Modellierung mit Testosterone4j" >
 		</topic>
 	</topic>
 	<topic href="contents/ivp_6.html#uistruktur" label="Beschreibung der UI-Struktur" >

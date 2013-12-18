@@ -28,7 +28,7 @@ der JUnit-Tests werden diese Dateien dann ausgelesen und die Tests ausgeführt.
 <h2>Anbindung an Test-Automatisierungs-Framework</h2>
 <p>
 Bisher ist unser Modell wie auch die generierten Java-Klassen völlig unabhängig von der zu verwendenden
-Technologie zur Ausführung der Tests. TDsl ist so flexibel dass praktisch jedes Test-Automatisierungs-Framework
+Technologie zur Ausführung der Tests. Testosterone4j ist so flexibel dass praktisch jedes Test-Automatisierungs-Framework
 angebunden oder jede Art von Testskripten generiert werden kann.
 </p>
 <p>
@@ -78,7 +78,7 @@ zu implementieren.
 <h3>Anbindung der Implementierungs-Klassen</h3>
 <p>
 Nachdem sämtliche Control- und ActivityAdapter-Implementierungen ausprogrammiert sind, müssen diese noch
-entsprechend angebunden werden. Dies erfolgt in TDsl durch Dependency Injection mit Hilfe von Google
+entsprechend angebunden werden. Dies erfolgt in Testosterone4j durch Dependency Injection mit Hilfe von Google
 Guice. Dazu muss in der Klasse <span class="inlinecode">TDslModule</span> ein entsprechendes Binding etabliert werden. Für jedes
 Control- und ActivityAdapter-Interface muss eine Implementierung gebunden sein.
 </p>

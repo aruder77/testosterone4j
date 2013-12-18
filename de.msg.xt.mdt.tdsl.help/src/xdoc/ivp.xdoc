@@ -1,4 +1,4 @@
-document[Model-Driven Testing -- Introducing TDsl]
+document[Model-Driven Testing -- Introducing Testosterone4j]
 
 authors[Axel Ruder]
 
@@ -128,19 +128,19 @@ die PageObjects eingesteuert werden, eine Lösung für eine clevere Generierung 
 jedoch nicht. 
 
 
-section:modellgetriebenerAnsatz[Modellierung mit TDsl]
+section:modellgetriebenerAnsatz[Modellierung mit Testosterone4j]
 
 Mit e[modellgetrieben] ist in diesem Artikel nicht die Verwendung von graphischen Modellen, wie etwa
 UML- oder BPM-Modelle gemeint, sondern textuelle Modelle in Form einer Domänenspezifischen Sprache e[TDsl]. Mit
 dieser Sprache wird die Benutzeroberfläche durch die Einführung von Test-relevanten Abstraktionen modelliert.
 
-Die Idee hinter TDsl wird in den folgenden Kapiteln vorgestellt.
+Die Idee hinter Testosterone4j wird in den folgenden Kapiteln vorgestellt.
 
-TDsl verwendet intern PageObjects, d.h. das auch bei TDsl die Testautomatisierungs-Implementierung in
+Testosterone4j verwendet intern PageObjects, d.h. das auch bei Testosterone4j die Testautomatisierungs-Implementierung in
 zwei Teile getrennt wird. 
 ol[
 	item[Die Beschreibung der UI-Struktur
-		Hier werden Datentypen, UI-Controls und Activities (TDsl-Bezeichnung für PageObjects) modelliert.]
+		Hier werden Datentypen, UI-Controls und Activities (Testosterone4j-Bezeichnung für PageObjects) modelliert.]
 	item[Spezifikation der Use-Cases und Tests
 		Hier werden die Test-Use-Cases und ihr Verhalten spezifiziert.]
 ]
@@ -150,13 +150,13 @@ chapter:uistruktur[Beschreibung der UI-Struktur]
 Die Struktur der Benutzeroberfläche muss einmalig, in der Regel parallel zur Entwicklung der Benutzeroberfläche,
 modelliert werden und dient dann als Ausgangsbasis für die Spezifikation der Use-Cases und Tests.
 
-Da die Spezifikation von Tests bei TDsl im Fokus steht, beschränkt sich die Beschreibung der UI ausschließlich
+Da die Spezifikation von Tests bei Testosterone4j im Fokus steht, beschränkt sich die Beschreibung der UI ausschließlich
 auf die Informationen die für die Spezifikation der Tests sowie die Automatisierung notwendig sind.
 
 Im Wesentlichen müssen folgende Informationen festgehalten werden:
 
 ul[
-	item[In welche "Seiten" die Benutzeroberfläche gegliedert ist (in TDsl-Jargon e[Activities])]
+	item[In welche "Seiten" die Benutzeroberfläche gegliedert ist (in Testosterone4j-Jargon e[Activities])]
 	item[Welche Benutzeroberflächen-Elemente (e[Controls]) auf dieser Seite vorhanden sind]
 	item[Welche e[Operationen] von den Controls angeboten werden]
 	item[Welche e[Datentypen] von den Operationen verwendet werden (als Parameter und Rückgabewert)]
@@ -174,7 +174,7 @@ Dabei wird nach dem Äquivalenzklassen-Prinzip vorgegangen. Eine Äquivalenzklas
 Dies erfolgt unter der Annahme dass es sinnvoll ist zumindest einen Wert aus jeder Äquivalenzklasse zu
 testen.
 
-Ein Beispiel für die Deklaration eines TDsl-Datentyps sieht folgendermaßen aus:
+Ein Beispiel für die Deklaration eines Testosterone4j-Datentyps sieht folgendermaßen aus:
 
 code[tdsl][
 datatype IntegerDT type Integer {
@@ -186,7 +186,7 @@ datatype IntegerDT type Integer {
 }
 ]
 
-Auch der technische Datentyp muss TDsl bekannt gemacht werden.
+Auch der technische Datentyp muss Testosterone4j bekannt gemacht werden.
 
 code[tdsl] [
 type Integer mappedBy java.lang.Integer
@@ -204,7 +204,7 @@ section:controls[Controls]
 
 Als nächstes werden die Benutzerelemente der Anwendung modelliert. Dies muss nur einmalig pro verwendetem
 UI-Toolkit durchgeführt werden, nicht für jede zu testende Anwendung. Dieser Schritt ist erforderlich,
-da TDsl mit jedem beliebigen Testautomatisierungsframework und jedem beliebigen UI-Toolkit verwendet
+da Testosterone4j mit jedem beliebigen Testautomatisierungsframework und jedem beliebigen UI-Toolkit verwendet
 werden kann.
 
 Ein Beispiel für die modellierung eines Controls ist Foldendes:
@@ -226,7 +226,7 @@ item[die Operation e[setText], die den Wert e[str] im Control setzt]
 item[die Operation e[isEnabled], die ermittelt ob das Control gerade aktiviert ist]
 ]
 
-So können und müssen sämtliche von der Anwendung verwendete UI-Controls mit ihren Operationen in TDsl
+So können und müssen sämtliche von der Anwendung verwendete UI-Controls mit ihren Operationen in Testosterone4j
 modelliert werden. Natürlich ist auch die verwendung von mehreren Parametern (durch Komma getrennt) pro
 Operation möglich.
 
@@ -248,7 +248,7 @@ Auf jeder Activity (Seite) befinden sich Instanzen von Controls (e[Fields]), üb
 Interaktion mit der Anwendung durchführt, beispielsweise das Eintragen eines Datums in ein Textfeld,
 oder das Klicken auf einen Button.
 
-Eine Activity wird wie folgt in TDsl spezifiziert:
+Eine Activity wird wie folgt in Testosterone4j spezifiziert:
 
 code[tdsl][
 activity LoginPage {
@@ -297,7 +297,7 @@ item[Für sämtliche (technische) Datentypen von Operations-Parametern und Rück
 	Beispiel ist der Datentyp für get-/setText des Feldes "userName" UserNameDT, während der Datentyp
 	für das Feld "password" PasswordDT beträgt.]
 item[Der Aufruf einer Operation eines bestimmten Benutzeroberflächen-Elements kann einen Übergang zu
-	einer anderen Seite auslösen. Dies kann in TDsl durch die Verwendung des Operators e[=>] modelliert
+	einer anderen Seite auslösen. Dies kann in Testosterone4j durch die Verwendung des Operators e[=>] modelliert
 	werden, dem die nachfolgende Activity angegeben wird. Im obigen Beispiel führt ein Klick auf den 
 	loginButton zur Activity e[OverviewPage].]
 ]
@@ -309,18 +309,18 @@ der Activity zusammenzufassen. Ein Beispiel hierfür zeigt folgendes Listing.
 
 code[tdsl][
 activity LoginPage {
-
-	field loginName ...
-	
-	field password ...
-	
-	field loginButton ...
-	
-	op login(UserNameDT userName, PasswordDT password) {
-		#userName.setText(str = userName)
-		#password.setText(str = password)
-		#loginButton.click
-	} => OverviewPage
+    
+    field loginName ...
+    
+    field password ...
+    
+    field loginButton ...
+    
+    op login(UserNameDT userName, PasswordDT password) {
+        #userName.setText(str = userName)
+        #password.setText(str = password)
+        #loginButton.click
+    } => OverviewPage
 }
 ]
 
@@ -333,7 +333,7 @@ dabei ist, dass der letzte Aufruf der Operation zur gleichen Activity verzweigt 
 chapter:useCases[Spezifikation der Use-Cases]
 
 Nachdem die Benutzeroberfläche in Form von Activities erfolgreich modelliert ist, können nun die Use-Cases
-der Anwendung komfortabel durch den TDsl-Editor spezifiziert werden. 
+der Anwendung komfortabel durch den Testosterone4j-Editor spezifiziert werden. 
 
 Der Rumpf eines Use-Cases sieht folgendermaßen aus:
 
@@ -419,7 +419,7 @@ Beispiele:
 code[tdsl] [
 val userNameValue = #userName.getText
 var String someString
-someString = "TDsl sucks!".replace("su", "ro") 
+someString = "Testosterone4j sucks!".replace("su", "ro") 
 ]
 
 section:ifElse[Bedingte Verzweigungen]
@@ -438,7 +438,7 @@ if (<Xtend-Ausdruck>) {
 
 Die code[tdsl][else if] und code[tdsl][else] Zweige sind wie üblich optional.
 
-In jedem Zweig können wiederum alle TDsl Statements dieses Kapitels verwendet werden.
+In jedem Zweig können wiederum alle Testosterone4j Statements dieses Kapitels verwendet werden.
 
 section:expressions[Einbettung von Xtend Code]
 
@@ -460,19 +460,19 @@ Auch in dem eingebettetem Code stehen die Parameter und Variablen des Use-Cases 
 section:asserts[Verifikation von Ergebnissen]
 
 Die Verifikation von bestimmten Prüfpunkten ist stark abhängig vom verwendeten Test-Automatisierungs-Framework.
-Deshalb gibt es in TDsl dafür keine explizite Unterstützung. Die Verifikation kann aber leicht Implementierungs-abhängig
+Deshalb gibt es in Testosterone4j dafür keine explizite Unterstützung. Die Verifikation kann aber leicht Implementierungs-abhängig
 als Xtend-Code realisiert werden.
 
 Wichtig ist jedoch, dass dem verifizierenden Xtend-Code-Block das Schlüsselwort code[tdsl][assert] vorangestellt
-wird um TDsl bewusst zu machen dass es sich hier um verifizierenden Code handelt. Dies ist deshalb wichtig
+wird um Testosterone4j bewusst zu machen dass es sich hier um verifizierenden Code handelt. Dies ist deshalb wichtig
 weil bei der Testfall-Generierung die Testfälle quasi e["trocken"] durchlaufen werden und die code[tdsl][assert]s
 hier übersprungen werden müssen.
 
 code[tdsl][
-	val inputUserName = "Peter Pan"
-	#userName.setText(str=inputUserName)
-	val actualUserName = #userName.getText
-	assert \[ org.junit.Assert::assertEquals(inputUserName, actualUserName) \]
+val inputUserName = "Peter Pan"
+#userName.setText(str=inputUserName)
+val actualUserName = #userName.getText
+assert \[ org.junit.Assert::assertEquals(inputUserName, actualUserName) \]
 ]  
 
 chapter:tests[Anlage von Tests]
@@ -509,7 +509,7 @@ der JUnit-Tests werden diese Dateien dann ausgelesen und die Tests ausgeführt.
 section:anbindungTestAutomatisierung[Anbindung an Test-Automatisierungs-Framework]
 
 Bisher ist unser Modell wie auch die generierten Java-Klassen völlig unabhängig von der zu verwendenden
-Technologie zur Ausführung der Tests. TDsl ist so flexibel dass praktisch jedes Test-Automatisierungs-Framework
+Technologie zur Ausführung der Tests. Testosterone4j ist so flexibel dass praktisch jedes Test-Automatisierungs-Framework
 angebunden oder jede Art von Testskripten generiert werden kann.
 
 Dabei können die generierten Java-Klassen auf zwei unterschiedliche Art und Weise verwendet werden.
@@ -549,7 +549,7 @@ zu implementieren.
 section2:tdslmodule[Anbindung der Implementierungs-Klassen]
 
 Nachdem sämtliche Control- und ActivityAdapter-Implementierungen ausprogrammiert sind, müssen diese noch
-entsprechend angebunden werden. Dies erfolgt in TDsl durch Dependency Injection mit Hilfe von Google
+entsprechend angebunden werden. Dies erfolgt in Testosterone4j durch Dependency Injection mit Hilfe von Google
 Guice. Dazu muss in der Klasse code[TDslModule] ein entsprechendes Binding etabliert werden. Für jedes
 Control- und ActivityAdapter-Interface muss eine Implementierung gebunden sein.
 
@@ -557,5 +557,42 @@ Control- und ActivityAdapter-Interface muss eine Implementierung gebunden sein.
 
 chapter:fazit[Fazit]
 
+Mit Testosterone4j steht ein Tool zur Verfügung, das es erlaubt sehr effizient wartungsarme User-Interface
+Tests zu schreiben und trumpft gegenüber anderen Ansätzen vor allem mit folgenden Vorteilen.
+
+ul[
+	item[e[Starke Editor-Unterstützung beim Erstellen der Test-Skripte.]
+	Testosterone4j bietet eine ausführliche Unterstützung beim Erstellen der Tests mit Code-Completion,
+	Code-Templates, Outline-View und Quick-Fixes. Dabei bietet der Editor nur Operationen an die zum
+	jeweiligen Zeitpunkt im Testskript möglich sind.]
 
 
+	item[e[Unabhängigkeit vom verwendeten Test-Automatisierungs Framework]
+	Für die eigentliche Ausführung der Tests kann jedes beliebige Automatisierungs-Framework verwendet
+	werden.]
+
+
+	item[e[Mächtige Integration von Xtend]
+	Mit der Integration von Xtend als Expression Language können auch die komplexesten Testfälle geschrieben
+	werden. Alles was in Java möglich ist, geht auch hier.]
+
+
+	item[e[Testdaten-Generierung]
+	Die Testdaten können von Testosterone4j automatisch anhand der angegebenen fachlichen Datentypen
+	sinnvoll generiert werden. Auch Abhängigkeiten der Testdaten stellen kein Problem dar.]
+
+
+	item[e[Coverage-Report]
+	Für die Erzeugung der Testdaten wird für die ausgeführten Tests ein ausführlicher Abdeckungs-Bericht
+	erstellt.]
+
+
+	item[e[Debug-Möglichkeiten]
+	Zur Fehleranalyse in den Tests kann der Eclipse Debugger verwendet werden. Eine Schritt für Schritt
+	Ausführung der Tests sowie das Setzen von Breakpoints ist möglich.]
+
+
+	item[e[Ableitung des Struktur-Modells aus UI-Modellen einfach möglich]
+	Sollte bei der Entwicklung der zu testenden Software ein modellgetriebener Ansatz im Einsatz sein,
+	kann das Testosterone4j Strukturmodell zum Großen Teil aus diesem Abgeleitet werden.]
+]

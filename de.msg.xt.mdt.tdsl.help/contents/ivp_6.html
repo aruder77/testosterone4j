@@ -15,7 +15,7 @@ Die Struktur der Benutzeroberfläche muss einmalig, in der Regel parallel zur Ent
 modelliert werden und dient dann als Ausgangsbasis für die Spezifikation der Use-Cases und Tests.
 </p>
 <p>
-Da die Spezifikation von Tests bei TDsl im Fokus steht, beschränkt sich die Beschreibung der UI ausschließlich
+Da die Spezifikation von Tests bei Testosterone4j im Fokus steht, beschränkt sich die Beschreibung der UI ausschließlich
 auf die Informationen die für die Spezifikation der Tests sowie die Automatisierung notwendig sind.
 </p>
 <p>
@@ -24,7 +24,7 @@ Im Wesentlichen müssen folgende Informationen festgehalten werden:
 <p>
 <ul>
 	<li>
-		In welche "Seiten" die Benutzeroberfläche gegliedert ist (in TDsl-Jargon <em>Activities</em>)
+		In welche "Seiten" die Benutzeroberfläche gegliedert ist (in Testosterone4j-Jargon <em>Activities</em>)
 	</li>
 	<li>
 		Welche Benutzeroberflächen-Elemente (<em>Controls</em>) auf dieser Seite vorhanden sind
@@ -54,7 +54,7 @@ Dies erfolgt unter der Annahme dass es sinnvoll ist zumindest einen Wert aus jed
 testen.
 </p>
 <p>
-Ein Beispiel für die Deklaration eines TDsl-Datentyps sieht folgendermaßen aus:
+Ein Beispiel für die Deklaration eines Testosterone4j-Datentyps sieht folgendermaßen aus:
 </p>
 <p>
 <div class="literallayout">
@@ -79,7 +79,7 @@ Ein Beispiel für die Deklaration eines TDsl-Datentyps sieht folgendermaßen aus:
 </div>
 </p>
 <p>
-Auch der technische Datentyp muss TDsl bekannt gemacht werden.
+Auch der technische Datentyp muss Testosterone4j bekannt gemacht werden.
 </p>
 <p>
 <div class="literallayout">
@@ -105,7 +105,7 @@ Datentypen wirklich die fachliche Datentypen der Anwendung verwendet werden, bei
 <p>
 Als nächstes werden die Benutzerelemente der Anwendung modelliert. Dies muss nur einmalig pro verwendetem
 UI-Toolkit durchgeführt werden, nicht für jede zu testende Anwendung. Dieser Schritt ist erforderlich,
-da TDsl mit jedem beliebigen Testautomatisierungsframework und jedem beliebigen UI-Toolkit verwendet
+da Testosterone4j mit jedem beliebigen Testautomatisierungsframework und jedem beliebigen UI-Toolkit verwendet
 werden kann.
 </p>
 <p>
@@ -147,7 +147,7 @@ Beispiel wird ein Control <em>TextControl</em> definiert, das drei Operationen b
 </ul>
 </p>
 <p>
-So können und müssen sämtliche von der Anwendung verwendete UI-Controls mit ihren Operationen in TDsl
+So können und müssen sämtliche von der Anwendung verwendete UI-Controls mit ihren Operationen in Testosterone4j
 modelliert werden. Natürlich ist auch die verwendung von mehreren Parametern (durch Komma getrennt) pro
 Operation möglich.
 </p>
@@ -177,7 +177,7 @@ Interaktion mit der Anwendung durchführt, beispielsweise das Eintragen eines Dat
 oder das Klicken auf einen Button.
 </p>
 <p>
-Eine Activity wird wie folgt in TDsl spezifiziert:
+Eine Activity wird wie folgt in Testosterone4j spezifiziert:
 </p>
 <p>
 <div class="literallayout">
@@ -263,7 +263,7 @@ deklariert werden. Das ist aus zwei Gründen wichtig:
 	</li>
 	<li>
 		Der Aufruf einer Operation eines bestimmten Benutzeroberflächen-Elements kann einen Übergang zu
-			einer anderen Seite auslösen. Dies kann in TDsl durch die Verwendung des Operators <em>=&gt;</em> modelliert
+			einer anderen Seite auslösen. Dies kann in Testosterone4j durch die Verwendung des Operators <em>=&gt;</em> modelliert
 			werden, dem die nachfolgende Activity angegeben wird. Im obigen Beispiel führt ein Klick auf den 
 			loginButton zur Activity <em>OverviewPage</em>.
 	</li>
@@ -281,24 +281,29 @@ der Activity zusammenzufassen. Ein Beispiel hierfür zeigt folgendes Listing.
 <p class="code">
 <span class="keyword">activity</span>&nbsp;LoginPage&nbsp;{
 <br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">field</span>&nbsp;loginName&nbsp;...
+&nbsp;&nbsp;
 <br/>
+&nbsp;&nbsp;<span class="keyword">field</span>&nbsp;loginName&nbsp;...
 <br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">field</span>&nbsp;password&nbsp;...
+&nbsp;&nbsp;
 <br/>
+&nbsp;&nbsp;<span class="keyword">field</span>&nbsp;password&nbsp;...
 <br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">field</span>&nbsp;loginButton&nbsp;...
+&nbsp;&nbsp;
 <br/>
+&nbsp;&nbsp;<span class="keyword">field</span>&nbsp;loginButton&nbsp;...
 <br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">op</span>&nbsp;login(UserNameDT&nbsp;userName,&nbsp;PasswordDT&nbsp;password)&nbsp;{
+&nbsp;&nbsp;
 <br/>
-#userName.setText(str&nbsp;=&nbsp;userName)
+&nbsp;&nbsp;<span class="keyword">op</span>&nbsp;login(UserNameDT&nbsp;userName,&nbsp;PasswordDT&nbsp;password)&nbsp;{
 <br/>
-#password.setText(str&nbsp;=&nbsp;password)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#userName.setText(str&nbsp;=&nbsp;userName)
 <br/>
-#loginButton.click
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#password.setText(str&nbsp;=&nbsp;password)
 <br/>
-&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;=&gt;&nbsp;OverviewPage
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#loginButton.click
+<br/>
+&nbsp;&nbsp;}&nbsp;=&gt;&nbsp;OverviewPage
 <br/>
 }
 <br/>
