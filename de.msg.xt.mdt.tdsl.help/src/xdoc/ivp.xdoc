@@ -230,10 +230,18 @@ So können und müssen sämtliche von der Anwendung verwendete UI-Controls mit i
 modelliert werden. Natürlich ist auch die verwendung von mehreren Parametern (durch Komma getrennt) pro
 Operation möglich.
 
-Ein Beispiel für ein komplexeres Control wie zum Beispiel einer Tabelle sieht wie folgt aus:
+Ein Beispiel für ein komplexeres Control wie zum Beispiel eines Tree-Controls sieht wie folgt aus:
 
 code[tdsl] [
-
+control TreeControl {
+	op void selectNode(String nodePath)
+	op void doubleClickNode(String nodePath)
+	op Boolean isEnabled
+	op void invokeContextMenu(String nodePath, String contextMenuEntry)
+	op Boolean isContextMenuEnabled(String nodePath, String contextMenuEntry)
+	op Boolean hasChildNode(String nodePath, String nodePattern, Boolean recursive)
+	op void setIgnoreSuffixPattern(String suffixPattern)
+}
 ]
 
 section:activities[Activities]

@@ -152,12 +152,30 @@ modelliert werden. Natürlich ist auch die verwendung von mehreren Parametern (du
 Operation möglich.
 </p>
 <p>
-Ein Beispiel für ein komplexeres Control wie zum Beispiel einer Tabelle sieht wie folgt aus:
+Ein Beispiel für ein komplexeres Control wie zum Beispiel eines Tree-Controls sieht wie folgt aus:
 </p>
 <p>
 <div class="literallayout">
 <div class="incode">
 <p class="code">
+<span class="keyword">control</span>&nbsp;TreeControl&nbsp;{
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">op</span>&nbsp;void&nbsp;selectNode(String&nbsp;nodePath)
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">op</span>&nbsp;void&nbsp;doubleClickNode(String&nbsp;nodePath)
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">op</span>&nbsp;Boolean&nbsp;isEnabled
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">op</span>&nbsp;void&nbsp;invokeContextMenu(String&nbsp;nodePath,&nbsp;String&nbsp;contextMenuEntry)
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">op</span>&nbsp;Boolean&nbsp;isContextMenuEnabled(String&nbsp;nodePath,&nbsp;String&nbsp;contextMenuEntry)
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">op</span>&nbsp;Boolean&nbsp;hasChildNode(String&nbsp;nodePath,&nbsp;String&nbsp;nodePattern,&nbsp;Boolean&nbsp;recursive)
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">op</span>&nbsp;void&nbsp;setIgnoreSuffixPattern(String&nbsp;suffixPattern)
+<br/>
+}
+<br/>
 </p>
 </div>
 </div>
