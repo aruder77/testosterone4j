@@ -1,4 +1,4 @@
-document[Model-Driven Testing -- Introducing Testosterone4j]
+document[Model-Driven Testing -- Evaluating Testosterone4j]
 
 authors[Axel Ruder]
 
@@ -15,17 +15,17 @@ Dabei ist eine frühzeitige Erkennung von Fehlern für eine effektive und kosten
 Automatisierte Tests können in zeitlich kurzen Abständen wiederholt ausgeführt werden und erleichtern damit erheblich die 
 Suche nach der Fehlerursache, da die Anzahl der möglichen problematischen Änderungen entsprechend gering ist.
 Jedoch kann sich die Wartung der Testskripte als ziemlich aufwändig erweisen. 
-Ziel dieses Artikels ist es, einen Ansatz vorzustellen, bei dem durch Verwendung von Abstraktionen und 
-modellgetriebenen Entwicklungsmethoden diese Aufwände minimiert werden können.
+Ziel dieses Artikels ist es, einen Ansatz sowie das Open-Source Testosterone4j vorzustellen, bei dem durch Verwendung von Abstraktionen und 
+modellgetriebenen Entwicklungsmethoden diese Aufwände minimiert werden können. 
 
 
 section:einordnung[Einordnung]
 
-Die grafischen Benutzeroberflächen von betrieblichen Informationssystemen bestehen oft aus duzenden Masken, 
-welche die fachlichen Anwendungsfälle realisieren. Es ist eine Herausforderung diese fachlichen Abläufe während 
+Die grafischen Benutzeroberflächen von betrieblichen Informationssystemen bestehen oft aus dutzenden Masken, 
+welche die fachlichen Anwendungsfälle realisieren. Es ist eine Herausforderung, diese fachlichen Abläufe während 
 der gesamten Systementwicklungszeit wiederholt effizient zu testen, da Masken im Laufe eines Projekts Änderungen unterworfen sind. 
 Die Automatisierung von Tests trägt zwar dazu bei, Tests jederzeit wiederholbar zu machen, jedoch muss ein Weg gefunden werden, 
-der den Anpassungsaufwand für die Testfall-Skripte aufgrund fachlicher oder technischer Änderungen über die Projektlaufzeit hinweg, 
+der den Anpassungsaufwand für die Testfall-Skripte aufgrund fachlicher oder technischer Änderungen über die Projektlaufzeit hinweg 
 in Grenzen hält.
 
 Der Artikel fokussiert sich auf das Testen von maskenorientierten Anwendungen auf System-Ebene, d.h. aus Benutzersicht 
@@ -38,17 +38,20 @@ Unit- und Integrationstests, sowie Last- und Performancetests werden aus Platzgr
 
 section:ziel[Ziel]
 
-Ziel des hier vorgestellten Ansatzes ist es, eine effiziente, toolgestützte Spezifikation von
-UI-Tests zu ermöglichen, unter Verwendung von modellgetriebenen Entwicklungsmethoden.
+Ziel des hier vorgestellten Ansatzes ist eine effiziente, toolgestützte Spezifikation von
+UI-Tests unter Verwendung von modellgetriebenen Entwicklungsmethoden.
 
-Die Modelle sollen dabei verwendet werden können um mit Hilfe eines Generators Testfälle abzuleiten,
+Die Modelle sollen dazu verwendet werden können, mit Hilfe eines Generators Testfälle abzuleiten,
 die automatisiert ausführbar sind.
 
 Sowohl die Modelle als auch der Testfall-Generator sollen dabei unabhängig vom verwendeten Automatisierungs-Framework
-sein, so dass Technologieabhängig das richtige Werkzeug gewählt werden kann.
+sein, so dass Technologie-abhängig das richtige Werkzeug gewählt werden kann.
 
 Die generierten Tests sollen sowohl Abläufe als auch die zugehörigen Testdaten enthalten. Dabei ist es
 wichtig, dass Abhängigkeiten von Testdaten berücksichtigt werden.
+
+Für die Erreichung dieser Ziele wird das Open-Source Tool Testosterone4j evaluiert, mit dem modellgetrieben
+automatisierte Tests entwickelt werden können.
 
 
 chapter:testautomatisierung[Testautomatisierung]
@@ -57,37 +60,36 @@ chapter:testautomatisierung[Testautomatisierung]
 section:captureReplay[Capture-/Replay Tools]
 
 Sehr häufig werden für die Automatisierung von Benutzeroberflächen-Tests sogenannte Capture-/Replay Tools eingesetzt. 
-Wie der Name bereits suggeriert, bieten diese Tools die komfortable Möglichkeit fachliche Anwendungsfälle (Use Cases) einmalig, 
-durch ganz reguläre Bedienung der Anwendung aufnehmen zu können. Später kann der aufgezeichnete Ablauf auf Knopfdruck beliebig oft
+Wie der Name bereits suggeriert, bieten diese Tools die komfortable Möglichkeit, fachliche Anwendungsfälle (Use Cases) einmalig 
+durch ganz reguläre Bedienung der Anwendung aufzunehmen. Später kann der aufgezeichnete Ablauf auf Knopfdruck beliebig oft
 wiedergegeben werden.
 
-Basis dieser Tools ist dabei immer eine Testskript-Sprache, sowie mächtige Bibliotheksfunktionen zur Erkennung, Stimulation und 
-Analyse von Benutzeroberflächen-Elementen (Controls). Die Aufnahmemöglichkeit ist dann lediglich eine Zusatzfunktion, 
-bei der die durchgeführten Benutzeraktionen auf den Controls erkannt und in Form eines Testskripts aufzeichnet werden.
+Basis dieser Tools sind dabei immer eine Testskript-Sprache sowie mächtige Bibliotheksfunktionen zur Erkennung, Stimulation und 
+Analyse von Benutzeroberflächen-Elementen (Controls). Die Aufnahmemöglichkeit ist eine Zusatzfunktion, 
+bei der die durchgeführten Benutzeraktionen auf den Controls erkannt und in Form eines Testskripts aufgezeichnet werden.
 
-Die Vorteile der Capture-/Replay Tools sind erst einmal sehr verlockend. Die Erstellung der Testskripts beschränkt sich 
-lediglich auf das einmalige Durchklicken des entsprechenden Anwendungsfalls und kann auch von entwicklungsfernen Personen 
+Die Vorteile der Capture-/Replay Tools sind erst einmal sehr verlockend. Die Erstellung der Testskripte erfordert nur ein einmaliges Durchklicken des entsprechenden Anwendungsfalls und kann auch von entwicklungsfernen Personen 
 mit rein fachlichem Knowhow durchgeführt werden. 
 
-Die Aufnahme von Use Cases mit Hilfe dieser Tools hat jedoch für die Wartung der Testskripte ein gravierendes, konzeptionelles Problem.
+Die Aufnahme von Use Cases mit Hilfe dieser Tools hat jedoch für die Wartung der Testskripte ein gravierendes konzeptionelles Problem.
 
 section:redundanz[Das Problem der Redundanz]
 
 Anwendungsfälle beinhalten häufig sich wiederholende Sequenzen in der Benutzeroberfläche, wie beispielsweise das Öffnen 
-eines Hauptgeschäftsobjekts, die Selektion eines Subdatenbestands und die Freigabe dieser Daten zur Bearbeitung usw.
+eines Hauptgeschäftsobjekts, die Selektion eines Subdatenbestands und die Freigabe dieser Daten zur Bearbeitung.
 
 Werden bestimmte Masken oder Dialoge von mehreren Use Cases angesprochen und zeichnet man die zugehörigen Abläufe mit 
-Capture/Replay-Tools auf, so enthalten die dazugehörenden, proprietären Tool-Skripte viele redundante Codeanteile. 
+Capture/Replay-Tools auf, so enthalten die dazugehörenden proprietären Tool-Skripte viele redundante Codeanteile. 
 
 Diese Anteile bestehen hauptsächlich aus Code zur Identifikation und Stimulation der beteiligten GUI-Bedienelemente. 
 Da innerhalb eines Ablaufs bestimmte GUI-Elemente (z.B. Menüs, Listauswahlen, etc.) in der Regel mehrmals vorkommen, 
 erkennt man in den Codeanteilen viele sich wiederholende oder sehr ähnliche Zeilen.
 
-Das daraus resultierende Problem ist die Wartbarkeit der Testskripte. Eine kleine Änderung in der Anwendung 
-(z.B. Umbenennen eines GUI-Controls) führt zu mehreren fehlgeschlagenen Testfällen, was leider oft erst zur Laufzeit erkannt wird. 
+Das daraus resultierende Problem betrifft die Wartbarkeit der Testskripte. Eine kleine Änderung in der Anwendung 
+(z.B. das Umbenennen eines GUI-Controls) führt zu mehreren fehlgeschlagenen Testfällen, was leider oft erst zur Laufzeit erkannt wird. 
 Testmitarbeiter zeichnen dann entweder die Abläufe neu auf oder passen die vorhandenen Testskripte manuell an. 
-Diese manuelle Korrektur kostet zwar weniger Aufwand, als eine komplette Neuaufzeichnung, aber, wegen der zahleichen 
-Redundanzen in den Skripten, meistens immer noch mehr, als die verursachende Änderung (GUI-Control-Umbenennung) selbst.
+Diese manuelle Korrektur kostet zwar weniger Aufwand als eine komplette Neuaufzeichnung, aber wegen der zahleichen 
+Redundanzen in den Skripten meistens immer noch mehr als die verursachende Änderung (GUI-Control-Umbenennung) selbst.
 
 Wenn Testskripte im realen Projektleben eine Chance haben sollen, während der Entwicklung der Anwendung aktuell zu bleiben, 
 muss der Prozess für ihre Aktualisierung möglichst einfach sein. Gleiches gilt für die Testfalldurchführung.
@@ -95,8 +97,8 @@ muss der Prozess für ihre Aktualisierung möglichst einfach sein. Gleiches gilt
 
 chapter:pageObjects[PageObject Pattern]
 
-Initial von Google für Web-Oberflächen entwickelt, versucht es den Testautomatisierungscode der fachlichen Funktionalitäten 
-einer (Web-)Seite in einem sog. PageObject zu kapseln. Die Idee ist dabei Folgende:
+Initial von Google für Web-Oberflächen entwickelt, versucht das PageObject Pattern den Testautomatisierungscode der fachlichen Funktionalitäten 
+einer (Web-)Seite in einem sogenannten PageObject zu kapseln. Die Idee ist dabei die folgende:
 
 ul[
 	item[Für jede Seite der Anwendung wird eine PageObject-Klasse erstellt.]
@@ -105,23 +107,23 @@ ul[
 	item[Navigiert eine fachliche Funktion auf eine neue Seite, liefert die entsprechende PageObject-Methode ein PageObject 
 		 der neuen Seite zurück.]
 	item[Die eigentlichen Testskripte, die Abläufe der Anwendungsfälle testen, verwenden die Testautomatisierungs-Bibliotheken 
-		 nicht mehr direkt, sondern werden ausschließlich gegen die PageObjects entwickelt.]
+		 nicht mehr direkt sondern werden ausschließlich gegen die PageObjects entwickelt.]
 ]
 
 chapter:ansatz[Modellgetriebener Ansatz]
 
 section:problem[Das Problem]
 
-Obwohl das PageObject-Pattern bereits eine komfortable und redundanzarme Art bereitstellt automatisierte
-Tests zu erstellen, gibt es noch Verbesserungspotential.
+Obwohl das PageObject-Pattern bereits eine komfortable und Redundanz-arme Art Methode zur Erstellung automatisierter
+Tests bietet, gibt es noch Verbesserungspotential.
 
-Die Erstellung von PageObjects ist ein bischen mühsam, obwohl diese einen großen Anteil an schematischem
-Code beinhalten. Es wäre hier schön, eine effizientere Möglichkeit zu haben PageObjects zu erstellen.
+Die Erstellung von PageObjects ist ein bisschen mühsam, obwohl diese einen großen Anteil schematischen
+Code beinhalten. Hier wäre eine effizientere Möglichkeit zur Erstellung von PageObjects von Vorteil.
 
-Des Weiteren werden die eigentlichen Testfälle als JUnit-Test in Java geschrieben, was zum einen den
-Vorteil der Mächtigkeit von Java bietet, jedoch für die Spezifikation von fachlichen Tests auch hinderlich
-sein kann. Die Spezifikation von fachlichen Tests werden oft von Fachexperten ohne Entwicklungshintergrund
-durchgeführt und sind deshalb nicht vertraut mit der für ein Testskript relativ komplexen Java-Syntax.
+Des Weiteren werden die eigentlichen Testfälle als JUnit-Test in Java geschrieben. Dadurch kann zwar die ganze 
+Mächtigkeit von Java genutzt werden, andererseits kann dies für die Spezifikation von fachlichen Tests auch hinderlich
+sein. Die Spezifikation von fachlichen Tests wird oft von Fachexperten ohne Entwicklungshintergrund
+durchgeführt. Diese sind nicht vertraut mit der für ein Testskript relativ komplexen Java-Syntax.
 
 Außerdem bieten PageObjects keinen Ansatz für Testdaten. Natürlich können jede beliebige Testdaten in
 die PageObjects eingesteuert werden, eine Lösung für eine clevere Generierung von Testdaten bieten sie
@@ -130,27 +132,27 @@ jedoch nicht.
 
 section:modellgetriebenerAnsatz[Modellierung mit Testosterone4j]
 
-Mit e[modellgetrieben] ist in diesem Artikel nicht die Verwendung von graphischen Modellen, wie etwa
-UML- oder BPM-Modelle gemeint, sondern textuelle Modelle in Form einer Domänenspezifischen Sprache e[TDsl]. Mit
+Mit e[modellgetrieben] ist in diesem Artikel nicht die Verwendung von graphischen Modellen wie etwa
+UML- oder BPM-Modellen gemeint sondern die Verwendung von textuellen Modellen in Form einer Domänenspezifischen Sprache e[TDsl]. Mit
 dieser Sprache wird die Benutzeroberfläche durch die Einführung von Test-relevanten Abstraktionen modelliert.
 
 Die Idee hinter Testosterone4j wird in den folgenden Kapiteln vorgestellt.
 
-Testosterone4j verwendet intern PageObjects, d.h. das auch bei Testosterone4j die Testautomatisierungs-Implementierung in
+Testosterone4j verwendet intern PageObjects, d.h. dass auch bei Testosterone4j die Testautomatisierungs-Implementierung in
 zwei Teile getrennt wird. 
 ol[
-	item[Die Beschreibung der UI-Struktur
+	item[Die Beschreibung der UI-Struktur: 
 		Hier werden Datentypen, UI-Controls und Activities (Testosterone4j-Bezeichnung für PageObjects) modelliert.]
-	item[Spezifikation der Use-Cases und Tests
+	item[Spezifikation der Use-Cases und Tests: 
 		Hier werden die Test-Use-Cases und ihr Verhalten spezifiziert.]
 ]
 
 chapter:uistruktur[Beschreibung der UI-Struktur]
 
-Die Struktur der Benutzeroberfläche muss einmalig, in der Regel parallel zur Entwicklung der Benutzeroberfläche,
+Die Struktur der Benutzeroberfläche muss einmalig in der Regel parallel zur Entwicklung der Benutzeroberfläche
 modelliert werden und dient dann als Ausgangsbasis für die Spezifikation der Use-Cases und Tests.
 
-Da die Spezifikation von Tests bei Testosterone4j im Fokus steht, beschränkt sich die Beschreibung der UI ausschließlich
+Da die Spezifikation von Tests bei Testosterone4j im Fokus steht, beschränkt sich die Beschreibung des UIs ausschließlich
 auf die Informationen die für die Spezifikation der Tests sowie die Automatisierung notwendig sind.
 
 Im Wesentlichen müssen folgende Informationen festgehalten werden:
@@ -166,12 +168,12 @@ ul[
 section:datentypen[Datentypen]
 
 Zunächst müssen die fachlichen Datentypen der Anwendung und deren Äquivalenzklassen modelliert werden.
-Damit der Testfall-Generator für jede beliebige Eingabe entscheiden kann was für ein Wert als Eingabe-Datum
-verwendet werden darf, müssen wir ihm in Form einer Datentyp-Deklaration diese bekannt machen. 
+Damit der Testfall-Generator für jede beliebige Eingabe entscheiden kann, was für ein Wert als Eingabe-Datum
+verwendet werden darf, müssen wir ihm diese in Form einer Datentyp-Deklaration bekannt machen. 
 
 Dabei wird nach dem Äquivalenzklassen-Prinzip vorgegangen. Eine Äquivalenzklasse ist eine Klasse von
-(Eingabe-)Werten, für die von der zu testenden Anwendung gleiches Verhalten vom Test-Designer erwartet wird.
-Dies erfolgt unter der Annahme dass es sinnvoll ist zumindest einen Wert aus jeder Äquivalenzklasse zu
+(Eingabe-)Werten, für die von der zu testenden Anwendung das gleiche Verhalten vom Test-Designer erwartet wird.
+Dies erfolgt unter der Annahme, dass es sinnvoll ist, zumindest einen Wert aus jeder Äquivalenzklasse zu
 testen.
 
 Ein Beispiel für die Deklaration eines Testosterone4j-Datentyps sieht folgendermaßen aus:
@@ -195,8 +197,8 @@ type Integer mappedBy java.lang.Integer
 Da für die Generierung der Testfälle Java verwendet wird, muss durch die Angabe von code[tdsl][mappedBy]
 angegeben werden auf was für einen Java-Datentyp der Typ abgebildet wird.
 
-Obiges Beispiel demonstriert die Verwendung von Äquivalenzklassen, im Allgemeinen sollten jedoch für
-Datentypen wirklich die fachliche Datentypen der Anwendung verwendet werden, beispielsweise e[Seriennummer],
+Obiges Beispiel demonstriert die Verwendung von Äquivalenzklassen. Im Allgemeinen sollten jedoch für
+Datentypen die fachlichen Datentypen der Anwendung verwendet werden, beispielsweise e[Seriennummer],
 e[Baujahr] oder e[Postleitzahl]. 
   
 
@@ -207,7 +209,7 @@ UI-Toolkit durchgeführt werden, nicht für jede zu testende Anwendung. Dieser S
 da Testosterone4j mit jedem beliebigen Testautomatisierungsframework und jedem beliebigen UI-Toolkit verwendet
 werden kann.
 
-Ein Beispiel für die modellierung eines Controls ist Foldendes:
+Ein Beispiel für die Modellierung eines Controls:
 
 code[tdsl][
 control TextControl {
@@ -217,7 +219,7 @@ control TextControl {
 }
 ]
 
-e[String] und e[Boolean] sind dabei technische Datentypen die mit code[type] definiert worden sind. Im
+e[String] und e[Boolean] sind technische Datentypen die mit code[type] definiert worden sind. Im
 Beispiel wird ein Control e[TextControl] definiert, das drei Operationen bietet.
 
 ul[
@@ -227,10 +229,10 @@ item[die Operation e[isEnabled], die ermittelt ob das Control gerade aktiviert i
 ]
 
 So können und müssen sämtliche von der Anwendung verwendete UI-Controls mit ihren Operationen in Testosterone4j
-modelliert werden. Natürlich ist auch die verwendung von mehreren Parametern (durch Komma getrennt) pro
+modelliert werden. Natürlich ist auch die Verwendung von mehreren Parametern (durch Komma getrennt) pro
 Operation möglich.
 
-Ein Beispiel für ein komplexeres Control wie zum Beispiel eines Tree-Controls sieht wie folgt aus:
+Ein Beispiel für ein komplexeres Control wie ein Tree-Control sieht wie folgt aus:
 
 code[tdsl] [
 control TreeControl {
@@ -247,13 +249,13 @@ control TreeControl {
 section:activities[Activities]
 
 e[Activities] beschreiben die "Seiten" der Benutzeroberfläche. Was genau eine Seite darstellt obliegt
-dem Test-Designer. Eine Activity kann dabei eine komplette Seite einer Web-Anwendung darstellen oder
-aber auch nur einen Teil davon. Wichtig ist, dass die Anwendung disjunkt in Activities zerlegt wird.
+dem Test-Designer. Eine Activity kann eine komplette Seite einer Web-Anwendung darstellen oder 
+nur einen Teil davon. Wichtig ist, dass die Anwendung disjunkt in Activities zerlegt wird.
 
 section2:fields[Fields]
 
 Auf jeder Activity (Seite) befinden sich Instanzen von Controls (e[Fields]), über die der Benutzer seine
-Interaktion mit der Anwendung durchführt, beispielsweise das Eintragen eines Datums in ein Textfeld,
+Interaktion mit der Anwendung durchführt, beispielsweise das Eintragen eines Datums in ein Textfeld
 oder das Klicken auf einen Button.
 
 Eine Activity wird wie folgt in Testosterone4j spezifiziert:
@@ -289,21 +291,21 @@ Die Activity e[LoginPage] besitzt drei Eingabeelemente (Fields): zwei Textfelder
 Passwort und einen Login-Button. Die drei Elemente werden jeweils durch eine e[Field]-Definition beschrieben.
 
 Das erste Field wird durch e[userName] innerhalb der Seite eindeutig identifiziert. Der String nach dem
-Schlüsselwort identifiedBy e["key.userName"] gibt eine ID an, mit Hilfe dessen das Test-Automatisierungsframework
-das Control auf der Seite finden und identifizieren kann. In der Regel ist es dafür nötig diese ID bei
-der Implementierung der Anwendung im Control zu hinterlegen.
+Schlüsselwort identifiedBy e["key.userName"] gibt eine ID an, mit deren Hilfe das Test-Automatisierungsframework
+das Control auf der Seite finden und identifizieren kann. In der Regel muss diese ID dafür bei
+der Implementierung der Anwendung im Control hinterlegt werden.
 
-Das e[control]-keyword gibt an um welches Control es sich bei diesem Eingabeelement handelt. 
+Das e[control]-keyword gibt an, um welches Control es sich bei diesem Eingabe-Element handelt. 
 
-Im darauf folgendem Block müssen nun sämtliche Operationen des Controls spezifisch für dieses Feld wiederholt
+Im folgenden Block müssen sämtliche Operationen des Controls spezifisch für dieses Feld wiederholt
 deklariert werden. Das ist aus zwei Gründen wichtig:
 
 ol[
-item[Für sämtliche (technische) Datentypen von Operations-Parametern und Rückgabewerte müssen für dieses
+item[Für sämtliche (technische) Datentypen von Operations-Parametern und Rückgabewerten muss für dieses
 	spezifische Feld der passende fachliche Datentyp angegeben werden. Der fachliche Datentyp kann für
-	jedes Feld ein anderer sein, deshalb muss dieses Mapping für jedes Feld angegeben werden. Im obigen
+	jedes Feld ein anderer sein. Deshalb muss dieses Mapping für jedes Feld angegeben werden. Im obigen
 	Beispiel ist der Datentyp für get-/setText des Feldes "userName" UserNameDT, während der Datentyp
-	für das Feld "password" PasswordDT beträgt.]
+	für das Feld "password" PasswordDT ist.]
 item[Der Aufruf einer Operation eines bestimmten Benutzeroberflächen-Elements kann einen Übergang zu
 	einer anderen Seite auslösen. Dies kann in Testosterone4j durch die Verwendung des Operators e[=>] modelliert
 	werden, dem die nachfolgende Activity angegeben wird. Im obigen Beispiel führt ein Klick auf den 
@@ -312,7 +314,7 @@ item[Der Aufruf einer Operation eines bestimmten Benutzeroberflächen-Elements k
 
 section2:activityOperations[Activity-Operationen]
 
-Oft ist es sinnvoll mehrere Einzeloperationen auf UI-Elementen (Fields) zu einer fachlichen Operation
+Oft ist es sinnvoll, mehrere Einzeloperationen auf UI-Elementen (Fields) zu einer fachlichen Operation
 der Activity zusammenzufassen. Ein Beispiel hierfür zeigt folgendes Listing.
 
 code[tdsl][
@@ -334,8 +336,8 @@ activity LoginPage {
 
 Es wird eine Operation e[login] deklariert, die Benutzername und Passwort entgegennimmt und den Anmeldevorgang
 vornimmt. Dabei verwendet die Operation die Control-Operationen um den Vorgang durchzuführen. Die Syntax
-und die Möglichkeiten des Operations-Inhalts entspricht denen von Use-Case Blöcken, die im folgenden
-Kapitel näher vorgestellt wird. Als Resultat der Operation wird zur e[OperviewPage] verzweigt. Wichtig
+und die Möglichkeiten des Operations-Inhalts entsprechen denen von Use-Case Blöcken, die im folgenden
+Kapitel näher vorgestellt wird. Als Resultat der Operation wird zur e[OverviewPage] verzweigt. Wichtig
 dabei ist, dass der letzte Aufruf der Operation zur gleichen Activity verzweigt wie die Operation selbst. 
 
 chapter:useCases[Spezifikation der Use-Cases]
@@ -353,7 +355,7 @@ useCase OpenDocument initial MainWindowActivity {
 
 e[OpenDocument] ist der eindeutige Name des UseCases. Mit code[tdsl][initial] wird die Activity benannt,
 die als Ausgangs-Activity des Use-Cases dient. Das optionale Schlüsselwort code[tdsl][=>] gibt die Activity
-an mit der der Use-Case endet. Standardmäßig wird hierfür die Ausgangs-Activity angenommen.
+an, mit der der Use-Case endet. Standardmäßig wird hierfür die Ausgangs-Activity angenommen.
 
 Innerhalb des Use-Case Blocks können beliebig viele e[Statements] abgesetzt werden. Die verschiedenen
 Arten von e[Statements] werden in den folgenden Sektionen vorgestellt.
@@ -366,18 +368,18 @@ useCase OpenDocument(StringDT documentName) initial MainWindowActivity {
 } => NavigationViewActivity
 ]
 
-Der Typ des Parameters muss hierbei ein spezifizierter #code[tdsl][datatype] sein.
+Der Typ des Parameters muss ein spezifizierter #code[tdsl][datatype] sein.
 
 section:controlOperationCalls[Aufruf von Operationen]
 
-In erster Linie ist natürlich der Aufruf von Operationen der Activities und deren Felder von Interesse.
-Der Aufruf einer Operation erfolgt durch das Voranstellen von code[tdsl][#] gefolgt durch entweder
+In erster Linie sind natürlich die Aufrufe von Operationen der Activities und deren Felder von Interesse.
+Der Aufruf einer Operation erfolgt durch das Voranstellen von code[tdsl][#] gefolgt von entweder
 ul[
-item[dem Namen der Activity-Operation, oder]
-item[dem Namen des Fields und anschließendem Namen der Control-Operation, getrennt durch einen Punkt.]
+item[dem Namen der Activity-Operation oder]
+item[dem Namen des Fields und anschließend dem Namen der Control-Operation, getrennt durch einen Punkt.]
 ]
 
-Anschließend können noch die Parameter der Operation zugewiesen werden. Da jeder Parameter nur optional
+Anschließend können der Operation Parameter zugewiesen werden. Da jeder Parameter nur optional
 angegeben werden muss, muss jedoch die Zuweisung durch explizite Angabe des Parameternamens erfolgen.
 
 Beispiele für den Aufruf von Operationen sind:
@@ -394,7 +396,7 @@ code[tdsl] [
 #login(userName="peterPan", password="secret")
 ]
 
-Als Wert für einen Parameter kann dabei eine beliebiger Xtend-Ausdruck angegeben werden, so dass hier
+Als Wert für einen Parameter kann dabei jeder beliebige Xtend-Ausdruck angegeben werden, so dass hier
 die volle Mächtigkeit von Xtend/Java zur Verfügung steht! Dabei kann natürlich auch auf die Use-Case
 Parameter oder Variablen (siehe ref:variables) zugegriffen werden.
 
@@ -404,7 +406,7 @@ bei der Wahl des Wertes hängt von den beim Test angegebenen Coverage-Kriterien 
 
 section:subUseCaseCalls[Aufruf von anderen Use-Cases]
 
-Um maximale Wiederverwendung zu fördern können Use-Cases andere Use-Cases aufrufen. Dies erfolgt über
+Zur Gewährleistung von maximaler Wiederverwendung können Use-Cases andere Use-Cases aufrufen. Dies erfolgt über
 das Schlüsselwort code[tdsl][call].
 
 code[tdsl][
@@ -416,8 +418,8 @@ Die Übergabe eventueller Use-Case Parameter erfolgt analog der Parameter-Überg
 section:variables[Variablen]
 
 Oft ist es sinnvoll Werte für den späteren Zugriff in Variablen zu speichern. Dies erfolgt über die Schlüsselwörter
-code[val], für finale (nicht veränderbare) Variablen, und code[var], für veränderbare Variablen. Der
-Typ der Variablen muss nur angegeben werden wenn der Typ nicht durch einen angegebenen Ausdruck abgeleitet
+code[val] für finale (nicht veränderbare) Variablen und code[var] für veränderbare Variablen. Der
+Typ der Variablen muss nur angegeben werden, wenn der Typ nicht durch einen angegebenen Ausdruck abgeleitet
 werden kann.
 
 Als Werte für Variablen können beliebige Xtend-Ausdrücke sowie Aufrufe von Operationen mit Rückgabewert
@@ -472,7 +474,7 @@ Deshalb gibt es in Testosterone4j dafür keine explizite Unterstützung. Die Ver
 als Xtend-Code realisiert werden.
 
 Wichtig ist jedoch, dass dem verifizierenden Xtend-Code-Block das Schlüsselwort code[tdsl][assert] vorangestellt
-wird um Testosterone4j bewusst zu machen dass es sich hier um verifizierenden Code handelt. Dies ist deshalb wichtig
+wird, um Testosterone4j bewusst zu machen, dass es sich hier um verifizierenden Code handelt. Dies ist deshalb wichtig,
 weil bei der Testfall-Generierung die Testfälle quasi e["trocken"] durchlaufen werden und die code[tdsl][assert]s
 hier übersprungen werden müssen.
 
@@ -488,8 +490,8 @@ chapter:tests[Anlage von Tests]
 Nachdem auch die Abläufe der Anwendung in Form von UseCases modelliert worden sind, können final die
 eigentlichen Testfälle angelegt werden.
 
-Dabei spezifizieren die Tests lediglich welcher Testfall-Generator verwendet werden soll, welcher UseCase auszuführen ist
-und eventuell welche Abdeckungs-Kriterien angewandt werden sollen. 
+Dabei spezifizieren die Tests lediglich, welcher Testfall-Generator verwendet werden soll, welcher UseCase auszuführen ist
+und eventuell welche Abdeckungs-Kriterien angewendet werden sollen. 
 
 Ein Beispiel für einen Test sieht folgendermaßen aus:
 
@@ -497,7 +499,7 @@ code[tdsl][
 test OpenDocumentTest generator de.msg.xt.mdt.tdsl.SampleTestGenerator useCase OpenDocument
 ]  
 
-Als Testfall-Generator kann eine beliebige Java-Klasse angegeben werden die das Interface de.msg.xt.mdt.tdsl.ITestGenerator
+Als Testfall-Generator kann eine beliebige Java-Klasse angegeben werden, die das Interface de.msg.xt.mdt.tdsl.ITestGenerator
 implementiert.
 
 chapter:generierung[Generierung von Testfällen]
@@ -512,7 +514,7 @@ Damit die Tests ausgeführt werden können, müssen zunächst die Test-Daten vom
 werden. Dies geschieht durch die Ausführung der JUnit-Tests mit dem System-Property "generate=true".
 Ist dieses Property bei der Ausführung der JUnit-Tests gesetzt, so werden vor der Test-Ausführung die
 Test-Daten entsprechend der Abdeckungs-Kriterien generiert und in Dateien geschrieben. Bei weiteren Läufen
-der JUnit-Tests werden diese Dateien dann ausgelesen und die Tests ausgeführt.
+der JUnit-Tests werden diese Dateien ausgelesen und die Tests ausgeführt.
 
 section:anbindungTestAutomatisierung[Anbindung an Test-Automatisierungs-Framework]
 
@@ -528,19 +530,19 @@ ul[
 	Java-basiert ist und die Ausführung als JUnit-Test erlaubt. Beispiele hierfür sind SWT-Bot oder auch
 	der Selenium Web-Driver.]
 	item[Die Ausführung der generierten JUnit-Tests führt noch keine Test aus, sondern erzeugt Test-Skript-Dokumente
-	die von der eigentlichen Test-Automatisierungs-Lösung interpretiert und ausgeführt wird. Auch eine
+	die von der eigentlichen Test-Automatisierungs-Lösung interpretiert und ausgeführt werden. Auch eine
 	manuelle Ausführung ist natürlich denkbar.]
 ]
 
-Das ist deshalb möglich, weil zur eigentlichen Ausführung der Control- oder Activity-Operationen an extern
+Das ist deshalb möglich, weil zur eigentlichen Ausführung der Control- oder Activity-Operationen die Kontrolle an extern
 zu implementierende Klassen delegiert wird.  
-Die Implementierung dieser wird im Folgenden kurz erläutert.
+Deren Implementierung wird im Folgenden kurz erläutert.
  
 
 section2:controlImplementierung[Implementierung der Controls]
 
-Aus einem Control Modellelement wird keine konkrete Klasse generiert, sondern nur ein Java-Interface
-mit den entsprechenden Methoden. Für das konkrete zu verwendende Test-Framework müssen diese Interfaces
+Aus einem Control Modellelement wird keine konkrete Klasse generiert sondern nur ein Java-Interface
+mit den entsprechenden Methoden. Für das zu verwendende Test-Framework müssen diese Interfaces
 implementiert werden. 
 
 Je nachdem welche der oben beschriebenen Methoden verwendet wird, wird in der Implementierung der Control-Methoden
@@ -565,13 +567,13 @@ Control- und ActivityAdapter-Interface muss eine Implementierung gebunden sein.
 
 chapter:fazit[Fazit]
 
-Mit Testosterone4j steht ein Tool zur Verfügung, das es erlaubt sehr effizient wartungsarme User-Interface
-Tests zu schreiben und trumpft gegenüber anderen Ansätzen vor allem mit folgenden Vorteilen.
+Mit Testosterone4j steht ein Tool zur Verfügung, mit dem sehr effizient wartungsarme User-Interface
+Tests geschrieben werden können. Es überzeugt gegenüber anderen Ansätzen vor allem mit folgenden Vorteilen:
 
 ul[
 	item[e[Starke Editor-Unterstützung beim Erstellen der Test-Skripte.]
 	Testosterone4j bietet eine ausführliche Unterstützung beim Erstellen der Tests mit Code-Completion,
-	Code-Templates, Outline-View und Quick-Fixes. Dabei bietet der Editor nur Operationen an die zum
+	Code-Templates, Outline-View und Quick-Fixes. Dabei bietet der Editor nur Operationen an, die zum
 	jeweiligen Zeitpunkt im Testskript möglich sind.]
 
 
@@ -582,7 +584,7 @@ ul[
 
 	item[e[Mächtige Integration von Xtend]
 	Mit der Integration von Xtend als Expression Language können auch die komplexesten Testfälle geschrieben
-	werden. Alles was in Java möglich ist, geht auch hier.]
+	werden. Alles, was in Java möglich ist, geht auch hier.]
 
 
 	item[e[Testdaten-Generierung]
@@ -596,11 +598,10 @@ ul[
 
 
 	item[e[Debug-Möglichkeiten]
-	Zur Fehleranalyse in den Tests kann der Eclipse Debugger verwendet werden. Eine Schritt für Schritt
-	Ausführung der Tests sowie das Setzen von Breakpoints ist möglich.]
+	Zur Fehleranalyse in den Tests kann der Eclipse Debugger verwendet werden. Eine Schritt-für-Schritt-Ausführung der Tests sowie das Setzen von Breakpoints ist möglich.]
 
 
 	item[e[Ableitung des Struktur-Modells aus UI-Modellen einfach möglich]
 	Sollte bei der Entwicklung der zu testenden Software ein modellgetriebener Ansatz im Einsatz sein,
-	kann das Testosterone4j Strukturmodell zum Großen Teil aus diesem Abgeleitet werden.]
+	kann das Testosterone4j Strukturmodell zum großen Teil aus diesem abgeleitet werden.]
 ]
