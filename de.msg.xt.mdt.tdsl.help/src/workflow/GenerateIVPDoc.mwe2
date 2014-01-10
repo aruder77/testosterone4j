@@ -12,7 +12,7 @@ Workflow {
     component = @workflow.XDocGenerator {
         modelPath = "xdoc"
         targetDir = "pdfmanual"
-        document = "Model-Driven Testing -- Introducing Testosterone4j"
+        document = "Model-Driven Testing -- Evaluating Testosterone4j"
 		pdfLatex = "pdflatex.exe"
         // whether to create todo elements or not
         release = true
