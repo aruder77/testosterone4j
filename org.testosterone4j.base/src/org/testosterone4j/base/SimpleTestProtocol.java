@@ -18,7 +18,7 @@ public class SimpleTestProtocol implements ITestProtocol {
 	private static final Logger LOG = Logger.getLogger(SimpleTestProtocol.class
 			.getName());
 	private static final Logger GENERATION_LOG = Logger
-			.getLogger("de.msg.xt.mdt.GenerationLog");
+			.getLogger("org.testosterone4j.GenerationLog");
 
 	private static StringBuffer buffer = null;
 

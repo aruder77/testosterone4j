@@ -1,42 +1,42 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <templates>
 
-<template id="activity" autoinsert="true" context="de.msg.xt.mdt.tdsl.TDsl.Element" deleted="false" description="Insert a new activity" enabled="true" name="activity">activity ${name} identifiedBy ${uniqueId} extends ${parent:CrossReference(Activity.parent)} {
+<template id="activity" autoinsert="true" context="org.testosterone4j.tdsl.TDsl.Element" deleted="false" description="Insert a new activity" enabled="true" name="activity">activity ${name} identifiedBy ${uniqueId} extends ${parent:CrossReference(Activity.parent)} {
 	${cursor}
 }</template>
-<template id="assertEquals" autoinsert="true" context="de.msg.xt.mdt.tdsl.TDsl.Assert" deleted="false" description="Insert an assert equals" enabled="true" name="assertEquals">assert [ assertEquals(${value1}, ${value2}) ]</template>
-<template id="assignGenerated" autoinsert="true" context="de.msg.xt.mdt.tdsl.TDsl.Statement" deleted="false" description="assign a generated value" enabled="true" name="assignGenerated">val ${name} = generatedValue(${param})</template>
-<template id="classGeneratedValues" autoinsert="true" context="de.msg.xt.mdt.tdsl.TDsl.EquivalenceClass" deleted="false" description="Insert class with generated values" enabled="true" name="classGeneratedValues">class ${name} valueGenerator ${expression} classPredicate ${predicate}</template>
-<template id="classValue" autoinsert="true" context="de.msg.xt.mdt.tdsl.TDsl.EquivalenceClass" deleted="false" description="Insert a class with a value" enabled="true" name="classValue">class ${name} classValue ${classValue}</template>
-<template id="classValues" autoinsert="true" context="de.msg.xt.mdt.tdsl.TDsl.EquivalenceClass" deleted="false" description="Insert a class with multiple values" enabled="true" name="classValues">class ${name} classValues #[${cursor}]</template>
-<template id="control" autoinsert="true" context="de.msg.xt.mdt.tdsl.TDsl.Control" deleted="false" description="Insert a control" enabled="true" name="control">control ${name} {
+<template id="assertEquals" autoinsert="true" context="org.testosterone4j.tdsl.TDsl.Assert" deleted="false" description="Insert an assert equals" enabled="true" name="assertEquals">assert [ assertEquals(${value1}, ${value2}) ]</template>
+<template id="assignGenerated" autoinsert="true" context="org.testosterone4j.tdsl.TDsl.Statement" deleted="false" description="assign a generated value" enabled="true" name="assignGenerated">val ${name} = generatedValue(${param})</template>
+<template id="classGeneratedValues" autoinsert="true" context="org.testosterone4j.tdsl.TDsl.EquivalenceClass" deleted="false" description="Insert class with generated values" enabled="true" name="classGeneratedValues">class ${name} valueGenerator ${expression} classPredicate ${predicate}</template>
+<template id="classValue" autoinsert="true" context="org.testosterone4j.tdsl.TDsl.EquivalenceClass" deleted="false" description="Insert a class with a value" enabled="true" name="classValue">class ${name} classValue ${classValue}</template>
+<template id="classValues" autoinsert="true" context="org.testosterone4j.tdsl.TDsl.EquivalenceClass" deleted="false" description="Insert a class with multiple values" enabled="true" name="classValues">class ${name} classValues #[${cursor}]</template>
+<template id="control" autoinsert="true" context="org.testosterone4j.tdsl.TDsl.Control" deleted="false" description="Insert a control" enabled="true" name="control">control ${name} {
 	${cursor}
 }</template>
-<template id="datatype" autoinsert="true" context="de.msg.xt.mdt.tdsl.TDsl.DataType" deleted="false" description="Insert a datatype" enabled="true" name="datatype">datatype ${name} type ${type:CrossReference(DataType.type)} {
+<template id="datatype" autoinsert="true" context="org.testosterone4j.tdsl.TDsl.DataType" deleted="false" description="Insert a datatype" enabled="true" name="datatype">datatype ${name} type ${type:CrossReference(DataType.type)} {
 	class ${className} classValue ${cursor}
 }</template>
-<template id="field" autoinsert="true" context="de.msg.xt.mdt.tdsl.TDsl.Field" deleted="false" description="Insert new field stub" enabled="true" name="field">field ${fieldName} identifiedBy ${uniqueId} control ${control:CrossReference(Field.control)}</template>
-<template id="ifElse" autoinsert="true" context="de.msg.xt.mdt.tdsl.TDsl.Statement" deleted="false" description="Insert if-else" enabled="true" name="ifElse">if (${expression}) {
+<template id="field" autoinsert="true" context="org.testosterone4j.tdsl.TDsl.Field" deleted="false" description="Insert new field stub" enabled="true" name="field">field ${fieldName} identifiedBy ${uniqueId} control ${control:CrossReference(Field.control)}</template>
+<template id="ifElse" autoinsert="true" context="org.testosterone4j.tdsl.TDsl.Statement" deleted="false" description="Insert if-else" enabled="true" name="ifElse">if (${expression}) {
 	${block1}
 } else {
 	${block2}
 }</template>
-<template id="package" autoinsert="true" context="de.msg.xt.mdt.tdsl.TDsl.TestModel" deleted="false" description="New TDsl file template" enabled="true" name="package">package ${name} for ${sutRef:CrossReference(PackageDeclaration.sutRef)} {
-	import de.msg.xt.mdt.tdsl.swtbot.*
-	import de.msg.xt.mdt.tdsl.basictypes.*
+<template id="package" autoinsert="true" context="org.testosterone4j.tdsl.TDsl.TestModel" deleted="false" description="New TDsl file template" enabled="true" name="package">package ${name} for ${sutRef:CrossReference(PackageDeclaration.sutRef)} {
+	import org.testosterone4j.tdsl.swtbot.*
+	import org.testosterone4j.tdsl.basictypes.*
 
 	${cursor}
 }</template>
-<template id="tags" autoinsert="true" context="de.msg.xt.mdt.tdsl.TDsl.TagsDeclaration" deleted="false" description="Insert a tags declaration" enabled="true" name="tags">tags {
+<template id="tags" autoinsert="true" context="org.testosterone4j.tdsl.TDsl.TagsDeclaration" deleted="false" description="Insert a tags declaration" enabled="true" name="tags">tags {
 	${cursor}
 }</template>
-<template id="test" autoinsert="true" context="de.msg.xt.mdt.tdsl.TDsl.Element" deleted="false" description="Insert a test" enabled="true" name="test">test ${name} generator de.msg.xt.mdt.base.SampleTestGenerator useCase ${useCase}</template>
-<template id="toolkit" autoinsert="true" context="de.msg.xt.mdt.tdsl.TDsl.Element" deleted="false" description="Insert a toolkit" enabled="true" name="toolkit">toolkit ${name} {
+<template id="test" autoinsert="true" context="org.testosterone4j.tdsl.TDsl.Element" deleted="false" description="Insert a test" enabled="true" name="test">test ${name} generator org.testosterone4j.base.SampleTestGenerator useCase ${useCase}</template>
+<template id="toolkit" autoinsert="true" context="org.testosterone4j.tdsl.TDsl.Element" deleted="false" description="Insert a toolkit" enabled="true" name="toolkit">toolkit ${name} {
 	${cursor}
 }</template>
-<template id="type" autoinsert="true" context="de.msg.xt.mdt.tdsl.TDsl.Type" deleted="false" description="Insert a type" enabled="true" name="type">type ${ name} mappedBy ${type:CrossReference(JvmParameterizedTypeReference.type)}</template>
-<template id="useCase" autoinsert="true" context="de.msg.xt.mdt.tdsl.TDsl.Element" deleted="false" description="Insert a use case" enabled="true" name="useCase">useCase ${name} initial ${useCase} {
+<template id="type" autoinsert="true" context="org.testosterone4j.tdsl.TDsl.Type" deleted="false" description="Insert a type" enabled="true" name="type">type ${ name} mappedBy ${type:CrossReference(JvmParameterizedTypeReference.type)}</template>
+<template id="useCase" autoinsert="true" context="org.testosterone4j.tdsl.TDsl.Element" deleted="false" description="Insert a use case" enabled="true" name="useCase">useCase ${name} initial ${useCase} {
 	${cursor}
 }</template>
-<template id="predicate" autoinsert="true" context="de.msg.xt.mdt.tdsl.TDsl.Element" deleted="false" description="Insert a tag predicate" enabled="true" name="predicate">predicate ${name} [java.util.Set&lt;de.msg.xt.mdt.base.Tag&gt; fieldTags, java.util.Set&lt;de.msg.xt.mdt.base.Tag&gt; classTags | ${cursor} ]</template>
+<template id="predicate" autoinsert="true" context="org.testosterone4j.tdsl.TDsl.Element" deleted="false" description="Insert a tag predicate" enabled="true" name="predicate">predicate ${name} [java.util.Set&lt;org.testosterone4j.base.Tag&gt; fieldTags, java.util.Set&lt;org.testosterone4j.base.Tag&gt; classTags | ${cursor} ]</template>
 </templates>

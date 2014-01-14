@@ -2,8 +2,8 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>de.msg.xt.mdt</groupId>
-	<artifactId>de.msg.xt.mdt.tdsl.parent</artifactId>
+	<groupId>org.testosterone4j</groupId>
+	<artifactId>org.testosterone4j.parent</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>BNE3 Client (POM)</name>
@@ -12,14 +12,14 @@
 	<modules>
 
 
-		<module>../de.msg.xt.mdt.tdsl</module>
-		<module>../de.msg.xt.mdt.tdsl.base</module>
-		<module>../de.msg.xt.mdt.tdsl.runtime.feature</module>
-		<module>../de.msg.xt.mdt.tdsl.sdk</module>
-		<module>../de.msg.xt.mdt.tdsl.ui</module>
-		<module>../de.msg.xt.mdt.update-site</module>
+		<module>../org.testosterone4j.tdsl</module>
+		<module>../org.testosterone4j.base</module>
+		<module>../org.testosterone4j.runtime.feature</module>
+		<module>../org.testosterone4j.sdk.feature</module>
+		<module>../org.testosterone4j.tdsl.ui</module>
+		<module>../org.testosterone4j.update-site</module>
 
-		<module>../de.msg.xt.mdt.tdsl.help</module>
+<!-- 		<module>../org.testosterone4j.tdsl.help</module> -->
 	</modules>
 
 	<properties>
@@ -66,7 +66,7 @@
 
 	<!-- <repositories> <repository> <id>bne3.target</id> <layout>p2</layout> 
 		<url>http://libne3ci01.bmwgroup.net:11000/eclipse/com.bmw.bne3.target-3.0.4/</url> 
-		</repository> <repository> <id>xt.mdt</id> <layout>p2</layout> <url>http://libne3ci01.bmwgroup.net:11000/eclipse/de.msg.xt.mdt.update-site-1.0.0/</url> 
+		</repository> <repository> <id>xt.mdt</id> <layout>p2</layout> <url>http://libne3ci01.bmwgroup.net:11000/eclipse/org.testosterone4j.update-site-1.0.0/</url> 
 		</repository> </repositories> -->
 
 	<build>

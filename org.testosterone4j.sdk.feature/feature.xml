@@ -1,21 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="de.msg.xt.mdt.tdsl.sdk"
+      id="org.testosterone4j.sdk.feature"
       label="TDsl SDK Feature "
       version="0.0.1.qualifier">
 
    <requires>
       <import feature="org.eclipse.xtext.sdk" version="2.3.1.v201208210947" match="greaterOrEqual"/>
       <import feature="org.eclipse.xtext.xdoc.feature" version="0.1.0" match="compatible"/>
-      <import plugin="de.msg.xt.mdt.tdsl.help"/>
+      <!--<import plugin="org.testosterone4j.tdsl.help"/>-->
    </requires>
-
-   <plugin
-         id="de.msg.xt.mdt.tdsl.base"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
 
    <plugin
          id="org.eclipse.xtext.xbase.lib"
@@ -46,21 +39,21 @@
          unpack="false"/>
 
    <plugin
-         id="de.msg.xt.mdt.tdsl"
+         id="org.testosterone4j.tdsl"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="de.msg.xt.mdt.tdsl.ui"
+         id="org.testosterone4j.tdsl.ui"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="de.msg.xt.mdt.tdsl.help"
+         id="org.testosterone4j.base"
          download-size="0"
          install-size="0"
          version="0.0.0"

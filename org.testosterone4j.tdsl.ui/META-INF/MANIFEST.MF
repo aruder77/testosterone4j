@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: de.msg.xt.mdt.tdsl.ui
+Bundle-Name: org.testosterone4j.tdsl.ui
 Bundle-Vendor: My Company
 Bundle-Version: 0.0.1.qualifier
 Bundle-SymbolicName: org.testosterone4j.tdsl.ui;singleton:=true
@@ -26,5 +26,5 @@ Export-Package: org.testosterone4j.tdsl.ui,
  org.testosterone4j.tdsl.ui.contentassist.antlr,
  org.testosterone4j.tdsl.ui.internal,
  org.testosterone4j.tdsl.ui.quickfix
-Bundle-Activator: de.msg.xt.mdt.tdsl.ui.internal.TDslActivator
+Bundle-Activator: org.testosterone4j.tdsl.ui.internal.TDslActivator
 Eclipse-BuddyPolicy: dependent

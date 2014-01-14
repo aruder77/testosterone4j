@@ -6,49 +6,49 @@
     <extension
             point="org.eclipse.ui.editors">
         <editor
-            class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.editor.XtextEditor"
+            class="org.testosterone4j.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.editor.XtextEditor"
             contributorClass="org.eclipse.ui.editors.text.TextEditorActionContributor"
             default="true"
             extensions="tdsl"
-            id="de.msg.xt.mdt.tdsl.TDsl"
-            matchingStrategy="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.xbase.ui.editor.JavaEditorInputMatcher"
+            id="org.testosterone4j.tdsl.TDsl"
+            matchingStrategy="org.testosterone4j.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.xbase.ui.editor.JavaEditorInputMatcher"
             name="TDsl Editor">
         </editor>
     </extension>
     <extension
         point="org.eclipse.ui.handlers">
         <handler
-            class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.editor.hyperlinking.OpenDeclarationHandler"
+            class="org.testosterone4j.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.editor.hyperlinking.OpenDeclarationHandler"
             commandId="org.eclipse.xtext.ui.editor.hyperlinking.OpenDeclaration">
             <activeWhen>
                 <reference
-                    definitionId="de.msg.xt.mdt.tdsl.TDsl.Editor.opened">
+                    definitionId="org.testosterone4j.tdsl.TDsl.Editor.opened">
                 </reference>
             </activeWhen>
         </handler>
         <handler
-            class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.editor.handler.ValidateActionHandler"
-            commandId="de.msg.xt.mdt.tdsl.TDsl.validate">
+            class="org.testosterone4j.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.editor.handler.ValidateActionHandler"
+            commandId="org.testosterone4j.tdsl.TDsl.validate">
          <activeWhen>
             <reference
-                    definitionId="de.msg.xt.mdt.tdsl.TDsl.Editor.opened">
+                    definitionId="org.testosterone4j.tdsl.TDsl.Editor.opened">
             </reference>
          </activeWhen>
       	</handler>
       	<!-- copy qualified name -->
         <handler
-            class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.editor.copyqualifiedname.EditorCopyQualifiedNameHandler"
+            class="org.testosterone4j.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.editor.copyqualifiedname.EditorCopyQualifiedNameHandler"
             commandId="org.eclipse.xtext.ui.editor.copyqualifiedname.EditorCopyQualifiedName">
             <activeWhen>
-				<reference definitionId="de.msg.xt.mdt.tdsl.TDsl.Editor.opened" />
+				<reference definitionId="org.testosterone4j.tdsl.TDsl.Editor.opened" />
             </activeWhen>
         </handler>
         <handler
-            class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.editor.copyqualifiedname.OutlineCopyQualifiedNameHandler"
+            class="org.testosterone4j.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.editor.copyqualifiedname.OutlineCopyQualifiedNameHandler"
             commandId="org.eclipse.xtext.ui.editor.copyqualifiedname.OutlineCopyQualifiedName">
             <activeWhen>
             	<and>
-            		<reference definitionId="de.msg.xt.mdt.tdsl.TDsl.XtextEditor.opened" />
+            		<reference definitionId="org.testosterone4j.tdsl.TDsl.XtextEditor.opened" />
 	                <iterate>
 						<adapt type="org.eclipse.xtext.ui.editor.outline.IOutlineNode" />
 					</iterate>
@@ -57,22 +57,22 @@
         </handler>
     </extension>
     <extension point="org.eclipse.core.expressions.definitions">
-        <definition id="de.msg.xt.mdt.tdsl.TDsl.Editor.opened">
+        <definition id="org.testosterone4j.tdsl.TDsl.Editor.opened">
             <and>
                 <reference definitionId="isActiveEditorAnInstanceOfXtextEditor"/>
                 <with variable="activeEditor">
                     <test property="org.eclipse.xtext.ui.editor.XtextEditor.languageName" 
-                        value="de.msg.xt.mdt.tdsl.TDsl" 
+                        value="org.testosterone4j.tdsl.TDsl" 
                         forcePluginActivation="true"/>
                 </with>        
             </and>
         </definition>
-        <definition id="de.msg.xt.mdt.tdsl.TDsl.XtextEditor.opened">
+        <definition id="org.testosterone4j.tdsl.TDsl.XtextEditor.opened">
             <and>
                 <reference definitionId="isXtextEditorActive"/>
                 <with variable="activeEditor">
                     <test property="org.eclipse.xtext.ui.editor.XtextEditor.languageName" 
-                        value="de.msg.xt.mdt.tdsl.TDsl" 
+                        value="org.testosterone4j.tdsl.TDsl" 
                         forcePluginActivation="true"/>
                 </with>        
             </and>
@@ -81,33 +81,33 @@
     <extension
             point="org.eclipse.ui.preferencePages">
         <page
-            class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.editor.preferences.LanguageRootPreferencePage"
-            id="de.msg.xt.mdt.tdsl.TDsl"
+            class="org.testosterone4j.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.editor.preferences.LanguageRootPreferencePage"
+            id="org.testosterone4j.tdsl.TDsl"
             name="TDsl">
-            <keywordReference id="de.msg.xt.mdt.tdsl.ui.keyword_TDsl"/>
+            <keywordReference id="org.testosterone4j.tdsl.ui.keyword_TDsl"/>
         </page>
         <page
-            category="de.msg.xt.mdt.tdsl.TDsl"
-            class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.editor.syntaxcoloring.SyntaxColoringPreferencePage"
-            id="de.msg.xt.mdt.tdsl.TDsl.coloring"
+            category="org.testosterone4j.tdsl.TDsl"
+            class="org.testosterone4j.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.editor.syntaxcoloring.SyntaxColoringPreferencePage"
+            id="org.testosterone4j.tdsl.TDsl.coloring"
             name="Syntax Coloring">
-            <keywordReference id="de.msg.xt.mdt.tdsl.ui.keyword_TDsl"/>
+            <keywordReference id="org.testosterone4j.tdsl.ui.keyword_TDsl"/>
         </page>
         <page
-            category="de.msg.xt.mdt.tdsl.TDsl"
-            class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.editor.templates.XtextTemplatePreferencePage"
-            id="de.msg.xt.mdt.tdsl.TDsl.templates"
+            category="org.testosterone4j.tdsl.TDsl"
+            class="org.testosterone4j.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.editor.templates.XtextTemplatePreferencePage"
+            id="org.testosterone4j.tdsl.TDsl.templates"
             name="Templates">
-            <keywordReference id="de.msg.xt.mdt.tdsl.ui.keyword_TDsl"/>
+            <keywordReference id="org.testosterone4j.tdsl.ui.keyword_TDsl"/>
         </page>
     </extension>
     <extension
             point="org.eclipse.ui.propertyPages">
         <page
-            class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.editor.preferences.LanguageRootPreferencePage"
-            id="de.msg.xt.mdt.tdsl.TDsl"
+            class="org.testosterone4j.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.editor.preferences.LanguageRootPreferencePage"
+            id="org.testosterone4j.tdsl.TDsl"
             name="TDsl">
-            <keywordReference id="de.msg.xt.mdt.tdsl.ui.keyword_TDsl"/>
+            <keywordReference id="org.testosterone4j.tdsl.ui.keyword_TDsl"/>
             <enabledWhen>
 	            <adapt type="org.eclipse.core.resources.IProject"/>
 			</enabledWhen>
@@ -117,14 +117,14 @@
     <extension
         point="org.eclipse.ui.keywords">
         <keyword
-            id="de.msg.xt.mdt.tdsl.ui.keyword_TDsl"
+            id="org.testosterone4j.tdsl.ui.keyword_TDsl"
             label="TDsl"/>
     </extension>
     <extension
          point="org.eclipse.ui.commands">
       <command
             description="Trigger expensive validation"
-            id="de.msg.xt.mdt.tdsl.TDsl.validate"
+            id="org.testosterone4j.tdsl.TDsl.validate"
             name="Validate">
       </command>
       <!-- copy qualified name -->
@@ -145,12 +145,12 @@
         <menuContribution
             locationURI="popup:#TextEditorContext?after=group.edit">
              <command
-                 commandId="de.msg.xt.mdt.tdsl.TDsl.validate"
+                 commandId="org.testosterone4j.tdsl.TDsl.validate"
                  style="push"
                  tooltip="Trigger expensive validation">
             <visibleWhen checkEnabled="false">
                 <reference
-                    definitionId="de.msg.xt.mdt.tdsl.TDsl.Editor.opened">
+                    definitionId="org.testosterone4j.tdsl.TDsl.Editor.opened">
                 </reference>
             </visibleWhen>
          </command>  
@@ -160,7 +160,7 @@
          	<command commandId="org.eclipse.xtext.ui.editor.copyqualifiedname.EditorCopyQualifiedName" 
          		style="push" tooltip="Copy Qualified Name">
             	<visibleWhen checkEnabled="false">
-                	<reference definitionId="de.msg.xt.mdt.tdsl.TDsl.Editor.opened" />
+                	<reference definitionId="org.testosterone4j.tdsl.TDsl.Editor.opened" />
             	</visibleWhen>
          	</command>  
          </menuContribution>
@@ -168,7 +168,7 @@
          	<command commandId="org.eclipse.xtext.ui.editor.copyqualifiedname.EditorCopyQualifiedName"
             	style="push" tooltip="Copy Qualified Name">
             	<visibleWhen checkEnabled="false">
-                	<reference definitionId="de.msg.xt.mdt.tdsl.TDsl.Editor.opened" />
+                	<reference definitionId="org.testosterone4j.tdsl.TDsl.Editor.opened" />
             	</visibleWhen>
          	</command>  
          </menuContribution>
@@ -177,7 +177,7 @@
 				style="push" tooltip="Copy Qualified Name">
          		<visibleWhen checkEnabled="false">
 	            	<and>
-	            		<reference definitionId="de.msg.xt.mdt.tdsl.TDsl.XtextEditor.opened" />
+	            		<reference definitionId="org.testosterone4j.tdsl.TDsl.XtextEditor.opened" />
 						<iterate>
 							<adapt type="org.eclipse.xtext.ui.editor.outline.IOutlineNode" />
 						</iterate>
@@ -190,7 +190,7 @@
 		<menuContribution locationURI="popup:#TextEditorContext?endof=group.find">
 			<command commandId="org.eclipse.xtext.ui.editor.FindReferences">
 				<visibleWhen checkEnabled="false">
-                	<reference definitionId="de.msg.xt.mdt.tdsl.TDsl.Editor.opened">
+                	<reference definitionId="org.testosterone4j.tdsl.TDsl.Editor.opened">
                 	</reference>
             	</visibleWhen>
 			</command>
@@ -198,11 +198,11 @@
 	</extension>
 	<extension point="org.eclipse.ui.handlers">
 	    <handler
-            class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.editor.findrefs.FindReferencesHandler"
+            class="org.testosterone4j.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.editor.findrefs.FindReferencesHandler"
             commandId="org.eclipse.xtext.ui.editor.FindReferences">
             <activeWhen>
                 <reference
-                    definitionId="de.msg.xt.mdt.tdsl.TDsl.Editor.opened">
+                    definitionId="org.testosterone4j.tdsl.TDsl.Editor.opened">
                 </reference>
             </activeWhen>
         </handler>
@@ -213,19 +213,19 @@
 	<extension
 		point="org.eclipse.emf.ecore.extension_parser">
 		<parser
-			class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.resource.IResourceFactory"
+			class="org.testosterone4j.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.resource.IResourceFactory"
 			type="tdsl">
 		</parser>
 	</extension>
 	<extension point="org.eclipse.xtext.extension_resourceServiceProvider">
         <resourceServiceProvider
-            class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.resource.IResourceUIServiceProvider"
+            class="org.testosterone4j.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.resource.IResourceUIServiceProvider"
             uriExtension="tdsl">
         </resourceServiceProvider>
     </extension>
 
 
-	<!-- marker definitions for de.msg.xt.mdt.tdsl.TDsl -->
+	<!-- marker definitions for org.testosterone4j.tdsl.TDsl -->
 	<extension
 	        id="tdsl.check.fast"
 	        name="TDsl Problem"
@@ -251,27 +251,27 @@
    <extension
          point="org.eclipse.xtext.builder.participant">
       <participant
-            class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.builder.IXtextBuilderParticipant">
+            class="org.testosterone4j.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.builder.IXtextBuilderParticipant">
       </participant>
    </extension>
    <extension
             point="org.eclipse.ui.preferencePages">
         <page
-            category="de.msg.xt.mdt.tdsl.TDsl"
-            class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.builder.preferences.BuilderPreferencePage"
-            id="de.msg.xt.mdt.tdsl.TDsl.compiler.preferencePage"
+            category="org.testosterone4j.tdsl.TDsl"
+            class="org.testosterone4j.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.builder.preferences.BuilderPreferencePage"
+            id="org.testosterone4j.tdsl.TDsl.compiler.preferencePage"
             name="Compiler">
-            <keywordReference id="de.msg.xt.mdt.tdsl.ui.keyword_TDsl"/>
+            <keywordReference id="org.testosterone4j.tdsl.ui.keyword_TDsl"/>
         </page>
     </extension>
     <extension
             point="org.eclipse.ui.propertyPages">
         <page
-            category="de.msg.xt.mdt.tdsl.TDsl"
-            class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.builder.preferences.BuilderPreferencePage"
-            id="de.msg.xt.mdt.tdsl.TDsl.compiler.propertyPage"
+            category="org.testosterone4j.tdsl.TDsl"
+            class="org.testosterone4j.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.builder.preferences.BuilderPreferencePage"
+            id="org.testosterone4j.tdsl.TDsl.compiler.propertyPage"
             name="Compiler">
-            <keywordReference id="de.msg.xt.mdt.tdsl.ui.keyword_TDsl"/>
+            <keywordReference id="org.testosterone4j.tdsl.ui.keyword_TDsl"/>
             <enabledWhen>
 	            <adapt type="org.eclipse.core.resources.IProject"/>
 			</enabledWhen>
@@ -283,11 +283,11 @@
 	<extension
 		point="org.eclipse.ui.handlers">
 		<handler 
-			class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.editor.outline.quickoutline.ShowQuickOutlineActionHandler"
+			class="org.testosterone4j.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.editor.outline.quickoutline.ShowQuickOutlineActionHandler"
 			commandId="org.eclipse.xtext.ui.editor.outline.QuickOutline">
 			<activeWhen>
 				<reference
-					definitionId="de.msg.xt.mdt.tdsl.TDsl.Editor.opened">
+					definitionId="org.testosterone4j.tdsl.TDsl.Editor.opened">
 				</reference>
 			</activeWhen>
 		</handler>
@@ -307,33 +307,33 @@
 				style="push"
 				tooltip="Open Quick Outline">
 				<visibleWhen checkEnabled="false">
-					<reference definitionId="de.msg.xt.mdt.tdsl.TDsl.Editor.opened"/>
+					<reference definitionId="org.testosterone4j.tdsl.TDsl.Editor.opened"/>
 				</visibleWhen>
 			</command>
 		</menuContribution>
 	</extension>
-    <!-- quickfix marker resolution generator for de.msg.xt.mdt.tdsl.TDsl -->
+    <!-- quickfix marker resolution generator for org.testosterone4j.tdsl.TDsl -->
     <extension
             point="org.eclipse.ui.ide.markerResolution">
         <markerResolutionGenerator
-            class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.editor.quickfix.MarkerResolutionGenerator"
-            markerType="de.msg.xt.mdt.tdsl.ui.tdsl.check.fast">
+            class="org.testosterone4j.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.editor.quickfix.MarkerResolutionGenerator"
+            markerType="org.testosterone4j.tdsl.ui.tdsl.check.fast">
             <attribute
                 name="FIXABLE_KEY"
                 value="true">
             </attribute>
         </markerResolutionGenerator>
         <markerResolutionGenerator
-            class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.editor.quickfix.MarkerResolutionGenerator"
-            markerType="de.msg.xt.mdt.tdsl.ui.tdsl.check.normal">
+            class="org.testosterone4j.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.editor.quickfix.MarkerResolutionGenerator"
+            markerType="org.testosterone4j.tdsl.ui.tdsl.check.normal">
             <attribute
                 name="FIXABLE_KEY"
                 value="true">
             </attribute>
         </markerResolutionGenerator>
         <markerResolutionGenerator
-            class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.editor.quickfix.MarkerResolutionGenerator"
-            markerType="de.msg.xt.mdt.tdsl.ui.tdsl.check.expensive">
+            class="org.testosterone4j.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.editor.quickfix.MarkerResolutionGenerator"
+            markerType="org.testosterone4j.tdsl.ui.tdsl.check.expensive">
             <attribute
                 name="FIXABLE_KEY"
                 value="true">
@@ -343,11 +343,11 @@
    	<!-- Rename Refactoring -->
 	<extension point="org.eclipse.ui.handlers">
 		<handler 
-			class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.refactoring.ui.DefaultRenameElementHandler"
+			class="org.testosterone4j.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.refactoring.ui.DefaultRenameElementHandler"
 			commandId="org.eclipse.xtext.ui.refactoring.RenameElement">
 			<activeWhen>
 				<reference
-					definitionId="de.msg.xt.mdt.tdsl.TDsl.Editor.opened">
+					definitionId="org.testosterone4j.tdsl.TDsl.Editor.opened">
 				</reference>
 			</activeWhen>
 		</handler>
@@ -359,7 +359,7 @@
                style="push">
             <visibleWhen checkEnabled="false">
                <reference
-                     definitionId="de.msg.xt.mdt.tdsl.TDsl.Editor.opened">
+                     definitionId="org.testosterone4j.tdsl.TDsl.Editor.opened">
                </reference>
             </visibleWhen>
          </command>
@@ -367,11 +367,11 @@
    </extension>
    <extension point="org.eclipse.ui.preferencePages">
 	    <page
-	        category="de.msg.xt.mdt.tdsl.TDsl"
-	        class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.refactoring.ui.RefactoringPreferencePage"
-	        id="de.msg.xt.mdt.tdsl.TDsl.refactoring"
+	        category="org.testosterone4j.tdsl.TDsl"
+	        class="org.testosterone4j.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.refactoring.ui.RefactoringPreferencePage"
+	        id="org.testosterone4j.tdsl.TDsl.refactoring"
 	        name="Refactoring">
-	        <keywordReference id="de.msg.xt.mdt.tdsl.ui.keyword_TDsl"/>
+	        <keywordReference id="org.testosterone4j.tdsl.ui.keyword_TDsl"/>
 	    </page>
 	</extension>
 
@@ -379,20 +379,20 @@
 	<extension
 		point="org.eclipse.ui.handlers">
 		<handler 
-			class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.xbase.ui.hierarchy.OpenTypeHierarchyHandler"
+			class="org.testosterone4j.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.xbase.ui.hierarchy.OpenTypeHierarchyHandler"
 			commandId="org.eclipse.xtext.xbase.ui.hierarchy.OpenTypeHierarchy">
 			<activeWhen>
 				<reference
-					definitionId="de.msg.xt.mdt.tdsl.TDsl.Editor.opened">
+					definitionId="org.testosterone4j.tdsl.TDsl.Editor.opened">
 				</reference>
 			</activeWhen>
 		</handler>
 		<handler 
-			class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.xbase.ui.hierarchy.QuickTypeHierarchyHandler"
+			class="org.testosterone4j.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.xbase.ui.hierarchy.QuickTypeHierarchyHandler"
 			commandId="org.eclipse.jdt.ui.edit.text.java.open.hierarchy">
 			<activeWhen>
 				<reference
-					definitionId="de.msg.xt.mdt.tdsl.TDsl.Editor.opened">
+					definitionId="org.testosterone4j.tdsl.TDsl.Editor.opened">
 				</reference>
 			</activeWhen>
 		</handler>
@@ -404,7 +404,7 @@
 				style="push"
 				tooltip="Open Type Hierarchy">
 				<visibleWhen checkEnabled="false">
-					<reference definitionId="de.msg.xt.mdt.tdsl.TDsl.Editor.opened"/>
+					<reference definitionId="org.testosterone4j.tdsl.TDsl.Editor.opened"/>
 				</visibleWhen>
 			</command>
 		</menuContribution>
@@ -414,7 +414,7 @@
 				style="push"
 				tooltip="Quick Type Hierarchy">
 				<visibleWhen checkEnabled="false">
-					<reference definitionId="de.msg.xt.mdt.tdsl.TDsl.Editor.opened"/>
+					<reference definitionId="org.testosterone4j.tdsl.TDsl.Editor.opened"/>
 				</visibleWhen>
 			</command>
 		</menuContribution>
@@ -423,11 +423,11 @@
 	<extension
 		point="org.eclipse.ui.handlers">
 		<handler 
-			class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.xbase.ui.hierarchy.OpenCallHierachyHandler"
+			class="org.testosterone4j.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.xbase.ui.hierarchy.OpenCallHierachyHandler"
 			commandId="org.eclipse.xtext.xbase.ui.hierarchy.OpenCallHierarchy">
 			<activeWhen>
 				<reference
-					definitionId="de.msg.xt.mdt.tdsl.TDsl.Editor.opened">
+					definitionId="org.testosterone4j.tdsl.TDsl.Editor.opened">
 				</reference>
 			</activeWhen>
 		</handler>
@@ -440,38 +440,38 @@
 				style="push"
 				tooltip="Open Call Hierarchy">
 				<visibleWhen checkEnabled="false">
-					<reference definitionId="de.msg.xt.mdt.tdsl.TDsl.Editor.opened"/>
+					<reference definitionId="org.testosterone4j.tdsl.TDsl.Editor.opened"/>
 				</visibleWhen>
 			</command>
 		</menuContribution>
 	</extension>
 	<extension
          point="org.eclipse.core.runtime.adapters">
-      <factory class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.builder.smap.StratumBreakpointAdapterFactory"
+      <factory class="org.testosterone4j.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.builder.smap.StratumBreakpointAdapterFactory"
          adaptableType="org.eclipse.xtext.ui.editor.XtextEditor">
          <adapter type="org.eclipse.debug.ui.actions.IToggleBreakpointsTarget"/>
       </factory> 
    </extension>
    <extension point="org.eclipse.ui.editorActions">
-      <editorContribution targetID="de.msg.xt.mdt.tdsl.TDsl" 
-                          id="de.msg.xt.mdt.tdsl.TDsl.ide.rulerActions">
+      <editorContribution targetID="org.testosterone4j.tdsl.TDsl" 
+                          id="org.testosterone4j.tdsl.TDsl.ide.rulerActions">
 	     <action
 	             label="Not Used"
-	             class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.debug.ui.actions.RulerToggleBreakpointActionDelegate"
+	             class="org.testosterone4j.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.debug.ui.actions.RulerToggleBreakpointActionDelegate"
 	             style="push"
 	             actionID="RulerDoubleClick"
-	             id="de.msg.xt.mdt.tdsl.TDsl.doubleClickBreakpointAction"/>
+	             id="org.testosterone4j.tdsl.TDsl.doubleClickBreakpointAction"/>
 	  </editorContribution>
    </extension>
    <extension point="org.eclipse.ui.popupMenus">
       <viewerContribution
          targetID="example.rulerContextMenuId"
-         id="de.msg.xt.mdt.tdsl.TDsl.ide.RulerPopupActions">
+         id="org.testosterone4j.tdsl.TDsl.ide.RulerPopupActions">
          <action
             label="Toggle Breakpoint"
-            class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.debug.ui.actions.RulerToggleBreakpointActionDelegate"
+            class="org.testosterone4j.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.debug.ui.actions.RulerToggleBreakpointActionDelegate"
             menubarPath="additions"
-            id="de.msg.xt.mdt.tdsl.TDsl.ide.rulerContextMenu.toggleBreakpointAction">
+            id="org.testosterone4j.tdsl.TDsl.ide.rulerContextMenu.toggleBreakpointAction">
          </action>
       </viewerContribution>
    </extension>
@@ -479,11 +479,11 @@
     <!-- Introduce Local Variable Refactoring -->
 	<extension point="org.eclipse.ui.handlers">
 		<handler 
-			class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.xbase.ui.refactoring.ExtractVariableHandler"
+			class="org.testosterone4j.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.xbase.ui.refactoring.ExtractVariableHandler"
 			commandId="org.eclipse.xtext.xbase.ui.refactoring.ExtractLocalVariable">
 			<activeWhen>
 				<reference
-					definitionId="de.msg.xt.mdt.tdsl.TDsl.Editor.opened">
+					definitionId="org.testosterone4j.tdsl.TDsl.Editor.opened">
 				</reference>
 			</activeWhen>
 		</handler>
@@ -495,7 +495,7 @@
                style="push">
             <visibleWhen checkEnabled="false">
                <reference
-                     definitionId="de.msg.xt.mdt.tdsl.TDsl.Editor.opened">
+                     definitionId="org.testosterone4j.tdsl.TDsl.Editor.opened">
                </reference>
             </visibleWhen>
          </command>
@@ -503,20 +503,20 @@
    </extension>  
 
   <extension point="org.eclipse.compare.contentViewers">
-    <viewer id="de.msg.xt.mdt.tdsl.TDsl.compare.contentViewers"
-            class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.compare.InjectableViewerCreator"
+    <viewer id="org.testosterone4j.tdsl.TDsl.compare.contentViewers"
+            class="org.testosterone4j.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.compare.InjectableViewerCreator"
             extensions="tdsl">
     </viewer>
   </extension>
   <extension point="org.eclipse.compare.contentMergeViewers">
-    <viewer id="de.msg.xt.mdt.tdsl.TDsl.compare.contentMergeViewers"
-            class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.compare.InjectableViewerCreator"
+    <viewer id="org.testosterone4j.tdsl.TDsl.compare.contentMergeViewers"
+            class="org.testosterone4j.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.compare.InjectableViewerCreator"
             extensions="tdsl" label="TDsl Compare">
      </viewer>
   </extension>
   <extension point="org.eclipse.ui.editors.documentProviders">
-    <provider id="de.msg.xt.mdt.tdsl.TDsl.editors.documentProviders"
-            class="de.msg.xt.mdt.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.editor.model.XtextDocumentProvider"
+    <provider id="org.testosterone4j.tdsl.TDsl.editors.documentProviders"
+            class="org.testosterone4j.tdsl.ui.TDslExecutableExtensionFactory:org.eclipse.xtext.ui.editor.model.XtextDocumentProvider"
             extensions="tdsl">
     </provider>
   </extension>
