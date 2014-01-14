@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: TDsl Base Classes
-Bundle-SymbolicName: de.msg.xt.mdt.tdsl.base;singleton:=true
+Bundle-SymbolicName: org.testosterone4j.base;singleton:=true
 Bundle-Version: 0.0.1.qualifier
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,

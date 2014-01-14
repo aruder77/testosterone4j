@@ -3,10 +3,10 @@ Bundle-ManifestVersion: 2
 Bundle-Name: de.msg.xt.mdt.tdsl.tests
 Bundle-Vendor: My Company
 Bundle-Version: 0.0.1.qualifier
-Bundle-SymbolicName: de.msg.xt.mdt.tdsl.tests; singleton:=true
+Bundle-SymbolicName: org.testosterone4j.tdsl.tests;singleton:=true
 Bundle-ActivationPolicy: lazy
-Require-Bundle: de.msg.xt.mdt.tdsl,
- de.msg.xt.mdt.tdsl.ui,
+Require-Bundle: org.testosterone4j.tdsl,
+ org.testosterone4j.tdsl.ui,
  org.eclipse.core.runtime,
  org.eclipse.xtext.junit4,
  org.eclipse.ui.workbench;resolution:=optional,

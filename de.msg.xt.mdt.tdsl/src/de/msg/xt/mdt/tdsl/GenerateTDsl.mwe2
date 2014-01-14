@@ -6,7 +6,7 @@ import org.eclipse.xtext.ui.generator.*
 
 var grammarURI = "classpath:/de/msg/xt/mdt/tdsl/TDsl.xtext"
 var fileExtensions = "tdsl"
-var projectName = "de.msg.xt.mdt.tdsl"
+var projectName = "org.testosterone4j.tdsl"
 var runtimeProject = "../${projectName}"
 var generateXtendStub = true
 var encoding = "UTF-8"
