@@ -65,11 +65,12 @@ Workflow {
     
     		// The antlr parser generator fragment.
     		fragment = parser.antlr.XtextAntlrGeneratorFragment auto-inject {
+		        antlrParam = "-Xconversiontimeout" antlrParam = "10000"
     		//  options = {
     		//      backtrack = true
     		//  }
     		}
-    
+    	
     		// Xtend-based API for validation
     		fragment = validation.ValidatorFragment auto-inject {
     		//    composedCheck = "org.eclipse.xtext.validation.ImportUriValidator"

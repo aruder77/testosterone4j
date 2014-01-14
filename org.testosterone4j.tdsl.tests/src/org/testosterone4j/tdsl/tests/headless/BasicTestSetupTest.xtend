@@ -88,7 +88,7 @@ class BasicTestSetupTest {
 					#refresh
 				}
 				
-				test SampleTestUseCaseTest generator de.msg.xt.mdt.base.SampleTestGenerator useCase SampleTestUseCase
+				test SampleTestUseCaseTest generator org.testosterone4j.base.SampleTestGenerator useCase SampleTestUseCase
 			'''
 	
 	@Inject extension ParseHelper<TestModel>
@@ -387,7 +387,7 @@ class BasicTestSetupTest {
 					#saveAndClose
 				}
 				
-				test SampleTestUseCaseTest generator de.msg.xt.mdt.base.SampleTestGenerator useCase SampleTestUseCase
+				test SampleTestUseCaseTest generator org.testosterone4j.base.SampleTestGenerator useCase SampleTestUseCase
 			}
 		'''.parse.assertNoErrors				
 	}

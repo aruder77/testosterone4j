@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: de.msg.xt.mdt.tdsl.tests
+Bundle-Name: org.testosterone4j.tdsl.tests
 Bundle-Vendor: My Company
 Bundle-Version: 0.0.1.qualifier
 Bundle-SymbolicName: org.testosterone4j.tdsl.tests;singleton:=true
