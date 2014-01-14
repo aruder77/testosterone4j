@@ -1,15 +1,15 @@
-package de.msg.xt.mdt.tdsl.tests.ui.contentassist
+package org.testosterone4j.tdsl.tests.ui.contentassist
 
-import de.msg.xt.mdt.tdsl.TDslUiInjectorProvider
-import de.msg.xt.mdt.tdsl.tests.XtextParameterized
-import de.msg.xt.mdt.tdsl.tests.headless.BasicTestSetupTest
+import org.testosterone4j.tdsl.TDslUiInjectorProvider
+import org.testosterone4j.tdsl.tests.XtextParameterized
+import org.testosterone4j.tdsl.tests.headless.BasicTestSetupTest
 import org.eclipse.xtext.junit4.InjectWith
 import org.junit.Test
 import org.junit.runner.RunWith
-import de.msg.xt.mdt.tdsl.tests.XtextParameterized.Parameters
-import de.msg.xt.mdt.tdsl.tests.headless.ExpressionScopingTest
-import de.msg.xt.mdt.tdsl.tests.XtextParameterized.Parameter
-import de.msg.xt.mdt.tdsl.tests.headless.LocalScopingTest
+import org.testosterone4j.tdsl.tests.XtextParameterized.Parameters
+import org.testosterone4j.tdsl.tests.headless.ExpressionScopingTest
+import org.testosterone4j.tdsl.tests.XtextParameterized.Parameter
+import org.testosterone4j.tdsl.tests.headless.LocalScopingTest
 
 @RunWith(XtextParameterized)
 @InjectWith(TDslUiInjectorProvider)

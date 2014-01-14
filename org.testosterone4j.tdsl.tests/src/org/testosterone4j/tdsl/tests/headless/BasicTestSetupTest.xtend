@@ -1,7 +1,7 @@
-package de.msg.xt.mdt.tdsl.tests.headless
+package org.testosterone4j.tdsl.tests.headless
 
-import de.msg.xt.mdt.tdsl.TDslInjectorProvider
-import de.msg.xt.mdt.tdsl.tDsl.TestModel
+import org.testosterone4j.tdsl.TDslInjectorProvider
+import org.testosterone4j.tdsl.tDsl.TestModel
 import javax.inject.Inject
 import org.eclipse.xtext.junit4.InjectWith
 import org.eclipse.xtext.junit4.XtextRunner

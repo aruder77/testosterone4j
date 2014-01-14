@@ -21,16 +21,10 @@ Import-Package: org.apache.log4j,
  org.apache.commons.logging,
  org.eclipse.xtext.xbase.lib
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Export-Package: de.msg.xt.mdt.tdsl.ui.contentassist.antlr,
- de.msg.xt.mdt.tdsl.ui.internal,
- org.testosterone4j.tdsl.ui,
+Export-Package: org.testosterone4j.tdsl.ui,
  org.testosterone4j.tdsl.ui.contentassist,
- org.testosterone4j.tdsl.ui.quickfix,
- org.testosterone4j.ui.quickfix,
- org.testosterone4j.ui.contentassist,
- org.testosterone4j.ui.contentassist.antlr,
- org.testosterone4j.ui.internal,
  org.testosterone4j.tdsl.ui.contentassist.antlr,
- org.testosterone4j.tdsl.ui.internal
+ org.testosterone4j.tdsl.ui.internal,
+ org.testosterone4j.tdsl.ui.quickfix
 Bundle-Activator: de.msg.xt.mdt.tdsl.ui.internal.TDslActivator
 Eclipse-BuddyPolicy: dependent

@@ -12,17 +12,16 @@ import org.eclipse.xtext.xbase.featurecalls.IdentifiableSimpleNameProvider;
 import org.eclipse.xtext.xbase.scoping.batch.IBatchScopeProvider;
 import org.eclipse.xtext.xbase.scoping.batch.ImplicitlyImportedTypes;
 import org.eclipse.xtext.xbase.typesystem.computation.ITypeComputer;
+import org.testosterone4j.tdsl.converter.TDslValueConverterService;
+import org.testosterone4j.tdsl.jvmmodel.TDslCompiler;
+import org.testosterone4j.tdsl.jvmmodel.TDslQualifiedNameProvider;
+import org.testosterone4j.tdsl.scoping.TDslBatchScopeProvider;
 import org.testosterone4j.tdsl.scoping.TDslDefaultResourceDescriptionStrategy;
-
-import de.msg.xt.mdt.tdsl.converter.TDslValueConverterService;
-import de.msg.xt.mdt.tdsl.jvmmodel.TDslCompiler;
-import de.msg.xt.mdt.tdsl.jvmmodel.TDslQualifiedNameProvider;
-import de.msg.xt.mdt.tdsl.scoping.TDslBatchScopeProvider;
-import de.msg.xt.mdt.tdsl.scoping.TDslGlobalScopeProvider;
-import de.msg.xt.mdt.tdsl.scoping.TDslIdentifiableSimpleNameProvider;
-import de.msg.xt.mdt.tdsl.scoping.TDslScopeProvider;
-import de.msg.xt.mdt.tdsl.typeprovider.TDslImplicitlyImportedTypes;
-import de.msg.xt.mdt.tdsl.typeprovider.TDslTypeComputer;
+import org.testosterone4j.tdsl.scoping.TDslGlobalScopeProvider;
+import org.testosterone4j.tdsl.scoping.TDslIdentifiableSimpleNameProvider;
+import org.testosterone4j.tdsl.scoping.TDslScopeProvider;
+import org.testosterone4j.tdsl.typeprovider.TDslImplicitlyImportedTypes;
+import org.testosterone4j.tdsl.typeprovider.TDslTypeComputer;
 
 /**
  * Use this class to register components to be used at runtime / without the
@@ -30,7 +29,7 @@ import de.msg.xt.mdt.tdsl.typeprovider.TDslTypeComputer;
  */
 @SuppressWarnings("restriction")
 public class TDslRuntimeModule extends
-		de.msg.xt.mdt.tdsl.AbstractTDslRuntimeModule {
+		org.testosterone4j.tdsl.AbstractTDslRuntimeModule {
 
 	@Override
 	public Class<? extends ITypeComputer> bindITypeComputer() {

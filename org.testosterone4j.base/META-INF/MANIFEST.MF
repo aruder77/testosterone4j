@@ -12,6 +12,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.swtbot.junit4_x;bundle-version="2.0.0",
  org.junit
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Export-Package: de.msg.xt.mdt.base,
- de.msg.xt.mdt.base.util
+Export-Package: org.testosterone4j.base,
+ org.testosterone4j.base.util
 Eclipse-BuddyPolicy: dependent

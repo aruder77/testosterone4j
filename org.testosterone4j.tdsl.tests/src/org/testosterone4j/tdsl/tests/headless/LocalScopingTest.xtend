@@ -1,11 +1,11 @@
-package de.msg.xt.mdt.tdsl.tests.headless
+package org.testosterone4j.tdsl.tests.headless
 
-import de.msg.xt.mdt.tdsl.TDslInjectorProvider
-import de.msg.xt.mdt.tdsl.tDsl.TestModel
-import de.msg.xt.mdt.tdsl.tests.XtextParameterized
-import de.msg.xt.mdt.tdsl.tests.XtextParameterized.Parameter
-import de.msg.xt.mdt.tdsl.tests.XtextParameterized.Parameters
-import de.msg.xt.mdt.tdsl.tests.headless.BasicTestSetupTest
+import org.testosterone4j.tdsl.TDslInjectorProvider
+import org.testosterone4j.tdsl.tDsl.TestModel
+import org.testosterone4j.tdsl.tests.XtextParameterized
+import org.testosterone4j.tdsl.tests.XtextParameterized.Parameter
+import org.testosterone4j.tdsl.tests.XtextParameterized.Parameters
+import org.testosterone4j.tdsl.tests.headless.BasicTestSetupTest
 import java.util.ArrayList
 import javax.inject.Inject
 import org.eclipse.xtext.junit4.InjectWith

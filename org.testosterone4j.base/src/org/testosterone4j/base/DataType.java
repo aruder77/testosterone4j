@@ -1,0 +1,16 @@
+package org.testosterone4j.base;
+
+import java.io.Serializable;
+
+public interface DataType<DT, EC extends EquivalenceClass> extends Serializable {
+
+	DT getValue();
+
+	void setValue(DT value);
+
+	EC getEquivalenceClass();
+
+	void setEquivalenceClass(EC equivalenceClass);
+
+	Class<EC> getEquivalenceClassEnum();
+}

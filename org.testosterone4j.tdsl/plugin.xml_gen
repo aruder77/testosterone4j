@@ -5,8 +5,8 @@
 
   <extension point="org.eclipse.emf.ecore.generated_package">
     <package 
-       uri = "http://testosterone4j.org/tdsl" 
-       class = "org.testosterone4j.tdsl.tdsl.TdslPackage"
+       uri = "http://testosterone4j.org/tdsl/TDsl" 
+       class = "org.testosterone4j.tdsl.tDsl.TDslPackage"
        genModel = "model/generated/TDsl.genmodel" /> 
 	
   </extension>

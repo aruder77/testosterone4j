@@ -17,21 +17,20 @@ import org.eclipse.xtext.resource.IEObjectDescription;
 import org.eclipse.xtext.resource.impl.DefaultResourceDescriptionStrategy;
 import org.eclipse.xtext.util.CancelIndicator;
 import org.eclipse.xtext.util.IAcceptor;
-
-import de.msg.xt.mdt.tdsl.tDsl.Activity;
-import de.msg.xt.mdt.tdsl.tDsl.ActivityOperationParameterAssignment;
-import de.msg.xt.mdt.tdsl.tDsl.ConditionalNextActivity;
-import de.msg.xt.mdt.tdsl.tDsl.DataType;
-import de.msg.xt.mdt.tdsl.tDsl.EquivalenceClass;
-import de.msg.xt.mdt.tdsl.tDsl.Import;
-import de.msg.xt.mdt.tdsl.tDsl.OperationParameterAssignment;
-import de.msg.xt.mdt.tdsl.tDsl.PackageDeclaration;
-import de.msg.xt.mdt.tdsl.tDsl.ParameterAssignment;
-import de.msg.xt.mdt.tdsl.tDsl.StatementLine;
-import de.msg.xt.mdt.tdsl.tDsl.TagWithCondition;
-import de.msg.xt.mdt.tdsl.tDsl.TagsDeclaration;
-import de.msg.xt.mdt.tdsl.tDsl.Test;
-import de.msg.xt.mdt.tdsl.tDsl.Toolkit;
+import org.testosterone4j.tdsl.tDsl.Activity;
+import org.testosterone4j.tdsl.tDsl.ActivityOperationParameterAssignment;
+import org.testosterone4j.tdsl.tDsl.ConditionalNextActivity;
+import org.testosterone4j.tdsl.tDsl.DataType;
+import org.testosterone4j.tdsl.tDsl.EquivalenceClass;
+import org.testosterone4j.tdsl.tDsl.Import;
+import org.testosterone4j.tdsl.tDsl.OperationParameterAssignment;
+import org.testosterone4j.tdsl.tDsl.PackageDeclaration;
+import org.testosterone4j.tdsl.tDsl.ParameterAssignment;
+import org.testosterone4j.tdsl.tDsl.StatementLine;
+import org.testosterone4j.tdsl.tDsl.TagWithCondition;
+import org.testosterone4j.tdsl.tDsl.TagsDeclaration;
+import org.testosterone4j.tdsl.tDsl.Test;
+import org.testosterone4j.tdsl.tDsl.Toolkit;
 
 public class TDslDefaultResourceDescriptionStrategy extends
 		DefaultResourceDescriptionStrategy implements
