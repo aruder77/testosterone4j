@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: de.msg.xt.mdt.tdsl.help
-Bundle-SymbolicName: de.msg.xt.mdt.tdsl.help;singleton:=true
+Bundle-Name: org.testosterone4j.help
+Bundle-SymbolicName: org.testosterone4j.help;singleton:=true
 Bundle-Version: 0.0.1.qualifier
 Bundle-Vendor: msg systems ag
 Require-Bundle: org.eclipse.help,

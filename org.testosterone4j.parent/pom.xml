@@ -19,7 +19,7 @@
 		<module>../org.testosterone4j.tdsl.ui</module>
 		<module>../org.testosterone4j.update-site</module>
 
-<!-- 		<module>../org.testosterone4j.tdsl.help</module> -->
+ 		<module>../org.testosterone4j.help</module>
 	</modules>
 
 	<properties>

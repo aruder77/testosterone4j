@@ -7,7 +7,7 @@
    <requires>
       <import feature="org.eclipse.xtext.sdk" version="2.3.1.v201208210947" match="greaterOrEqual"/>
       <import feature="org.eclipse.xtext.xdoc.feature" version="0.1.0" match="compatible"/>
-      <!--<import plugin="org.testosterone4j.tdsl.help"/>-->
+      <import plugin="org.testosterone4j.help"/>
    </requires>
 
    <plugin
