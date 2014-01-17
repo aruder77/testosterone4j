@@ -15,6 +15,7 @@ import org.testosterone4j.base.Parameters
 import org.testosterone4j.base.TDslParameterized
 import org.testosterone4j.base.Tag
 import org.testosterone4j.base.TestDescriptor
+import org.testosterone4j.base.TDslInjector
 import org.testosterone4j.base.util.TDslHelper
 import org.testosterone4j.tdsl.tDsl.Activity
 import org.testosterone4j.tdsl.tDsl.ActivityOperation
@@ -79,6 +80,7 @@ import org.eclipse.xtext.xbase.XBlockExpression
 import org.testosterone4j.tdsl.tDsl.ActivityExpectation
 import org.eclipse.xtext.common.types.JvmTypeParameter
 import org.testosterone4j.base.IEvaluationGroup
+import org.testosterone4j.base.TDslInjector
 
 /**
  * <p>Infers a JVM model from the source model.</p> 
@@ -219,7 +221,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 				members += activity.toField("injector", activity.newTypeRef(typeof(Injector))) [
 					it.setFinal(true)
 					it.setInitializer [
-						activity.newTypeRef(fqn.tdslInjector).serialize(activity, it)
+						activity.newTypeRef(typeof(TDslInjector)).serialize(activity, it)
 						it.append(".getInjector()")
 					]
 				]
@@ -228,7 +230,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 					it.setStatic(true)
 					it.setFinal(true)
 					it.setInitializer [
-						activity.newTypeRef(fqn.tdslInjector).serialize(activity, it)
+						activity.newTypeRef(TDslInjector).serialize(activity, it)
 						it.append(".getInjector().getInstance(")
 						activity.newTypeRef(typeof(ActivityLocator)).serialize(activity, it)
 						it.append(".class)")
@@ -650,7 +652,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 					it.setStatic(true)
 					it.setFinal(true)
 					it.setInitializer [
-						test.newTypeRef(fqn.tdslInjector).serialize(test, it)
+						test.newTypeRef(TDslInjector).serialize(test, it)
 						it.append(".createInjector(TEST_CASES_SERIALIZATION)")
 					]
 				]
@@ -717,14 +719,16 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 						val useCaseClass = test.newTypeRef(test.useCase.class_fqn)
 						if (useCaseClass != null) {
 							parameters +=
-								test.toParameter("testDescriptor", test.newTypeRef(typeof(TestDescriptor), useCaseClass))
+								test.toParameter("testDescriptor", test.newTypeRef(typeof(TestDescriptor)))
 						}
 					}
 					body = [
 						it.append(
 							'''
 							this.testNumber = testDescriptor.getTestNumber();
-							this.useCase = testDescriptor.getTestCase();
+							this.useCase = (''')
+						test.newTypeRef(test.useCase.class_fqn).serialize(test, it)
+						it.append(''')testDescriptor.getTestCase();
 							INJECTOR.injectMembers(this);''')
 					]
 				]

@@ -36,10 +36,6 @@ class NamingExtensions {
 	
 	
 	// Other
-	def String tdslInjector() {
-		"org.testosterone4j.base.TDslInjector"
-	}
-	
 	def String fqn(EObject o) {
 		o?.fullyQualifiedName?.toString
 	}

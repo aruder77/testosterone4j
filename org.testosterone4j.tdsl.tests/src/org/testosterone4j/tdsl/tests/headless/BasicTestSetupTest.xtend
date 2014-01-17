@@ -1,14 +1,17 @@
 package org.testosterone4j.tdsl.tests.headless
 
-import org.testosterone4j.tdsl.TDslInjectorProvider
-import org.testosterone4j.tdsl.tDsl.TestModel
 import javax.inject.Inject
 import org.eclipse.xtext.junit4.InjectWith
 import org.eclipse.xtext.junit4.XtextRunner
 import org.eclipse.xtext.junit4.util.ParseHelper
 import org.eclipse.xtext.junit4.validation.ValidationTestHelper
+import org.eclipse.xtext.xbase.compiler.CompilationTestHelper
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.testosterone4j.tdsl.TDslInjectorProvider
+import org.testosterone4j.tdsl.tDsl.TestModel
+import org.testosterone4j.tdsl.tests.util.TestExtensions
+import org.junit.Assert
 
 @RunWith(XtextRunner)
 @InjectWith(TDslInjectorProvider)
@@ -45,7 +48,7 @@ class BasicTestSetupTest {
 					}
 					
 					op openDialog => DialogActivity
-					op saveAndClose => usually ViewActivity
+					op saveAndClose => ViewActivity
 				}
 				
 				activity ViewActivity {
@@ -93,13 +96,23 @@ class BasicTestSetupTest {
 	
 	@Inject extension ParseHelper<TestModel>
 	@Inject extension ValidationTestHelper
+	@Inject extension CompilationTestHelper
+	@Inject extension TestExtensions
+	
+	
+	def parseAndCompile(CharSequence cs) {
+		cs.parse.assertNoErrors
+		cs.compile [
+			compileAllClasses
+		]	
+	}
 	
 	@Test
 	def void test_100_PackageDefinition() {
 		'''
 			package tdsl.testpackage {
 			}
-		'''.parse.assertNoErrors
+		'''.parseAndCompile
 	}
 	
 	@Test
@@ -109,7 +122,7 @@ class BasicTestSetupTest {
 				
 				type String mappedBy String
 			}
-		'''.parse.assertNoErrors
+		'''.parseAndCompile
 	}
 	
 	@Test
@@ -123,7 +136,7 @@ class BasicTestSetupTest {
 					class shortString classValue "shortString"
 				}
 			}
-		'''.parse.assertNoErrors		
+		'''.parseAndCompile
 	}
 	
 	@Test
@@ -135,7 +148,7 @@ class BasicTestSetupTest {
 					Empty, Invalid
 				}				
 			}
-		'''.parse.assertNoErrors				
+		'''.parseAndCompile			
 	}
 	
 	@Test
@@ -150,7 +163,7 @@ class BasicTestSetupTest {
 					op String getText
 				}				
 			}
-		'''.parse.assertNoErrors				
+		'''.parseAndCompile		
 	}
 	
 	@Test
@@ -173,7 +186,7 @@ class BasicTestSetupTest {
 					TextControl, Button
 				}				
 			}
-		'''.parse.assertNoErrors				
+		'''.parseAndCompile			
 	}
 	
 	@Test
@@ -205,7 +218,7 @@ class BasicTestSetupTest {
 					op saveAndClose
 				}
 			}
-		'''.parse.assertNoErrors				
+		'''.parseAndCompile			
 	}
 	
 	@Test
@@ -246,7 +259,7 @@ class BasicTestSetupTest {
 					op openEditor => EditorActivity 
 				}	
 			}			
-		'''.parse.assertNoErrors
+		'''.parseAndCompile
 	}
 	
 	@Test
@@ -273,7 +286,7 @@ class BasicTestSetupTest {
 					op cancel => returnToLastActivity
 				}	
 			}			
-		'''.parse.assertNoErrors
+		'''.parseAndCompile
 	}
 	
 	@Test
@@ -310,7 +323,7 @@ class BasicTestSetupTest {
 					#saveAndClose
 				}
 			}
-		'''.parse.assertNoErrors				
+		'''.parseAndCompile			
 	}
 
 	@Test
@@ -350,7 +363,7 @@ class BasicTestSetupTest {
 					#openEditor
 				} => EditorActivity
 			}
-		'''.parse.assertNoErrors				
+		'''.parseAndCompile		
 	}
 
 	@Test
@@ -389,7 +402,7 @@ class BasicTestSetupTest {
 				
 				test SampleTestUseCaseTest generator org.testosterone4j.base.SampleTestGenerator useCase SampleTestUseCase
 			}
-		'''.parse.assertNoErrors				
+		'''.parseAndCompile		
 	}
 	
 	@Test
@@ -397,7 +410,7 @@ class BasicTestSetupTest {
 		'''
 		«BASIC_TEST_PREAMBLE»
 		}
-		'''.parse.assertNoErrors
+		'''.parseAndCompile
 	}
 	
 }

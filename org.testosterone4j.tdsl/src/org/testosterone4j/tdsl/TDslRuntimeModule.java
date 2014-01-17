@@ -3,10 +3,10 @@
  */
 package org.testosterone4j.tdsl;
 
-import org.eclipse.xtext.conversion.IValueConverterService;
 import org.eclipse.xtext.naming.IQualifiedNameProvider;
 import org.eclipse.xtext.resource.IDefaultResourceDescriptionStrategy;
 import org.eclipse.xtext.scoping.IScopeProvider;
+import org.eclipse.xtext.xbase.compiler.OnTheFlyJavaCompiler;
 import org.eclipse.xtext.xbase.compiler.XbaseCompiler;
 import org.eclipse.xtext.xbase.featurecalls.IdentifiableSimpleNameProvider;
 import org.eclipse.xtext.xbase.scoping.batch.IBatchScopeProvider;
@@ -23,6 +23,8 @@ import org.testosterone4j.tdsl.scoping.TDslScopeProvider;
 import org.testosterone4j.tdsl.typeprovider.TDslImplicitlyImportedTypes;
 import org.testosterone4j.tdsl.typeprovider.TDslTypeComputer;
 
+import com.google.inject.Binder;
+
 /**
  * Use this class to register components to be used at runtime / without the
  * Equinox extension registry.
@@ -30,6 +32,13 @@ import org.testosterone4j.tdsl.typeprovider.TDslTypeComputer;
 @SuppressWarnings("restriction")
 public class TDslRuntimeModule extends
 		org.testosterone4j.tdsl.AbstractTDslRuntimeModule {
+
+	@Override
+	public void configure(Binder binder) {
+		super.configure(binder);
+		binder.bind(OnTheFlyJavaCompiler.class).to(
+				TDslOnTheFlyJavaCompiler.class);
+	}
 
 	@Override
 	public Class<? extends ITypeComputer> bindITypeComputer() {
@@ -75,7 +84,7 @@ public class TDslRuntimeModule extends
 
 	@Override
 	public Class<? extends org.eclipse.xtext.conversion.IValueConverterService> bindIValueConverterService() {
-		return (Class<? extends IValueConverterService>) TDslValueConverterService.class;
+		return TDslValueConverterService.class;
 	}
 
 }

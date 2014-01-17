@@ -1,22 +1,22 @@
 package org.testosterone4j.base;
 
-public class TestDescriptor<U> {
+public class TestDescriptor {
 
-    private final int testNumber;
+	private final int testNumber;
 
-    private final U testCase;
+	private final BaseUseCase testCase;
 
-    public TestDescriptor(int testNumber, U testCase) {
-        super();
-        this.testNumber = testNumber;
-        this.testCase = testCase;
-    }
+	public TestDescriptor(int testNumber, BaseUseCase testCase) {
+		super();
+		this.testNumber = testNumber;
+		this.testCase = testCase;
+	}
 
-    public int getTestNumber() {
-        return this.testNumber;
-    }
+	public int getTestNumber() {
+		return this.testNumber;
+	}
 
-    public U getTestCase() {
-        return this.testCase;
-    }
+	public BaseUseCase getTestCase() {
+		return this.testCase;
+	}
 }

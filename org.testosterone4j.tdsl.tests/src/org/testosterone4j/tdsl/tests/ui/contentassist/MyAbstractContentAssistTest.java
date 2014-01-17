@@ -7,23 +7,25 @@
  */
 package org.testosterone4j.tdsl.tests.ui.contentassist;
 
-import static org.eclipse.xtext.junit4.ui.util.IResourcesSetupUtil.monitor;
-
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.xtext.common.types.access.jdt.IJavaProjectProvider;
 import org.eclipse.xtext.common.types.access.jdt.JdtTypeProviderFactory;
 import org.eclipse.xtext.junit4.ui.ContentAssistProcessorTestBuilder;
-import org.eclipse.xtext.junit4.ui.util.JavaProjectSetupUtil;
 import org.eclipse.xtext.junit4.util.ResourceLoadHelper;
 import org.eclipse.xtext.resource.FileExtensionProvider;
 import org.eclipse.xtext.resource.XtextResource;
@@ -33,6 +35,7 @@ import org.eclipse.xtext.xbase.lib.CollectionLiterals;
 import org.eclipse.xtext.xbase.lib.Exceptions;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.testosterone4j.tdsl.tests.util.PluginProjectUtil;
 
 import com.google.inject.Inject;
 import com.google.inject.Injector;
@@ -55,22 +58,37 @@ public class MyAbstractContentAssistTest implements ResourceLoadHelper,
 	@BeforeClass
 	public static void setUp() {
 		try {
-			IProject project = JavaProjectSetupUtil
-					.createSimpleProject("contentAssistTest");
-			JavaCore.initializeAfterLoad(monitor());
-			IJavaProject javaProject = JavaProjectSetupUtil
-					.makeJavaProject(project);
-
-			JavaProjectSetupUtil
-					.addToClasspath(
-							javaProject,
-							JavaCore.newContainerEntry(new Path(
-									"org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6")));
-			JavaProjectSetupUtil.addToClasspath(javaProject, JavaCore
-					.newContainerEntry(new Path(
-							"org.eclipse.jdt.junit.JUNIT_CONTAINER/4")));
-
-			MyAbstractContentAssistTest.javaProject = javaProject;
+			List<String> srcFolders = new ArrayList<String>();
+			srcFolders.add("src");
+			List<IProject> referencedProjects = Collections.EMPTY_LIST;
+			Set<String> requiredBundles = new HashSet<String>();
+			requiredBundles.add("org.junit");
+			requiredBundles.add("org.testosterone4j.base");
+			requiredBundles.add("org.eclipse.xtext.xbase.lib");
+			// requiredBundles.add("org.eclipse.xtext");
+			// requiredBundles.add("org.eclipse.xtext.xbase");
+			// requiredBundles.add("org.eclipse.xtext.generator");
+			// requiredBundles.add("org.eclipse.emf.codegen.ecore");
+			// requiredBundles.add("org.eclipse.emf.mwe.utils");
+			// requiredBundles.add("org.eclipse.emf.mwe2.launch");
+			// requiredBundles.add("org.eclipse.xtext.util");
+			// requiredBundles.add("org.eclipse.emf.ecore");
+			// requiredBundles.add("org.eclipse.emf.common");
+			// requiredBundles.add("org.antlr.runtime");
+			// requiredBundles.add("org.eclipse.xtext.common.types");
+			// requiredBundles.add("org.apache.commons.logging");
+			// requiredBundles.add("org.eclipse.xtend.lib");
+			// requiredBundles.add("com.google.guava");
+			// requiredBundles.add("org.slf4j.api");
+			// requiredBundles.add("org.eclipse.xtext.xbase.junit");
+			List<String> exportedPackages = Collections.EMPTY_LIST;
+			Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+					.getShell();
+			IProject project = PluginProjectUtil.createPluginProject(
+					"contentAssistTest", srcFolders, referencedProjects,
+					requiredBundles, exportedPackages,
+					new NullProgressMonitor(), shell);
+			MyAbstractContentAssistTest.javaProject = JavaCore.create(project);
 
 		} catch (Throwable _e) {
 			throw Exceptions.sneakyThrow(_e);
