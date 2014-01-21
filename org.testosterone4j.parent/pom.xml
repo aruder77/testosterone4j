@@ -13,6 +13,7 @@
 
 
 		<module>../org.testosterone4j.tdsl</module>
+		<module>../org.testosterone4j.tdsl.tests</module>
 		<module>../org.testosterone4j.base</module>
 		<module>../org.testosterone4j.runtime.feature</module>
 		<module>../org.testosterone4j.sdk.feature</module>
