@@ -226,10 +226,16 @@ class TDslTypeComputer extends XbaseWithAnnotationsTypeComputer {
 		val container = generationSelektor.eContainer
 		var JvmTypeReference type
 		switch container {
-			OperationParameterAssignment:
-				type = typeReferences.getTypeForName(container?.name?.datatype?.class_FQN?.toString, generationSelektor)
-			ActivityOperationParameterAssignment:
-				type = typeReferences.getTypeForName(container?.name?.dataType?.class_FQN?.toString, generationSelektor)
+			OperationParameterAssignment: {
+				val dataType = container?.name?.datatype?.class_FQN?.toString
+				if (dataType != null)
+					type = typeReferences.getTypeForName(dataType, generationSelektor)
+			}
+			ActivityOperationParameterAssignment: {
+				val dataType = container?.name?.dataType?.class_FQN?.toString
+				if (dataType != null)
+					type = typeReferences.getTypeForName(dataType, generationSelektor)
+			}
 		}
 		state.acceptActualType(state.converter.toLightweightReference(type))
 	}
