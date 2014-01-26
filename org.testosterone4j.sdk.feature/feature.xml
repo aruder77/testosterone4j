@@ -7,7 +7,6 @@
    <requires>
       <import feature="org.eclipse.xtext.sdk" version="2.3.1.v201208210947" match="greaterOrEqual"/>
       <import feature="org.eclipse.xtext.xdoc.feature" version="0.1.0" match="compatible"/>
-      <import plugin="org.testosterone4j.help"/>
    </requires>
 
    <plugin
@@ -54,6 +53,13 @@
 
    <plugin
          id="org.testosterone4j.base"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.testosterone4j.help"
          download-size="0"
          install-size="0"
          version="0.0.0"
