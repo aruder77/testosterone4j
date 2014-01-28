@@ -26,6 +26,7 @@
 	<properties>
 		<tycho.version>0.17.0</tycho.version>
 		<xtext-version>2.4.3</xtext-version>
+		<uitest.vmparams>-Dorg.eclipse.swtbot.search.timeout=30000 -Xmx1024m -XX:MaxPermSize=384m</uitest.vmparams>
 	</properties>
 
 	<repositories>
@@ -84,16 +85,16 @@
 				<configuration>
 					<pomDependencies>consider</pomDependencies>
 					<environments>
-<!-- 						<environment> -->
-<!-- 							<os>win32</os> -->
-<!-- 							<ws>win32</ws> -->
-<!-- 							<arch>x86_64</arch> -->
-<!-- 						</environment> -->
-<!-- 						<environment> -->
-<!-- 							<os>win32</os> -->
-<!-- 							<ws>win32</ws> -->
-<!-- 							<arch>x86</arch> -->
-<!-- 						</environment> -->
+						<!-- <environment> -->
+						<!-- <os>win32</os> -->
+						<!-- <ws>win32</ws> -->
+						<!-- <arch>x86_64</arch> -->
+						<!-- </environment> -->
+						<!-- <environment> -->
+						<!-- <os>win32</os> -->
+						<!-- <ws>win32</ws> -->
+						<!-- <arch>x86</arch> -->
+						<!-- </environment> -->
 						<environment>
 							<os>macosx</os>
 							<ws>cocoa</ws>
@@ -102,7 +103,29 @@
 					</environments>
 				</configuration>
 			</plugin>
-			
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-surefire-plugin</artifactId>
+				<configuration>
+					<useUIHarness>true</useUIHarness>
+					<useUIThread>false</useUIThread>
+					<product>org.eclipse.platform.ide</product>
+					<argLine>${ui.test.vmargs}</argLine>
+					<application>org.eclipse.ui.ide.workbench</application>
+					<dependencies>
+						<dependency>
+							<type>p2-installable-unit</type>
+							<artifactId>org.eclipse.pde.feature.group</artifactId>
+							<version>${platform-version}</version>
+						</dependency>
+						<dependency>
+							<type>p2-installable-unit</type>
+							<artifactId>org.eclipse.xtext.sdk.feature.group</artifactId>
+							<version>${xtext-version}</version>
+						</dependency>
+					</dependencies>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-clean-plugin</artifactId>
@@ -319,6 +342,32 @@
 	</build>
 
 	<profiles>
+		<profile>
+			<id>macosx</id>
+			<activation>
+				<os>
+					<name>mac os x</name>
+					<family>mac</family>
+				</os>
+			</activation>
+			<properties>
+				<ui.test.vmargs>${uitest.vmparams} -XstartOnFirstThread</ui.test.vmargs>
+			</properties>
+		</profile>
+		<profile>
+			<id>other-os</id>
+			<activation>
+				<os>
+					<name>not-mac</name>
+					<family>!mac</family>
+				</os>
+			</activation>
+			<properties>
+				<ui.test.vmargs>${test.vmparams} ${uitest.vmparams}</ui.test.vmargs>
+			</properties>
+		</profile>
+
+
 		<profile>
 			<id>xt</id>
 

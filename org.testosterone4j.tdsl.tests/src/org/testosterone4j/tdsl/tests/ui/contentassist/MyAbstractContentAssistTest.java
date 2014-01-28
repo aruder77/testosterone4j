@@ -21,7 +21,9 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.xtext.common.types.access.jdt.IJavaProjectProvider;
 import org.eclipse.xtext.common.types.access.jdt.JdtTypeProviderFactory;
@@ -82,8 +84,21 @@ public class MyAbstractContentAssistTest implements ResourceLoadHelper,
 			// requiredBundles.add("org.slf4j.api");
 			// requiredBundles.add("org.eclipse.xtext.xbase.junit");
 			List<String> exportedPackages = Collections.EMPTY_LIST;
-			Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-					.getShell();
+			IWorkbenchWindow window = PlatformUI.getWorkbench()
+					.getActiveWorkbenchWindow();
+			for (IWorkbenchWindow w : PlatformUI.getWorkbench()
+					.getWorkbenchWindows()) {
+				final IWorkbenchWindow win = w;
+				Display.getDefault().syncExec(new Runnable() {
+					@Override
+					public void run() {
+						System.out.println("Window: "
+								+ win.getShell().getText());
+					}
+				});
+			}
+			window = PlatformUI.getWorkbench().getWorkbenchWindows()[0];
+			Shell shell = window.getShell();
 			IProject project = PluginProjectUtil.createPluginProject(
 					"contentAssistTest", srcFolders, referencedProjects,
 					requiredBundles, exportedPackages,
