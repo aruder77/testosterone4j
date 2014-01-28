@@ -1,7 +1,15 @@
 package org.testosterone4j.tdsl.jvmmodel
 
+import javax.inject.Inject
+import org.eclipse.emf.ecore.EObject
+import org.eclipse.xtext.common.types.JvmTypeReference
+import org.eclipse.xtext.naming.IQualifiedNameProvider
+import org.eclipse.xtext.naming.QualifiedName
+import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder
 import org.testosterone4j.base.AbstractActivity
 import org.testosterone4j.tdsl.tDsl.Activity
+import org.testosterone4j.tdsl.tDsl.ActivityOperationParameter
+import org.testosterone4j.tdsl.tDsl.ActivityOperationParameterAssignment
 import org.testosterone4j.tdsl.tDsl.Control
 import org.testosterone4j.tdsl.tDsl.DataType
 import org.testosterone4j.tdsl.tDsl.DataTypeMapping
@@ -16,13 +24,7 @@ import org.testosterone4j.tdsl.tDsl.Tag
 import org.testosterone4j.tdsl.tDsl.TagsDeclaration
 import org.testosterone4j.tdsl.tDsl.Toolkit
 import org.testosterone4j.tdsl.tDsl.UseCase
-import javax.inject.Inject
-import org.eclipse.emf.ecore.EObject
-import org.eclipse.xtext.common.types.JvmTypeReference
-import org.eclipse.xtext.naming.IQualifiedNameProvider
-import org.eclipse.xtext.naming.QualifiedName
-import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder
-import org.testosterone4j.tdsl.tDsl.GeneratedValueExpression
+import org.testosterone4j.tdsl.tDsl.ActivityOperationCall
 
 class NamingExtensions {
 	
@@ -72,6 +74,26 @@ class NamingExtensions {
 			activity.newTypeRef(parentClassName)
 		else 
 			activity.newTypeRef(typeof(AbstractActivity))
+	}
+	
+	// ActivityOperationParameter
+	
+	def String readableUniqueKey(ActivityOperationCall call, ActivityOperationParameter param) {
+		val callIndex = call?.useCasePath
+		val activityName = param?.activityOperation?.activity?.name
+		val operationName = param?.activityOperation?.name
+		val paramName = param?.name
+		val variableName = callIndex + ":" + activityName + '.' + operationName + '.' + paramName
+		variableName		
+	}
+	
+	
+	// ActivityOperationParameterAssignment
+	
+	def String preferredVariableName(ActivityOperationParameterAssignment assignment) {
+		val paramName = assignment?.name?.name
+		val methodName = assignment?.activityOperation?.name
+		paramName + "_" + methodName
 	}
 	
 	

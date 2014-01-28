@@ -271,11 +271,13 @@ class TDslCompiler extends XbaseCompiler {
 				switch (container) {
 					OperationParameterAssignment: {
 						dataType = container.name.datatype
-						varName = container.name.fullyQualifiedName.toString
+						val call = container.eContainer as OperationCall
+						varName = call.readableUniqueKey(container.name)
 					}
 					ActivityOperationParameterAssignment: {
 						dataType = container.name.dataType
-						varName = container.name.fullyQualifiedName.toString
+						val call = container.eContainer as ActivityOperationCall
+						varName = call.readableUniqueKey(container.name)
 					}
 				}
 				append("getOrGenerateValue(")

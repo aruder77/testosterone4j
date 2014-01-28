@@ -42,6 +42,7 @@ import org.testosterone4j.tdsl.tDsl.InnerBlock
 import org.testosterone4j.tdsl.tDsl.ActivityExpectation
 import org.eclipse.internal.xtend.expression.ast.IfExpression
 import org.eclipse.xtext.xbase.XIfExpression
+import org.testosterone4j.tdsl.tDsl.ActivityOperationParameter
 
 /**
  * Convenience meta-model extensions. Please order by Metamodel-Class and alphabetically!
@@ -136,6 +137,12 @@ class MetaModelExtensions {
 	
 	def boolean hasExpectStatement(ActivityOperationCall call) {
 		call.expectation != null
+	}
+	
+	// ActivityOperationParameter
+	
+	def ActivityOperation activityOperation(ActivityOperationParameter param) {
+		param?.eContainer as ActivityOperation
 	}
 	
 	
