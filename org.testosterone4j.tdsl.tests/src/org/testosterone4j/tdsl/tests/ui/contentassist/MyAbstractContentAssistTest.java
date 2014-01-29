@@ -64,7 +64,7 @@ public class MyAbstractContentAssistTest implements ResourceLoadHelper,
 			srcFolders.add("src");
 			List<IProject> referencedProjects = Collections.EMPTY_LIST;
 			Set<String> requiredBundles = new HashSet<String>();
-			requiredBundles.add("org.junit");
+			requiredBundles.add("org.junit;bundle-version=\"4.11.0\"‚");
 			requiredBundles.add("org.testosterone4j.base");
 			requiredBundles.add("org.eclipse.xtext.xbase.lib");
 			// requiredBundles.add("org.eclipse.xtext");
@@ -104,7 +104,6 @@ public class MyAbstractContentAssistTest implements ResourceLoadHelper,
 					requiredBundles, exportedPackages,
 					new NullProgressMonitor(), shell);
 			MyAbstractContentAssistTest.javaProject = JavaCore.create(project);
-
 		} catch (Throwable _e) {
 			throw Exceptions.sneakyThrow(_e);
 		}

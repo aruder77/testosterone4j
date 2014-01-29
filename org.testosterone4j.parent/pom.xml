@@ -95,12 +95,16 @@
 						<!-- <ws>win32</ws> -->
 						<!-- <arch>x86</arch> -->
 						<!-- </environment> -->
+<!-- 						<environment> -->
+<!-- 							<os>macosx</os> -->
+<!-- 							<ws>cocoa</ws> -->
+<!-- 							<arch>x86_64</arch> -->
+<!-- 						</environment> -->
 						<environment>
-							<os>macosx</os>
-							<ws>cocoa</ws>
+							<os>linux</os>
+							<ws>gtk</ws>
 							<arch>x86_64</arch>
-						</environment>
-					</environments>
+						</environment>					</environments>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -108,7 +112,7 @@
 				<artifactId>tycho-surefire-plugin</artifactId>
 				<configuration>
 					<useUIHarness>true</useUIHarness>
-					<useUIThread>false</useUIThread>
+					<useUIThread>true</useUIThread>
 					<product>org.eclipse.platform.ide</product>
 					<argLine>${ui.test.vmargs}</argLine>
 					<application>org.eclipse.ui.ide.workbench</application>
