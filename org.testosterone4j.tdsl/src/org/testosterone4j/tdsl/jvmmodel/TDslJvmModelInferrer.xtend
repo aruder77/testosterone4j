@@ -584,10 +584,14 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 			} else {
 				if (opMapping?.nextActivities?.empty) {
 					currentActivityType
-				} else if (opMapping?.nextActivities?.get(0).returnToLastActivity || opMapping?.nextActivities?.get(0).returnToLastActivity) {
+				} else if (opMapping?.nextActivities?.get(0).returnToLastActivity) {
 					field.newTypeRef(Void.TYPE)
 				} else {
-					field.newTypeRef(opMapping.nextActivities.get(0).next?.class_fqn)
+					val nextActFqn = opMapping.nextActivities.get(0).next?.class_fqn
+					if (nextActFqn != null)
+						field.newTypeRef(nextActFqn)
+					else 
+						field.newTypeRef(Void.TYPE)
 				}
 			}
 		} else {
