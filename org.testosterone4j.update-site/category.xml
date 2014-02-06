@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
    <feature url="features/org.testosterone4j.sdk.feature_0.0.1.qualifier.jar" id="org.testosterone4j.sdk.feature" version="0.0.1.qualifier">
-      <category name="TDsl"/>
+      <category name="Testosterone4J"/>
    </feature>
    <feature url="features/org.testosterone4j.runtime.feature_0.0.1.qualifier.jar" id="org.testosterone4j.runtime.feature" version="0.0.1.qualifier">
-      <category name="TDsl"/>
+      <category name="Testosterone4J"/>
    </feature>
-   <category-def name="TDsl" label="TDsl"/>
+   <category-def name="Testosterone4J" label="Testosterone4J"/>
 </site>
