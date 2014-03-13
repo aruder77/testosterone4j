@@ -1,5 +1,20 @@
 package org.testosterone4j.tdsl.jvmmodel
 
+import java.util.List
+import java.util.Set
+import java.util.Stack
+import javax.inject.Inject
+import org.eclipse.emf.ecore.EObject
+import org.eclipse.xtext.common.types.util.TypeReferences
+import org.eclipse.xtext.naming.IQualifiedNameProvider
+import org.eclipse.xtext.xbase.XBlockExpression
+import org.eclipse.xtext.xbase.XExpression
+import org.eclipse.xtext.xbase.XVariableDeclaration
+import org.eclipse.xtext.xbase.compiler.XbaseCompiler
+import org.eclipse.xtext.xbase.compiler.output.ITreeAppendable
+import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder
+import org.eclipse.xtext.xbase.lib.Pair
+import org.eclipse.xtext.xbase.typing.ITypeProvider
 import org.testosterone4j.base.AbstractActivity
 import org.testosterone4j.base.GenerationHelper
 import org.testosterone4j.base.Tag
@@ -22,21 +37,10 @@ import org.testosterone4j.tdsl.tDsl.OperationCall
 import org.testosterone4j.tdsl.tDsl.OperationParameterAssignment
 import org.testosterone4j.tdsl.tDsl.Parameter
 import org.testosterone4j.tdsl.tDsl.ParameterAssignment
+import org.testosterone4j.tdsl.tDsl.Selector
 import org.testosterone4j.tdsl.tDsl.StatementLine
 import org.testosterone4j.tdsl.tDsl.SubUseCaseCall
 import org.testosterone4j.tdsl.tDsl.UseCaseBlock
-import java.util.Set
-import java.util.Stack
-import javax.inject.Inject
-import org.eclipse.xtext.common.types.util.TypeReferences
-import org.eclipse.xtext.naming.IQualifiedNameProvider
-import org.eclipse.xtext.xbase.XBlockExpression
-import org.eclipse.xtext.xbase.XExpression
-import org.eclipse.xtext.xbase.compiler.XbaseCompiler
-import org.eclipse.xtext.xbase.compiler.output.ITreeAppendable
-import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder
-import org.eclipse.xtext.xbase.lib.Pair
-import org.eclipse.xtext.xbase.typing.ITypeProvider
 
 class TDslCompiler extends XbaseCompiler {
 
@@ -148,6 +152,8 @@ class TDslCompiler extends XbaseCompiler {
 				append(''')currentActivity);''')
 			}
 			GenerationSelektor: {
+			}
+			Selector: {
 			}
 			StatementLine: {
 				expr.statement.doInternalToJavaStatement(it, isReferenced)
@@ -280,21 +286,12 @@ class TDslCompiler extends XbaseCompiler {
 						varName = call.readableUniqueKey(container.name)
 					}
 				}
-				append("getOrGenerateValue(")
-				expr.newTypeRef(dataType.class_FQN.toString).serialize(expr, it)
-				append('''.class, "«varName»"''')
-				if (!expr.tags.empty) {
-					append(", ")
-					expr.newTypeRef(typeof(Tag)).createArrayType.serialize(expr, it)
-					append(''' {«FOR tag : expr.tags SEPARATOR ","»Tags.«tag.name»«ENDFOR»}''')
-				}
-				if (expr.expression != null) {
-					append(", ")
-					expr.expression.compileAsJavaExpression(it,
-						expr.newTypeRef(typeof(Set), expr.newTypeRef(typeof(Tag))))
-				}
-				append(")")
+				appendGetOrGenerateValue(expr, dataType, varName, expr.tags, expr.expression)				
 			}
+			Selector: {
+				var String varName = (expr.eContainer as XVariableDeclaration).name
+				appendGetOrGenerateValue(it, expr, expr.dataType, varName, expr.tags, expr.expression)
+			}			
 			GeneratedValueExpression: {
 				val lastExpression = expr.lastExpressionWithNextActivity
 				appendGeneratedValueExpression(lastExpression, expr, it)
@@ -319,6 +316,23 @@ class TDslCompiler extends XbaseCompiler {
 			default:
 				super.internalToConvertedExpression(expr, it)
 		}
+	}
+	
+	protected def appendGetOrGenerateValue(ITreeAppendable it, EObject expr, DataType dataType, String varName, List<org.testosterone4j.tdsl.tDsl.Tag> tags, XExpression tagExpression)  {
+		append("getOrGenerateValue(")
+		expr.newTypeRef(dataType.class_FQN.toString).serialize(expr, it)
+		append('''.class, "«varName»"''')
+		if (!tags.empty) {
+			append(", ")
+			expr.newTypeRef(typeof(Tag)).createArrayType.serialize(expr, it)
+			append(''' {«FOR tag : tags SEPARATOR ","»Tags.«tag.name»«ENDFOR»}''')
+		}
+		if (tagExpression != null) {
+			append(", ")
+			tagExpression.compileAsJavaExpression(it,
+				expr.newTypeRef(typeof(Set), expr.newTypeRef(typeof(Tag))))
+		}
+		append(")")
 	}
 
 	def dispatch appendGeneratedValueExpression(XExpression lastExpression, GeneratedValueExpression generatedValueExpr,

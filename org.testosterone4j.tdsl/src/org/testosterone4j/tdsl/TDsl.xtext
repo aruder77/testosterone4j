@@ -146,6 +146,11 @@ GenerationSelektor returns xbase::XExpression:
 	'select' ('(' (('tags' tags+=[Tag|ID] (',' tags+=[Tag|ID])*) | expression=XExpression) ')' )?
 ;
 
+Select returns xbase::XExpression:
+	{Selector}
+	'select' '(' dataType=[DataType|FQN] (',' (('tags' tags+=[Tag|ID] (',' tags+=[Tag|ID])*) | expression=XExpression))? ')'
+;
+
 OperationParameterAssignment returns xbase::XExpression:
 	{OperationParameterAssignment}
 	name=[DataTypeMapping|FQN] '=' value=ParameterInput
@@ -190,7 +195,7 @@ VariableDeclaration returns xbase::XVariableDeclaration:
 ;
 
 Expression returns xbase::XExpression:
-	OperationCall | ActivityOperationCall | GeneratedValueExpression | XExpression 
+	OperationCall | ActivityOperationCall | GeneratedValueExpression | XExpression | Select
 ;
 
 GeneratedValueExpression returns xbase::XExpression:

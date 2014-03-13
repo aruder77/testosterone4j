@@ -33,6 +33,7 @@ import org.eclipse.xtext.xbase.annotations.typesystem.XbaseWithAnnotationsTypeCo
 import org.eclipse.xtext.xbase.jvmmodel.IJvmModelAssociations
 import org.eclipse.xtext.xbase.typesystem.computation.ITypeComputationState
 import org.eclipse.xtext.xbase.typesystem.conformance.ConformanceHint
+import org.testosterone4j.tdsl.tDsl.Selector
 
 @Singleton
 class TDslTypeComputer extends XbaseWithAnnotationsTypeComputer {
@@ -68,6 +69,8 @@ class TDslTypeComputer extends XbaseWithAnnotationsTypeComputer {
 			_computeTypes(expression as InnerBlock, state);
 		} else if (expression instanceof ActivityExpectation) {
 			_computeTypes(expression as ActivityExpectation, state);
+		} else if (expression instanceof Selector) {
+			_computeTypes(expression as Selector, state);
 		} else {
 			if(expression != null) super.computeTypes(expression, state)
 		}
@@ -237,6 +240,16 @@ class TDslTypeComputer extends XbaseWithAnnotationsTypeComputer {
 					type = typeReferences.getTypeForName(dataType, generationSelektor)
 			}
 		}
+		state.acceptActualType(state.converter.toLightweightReference(type))
+	}
+
+	protected def _computeTypes(Selector selector, ITypeComputationState state) {
+		computeTypes(selector.expression, state.withNonVoidExpectation)
+
+		var JvmTypeReference type
+		val dataType = selector.dataType?.class_FQN?.toString
+		if (dataType != null)
+			type = typeReferences.getTypeForName(dataType, selector)
 		state.acceptActualType(state.converter.toLightweightReference(type))
 	}
 }
