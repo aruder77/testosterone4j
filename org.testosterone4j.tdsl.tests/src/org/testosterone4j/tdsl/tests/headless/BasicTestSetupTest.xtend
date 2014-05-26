@@ -102,9 +102,9 @@ class BasicTestSetupTest {
 	
 	def parseAndCompile(CharSequence cs) {
 		cs.parse.assertNoErrors
-//		cs.compile [
-//			compileAllClasses
-//		]	
+		cs.compile [
+			compileAllClasses
+		]	
 	}
 	
 	@Test
