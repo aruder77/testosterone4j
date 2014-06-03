@@ -44,8 +44,7 @@ import com.google.inject.Injector;
 import com.google.inject.Provider;
 
 @SuppressWarnings("all")
-public class MyAbstractContentAssistTest implements ResourceLoadHelper,
-		IJavaProjectProvider {
+public class MyAbstractContentAssistTest implements ResourceLoadHelper, IJavaProjectProvider {
 	@Inject
 	private Provider<XtextResourceSet> resourceSetProvider;
 
@@ -60,11 +59,11 @@ public class MyAbstractContentAssistTest implements ResourceLoadHelper,
 	@BeforeClass
 	public static void setUp() {
 		try {
-			List<String> srcFolders = new ArrayList<String>();
+			final List<String> srcFolders = new ArrayList<String>();
 			srcFolders.add("src");
-			List<IProject> referencedProjects = Collections.EMPTY_LIST;
-			Set<String> requiredBundles = new HashSet<String>();
-			requiredBundles.add("org.junit;bundle-version=\"4.11.0\"‚");
+			final List<IProject> referencedProjects = Collections.EMPTY_LIST;
+			final Set<String> requiredBundles = new HashSet<String>();
+			requiredBundles.add("org.junit;bundle-version=\"4.11.0\"");
 			requiredBundles.add("org.testosterone4j.base");
 			requiredBundles.add("org.eclipse.xtext.xbase.lib");
 			// requiredBundles.add("org.eclipse.xtext");
@@ -83,28 +82,23 @@ public class MyAbstractContentAssistTest implements ResourceLoadHelper,
 			// requiredBundles.add("com.google.guava");
 			// requiredBundles.add("org.slf4j.api");
 			// requiredBundles.add("org.eclipse.xtext.xbase.junit");
-			List<String> exportedPackages = Collections.EMPTY_LIST;
-			IWorkbenchWindow window = PlatformUI.getWorkbench()
-					.getActiveWorkbenchWindow();
-			for (IWorkbenchWindow w : PlatformUI.getWorkbench()
-					.getWorkbenchWindows()) {
+			final List<String> exportedPackages = Collections.EMPTY_LIST;
+			IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+			for (final IWorkbenchWindow w : PlatformUI.getWorkbench().getWorkbenchWindows()) {
 				final IWorkbenchWindow win = w;
 				Display.getDefault().syncExec(new Runnable() {
 					@Override
 					public void run() {
-						System.out.println("Window: "
-								+ win.getShell().getText());
+						System.out.println("Window: " + win.getShell().getText());
 					}
 				});
 			}
 			window = PlatformUI.getWorkbench().getWorkbenchWindows()[0];
-			Shell shell = window.getShell();
-			IProject project = PluginProjectUtil.createPluginProject(
-					"contentAssistTest", srcFolders, referencedProjects,
-					requiredBundles, exportedPackages,
-					new NullProgressMonitor(), shell);
+			final Shell shell = window.getShell();
+			final IProject project = PluginProjectUtil.createPluginProject("contentAssistTest", srcFolders, referencedProjects,
+					requiredBundles, exportedPackages, new NullProgressMonitor(), shell);
 			MyAbstractContentAssistTest.javaProject = JavaCore.create(project);
-		} catch (Throwable _e) {
+		} catch (final Throwable _e) {
 			throw Exceptions.sneakyThrow(_e);
 		}
 	}
@@ -112,19 +106,17 @@ public class MyAbstractContentAssistTest implements ResourceLoadHelper,
 	@AfterClass
 	public static void tearDown() {
 		try {
-			IProject _project = MyAbstractContentAssistTest.javaProject
-					.getProject();
-			NullProgressMonitor _nullProgressMonitor = new NullProgressMonitor();
+			final IProject _project = MyAbstractContentAssistTest.javaProject.getProject();
+			final NullProgressMonitor _nullProgressMonitor = new NullProgressMonitor();
 			_project.delete(true, _nullProgressMonitor);
-		} catch (Throwable _e) {
+		} catch (final Throwable _e) {
 			throw Exceptions.sneakyThrow(_e);
 		}
 	}
 
 	@SuppressWarnings("unchecked")
 	protected ArrayList<String> expect(final String[]... arrays) {
-		final ArrayList<String> expectation = CollectionLiterals
-				.<String> newArrayList();
+		final ArrayList<String> expectation = CollectionLiterals.<String> newArrayList();
 		for (final String[] array : arrays) {
 			CollectionExtensions.<String> addAll(expectation, array);
 		}
@@ -132,8 +124,8 @@ public class MyAbstractContentAssistTest implements ResourceLoadHelper,
 	}
 
 	protected ContentAssistProcessorTestBuilder newBuilder() throws Exception {
-		ContentAssistProcessorTestBuilder _contentAssistProcessorTestBuilder = new ContentAssistProcessorTestBuilder(
-				this.injector, this);
+		final ContentAssistProcessorTestBuilder _contentAssistProcessorTestBuilder = new ContentAssistProcessorTestBuilder(
+				injector, this);
 		return _contentAssistProcessorTestBuilder;
 	}
 
@@ -142,28 +134,26 @@ public class MyAbstractContentAssistTest implements ResourceLoadHelper,
 		try {
 			XtextResource _xblockexpression = null;
 			{
-				final XtextResourceSet set = this.resourceSetProvider.get();
-				this.initializeTypeProvider(set);
-				String _primaryFileExtension = this.fileExtensionProvider
-						.getPrimaryFileExtension();
-				String _plus = ("Test." + _primaryFileExtension);
-				URI _createURI = URI.createURI(_plus);
+				final XtextResourceSet set = resourceSetProvider.get();
+				initializeTypeProvider(set);
+				final String _primaryFileExtension = fileExtensionProvider.getPrimaryFileExtension();
+				final String _plus = ("Test." + _primaryFileExtension);
+				final URI _createURI = URI.createURI(_plus);
 				final Resource result = set.createResource(_createURI);
 				result.load(stream, null);
 				_xblockexpression = (((XtextResource) result));
 			}
 			return _xblockexpression;
-		} catch (Throwable _e) {
+		} catch (final Throwable _e) {
 			throw Exceptions.sneakyThrow(_e);
 		}
 	}
 
 	protected void initializeTypeProvider(final XtextResourceSet set) {
-		JdtTypeProviderFactory _jdtTypeProviderFactory = new JdtTypeProviderFactory(
-				this);
+		final JdtTypeProviderFactory _jdtTypeProviderFactory = new JdtTypeProviderFactory(this);
 		final JdtTypeProviderFactory typeProviderFactory = _jdtTypeProviderFactory;
 		typeProviderFactory.findOrCreateTypeProvider(set);
-		IJavaProject _javaProject = this.getJavaProject(set);
+		final IJavaProject _javaProject = getJavaProject(set);
 		set.setClasspathURIContext(_javaProject);
 	}
 

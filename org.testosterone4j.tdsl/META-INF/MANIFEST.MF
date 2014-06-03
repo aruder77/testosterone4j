@@ -15,20 +15,20 @@ Require-Bundle: org.eclipse.xtext;visibility:=reexport,
  org.eclipse.emf.ecore,
  org.eclipse.emf.common,
  org.antlr.runtime,
- org.eclipse.xtext.common.types,
- org.eclipse.xtext.xbase.lib;visibility:=reexport,
+ org.eclipse.xtext.common.types;bundle-version="[2.5.4,2.6.0)",
+ org.eclipse.xtext.xbase.lib;bundle-version="[2.5.4,2.6.0)";visibility:=reexport,
  org.junit;bundle-version="4.10.0",
  org.apache.commons.logging;bundle-version="1.0.4",
- org.eclipse.xtend.lib,
+ org.eclipse.xtend.lib;bundle-version="[2.5.4,2.6.0)",
  com.google.guava,
  org.testosterone4j.base;bundle-version="0.0.1";visibility:=reexport,
  org.slf4j.api;bundle-version="1.7.2",
- org.eclipse.xtext.xbase.junit;bundle-version="2.4.0"
+ org.eclipse.xtext.xbase.junit;bundle-version="[2.5.4,2.6.0)",
+ org.objectweb.asm;bundle-version="[5.0.1,6.0.0)";resolution:=optional
 Import-Package: org.apache.log4j,
  org.eclipse.xtext.xbase.lib
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Export-Package: 
- org.testosterone4j.tdsl,
+Export-Package: org.testosterone4j.tdsl,
  org.testosterone4j.tdsl.converter,
  org.testosterone4j.tdsl.formatting,
  org.testosterone4j.tdsl.jvmmodel,
@@ -42,3 +42,4 @@ Export-Package:
  org.testosterone4j.tdsl.tDsl.util,
  org.testosterone4j.tdsl.typeprovider,
  org.testosterone4j.tdsl.validation
+

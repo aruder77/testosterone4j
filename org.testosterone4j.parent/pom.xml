@@ -25,7 +25,7 @@
 
 	<properties>
 		<tycho.version>0.17.0</tycho.version>
-		<xtext-version>2.4.3</xtext-version>
+		<xtext-version>2.5.4</xtext-version>
 		<uitest.vmparams>-Dorg.eclipse.swtbot.search.timeout=30000 -Xmx1024m -XX:MaxPermSize=384m</uitest.vmparams>
 	</properties>
 

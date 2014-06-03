@@ -13,7 +13,7 @@
          id="org.eclipse.xtext.xbase.lib"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="2.4.3"
          unpack="false"/>
 
    <plugin

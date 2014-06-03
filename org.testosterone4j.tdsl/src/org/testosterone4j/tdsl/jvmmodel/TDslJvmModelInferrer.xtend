@@ -631,7 +631,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 
 		val JvmTypeAnnotationValue annotationValue = typesFactory.createJvmTypeAnnotationValue();
 		annotationValue?.getValues().add(value);
-		result.getValues().add(annotationValue);
+		result.explicitValues.add(annotationValue)
 
 		return result;
 	}
