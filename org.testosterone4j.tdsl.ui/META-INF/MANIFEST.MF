@@ -17,9 +17,8 @@ Require-Bundle: org.testosterone4j.tdsl;visibility:=reexport,
  org.eclipse.xtext.common.types.ui;bundle-version="[2.5.4,2.6.0)",
  org.eclipse.xtext.ui.codetemplates.ui;bundle-version="[2.5.4,2.6.0)",
  org.eclipse.compare
-Import-Package: org.apache.log4j,
- org.apache.commons.logging,
- org.eclipse.xtext.xbase.lib
+Import-Package: org.apache.commons.logging,
+ org.apache.log4j
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: org.testosterone4j.tdsl.ui,
  org.testosterone4j.tdsl.ui.contentassist,
