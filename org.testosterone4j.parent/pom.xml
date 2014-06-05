@@ -6,8 +6,8 @@
 	<artifactId>org.testosterone4j.parent</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
-	<name>BNE3 Client (POM)</name>
-	<description>This is the BNE3 client parent project</description>
+	<name>org.testosterone4j.parent</name>
+	<description>This is the Testosterone4J parent project</description>
 
 	<modules>
 

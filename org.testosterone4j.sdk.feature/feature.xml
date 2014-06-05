@@ -5,7 +5,7 @@
       version="0.0.1.qualifier">
 
    <requires>
-      <import feature="org.eclipse.xtext.sdk" version="2.3.1.v201208210947" match="greaterOrEqual"/>
+      <import feature="org.eclipse.xtext.sdk" version="2.5.4" match="equivalent"/>
       <import feature="org.eclipse.xtext.xdoc.feature" version="0.1.0" match="compatible"/>
    </requires>
 
@@ -13,7 +13,7 @@
          id="org.eclipse.xtext.xbase.lib"
          download-size="0"
          install-size="0"
-         version="2.4.3"
+         version="2.5.4"
          unpack="false"/>
 
    <plugin

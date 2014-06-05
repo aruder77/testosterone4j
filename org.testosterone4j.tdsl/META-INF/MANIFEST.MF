@@ -25,8 +25,7 @@ Require-Bundle: org.eclipse.xtext;bundle-version="[2.5.4,2.6.0)";visibility:=ree
  org.slf4j.api;bundle-version="1.7.2",
  org.eclipse.xtext.xbase.junit;bundle-version="[2.5.4,2.6.0)",
  org.objectweb.asm;bundle-version="[5.0.1,6.0.0)";resolution:=optional
-Import-Package: org.apache.log4j,
- org.eclipse.xtext.xbase.lib
+Import-Package: org.apache.log4j
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: org.testosterone4j.tdsl,
  org.testosterone4j.tdsl.converter,
