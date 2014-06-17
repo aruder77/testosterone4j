@@ -58,7 +58,7 @@
 		<profile>
 			<id>publishToBne</id>
 			<properties>
-				<publish-dest>/var/www/vhosts/lvps91-250-115-227.dedicated.hosteurope.de/testosterone4j/updates/latest</publish-dest>
+				<publish-dest>/home/qqbne03/build_server/tomcat_nexus/webapps/eclipse/org.testosterone4j.update-site</publish-dest>
 			</properties>
 		</profile>
 	</profiles>
