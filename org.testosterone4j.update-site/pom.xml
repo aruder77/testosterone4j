@@ -44,13 +44,19 @@
 		</profile>
 		
 		<profile>
-			<id>xt</id>
+			<id>publishToXT</id>
 			<properties>
 				<publish-dest>/v/taskdev/sw/share/apache/htdocs/updates/latest</publish-dest>
 			</properties>
 		</profile>
 		<profile>
-			<id>testosterone4j</id>
+			<id>publishToTestosterone4j</id>
+			<properties>
+				<publish-dest>/var/www/vhosts/lvps91-250-115-227.dedicated.hosteurope.de/testosterone4j/updates/latest</publish-dest>
+			</properties>
+		</profile>
+		<profile>
+			<id>publishToBne</id>
 			<properties>
 				<publish-dest>/var/www/vhosts/lvps91-250-115-227.dedicated.hosteurope.de/testosterone4j/updates/latest</publish-dest>
 			</properties>

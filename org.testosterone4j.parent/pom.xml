@@ -373,7 +373,7 @@
 
 
 		<profile>
-			<id>xt</id>
+			<id>xDocFromXT</id>
 
 			<repositories>
 				<repository>
@@ -384,7 +384,7 @@
 			</repositories>
 		</profile>
 		<profile>
-			<id>testosterone4j</id>
+			<id>xDocFromTestosterone4j</id>
 
 			<repositories>
 				<repository>
