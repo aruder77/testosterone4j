@@ -23,7 +23,6 @@ import org.testosterone4j.tdsl.tDsl.ActivityOperationCall
 import org.testosterone4j.tdsl.tDsl.ActivityOperationParameter
 import org.testosterone4j.tdsl.tDsl.ConditionalNextActivity
 import org.testosterone4j.tdsl.tDsl.Control
-import org.testosterone4j.tdsl.tDsl.DataType
 import org.testosterone4j.tdsl.tDsl.DataTypeMapping
 import org.testosterone4j.tdsl.tDsl.Element
 import org.testosterone4j.tdsl.tDsl.Field
@@ -81,6 +80,7 @@ import org.testosterone4j.tdsl.tDsl.ActivityExpectation
 import org.eclipse.xtext.common.types.JvmTypeParameter
 import org.testosterone4j.base.IEvaluationGroup
 import org.testosterone4j.base.TDslInjector
+import org.testosterone4j.tdsl.tDsl.DataType
 
 /**
  * <p>Infers a JVM model from the source model.</p> 
@@ -1026,6 +1026,9 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 					it.body = [
 						it.append(
 							'''
+							if (this._equivalenceClass == null && this._value != null) {
+								this._equivalenceClass = «dataType.equivalenceClass_name».getByValue(this._value);
+							}
 							return this._equivalenceClass;''')
 					]
 				]
@@ -1064,10 +1067,22 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 					it.setStatic(true)
 					it.parameters += predicate.toParameter("field", fieldTypeRef)
 					body = [
+						val wildcardRef1 = typesFactory.createJvmWildcardTypeReference
+						val wildcardRef2 = typesFactory.createJvmWildcardTypeReference
+						val upperBound = typesFactory.createJvmUpperBound
+						upperBound.typeReference = predicate.newTypeRef(EquivalenceClass).cloneWithProxies
+						wildcardRef2.constraints.add(upperBound)
+						predicate.newTypeRef(org.testosterone4j.base.DataType, wildcardRef1, wildcardRef2).serialize(predicate, it)
 						it.append(
-							"java.util.Set<org.testosterone4j.base.Tag> valueTags = new java.util.HashSet<org.testosterone4j.base.Tag>(field.getLastEnteredValue().getEquivalenceClass().getClassTags());").
-							newLine
-						it.append("return predicateFunction().apply(field.getTags(), valueTags);")
+							'''
+							 lastEnteredValue = field.getLastEnteredValue();
+							boolean result = false;
+							if (lastEnteredValue != null && lastEnteredValue.getEquivalenceClass() != null) {
+								java.util.Set<org.testosterone4j.base.Tag> valueTags = new java.util.HashSet<org.testosterone4j.base.Tag>(lastEnteredValue.getEquivalenceClass().getClassTags());
+								result = predicateFunction().apply(field.getTags(), valueTags);
+							} 
+							return result;
+							''');
 					]
 				]
 				members += predicate.toMethod("evaluate", predicate.newTypeRef(typeof(boolean))) [
