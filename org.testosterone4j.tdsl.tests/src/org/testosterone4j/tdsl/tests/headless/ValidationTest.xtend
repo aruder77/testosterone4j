@@ -37,7 +37,8 @@ class ValidationTest {
 					op StringDT getText
 				}
 			}
-		'''.assertTDslError(TDslPackage.eINSTANCE.field, "An operation mapping must be defined for operations 'search'.", TDslValidator.UNSUFFICIENT_OPERATION_MAPPINGS)
+		'''.assertTDslError(TDslPackage.eINSTANCE.field, "An operation mapping must be defined for operations 'search'.", TDslValidator.UNSUFFICIENT_OPERATION_MAPPINGS
+		)
 	}
 	
 	@Test

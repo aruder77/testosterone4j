@@ -1,6 +1,6 @@
 package org.testosterone4j.base;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertSame;
 import static org.mockito.Mockito.when;
 
 import java.util.Set;
@@ -38,25 +38,21 @@ public class AbstractActivityTest {
 	 */
 	@Test
 	public void testAdapterReturnsNewActivitySame() {
-		parameterizedAdapterReturnsNewActivity("abc", SampleActivity.class, null, true);
-		parameterizedAdapterReturnsNewActivity("abc", SampleActivity.class, null, false);
-		parameterizedAdapterReturnsNewActivity("abc", SampleActivity.class, SampleActivityAdapter.class, true);
-		parameterizedAdapterReturnsNewActivity("abc", SampleActivity.class, SampleActivityAdapter.class, false);
-		parameterizedAdapterReturnsNewActivity(null, SampleActivity.class, null, true);
-		parameterizedAdapterReturnsNewActivity(null, SampleActivity.class, null, false);
-		parameterizedAdapterReturnsNewActivity(null, SampleActivity.class, SampleActivityAdapter.class, true);
-		parameterizedAdapterReturnsNewActivity(null, SampleActivity.class, SampleActivityAdapter.class, false);
+		parameterizedAdapterReturnsNewActivity(SampleActivity.class, null, true);
+		parameterizedAdapterReturnsNewActivity(SampleActivity.class, null, false);
+		parameterizedAdapterReturnsNewActivity(SampleActivity.class, SampleActivityAdapter.class, true);
+		parameterizedAdapterReturnsNewActivity(SampleActivity.class, SampleActivityAdapter.class, false);
 	}
 	
 	
-	public void parameterizedAdapterReturnsNewActivity(String expectedId, Class<? extends AbstractActivity> expectedActivity, Class<? extends ActivityAdapter> expectedAdapterClass, boolean expectIrregularNextActivity) {
+	public void parameterizedAdapterReturnsNewActivity(Class<? extends AbstractActivity> expectedActivity, Class<? extends ActivityAdapter> expectedAdapterClass, boolean expectIrregularNextActivity) {
 		// setup
 		Function0<Object> call = Mockito.mock(Function0.class);
 		when(call.apply()).thenReturn(sampleActivity);
 		activity.adapter = sampleActivityAdapter;
 		
 		// execute
-		AbstractActivity actualActivity = activity.callContextAdapter(call, expectedId, expectedActivity, expectedAdapterClass, expectIrregularNextActivity);
+		AbstractActivity actualActivity = activity.callContextAdapter(call, expectedActivity, expectedAdapterClass, expectIrregularNextActivity);
 		
 		// verify
 		assertSame(sampleActivity, actualActivity);
@@ -68,14 +64,10 @@ public class AbstractActivityTest {
 	 */
 	@Test
 	public void testAdapterReturnsNewActivityChild() {
-			parameterizedAdapterReturnsNewActivity("abc", SampleSuperActivity.class, null, true);
-			parameterizedAdapterReturnsNewActivity("abc", SampleSuperActivity.class, null, false);
-			parameterizedAdapterReturnsNewActivity("abc", SampleSuperActivity.class, SampleActivityAdapter.class, true);
-			parameterizedAdapterReturnsNewActivity("abc", SampleSuperActivity.class, SampleActivityAdapter.class, false);
-			parameterizedAdapterReturnsNewActivity(null, SampleSuperActivity.class, null, true);
-			parameterizedAdapterReturnsNewActivity(null, SampleSuperActivity.class, null, false);
-			parameterizedAdapterReturnsNewActivity(null, SampleSuperActivity.class, SampleActivityAdapter.class, true);
-			parameterizedAdapterReturnsNewActivity(null, SampleSuperActivity.class, SampleActivityAdapter.class, false);
+			parameterizedAdapterReturnsNewActivity(SampleSuperActivity.class, null, true);
+			parameterizedAdapterReturnsNewActivity(SampleSuperActivity.class, null, false);
+			parameterizedAdapterReturnsNewActivity(SampleSuperActivity.class, SampleActivityAdapter.class, true);
+			parameterizedAdapterReturnsNewActivity(SampleSuperActivity.class, SampleActivityAdapter.class, false);
 	}
 
 	/**
@@ -96,7 +88,7 @@ public class AbstractActivityTest {
 		});
 		
 		// execute
-		AbstractActivity actualActivity = activity.callContextAdapter(call, "abc", SampleChildActivity.class, SampleActivityAdapter.class, false);
+		AbstractActivity actualActivity = activity.callContextAdapter(call, SampleChildActivity.class, SampleActivityAdapter.class, false);
 		
 		// verify RuntimeException since SampleActivity does not implement IActivityContext
 	}
