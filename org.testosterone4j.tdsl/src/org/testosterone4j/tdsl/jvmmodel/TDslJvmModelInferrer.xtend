@@ -2,50 +2,12 @@ package org.testosterone4j.tdsl.jvmmodel
 
 import com.google.inject.Inject
 import com.google.inject.Injector
-import org.testosterone4j.base.AbstractActivity
-import org.testosterone4j.base.ActivityAdapter
-import org.testosterone4j.base.ActivityLocator
-import org.testosterone4j.base.BaseUseCase
-import org.testosterone4j.base.ControlField
-import org.testosterone4j.base.EquivalenceClass
-import org.testosterone4j.base.GenerationHelper
-import org.testosterone4j.base.Generator
-import org.testosterone4j.base.ITestProtocol
-import org.testosterone4j.base.Parameters
-import org.testosterone4j.base.TDslParameterized
-import org.testosterone4j.base.Tag
-import org.testosterone4j.base.TestDescriptor
-import org.testosterone4j.base.TDslInjector
-import org.testosterone4j.base.util.TDslHelper
-import org.testosterone4j.tdsl.tDsl.Activity
-import org.testosterone4j.tdsl.tDsl.ActivityOperation
-import org.testosterone4j.tdsl.tDsl.ActivityOperationCall
-import org.testosterone4j.tdsl.tDsl.ActivityOperationParameter
-import org.testosterone4j.tdsl.tDsl.ConditionalNextActivity
-import org.testosterone4j.tdsl.tDsl.Control
-import org.testosterone4j.tdsl.tDsl.DataTypeMapping
-import org.testosterone4j.tdsl.tDsl.Element
-import org.testosterone4j.tdsl.tDsl.Field
-import org.testosterone4j.tdsl.tDsl.Operation
-import org.testosterone4j.tdsl.tDsl.OperationCall
-import org.testosterone4j.tdsl.tDsl.PackageDeclaration
-import org.testosterone4j.tdsl.tDsl.Parameter
-import org.testosterone4j.tdsl.tDsl.Predicate
-import org.testosterone4j.tdsl.tDsl.StatementLine
-import org.testosterone4j.tdsl.tDsl.TagsDeclaration
-import org.testosterone4j.tdsl.tDsl.Test
-import org.testosterone4j.tdsl.tDsl.Toolkit
-import org.testosterone4j.tdsl.tDsl.UseCase
 import java.util.Collection
 import java.util.HashSet
 import java.util.Iterator
 import java.util.List
 import java.util.Set
 import java.util.Stack
-import javax.xml.bind.annotation.XmlAttribute
-import javax.xml.bind.annotation.XmlElement
-import javax.xml.bind.annotation.XmlRootElement
-import javax.xml.bind.annotation.XmlTransient
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.jdt.annotation.Nullable
 import org.eclipse.xtext.common.types.JvmAnnotationReference
@@ -56,11 +18,13 @@ import org.eclipse.xtext.common.types.JvmGenericType
 import org.eclipse.xtext.common.types.JvmOperation
 import org.eclipse.xtext.common.types.JvmType
 import org.eclipse.xtext.common.types.JvmTypeAnnotationValue
+import org.eclipse.xtext.common.types.JvmTypeParameter
 import org.eclipse.xtext.common.types.JvmTypeReference
 import org.eclipse.xtext.common.types.JvmVisibility
 import org.eclipse.xtext.common.types.TypesFactory
 import org.eclipse.xtext.common.types.util.TypeReferences
 import org.eclipse.xtext.naming.IQualifiedNameProvider
+import org.eclipse.xtext.xbase.XBlockExpression
 import org.eclipse.xtext.xbase.XExpression
 import org.eclipse.xtext.xbase.compiler.TypeReferenceSerializer
 import org.eclipse.xtext.xbase.compiler.XbaseCompiler
@@ -70,17 +34,48 @@ import org.eclipse.xtext.xbase.jvmmodel.IJvmDeclaredTypeAcceptor
 import org.eclipse.xtext.xbase.jvmmodel.IJvmModelAssociator
 import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder
 import org.eclipse.xtext.xbase.lib.Functions.Function0
-import org.eclipse.xtext.xbase.lib.Functions.Function1
-import org.eclipse.xtext.xbase.lib.Functions.Function2
 import org.eclipse.xtext.xbase.lib.Procedures.Procedure1
 import org.junit.After
+import org.junit.Before
 import org.junit.runner.RunWith
-import org.eclipse.xtext.xbase.XBlockExpression
-import org.testosterone4j.tdsl.tDsl.ActivityExpectation
-import org.eclipse.xtext.common.types.JvmTypeParameter
+import org.testosterone4j.base.AbstractActivity
+import org.testosterone4j.base.ActivityAdapter
+import org.testosterone4j.base.ActivityLocator
+import org.testosterone4j.base.BaseDataType
+import org.testosterone4j.base.BaseUseCase
+import org.testosterone4j.base.ControlField
+import org.testosterone4j.base.EquivalenceClass
+import org.testosterone4j.base.GenerationHelper
+import org.testosterone4j.base.Generator
 import org.testosterone4j.base.IEvaluationGroup
+import org.testosterone4j.base.ITestProtocol
+import org.testosterone4j.base.Parameters
 import org.testosterone4j.base.TDslInjector
+import org.testosterone4j.base.TDslParameterized
+import org.testosterone4j.base.Tag
+import org.testosterone4j.base.TestDescriptor
+import org.testosterone4j.base.util.TDslHelper
+import org.testosterone4j.tdsl.tDsl.Activity
+import org.testosterone4j.tdsl.tDsl.ActivityExpectation
+import org.testosterone4j.tdsl.tDsl.ActivityOperation
+import org.testosterone4j.tdsl.tDsl.ActivityOperationParameter
+import org.testosterone4j.tdsl.tDsl.ConditionalNextActivity
+import org.testosterone4j.tdsl.tDsl.Control
 import org.testosterone4j.tdsl.tDsl.DataType
+import org.testosterone4j.tdsl.tDsl.DataTypeMapping
+import org.testosterone4j.tdsl.tDsl.Field
+import org.testosterone4j.tdsl.tDsl.Operation
+import org.testosterone4j.tdsl.tDsl.OperationCall
+import org.testosterone4j.tdsl.tDsl.PackageDeclaration
+import org.testosterone4j.tdsl.tDsl.Parameter
+import org.testosterone4j.tdsl.tDsl.Predicate
+import org.testosterone4j.tdsl.tDsl.StatementLine
+import org.testosterone4j.tdsl.tDsl.TagsDeclaration
+import org.testosterone4j.tdsl.tDsl.Test
+import org.testosterone4j.tdsl.tDsl.TestModel
+import org.testosterone4j.tdsl.tDsl.Toolkit
+import org.testosterone4j.tdsl.tDsl.UseCase
+import org.testosterone4j.base.ActivityRegistry
 
 /**
  * <p>Infers a JVM model from the source model.</p> 
@@ -115,30 +110,47 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 	@Inject
 	IJvmModelAssociator associator;
 
-	def dispatch void infer(PackageDeclaration pack, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
-			println("inferring package " + pack.name + " preIndexingPhase: " + isPreIndexingPhase)
-			for (element : pack.elements/* .filter([!(it instanceof Predicate)] ) */) {
-				element.infer(acceptor, isPreIndexingPhase)
+	JvmGenericType someClass
+	int index = 0;
+
+	def dispatch void infer(TestModel model, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
+
+			for (pack: model.packages) {
+				pack.infer(acceptor, isPreIndexingPhase)
 			}
 
-	/*		val predicates = pack.elements.filter(typeof(Predicate))
-		if (!predicates.empty) { 
-			acceptor.accept(pack.toClass(pack.predicateClass_fqn)).initializeLater [
-				
-				for (predicate : predicates) {
-					members += predicate.toMethod(predicate.name, predicate.newTypeRef(typeof(Boolean))) [
-						parameters += predicate.toParameter("fieldTags", predicate.newTypeRef(typeof(Tag)).createArrayType)
-						parameters += predicate.toParameter("equivClassTags", predicate.newTypeRef(typeof(Tag)).createArrayType)
-						
-						it.body = [
-							it.append('''
-								return false;
+		acceptor.accept(model.toClass(fqn.activityRegistry_fqn)).initializeLater [
+			superTypes += model.newTypeRef(ActivityRegistry)
+			val wildcardRef = typesFactory.createJvmWildcardTypeReference
+			val upperBound = typesFactory.createJvmUpperBound
+			upperBound.typeReference = model.newTypeRef(AbstractActivity).cloneWithProxies
+			wildcardRef.constraints.add(upperBound)
+			val activityClassRef = model.newTypeRef(Class, wildcardRef)
+			members += model.toMethod("resolveActivity", activityClassRef) [
+					parameters += model.toParameter("id", model.newTypeRef(String))
+					body = [
+						append(
+							'''
+								Class<? extends AbstractActivity> activity = null;
+								«FOR resource : model.eResource.resourceSet.resources»
+									«FOR activity : resource.allContents.toIterable.filter(Activity)»
+										if ("«activity.identifier»".equals(id)) {
+											return «activity.class_fqn».class;
+										}
+									«ENDFOR»
+								«ENDFOR»
+								return activity;
 							''')
-						]
 					]
-				}
+				]
 			]
-		} */
+	}
+
+	def dispatch void infer(PackageDeclaration pack, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
+		println("inferring package " + pack.name + " preIndexingPhase: " + isPreIndexingPhase)
+		for (element : pack.elements) {
+			element.infer(acceptor, isPreIndexingPhase)
+		}
 	}
 
 	def dispatch void infer(Toolkit toolkit, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
@@ -158,7 +170,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 	}
 
 	def activityAdapterParentClass(Activity activity) {
-		var clazz = activity?.parent?.adapterInterface_fqn 
+		var clazz = activity?.parent?.adapterInterface_fqn
 		if (clazz == null)
 			clazz = activity?.toolkit?.activityAdapter_FQN
 		clazz
@@ -171,7 +183,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 			activityAdapterClassVar = activity.toInterface(activity.adapterInterface_fqn)[]
 			acceptor.accept(activityAdapterClassVar).initializeLater [
 				val activityAdapterParentClass = activity.activityAdapterParentClass
-				if (activityAdapterParentClass != null) 
+				if (activityAdapterParentClass != null)
 					superTypes += activity.newTypeRef(activityAdapterParentClass)
 				for (activityMethod : activity.operations) {
 					if (activityMethod.name != null && activityMethod.body == null) {
@@ -203,9 +215,6 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 					typeRef = newTypeRef(activityAdapterClassVal)
 				}
 				val activityAdapterClassRef = typeRef
-				
-				
-				
 				val superClass = activity.superClass_ref
 				if (superClass != null)
 					superTypes += superClass
@@ -263,7 +272,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 								controlFieldName»«ENDFOR»}''')
 					]
 				]
-				members += activity.toField("currentActivity", activity.newTypeRef(AbstractActivity))			
+				members += activity.toField("currentActivity", activity.newTypeRef(AbstractActivity))
 				members += activity.toMethod("find", newTypeRef(activityClass)) [
 					it.setStatic(true)
 					setBody [
@@ -335,12 +344,12 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 				}
 				for (operation : activity.operations) {
 					members += operation.toActivityOperation()
-					if (operation.returnedActivity?.class_fqn != null) 
+					if (operation.returnedActivity?.class_fqn != null)
 						members += operation.toActivityOperationDelegation()
 				}
 			])
 	}
-	
+
 	/*
 	 * Calculates the return type of an activity operation in an activity. 
 	 * If the activity operation leads to a new activity (explicitly, not with e.g. returnToLastActivity), it returns a reference to the new activity.
@@ -352,7 +361,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 			activityOperation.newTypeRef(nextActivityClass)
 		else
 			activityOperation.newTypeRef(Void::TYPE)
-				
+
 	}
 
 	def JvmOperation toActivityOperation(ActivityOperation operation) {
@@ -380,7 +389,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 		val clazzActivityTypeParamRef = operation.newTypeRef(Class, activityTypeParamRef)
 		val clazzAdapterTypeParamRef = operation.newTypeRef(Class, adapterTypeParamRef)
 
-		val returnType = if (nextActivityClass == null) operation.returnTypeRef else activityTypeParamRef
+		val returnType = if(nextActivityClass == null) operation.returnTypeRef else activityTypeParamRef
 
 		operation.toMethod(operation.name, returnType) [
 			for (param : operation.params) {
@@ -395,7 +404,6 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 				it.parameters += operation.toParameter("adapterClass", clazzAdapterTypeParamRef)
 				it.parameters += operation.toParameter("expectIrregularNextActivity", operation.newTypeRef(boolean))
 			}
-			
 			if (operation.body != null) {
 				body = operation.body
 			} else {
@@ -414,15 +422,15 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 							() {
 								@Override
 								public Object apply() {
-									return contextAdapter != null ? contextAdapter.«operation.name»(«FOR param : operation.params SEPARATOR ', '»«param.name».getValue()«ENDFOR») : null;
+									return contextAdapter != null ? contextAdapter.«operation.name»(«FOR param : operation.params SEPARATOR ', '»«param.
+								name».getValue()«ENDFOR») : null;
 								}
 							};
 						''')
 					if (nextActivityAdapterClass != null) {
 						it.append("return ")
-						it.append("this.callContextAdapter(functionCall, ")
-						operation.newTypeRef(TDslHelper).serialize(operation, it)
-						it.append(".extractId(activityClass), activityClass, adapterClass, expectIrregularNextActivity);")
+						it.append(
+							"this.callContextAdapter(functionCall, activityClass, adapterClass, expectIrregularNextActivity);")
 					} else {
 						it.append("functionCall.apply();")
 					}
@@ -445,33 +453,36 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 					it.parameters += param.toParameter(param.name, param.newTypeRef(param.dataType.class_fqn))
 				}
 			}
-				body = [
-					if (nextActivityAdapterClass != null) {
-						it.append("return ")
-					}
-					it.append('''this.«operation.name»(''')
-					if (!operation.params.empty) {
-						it.append('''«FOR param: operation.params SEPARATOR ','»«param.name»«ENDFOR», ''')
-					}
-					operation.newTypeRef(nextActivityClass).serialize(operation, it)
-					it.append(".class, ")
-					operation.newTypeRef(nextActivityAdapterClass).serialize(operation, it)
-					it.append(".class, false);")
-					
-				]
+			body = [
+				if (nextActivityAdapterClass != null) {
+					it.append("return ")
+				}
+				it.append('''this.«operation.name»(''')
+				if (!operation.params.empty) {
+					it.append('''«FOR param : operation.params SEPARATOR ','»«param.name»«ENDFOR», ''')
+				}
+				operation.newTypeRef(nextActivityClass).serialize(operation, it)
+				it.append(".class, ")
+				operation.newTypeRef(nextActivityAdapterClass).serialize(operation, it)
+				it.append(".class, false);")
+			]
 		]
 	}
+
 	def associateChildExpressions(XBlockExpression block, JvmOperation it) {
 		for (expression : block.expressions) {
 			val stmtLine = expression as StatementLine
+
 			/*if (stmtLine.statement instanceof ActivityOperationCall) {
 				val opCall = stmtLine.statement as ActivityOperationCall
 				for (param : opCall.paramAssignment)
 					associator.associateLogicalContainer(param.value, it)
-			} else*/ if (stmtLine.statement instanceof ActivityExpectation) {
+			} else*/
+			if (stmtLine.statement instanceof ActivityExpectation) {
 				val actExp = stmtLine.statement as ActivityExpectation
 				associator.associateLogicalContainer(actExp.guard, it)
-				//associator.associateLogicalContainer(actExp.block, it)
+
+			//associator.associateLogicalContainer(actExp.block, it)
 			}
 		}
 	}
@@ -522,10 +533,12 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 									fieldControl.«operation.name»(«mapParameters(field, operation)»);
 								}''').newLine
 							if (nextActivity != null && !condNextAct.usually) {
-								it.append('''
+								it.append(
+									'''
 									return «nextActivity.class_SimpleName».find();''')
 							} else if (condNextAct == null) {
-								it.append('''
+								it.append(
+									'''
 									return this;''')
 							}
 						}
@@ -590,7 +603,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 					val nextActFqn = opMapping.nextActivities.get(0).next?.class_fqn
 					if (nextActFqn != null)
 						field.newTypeRef(nextActFqn)
-					else 
+					else
 						field.newTypeRef(Void.TYPE)
 				}
 			}
@@ -703,8 +716,8 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 						if (!test.excludeTags.empty) {
 							it.append("generator.setExcludeTags(new ")
 							test.newTypeRef(typeof(Tag)).createArrayType.serialize(test, it)
-							it.append(''' {«FOR tag : test.excludeTags SEPARATOR ","»«tag.enumLiteral_FQN»«ENDFOR»});''').
-								newLine
+							it.append(
+								''' {«FOR tag : test.excludeTags SEPARATOR ","»«tag.enumLiteral_FQN»«ENDFOR»});''').newLine
 						}
 						it.append('''generator.setMinTestCases(«test.minNumber»);''').newLine
 						it.append('''generator.setMaxTestCases(«test.maxNumber»);''').newLine
@@ -732,12 +745,13 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 							this.testNumber = testDescriptor.getTestNumber();
 							this.useCase = (''')
 						test.newTypeRef(test.useCase.class_fqn).serialize(test, it)
-						it.append(''')testDescriptor.getTestCase();
+						it.append(
+							''')testDescriptor.getTestCase();
 							INJECTOR.injectMembers(this);''')
 					]
 				]
 				members += test.toMethod("setup", test.newTypeRef(Void::TYPE)) [
-					annotations += test.toAnnotation(typeof(org.junit.Before))
+					annotations += test.toAnnotation(typeof(Before))
 					body = [
 						it.append("LOCATOR.beforeTest();")
 					]
@@ -838,7 +852,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 						]
 					}
 					if (clazz.classPredicate != null) {
-						val expectedType = dataType.newTypeRef(typeof(Functions$Function1), dataType.type.mappedBy,
+						val expectedType = dataType.newTypeRef(typeof(Functions.Function1), dataType.type.mappedBy,
 							dataType.newTypeRef(typeof(Boolean)))
 						members += dataType.toMethod(clazz.classPredicate_name, expectedType) [
 							static = true
@@ -960,7 +974,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 			[
 				superTypes += dataType.newTypeRef(typeof(org.testosterone4j.base.DataType), dataType.type.mappedBy,
 					newTypeRef(equivalenceClass))
-				superTypes += dataType.newTypeRef(typeof(org.testosterone4j.base.BaseDataType))
+				superTypes += dataType.newTypeRef(typeof(BaseDataType))
 				members += dataType.toField("serialVersionUID", dataType.newTypeRef(typeof(long))) [
 					setFinal(true)
 					setStatic(true)
@@ -968,10 +982,8 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 						it.append(dataType.calcSerialVersionUID + "L")
 					]
 				]
-				members += dataType.toField("_value", dataType.type?.mappedBy) [
-				]
-				members += dataType.toField("_equivalenceClass", newTypeRef(equivalenceClass)) [
-				]
+				members += dataType.toField("_value", dataType.type?.mappedBy)[]
+				members += dataType.toField("_equivalenceClass", newTypeRef(equivalenceClass))[]
 				members += dataType.toConstructor [
 					setVisibility(JvmVisibility::PUBLIC)
 					it.body = [
@@ -1072,16 +1084,17 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 						val upperBound = typesFactory.createJvmUpperBound
 						upperBound.typeReference = predicate.newTypeRef(EquivalenceClass).cloneWithProxies
 						wildcardRef2.constraints.add(upperBound)
-						predicate.newTypeRef(org.testosterone4j.base.DataType, wildcardRef1, wildcardRef2).serialize(predicate, it)
+						predicate.newTypeRef(org.testosterone4j.base.DataType, wildcardRef1, wildcardRef2).
+							serialize(predicate, it)
 						it.append(
 							'''
-							 lastEnteredValue = field.getLastEnteredValue();
-							boolean result = false;
-							if (lastEnteredValue != null && lastEnteredValue.getEquivalenceClass() != null) {
-								java.util.Set<org.testosterone4j.base.Tag> valueTags = new java.util.HashSet<org.testosterone4j.base.Tag>(lastEnteredValue.getEquivalenceClass().getClassTags());
-								result = predicateFunction().apply(field.getTags(), valueTags);
-							} 
-							return result;
+								 lastEnteredValue = field.getLastEnteredValue();
+								boolean result = false;
+								if (lastEnteredValue != null && lastEnteredValue.getEquivalenceClass() != null) {
+									java.util.Set<org.testosterone4j.base.Tag> valueTags = new java.util.HashSet<org.testosterone4j.base.Tag>(lastEnteredValue.getEquivalenceClass().getClassTags());
+									result = predicateFunction().apply(field.getTags(), valueTags);
+								} 
+								return result;
 							''');
 					]
 				]
@@ -1098,7 +1111,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 				val fieldTagRef = predicate.newTypeRef(typeof(Set), predicate.newTypeRef(typeof(Tag)))
 				val valueTagRef = predicate.newTypeRef(typeof(Set), predicate.newTypeRef(typeof(Tag)))
 				members += predicate.toMethod("predicateFunction",
-					predicate.newTypeRef(typeof(Functions$Function2), fieldTagRef, valueTagRef,
+					predicate.newTypeRef(typeof(Functions.Function2), fieldTagRef, valueTagRef,
 						predicate.newTypeRef(typeof(Boolean)))) [
 					it.setStatic(true)
 					body = predicate.body
@@ -1124,8 +1137,8 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 			members += useCase.toField("currentActivity", useCase.newTypeRef(AbstractActivity))
 			for (inputParam : useCase.inputParameter) {
 				if (inputParam.name != null && inputParam?.dataType?.class_fqn != null) {
-					members += inputParam.toField(inputParam.name, inputParam.newTypeRef(inputParam.dataType.class_fqn)) [
-					]
+					members += inputParam.toField(inputParam.name,
+						inputParam.newTypeRef(inputParam.dataType.class_fqn))[]
 				} else {
 					System::out.println("Can't determine use case input parameter type!")
 				}
@@ -1153,8 +1166,8 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 				it.members += useCase.toConstructor() [
 					for (inputParam : useCase.inputParameter) {
 						if (inputParam?.dataType?.class_fqn != null) {
-							it.parameters +=
-								useCase.toParameter(inputParam.name, useCase.newTypeRef(inputParam.dataType.class_fqn))
+							it.parameters += useCase.toParameter(inputParam.name,
+								useCase.newTypeRef(inputParam.dataType.class_fqn))
 						}
 					}
 					body = [
@@ -1206,6 +1219,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 							it.append('''return («returnType»)currentActivity;''')
 						}
 					]
+
 					//associateChildExpressions(useCase.block, it)
 					associator.associateLogicalContainer(useCase.block, it)
 

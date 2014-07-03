@@ -16,7 +16,7 @@
 <stringAttribute key="featureDefaultLocation" value="workspace"/>
 <stringAttribute key="featurePluginResolution" value="workspace"/>
 <booleanAttribute key="includeOptional" value="false"/>
-<stringAttribute key="location" value="D:\Kepler\workspace"/>
+<stringAttribute key="location" value="D:\TechWS-MBT\workspace"/>
 <listAttribute key="org.eclipse.debug.ui.favoriteGroups">
 <listEntry value="org.eclipse.debug.ui.launchGroup.run"/>
 </listAttribute>
@@ -36,7 +36,6 @@
 <setEntry value="de.msg.bne.ide.feature:default"/>
 <setEntry value="de.msg.bne.ide.jee.feature:default"/>
 <setEntry value="de.msg.bne.ide.rcp.feature:default"/>
-<setEntry value="org.testosterone4j.tdsl.sdk:default"/>
 <setEntry value="ecobertura:default"/>
 <setEntry value="oracle.eclipse.tools.juno.glassfish:default"/>
 <setEntry value="org.eclipse.cvs:default"/>
@@ -284,6 +283,7 @@
 <setEntry value="org.sonar.ide.eclipse.mylyn.feature:default"/>
 <setEntry value="org.sonatype.m2e.mavenarchiver.feature:default"/>
 <setEntry value="org.sonatype.tycho.m2e.feature:default"/>
+<setEntry value="org.testosterone4j.tdsl.sdk:default"/>
 <setEntry value="org.tigris.subversion.clientadapter.feature:default"/>
 <setEntry value="org.tigris.subversion.clientadapter.javahl.feature:default"/>
 <setEntry value="org.tigris.subversion.clientadapter.svnkit.feature:default"/>

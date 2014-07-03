@@ -68,6 +68,10 @@ class NamingExtensions {
 			providingActivity.fullyQualifiedName?.toString + "Adapter"
 	}
 	
+	def String activityRegistry_fqn() {
+		"de.msg.xt.mdt.base.TDslActivityRegistry"
+	}
+	
 	def JvmTypeReference superClass_ref(Activity activity) {
 		val parentClassName = activity?.parent?.class_fqn
 		if (parentClassName != null) 
