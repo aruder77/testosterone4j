@@ -3,11 +3,14 @@
 */
 package org.testosterone4j.tdsl.ui.outline
 
+import org.eclipse.xtext.ui.editor.outline.IOutlineNode
+import org.eclipse.xtext.ui.editor.outline.impl.DefaultOutlineTreeProvider
+import org.eclipse.xtext.ui.editor.outline.impl.DocumentRootNode
+import org.eclipse.xtext.xtype.XImportSection
 import org.testosterone4j.tdsl.tDsl.ActivityOperation
 import org.testosterone4j.tdsl.tDsl.Element
 import org.testosterone4j.tdsl.tDsl.EquivalenceClass
 import org.testosterone4j.tdsl.tDsl.Field
-import org.testosterone4j.tdsl.tDsl.Import
 import org.testosterone4j.tdsl.tDsl.Operation
 import org.testosterone4j.tdsl.tDsl.PackageDeclaration
 import org.testosterone4j.tdsl.tDsl.Predicate
@@ -16,9 +19,6 @@ import org.testosterone4j.tdsl.tDsl.Test
 import org.testosterone4j.tdsl.tDsl.TestModel
 import org.testosterone4j.tdsl.tDsl.Type
 import org.testosterone4j.tdsl.tDsl.UseCase
-import org.eclipse.xtext.ui.editor.outline.IOutlineNode
-import org.eclipse.xtext.ui.editor.outline.impl.DefaultOutlineTreeProvider
-import org.eclipse.xtext.ui.editor.outline.impl.DocumentRootNode
 
 /**
  * Customization of the default outline structure.
@@ -37,9 +37,7 @@ class TDslOutlineTreeProvider extends DefaultOutlineTreeProvider {
 	def _createChildren(IOutlineNode parentNode,
 			PackageDeclaration packageDecl) {
 		for (Element element : packageDecl.getElements()) {
-			if (!(element instanceof Import)) {
-				createNode(parentNode, element);
-			}
+			createNode(parentNode, element);
 		}
 	}
 

@@ -8,22 +8,21 @@ import org.eclipse.xtext.resource.IDefaultResourceDescriptionStrategy;
 import org.eclipse.xtext.scoping.IScopeProvider;
 import org.eclipse.xtext.xbase.compiler.OnTheFlyJavaCompiler;
 import org.eclipse.xtext.xbase.compiler.XbaseCompiler;
-import org.eclipse.xtext.xbase.featurecalls.IdentifiableSimpleNameProvider;
-import org.eclipse.xtext.xbase.scoping.batch.IBatchScopeProvider;
+import org.eclipse.xtext.xbase.scoping.XImportSectionNamespaceScopeProvider;
 import org.eclipse.xtext.xbase.scoping.batch.ImplicitlyImportedTypes;
+import org.eclipse.xtext.xbase.scoping.batch.XbaseBatchScopeProvider;
 import org.eclipse.xtext.xbase.typesystem.computation.ITypeComputer;
 import org.testosterone4j.tdsl.converter.TDslValueConverterService;
 import org.testosterone4j.tdsl.jvmmodel.TDslCompiler;
 import org.testosterone4j.tdsl.jvmmodel.TDslQualifiedNameProvider;
 import org.testosterone4j.tdsl.scoping.TDslBatchScopeProvider;
 import org.testosterone4j.tdsl.scoping.TDslDefaultResourceDescriptionStrategy;
-import org.testosterone4j.tdsl.scoping.TDslGlobalScopeProvider;
-import org.testosterone4j.tdsl.scoping.TDslIdentifiableSimpleNameProvider;
 import org.testosterone4j.tdsl.scoping.TDslScopeProvider;
 import org.testosterone4j.tdsl.typeprovider.TDslImplicitlyImportedTypes;
 import org.testosterone4j.tdsl.typeprovider.TDslTypeComputer;
 
 import com.google.inject.Binder;
+import com.google.inject.name.Names;
 
 /**
  * Use this class to register components to be used at runtime / without the
@@ -54,7 +53,7 @@ public class TDslRuntimeModule extends
 		return TDslScopeProvider.class;
 	}
 
-	public Class<? extends IBatchScopeProvider> bindIBatchScopeProvider() {
+	public Class<? extends XbaseBatchScopeProvider> bindXbaseBatchScopeProvider() {
 		return TDslBatchScopeProvider.class;
 	}
 
@@ -68,15 +67,10 @@ public class TDslRuntimeModule extends
 		return TDslDefaultResourceDescriptionStrategy.class;
 	}
 
-	@Override
-	public Class<? extends org.eclipse.xtext.scoping.IGlobalScopeProvider> bindIGlobalScopeProvider() {
-		return TDslGlobalScopeProvider.class;
-	}
-
-	@Override
-	public Class<? extends IdentifiableSimpleNameProvider> bindIdentifiableSimpleNameProvider() {
-		return TDslIdentifiableSimpleNameProvider.class;
-	}
+//	@Override
+//	public Class<? extends org.eclipse.xtext.scoping.IGlobalScopeProvider> bindIGlobalScopeProvider() {
+//		return TDslGlobalScopeProvider.class;
+//	}
 
 	public Class<? extends ImplicitlyImportedTypes> bindImplicitlyImportedTypes() {
 		return TDslImplicitlyImportedTypes.class;
@@ -85,6 +79,11 @@ public class TDslRuntimeModule extends
 	@Override
 	public Class<? extends org.eclipse.xtext.conversion.IValueConverterService> bindIValueConverterService() {
 		return TDslValueConverterService.class;
+	}
+	
+	// contributed by org.eclipse.xtext.generator.xbase.XbaseGeneratorFragment
+	public void configureIScopeProviderDelegate(com.google.inject.Binder binder) {
+		binder.bind(org.eclipse.xtext.scoping.IScopeProvider.class).annotatedWith(Names.named(org.eclipse.xtext.scoping.impl.AbstractDeclarativeScopeProvider.NAMED_DELEGATE)).to(XImportSectionNamespaceScopeProvider.class);
 	}
 
 }

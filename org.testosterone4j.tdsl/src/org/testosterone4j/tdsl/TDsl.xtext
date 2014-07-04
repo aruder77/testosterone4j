@@ -12,15 +12,10 @@ TestModel:
 
 PackageDeclaration:
     'package' name=QualifiedName ('for' sutRef=[Toolkit|FQN])? '{'
-    	(imports+=Import)*
-    	//importSection=XImportSection?
+    	importSection=XImportSection?
     	(elements+=Element)*
     '}';
     
-Import: 
-	'import' importedNamespace=FqnWithWildCard
-;
-
 FqnWithWildCard: 
 	FQN('.*')?
 ;

@@ -65,10 +65,6 @@ class TDslFormatter extends AbstractDeclarativeFormatter {
 
 		c.setLinewrap(2).after(access.getElementRule());
 
-		c.setLinewrap().after(access.getImportRule());
-		c.setLinewrap(2).between(access.getImportRule(),
-				access.getElementRule());
-
 		c.setLinewrap().after(access.getTypeRule());
 		c.setLinewrap().after(access.getEquivalenceClassRule());
 		c.setLinewrap().after(access.getOperationRule());

@@ -22,7 +22,6 @@ import org.testosterone4j.tdsl.tDsl.ActivityOperationParameterAssignment;
 import org.testosterone4j.tdsl.tDsl.ConditionalNextActivity;
 import org.testosterone4j.tdsl.tDsl.DataType;
 import org.testosterone4j.tdsl.tDsl.EquivalenceClass;
-import org.testosterone4j.tdsl.tDsl.Import;
 import org.testosterone4j.tdsl.tDsl.OperationParameterAssignment;
 import org.testosterone4j.tdsl.tDsl.PackageDeclaration;
 import org.testosterone4j.tdsl.tDsl.ParameterAssignment;
@@ -56,8 +55,6 @@ public class TDslDefaultResourceDescriptionStrategy extends
 			return true;
 		} else if (eObject instanceof PackageDeclaration) {
 			return true;
-		} else if (eObject instanceof Import) {
-			return false;
 		} else if (eObject instanceof Test) {
 			return false;
 		} else if (eObject instanceof TagsDeclaration) {
