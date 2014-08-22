@@ -113,7 +113,7 @@ class TDslCompiler extends XbaseCompiler {
 				if (expect != null) {
 					expect.guard.doInternalToJavaStatement(it, true)
 					append("if (")
-					expect.guard.internalToConvertedExpression(it, expect.guard.newTypeRef(Boolean))
+					expect.guard.internalToConvertedExpression(it, expect.guard.newTypeRef(Boolean).toLightweight(expect))
 					append(") {").increaseIndentation.newLine
 					appendActivityOperationCall(expr, it, expect.activity)
 					expect.block.doInternalToJavaStatement(it, false)

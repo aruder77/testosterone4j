@@ -9,7 +9,6 @@ import java.util.List
 import java.util.Set
 import java.util.Stack
 import org.eclipse.emf.ecore.EObject
-import org.eclipse.jdt.annotation.Nullable
 import org.eclipse.xtext.common.types.JvmAnnotationReference
 import org.eclipse.xtext.common.types.JvmAnnotationType
 import org.eclipse.xtext.common.types.JvmConstructor
@@ -41,6 +40,7 @@ import org.junit.runner.RunWith
 import org.testosterone4j.base.AbstractActivity
 import org.testosterone4j.base.ActivityAdapter
 import org.testosterone4j.base.ActivityLocator
+import org.testosterone4j.base.ActivityRegistry
 import org.testosterone4j.base.BaseDataType
 import org.testosterone4j.base.BaseUseCase
 import org.testosterone4j.base.ControlField
@@ -75,7 +75,6 @@ import org.testosterone4j.tdsl.tDsl.Test
 import org.testosterone4j.tdsl.tDsl.TestModel
 import org.testosterone4j.tdsl.tDsl.Toolkit
 import org.testosterone4j.tdsl.tDsl.UseCase
-import org.testosterone4j.base.ActivityRegistry
 
 /**
  * <p>Infers a JVM model from the source model.</p> 
@@ -632,8 +631,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 	 * @return a result representing an annotation reference to the given annotation type, <code>null<code> if 
 	 * 		sourceElement or annotationType are <code>null</code>.  
 	 */
-	@Nullable
-	def JvmAnnotationReference toRunWithAnnotation(@Nullable EObject sourceElement) {
+	def JvmAnnotationReference toRunWithAnnotation(EObject sourceElement) {
 		var JvmAnnotationReference result = typesFactory.createJvmAnnotationReference();
 		val value = sourceElement.newTypeRef(typeof(TDslParameterized))
 		val JvmType jvmType = references.findDeclaredType(typeof(RunWith), sourceElement);
