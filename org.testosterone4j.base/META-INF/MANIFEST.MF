@@ -10,7 +10,8 @@ Require-Bundle: org.eclipse.ui,
  javax.inject;bundle-version="1.0.0",
  org.eclipse.xtext.xbase.lib;bundle-version="[2.5.4,2.6.0)",
  org.eclipse.swtbot.junit4_x;bundle-version="2.0.0",
- org.junit
+ org.junit,
+ org.testosterone4j.reflections;bundle-version="0.0.1"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: org.testosterone4j.base,
  org.testosterone4j.base.util

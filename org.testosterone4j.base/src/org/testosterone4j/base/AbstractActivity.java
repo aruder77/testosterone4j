@@ -99,7 +99,7 @@ public abstract class AbstractActivity implements IEvaluationGroup {
 	}
 	
 	private boolean isChildActivity(IActivityContext activityContextToCheck, Class<? extends AbstractActivity> parentActivity) {
-		ActivityRegistry activityRegistry = getInjector().getInstance(ActivityRegistry.class);
+		ActivityRegistry activityRegistry = ActivityRegistry.getInstance();
 		Class<? extends AbstractActivity> contextActivityClass = activityRegistry.resolveActivity(activityContextToCheck.getId());
 		if (contextActivityClass == null) {
 			throw new IllegalArgumentException("activity with id '" + activityContextToCheck.getId() + "' not defined!");

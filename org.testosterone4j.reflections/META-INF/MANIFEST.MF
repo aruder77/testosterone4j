@@ -3,8 +3,10 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Testosterone4j Reflections
 Bundle-SymbolicName: org.testosterone4j.reflections
 Bundle-Version: 0.0.1.qualifier
-Require-Bundle: com.google.guava
+Require-Bundle: com.google.guava,
+ org.eclipse.core.runtime;bundle-version="3.9.100"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Eclipse-BuddyPolicy: dependent
 Bundle-ClassPath: lib/dom4j-1.6.1.jar,
  lib/gson-1.4.jar,
  lib/guava-11.0.2.jar,

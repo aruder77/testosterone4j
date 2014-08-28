@@ -114,36 +114,9 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 	int index = 0;
 
 	def dispatch void infer(TestModel model, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
-
-			for (pack: model.packages) {
-				pack.infer(acceptor, isPreIndexingPhase)
-			}
-
-		acceptor.accept(model.toClass(fqn.activityRegistry_fqn)).initializeLater [
-			superTypes += model.newTypeRef(ActivityRegistry)
-			val wildcardRef = typesFactory.createJvmWildcardTypeReference
-			val upperBound = typesFactory.createJvmUpperBound
-			upperBound.typeReference = model.newTypeRef(AbstractActivity).cloneWithProxies
-			wildcardRef.constraints.add(upperBound)
-			val activityClassRef = model.newTypeRef(Class, wildcardRef)
-			members += model.toMethod("resolveActivity", activityClassRef) [
-					parameters += model.toParameter("id", model.newTypeRef(String))
-					body = [
-						append(
-							'''
-								Class<? extends AbstractActivity> activity = null;
-								«FOR resource : model.eResource.resourceSet.resources»
-									«FOR activity : resource.allContents.toIterable.filter(Activity)»
-										if ("«activity.identifier»".equals(id)) {
-											return «activity.class_fqn».class;
-										}
-									«ENDFOR»
-								«ENDFOR»
-								return activity;
-							''')
-					]
-				]
-			]
+		for (pack: model.packages) {
+			pack.infer(acceptor, isPreIndexingPhase)
+		}
 	}
 
 	def dispatch void infer(PackageDeclaration pack, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
@@ -208,6 +181,8 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 		val activityClass = activity.toClass(activity.class_FQN)
 		acceptor.accept(activityClass).initializeLater(
 			[
+				annotations += activity.toAnnotation(typeof(org.testosterone4j.base.Activity));
+				
 				var JvmTypeReference typeRef = null
 				if (activityAdapterClassVal == null) {
 					typeRef = activity.newTypeRef(activity.adapterInterface_fqn)
