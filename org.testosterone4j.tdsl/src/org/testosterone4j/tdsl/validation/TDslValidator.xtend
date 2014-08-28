@@ -26,7 +26,6 @@ class TDslValidator extends AbstractTDslValidator {
 	@Inject extension MetaModelExtensions
 	@Inject extension NamingExtensions
 
-	@Inject extension ITypeProvider
 	@Inject extension JvmTypesBuilder
 
 
@@ -78,7 +77,7 @@ class TDslValidator extends AbstractTDslValidator {
 			assignment.name.datatype.type?.mappedBy?.type != null) {
 			val JvmType expectedDataType = assignment.newTypeRef(assignment.name.datatype.class_FQN.toString).type
 			val JvmType expectedType = assignment.name.datatype.type.mappedBy.type
-			val assignmentValueType = assignment?.value.type
+/* 			val assignmentValueType = assignment?.value.type
 			val JvmType exprType = assignment?.value.type.type
 			if (!exprType.equals(expectedDataType) && !exprType.equals(expectedType) &&
 				!expectedType.isCompatible(exprType)) {
@@ -86,7 +85,7 @@ class TDslValidator extends AbstractTDslValidator {
 					"Value of parameter " + assignment.name.name.name + " must be either " + expectedDataType.simpleName +
 						" or " + expectedType.simpleName + ", but was " + exprType.simpleName + "!",
 					TDslPackage.Literals::OPERATION_PARAMETER_ASSIGNMENT__VALUE);
-			}
+			}*/
 		}
 	}
 
@@ -96,14 +95,14 @@ class TDslValidator extends AbstractTDslValidator {
 			assignment.name.dataType.type?.mappedBy?.type != null) {
 			val JvmType expectedDataType = assignment.newTypeRef(assignment.name.dataType.class_FQN.toString).type
 			val JvmType expectedType = assignment.name.dataType.type.mappedBy.type
-			val JvmType exprType = assignment?.value?.type?.type
+			/*val JvmType exprType = assignment?.value?.type?.type
 			if (exprType != null && !exprType.equals(expectedDataType) && !exprType.equals(expectedType) &&
 				!expectedType.isCompatible(exprType)) {
 				error(
 					"Value of parameter " + assignment.name.name + " must be either " + expectedDataType.simpleName +
 						" or " + expectedType.simpleName + ", but was " + exprType.simpleName + "!",
 					TDslPackage.Literals::ACTIVITY_OPERATION_PARAMETER_ASSIGNMENT__VALUE);
-			}
+			}*/
 		}
 	}
 
@@ -113,14 +112,14 @@ class TDslValidator extends AbstractTDslValidator {
 			assignment.name.dataType.type?.mappedBy?.type != null) {
 			val JvmType expectedDataType = assignment.newTypeRef(assignment.name.dataType.class_FQN.toString).type
 			val JvmType expectedType = assignment.name.dataType.type.mappedBy.type
-			val JvmType exprType = assignment?.value?.type?.type
+			/*val JvmType exprType = assignment?.value?.type?.type
 			if (exprType != null && !exprType.equals(expectedDataType) && !exprType.equals(expectedType) &&
 				!expectedType.isCompatible(exprType)) {
 				error(
 					"Value of parameter " + assignment.name.name + " must be either " + expectedDataType.simpleName +
 						" or " + expectedType.simpleName + ", but was " + exprType.simpleName + "!",
 					TDslPackage.Literals::PARAMETER_ASSIGNMENT__VALUE);
-			}
+			}*/
 		}
 	}
 

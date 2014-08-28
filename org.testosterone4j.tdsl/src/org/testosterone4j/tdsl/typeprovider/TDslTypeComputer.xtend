@@ -159,11 +159,9 @@ class TDslTypeComputer extends XbaseWithAnnotationsTypeComputer {
 			if (!expressions.isEmpty()) {
 				for (XExpression expression : expressions) {
 					val expressionState = state.withoutExpectation();
-					expressionState.computeTypes(expression);
-					if (expression instanceof XVariableDeclaration) {
-						addLocalToCurrentScope(expression as XVariableDeclaration, state);
-					} else if (expression instanceof StatementLine) {
+					if (expression instanceof StatementLine) {
 						val stmtLine = expression as StatementLine
+						expressionState.computeTypes(stmtLine.statement);
 						if (stmtLine.statement instanceof XVariableDeclaration) {
 							addLocalToCurrentScope(stmtLine.statement as XVariableDeclaration, state)
 						}

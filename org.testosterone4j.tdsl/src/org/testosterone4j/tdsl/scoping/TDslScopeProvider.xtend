@@ -1,5 +1,20 @@
 package org.testosterone4j.tdsl.scoping
 
+import java.util.ArrayList
+import java.util.Collections
+import java.util.List
+import javax.inject.Inject
+import org.eclipse.emf.ecore.EObject
+import org.eclipse.emf.ecore.EReference
+import org.eclipse.xtext.EcoreUtil2
+import org.eclipse.xtext.naming.QualifiedName
+import org.eclipse.xtext.scoping.IScope
+import org.eclipse.xtext.scoping.Scopes
+import org.eclipse.xtext.xbase.XExpression
+import org.eclipse.xtext.xbase.XVariableDeclaration
+import org.eclipse.xtext.xbase.annotations.typesystem.XbaseWithAnnotationsBatchScopeProvider
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.testosterone4j.tdsl.jvmmodel.MetaModelExtensions
 import org.testosterone4j.tdsl.tDsl.Activity
 import org.testosterone4j.tdsl.tDsl.ActivityOperation
@@ -19,37 +34,18 @@ import org.testosterone4j.tdsl.tDsl.SubUseCaseCall
 import org.testosterone4j.tdsl.tDsl.TDslFactory
 import org.testosterone4j.tdsl.tDsl.TDslPackage
 import org.testosterone4j.tdsl.tDsl.UseCase
-import java.util.ArrayList
-import java.util.Collections
-import java.util.List
-import javax.inject.Inject
-import org.eclipse.emf.ecore.EObject
-import org.eclipse.emf.ecore.EReference
-import org.eclipse.xtext.EcoreUtil2
-import org.eclipse.xtext.naming.QualifiedName
-import org.eclipse.xtext.scoping.IScope
-import org.eclipse.xtext.scoping.Scopes
-import org.eclipse.xtext.xbase.XBlockExpression
-import org.eclipse.xtext.xbase.XExpression
-import org.eclipse.xtext.xbase.XVariableDeclaration
-import org.eclipse.xtext.xbase.annotations.scoping.XbaseWithAnnotationsScopeProvider
-import org.eclipse.xtext.xbase.scoping.LocalVariableScopeContext
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
-import org.eclipse.xtext.xbase.scoping.XbaseScopeProvider.LocalVariableAcceptor
-import org.eclipse.xtext.xbase.scoping.featurecalls.IValidatedEObjectDescription
-import org.eclipse.xtext.xbase.validation.IssueCodes
-import org.eclipse.emf.ecore.resource.Resource
-import org.eclipse.xtext.xbase.scoping.DelegatingScope
-import org.testosterone4j.tdsl.tDsl.ActivityExpectation
+import org.eclipse.xtext.xbase.XIfExpression
 
-class TDslScopeProvider extends XbaseWithAnnotationsScopeProvider {
+class TDslScopeProvider extends XbaseWithAnnotationsBatchScopeProvider {
 
 	@Inject extension MetaModelExtensions
 
 	Logger logger = LoggerFactory::getLogger(typeof(TDslScopeProvider))
 
 	override getScope(EObject context, EReference reference) {
+		if (context instanceof XIfExpression) {
+			println("Hello")
+		}
 		var scope = tdslGetScope(context, reference)
 		if (scope == null)
 			scope = if (context != null)
@@ -472,7 +468,7 @@ class TDslScopeProvider extends XbaseWithAnnotationsScopeProvider {
 	}
 	
 	
-	override IScope createSimpleFeatureCallScope(EObject context, EReference reference, Resource resource, boolean includeCurrentBlock, int idx) {
+/* override IScope createSimpleFeatureCallScope(EObject context, EReference reference, Resource resource, boolean includeCurrentBlock, int idx) {
 		val implicitFeaturesAndStatics = new DelegatingScope(IScope.NULLSCOPE);
 		val actualContext = if (context != null && context.eContainer instanceof StatementLine) context.eContainer else context
 		val scopeContext = createLocalVariableScopeContext(actualContext, reference, includeCurrentBlock, idx);
@@ -480,7 +476,7 @@ class TDslScopeProvider extends XbaseWithAnnotationsScopeProvider {
 		val scopeForImplicitFeatures = createImplicitFeatureCallScope(actualContext, resource, IScope.NULLSCOPE, localVariableScope);
 		implicitFeaturesAndStatics.setDelegate(scopeForImplicitFeatures);
 		return localVariableScope;
-	}
+	}*/
 	
 	
 	
@@ -498,7 +494,7 @@ class TDslScopeProvider extends XbaseWithAnnotationsScopeProvider {
 		}
 	} */
 	
-	override createLocalVarScopeForBlock(
+/*	override createLocalVarScopeForBlock(
 			XBlockExpression block, int indexOfContextExpressionInBlock,
 			boolean referredFromClosure, LocalVariableAcceptor acceptor) {
 		val descriptions = new ArrayList<IValidatedEObjectDescription>
@@ -519,7 +515,7 @@ class TDslScopeProvider extends XbaseWithAnnotationsScopeProvider {
 		if (descriptions.isEmpty())
 			return;
 		acceptor.accept("XBlockExpression", descriptions);
-	}
+	} */
 	
 
 }

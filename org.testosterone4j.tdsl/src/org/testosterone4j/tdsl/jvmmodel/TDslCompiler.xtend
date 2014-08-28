@@ -52,8 +52,6 @@ class TDslCompiler extends XbaseCompiler {
 
 	@Inject extension IQualifiedNameProvider
 
-	@Inject extension ITypeProvider
-
 	@Inject extension JvmTypesBuilder
 
 	@Inject extension TypeReferences typeRefs

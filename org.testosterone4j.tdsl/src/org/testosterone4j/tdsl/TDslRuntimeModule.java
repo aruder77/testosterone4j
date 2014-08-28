@@ -15,7 +15,6 @@ import org.eclipse.xtext.xbase.typesystem.computation.ITypeComputer;
 import org.testosterone4j.tdsl.converter.TDslValueConverterService;
 import org.testosterone4j.tdsl.jvmmodel.TDslCompiler;
 import org.testosterone4j.tdsl.jvmmodel.TDslQualifiedNameProvider;
-import org.testosterone4j.tdsl.scoping.TDslBatchScopeProvider;
 import org.testosterone4j.tdsl.scoping.TDslDefaultResourceDescriptionStrategy;
 import org.testosterone4j.tdsl.scoping.TDslScopeProvider;
 import org.testosterone4j.tdsl.typeprovider.TDslImplicitlyImportedTypes;
@@ -53,8 +52,9 @@ public class TDslRuntimeModule extends
 		return TDslScopeProvider.class;
 	}
 
+	@Override
 	public Class<? extends XbaseBatchScopeProvider> bindXbaseBatchScopeProvider() {
-		return TDslBatchScopeProvider.class;
+		return TDslScopeProvider.class;
 	}
 
 	@Override
@@ -67,10 +67,11 @@ public class TDslRuntimeModule extends
 		return TDslDefaultResourceDescriptionStrategy.class;
 	}
 
-//	@Override
-//	public Class<? extends org.eclipse.xtext.scoping.IGlobalScopeProvider> bindIGlobalScopeProvider() {
-//		return TDslGlobalScopeProvider.class;
-//	}
+	// @Override
+	// public Class<? extends org.eclipse.xtext.scoping.IGlobalScopeProvider>
+	// bindIGlobalScopeProvider() {
+	// return TDslGlobalScopeProvider.class;
+	// }
 
 	public Class<? extends ImplicitlyImportedTypes> bindImplicitlyImportedTypes() {
 		return TDslImplicitlyImportedTypes.class;
@@ -80,10 +81,14 @@ public class TDslRuntimeModule extends
 	public Class<? extends org.eclipse.xtext.conversion.IValueConverterService> bindIValueConverterService() {
 		return TDslValueConverterService.class;
 	}
-	
+
 	// contributed by org.eclipse.xtext.generator.xbase.XbaseGeneratorFragment
+	@Override
 	public void configureIScopeProviderDelegate(com.google.inject.Binder binder) {
-		binder.bind(org.eclipse.xtext.scoping.IScopeProvider.class).annotatedWith(Names.named(org.eclipse.xtext.scoping.impl.AbstractDeclarativeScopeProvider.NAMED_DELEGATE)).to(XImportSectionNamespaceScopeProvider.class);
+		binder.bind(org.eclipse.xtext.scoping.IScopeProvider.class)
+				.annotatedWith(
+						Names.named(org.eclipse.xtext.scoping.impl.AbstractDeclarativeScopeProvider.NAMED_DELEGATE))
+				.to(XImportSectionNamespaceScopeProvider.class);
 	}
 
 }
