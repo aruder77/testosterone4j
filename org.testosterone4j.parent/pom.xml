@@ -21,6 +21,7 @@
 		<module>../org.testosterone4j.update-site</module>
 
 		<module>../org.testosterone4j.help</module>
+		<module>../org.testosterone4j.reflections</module>
 	</modules>
 
 	<properties>
