@@ -80,7 +80,7 @@ class TDslTypeComputer extends XbaseWithAnnotationsTypeComputer {
 		if (assert?.expression == null)
 			state.acceptActualType(getTypeForName(Void::TYPE, state))
 		else
-			computeTypes(assert?.expression, state)
+			computeTypes(assert.expression, state)
 	}
 
 	protected def _computeTypes(OperationCall opCall, ITypeComputationState state) {
@@ -213,8 +213,11 @@ class TDslTypeComputer extends XbaseWithAnnotationsTypeComputer {
 	}
 
 	protected def _computeTypes(SubUseCaseCall subUseCaseCall, ITypeComputationState state) {
-		for (expr : subUseCaseCall.paramAssignment.map[(it as ParameterAssignment).value]) {
-			state.withNonVoidExpectation.computeTypes(expr)
+		for (paramAssignment : subUseCaseCall.paramAssignment) {
+			val ITypeComputationState subState = state.withNonVoidExpectation
+			subState.withinScope(subUseCaseCall)
+			subState.computeTypes((paramAssignment as ParameterAssignment).value)
+			subState.acceptActualType(subState.converter.toLightweightReference(typeReferences.getTypeForName(Void::TYPE, paramAssignment)))
 		}
 
 		state.acceptActualType(

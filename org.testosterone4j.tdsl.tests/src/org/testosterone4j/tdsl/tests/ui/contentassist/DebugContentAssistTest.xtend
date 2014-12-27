@@ -12,7 +12,7 @@ import org.junit.Ignore
 @InjectWith(TDslUiInjectorProvider)
 class DebugContentAssistTest extends MyAbstractContentAssistTest {
 	
-	@Test @Ignore
+	@Test 
 	def void inActivityOperation() {
 		val builder = newBuilder.append(BasicTestSetupTest.BASIC_TEST_PREAMBLE).append('''
 			activity SampleTestActivity {
@@ -30,10 +30,10 @@ class DebugContentAssistTest extends MyAbstractContentAssistTest {
 				op activityOperation(StringDT param) {
 		''')
 		
-		builder.append("val localVar = ").assertProposal("param")
+		builder.append("call SampleTestUseCaseWithParameter(param=").assertProposal("param")
 	}	
 	
-	@Test
+	@Test @Ignore
 	def void inActivityOperation2() {
 		val builder = newBuilder.append(BasicTestSetupTest.BASIC_TEST_PREAMBLE).append('''
 			activity SampleTestActivity {
