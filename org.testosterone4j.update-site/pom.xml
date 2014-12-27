@@ -52,7 +52,7 @@
 		<profile>
 			<id>publishToTestosterone4j</id>
 			<properties>
-				<publish-dest>/var/www/vhosts/lvps91-250-115-227.dedicated.hosteurope.de/testosterone4j/updates/latest</publish-dest>
+				<publish-dest>/var/www/testosterone4j.org/updates/latest</publish-dest>
 			</properties>
 		</profile>
 		<profile>
