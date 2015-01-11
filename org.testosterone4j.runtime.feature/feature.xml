@@ -4,16 +4,17 @@
       label="TDsl Runtime Feature"
       version="0.0.1.qualifier">
 
-   <description url="http://www.example.com/description">
-      [Enter Feature Description here.]
+   <description>
+      This is the Testosterone4j runtime feature. It must be included
+in the target platform used to run the testosterone4j tests.
    </description>
 
-   <copyright url="http://www.example.com/copyright">
-      [Enter Copyright Description here.]
+   <copyright url="http://www.testosterone4j.org/copyright">
+      (c) Copyright Axel Ruder 2014,2015
    </copyright>
 
-   <license url="http://www.example.com/license">
-      [Enter License Description here.]
+   <license url="http://mozilla.org/MPL/2.0/">
+      This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
    </license>
 
    <plugin
@@ -57,4 +58,5 @@
          install-size="0"
          version="0.0.0"
          unpack="false"/>
+
 </feature>

@@ -13,7 +13,7 @@
 
 
 		<module>../org.testosterone4j.tdsl</module>
-<!-- 		<module>../org.testosterone4j.tdsl.tests</module> -->
+		<!-- <module>../org.testosterone4j.tdsl.tests</module> -->
 		<module>../org.testosterone4j.base</module>
 		<module>../org.testosterone4j.runtime.feature</module>
 		<module>../org.testosterone4j.sdk.feature</module>
@@ -28,6 +28,11 @@
 		<tycho.version>0.17.0</tycho.version>
 		<xtext-version>2.5.4</xtext-version>
 		<uitest.vmparams>-Dorg.eclipse.swtbot.search.timeout=30000 -Xmx1024m -XX:MaxPermSize=384m</uitest.vmparams>
+
+		<license.licenseName>mpl</license.licenseName>
+		<license.licenseResolver>${project.baseUri}/../org.testosterone4j.parent/src/license</license.licenseResolver>
+		<license.inceptionYear>2015</license.inceptionYear>
+		<license.organizationName>Axel Ruder</license.organizationName>
 	</properties>
 
 	<repositories>
@@ -96,16 +101,17 @@
 						<!-- <ws>win32</ws> -->
 						<!-- <arch>x86</arch> -->
 						<!-- </environment> -->
-<!-- 						<environment> -->
-<!-- 							<os>macosx</os> -->
-<!-- 							<ws>cocoa</ws> -->
-<!-- 							<arch>x86_64</arch> -->
-<!-- 						</environment> -->
+						<!-- <environment> -->
+						<!-- <os>macosx</os> -->
+						<!-- <ws>cocoa</ws> -->
+						<!-- <arch>x86_64</arch> -->
+						<!-- </environment> -->
 						<environment>
 							<os>linux</os>
 							<ws>gtk</ws>
 							<arch>x86_64</arch>
-						</environment>					</environments>
+						</environment>
+					</environments>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -168,6 +174,21 @@
 								<source>xtend-gen</source>
 							</sources>
 						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+				<version>1.8</version>
+				<executions>
+					<execution>
+						<id>first</id>
+						<goals>
+							<goal>update-file-header</goal>
+						</goals>
+						<phase>process-sources</phase>
 					</execution>
 				</executions>
 			</plugin>

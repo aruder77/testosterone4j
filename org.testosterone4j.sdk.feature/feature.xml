@@ -4,6 +4,18 @@
       label="TDsl SDK Feature "
       version="0.0.1.qualifier">
 
+   <description url="">
+      This is the Testosterone4j development feature. It must be installed in the Eclipse IDE used to develop your testosterone4j tests.
+   </description>
+   
+   <copyright url="http://www.testosterone4j.org/copyright">
+      (c) Copyright Axel Ruder 2014,2015
+   </copyright>
+
+   <license url="http://mozilla.org/MPL/2.0/">
+      This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+   </license>
+
    <requires>
       <import feature="org.eclipse.xtext.sdk" version="2.5.4" match="equivalent"/>
       <import feature="org.eclipse.xtext.xdoc.feature" version="0.1.0" match="compatible"/>
@@ -71,4 +83,5 @@
          install-size="0"
          version="0.0.0"
          unpack="false"/>
+
 </feature>
