@@ -27,12 +27,14 @@
 	<properties>
 		<tycho.version>0.17.0</tycho.version>
 		<xtext-version>2.5.4</xtext-version>
-		<uitest.vmparams>-Dorg.eclipse.swtbot.search.timeout=30000 -Xmx1024m -XX:MaxPermSize=384m</uitest.vmparams>
+		<uitest.vmparams>-Dorg.eclipse.swtbot.search.timeout=30000 -Xmx1024m
+			-XX:MaxPermSize=384m</uitest.vmparams>
 
 		<license.licenseName>mpl</license.licenseName>
 		<license.licenseResolver>${project.baseUri}/../org.testosterone4j.parent/src/license</license.licenseResolver>
 		<license.inceptionYear>2015</license.inceptionYear>
 		<license.organizationName>Axel Ruder</license.organizationName>
+		<license.addJavaLicenseAfterPackage>false</license.addJavaLicenseAfterPackage>
 	</properties>
 
 	<repositories>
@@ -191,6 +193,12 @@
 						<phase>process-sources</phase>
 					</execution>
 				</executions>
+				<configuration>
+					<extraExtensions>
+						<xtend>java</xtend>
+						<mwe2>java</mwe2>
+					</extraExtensions>
+				</configuration>
 			</plugin>
 		</plugins>
 
@@ -352,6 +360,27 @@
 										</versionRange>
 										<goals>
 											<goal>add-source</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											org.codehaus.mojo
+										</groupId>
+										<artifactId>
+											license-maven-plugin
+										</artifactId>
+										<versionRange>
+											[1.8,)
+										</versionRange>
+										<goals>
+											<goal>
+												update-file-header
+											</goal>
 										</goals>
 									</pluginExecutionFilter>
 									<action>
