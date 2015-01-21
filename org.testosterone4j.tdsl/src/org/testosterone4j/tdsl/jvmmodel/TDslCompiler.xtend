@@ -14,7 +14,6 @@ import org.eclipse.xtext.xbase.compiler.XbaseCompiler
 import org.eclipse.xtext.xbase.compiler.output.ITreeAppendable
 import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder
 import org.eclipse.xtext.xbase.lib.Pair
-import org.eclipse.xtext.xbase.typing.ITypeProvider
 import org.testosterone4j.base.AbstractActivity
 import org.testosterone4j.base.GenerationHelper
 import org.testosterone4j.base.Tag

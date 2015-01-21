@@ -5,25 +5,25 @@ Bundle-Vendor: My Company
 Bundle-Version: 0.0.1.qualifier
 Bundle-SymbolicName: org.testosterone4j.tdsl;singleton:=true
 Bundle-ActivationPolicy: lazy
-Require-Bundle: org.eclipse.xtext;bundle-version="[2.6.0,2.7.0)";visibility:=reexport,
- org.eclipse.xtext.xbase;bundle-version="[2.6.0,2.7.0)";resolution:=optional;visibility:=reexport,
- org.eclipse.xtext.generator;bundle-version="[2.6.0,2.7.0)";resolution:=optional,
+Require-Bundle: org.eclipse.xtext;bundle-version="[2.7.0,2.8.0)";visibility:=reexport,
+ org.eclipse.xtext.xbase;bundle-version="[2.7.0,2.8.0)";resolution:=optional;visibility:=reexport,
+ org.eclipse.xtext.generator;bundle-version="[2.7.0,2.8.0)";resolution:=optional,
  org.eclipse.emf.codegen.ecore;resolution:=optional,
  org.eclipse.emf.mwe.utils;resolution:=optional,
  org.eclipse.emf.mwe2.launch;resolution:=optional,
- org.eclipse.xtext.util;bundle-version="[2.6.0,2.7.0)",
+ org.eclipse.xtext.util;bundle-version="[2.7.0,2.8.0)",
  org.eclipse.emf.ecore,
  org.eclipse.emf.common,
  org.antlr.runtime,
- org.eclipse.xtext.common.types;bundle-version="[2.6.0,2.7.0)",
- org.eclipse.xtext.xbase.lib;bundle-version="[2.6.0,2.7.0)";visibility:=reexport,
+ org.eclipse.xtext.common.types;bundle-version="[2.7.0,2.8.0)",
+ org.eclipse.xtext.xbase.lib;bundle-version="[2.7.0,2.8.0)";visibility:=reexport,
  org.junit;bundle-version="4.10.0",
  org.apache.commons.logging;bundle-version="1.0.4",
- org.eclipse.xtend.lib;bundle-version="[2.6.0,2.7.0)",
+ org.eclipse.xtend.lib;bundle-version="[2.7.0,2.8.0)",
  com.google.guava,
  org.testosterone4j.base;bundle-version="0.0.1";visibility:=reexport,
  org.slf4j.api;bundle-version="1.7.2",
- org.eclipse.xtext.xbase.junit;bundle-version="[2.6.0,2.7.0)",
+ org.eclipse.xtext.xbase.junit;bundle-version="[2.7.0,2.8.0)",
  org.objectweb.asm;bundle-version="[5.0.1,6.0.0)";resolution:=optional
 Import-Package: org.apache.log4j,
  org.eclipse.xtext.xbase.lib

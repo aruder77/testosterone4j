@@ -1,6 +1,5 @@
 package org.testosterone4j.tdsl.scoping
 
-import org.eclipse.xtext.xbase.jvmmodel.JvmGlobalScopeProvider
 import com.google.common.base.Predicate
 import org.eclipse.emf.ecore.EClass
 import org.eclipse.emf.ecore.resource.Resource

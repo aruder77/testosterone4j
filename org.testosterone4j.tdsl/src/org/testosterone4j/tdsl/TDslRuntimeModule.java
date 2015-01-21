@@ -9,7 +9,7 @@ import org.eclipse.xtext.scoping.IScopeProvider;
 import org.eclipse.xtext.xbase.compiler.OnTheFlyJavaCompiler;
 import org.eclipse.xtext.xbase.compiler.XbaseCompiler;
 import org.eclipse.xtext.xbase.scoping.XImportSectionNamespaceScopeProvider;
-import org.eclipse.xtext.xbase.scoping.batch.ImplicitlyImportedTypes;
+import org.eclipse.xtext.xbase.scoping.batch.ImplicitlyImportedFeatures;
 import org.eclipse.xtext.xbase.scoping.batch.XbaseBatchScopeProvider;
 import org.eclipse.xtext.xbase.typesystem.computation.ITypeComputer;
 import org.testosterone4j.tdsl.converter.TDslValueConverterService;
@@ -73,7 +73,7 @@ public class TDslRuntimeModule extends
 	// return TDslGlobalScopeProvider.class;
 	// }
 
-	public Class<? extends ImplicitlyImportedTypes> bindImplicitlyImportedTypes() {
+	public Class<? extends ImplicitlyImportedFeatures> bindImplicitlyImportedTypes() {
 		return TDslImplicitlyImportedTypes.class;
 	}
 

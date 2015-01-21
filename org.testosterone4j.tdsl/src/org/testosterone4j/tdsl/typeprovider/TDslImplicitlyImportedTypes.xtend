@@ -1,13 +1,12 @@
 package org.testosterone4j.tdsl.typeprovider
 
-import org.testosterone4j.base.Tag
 import java.util.ArrayList
-import org.eclipse.xtext.xbase.scoping.batch.ImplicitlyImportedTypes
+import org.eclipse.xtext.xbase.scoping.batch.ImplicitlyImportedFeatures
 import org.junit.Assert
 import org.testosterone4j.base.Predicates
 import org.testosterone4j.base.RandomExtensions
 
-class TDslImplicitlyImportedTypes extends ImplicitlyImportedTypes {
+class TDslImplicitlyImportedTypes extends ImplicitlyImportedFeatures {
 	
 	override protected getStaticImportClasses() {
 		val list = new ArrayList<Class<?>>()

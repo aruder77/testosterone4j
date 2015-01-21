@@ -15,7 +15,6 @@ import org.eclipse.xtext.common.types.JvmType
 import org.eclipse.xtext.validation.Check
 import org.eclipse.xtext.xbase.XExpression
 import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder
-import org.eclipse.xtext.xbase.typing.ITypeProvider
 import org.testosterone4j.tdsl.tDsl.ActivityExpectation
 
 class TDslValidator extends AbstractTDslValidator {

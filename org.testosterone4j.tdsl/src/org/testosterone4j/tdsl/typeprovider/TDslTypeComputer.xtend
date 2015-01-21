@@ -34,11 +34,17 @@ import org.eclipse.xtext.xbase.jvmmodel.IJvmModelAssociations
 import org.eclipse.xtext.xbase.typesystem.computation.ITypeComputationState
 import org.eclipse.xtext.xbase.typesystem.conformance.ConformanceHint
 import org.testosterone4j.tdsl.tDsl.Selector
+import org.eclipse.xtext.xbase.typesystem.references.LightweightTypeReferenceFactory
+import org.eclipse.xtext.xbase.typesystem.legacy.StandardTypeReferenceOwner
+import org.eclipse.xtext.xbase.typesystem.util.CommonTypeComputationServices
 
 @Singleton
 class TDslTypeComputer extends XbaseWithAnnotationsTypeComputer {
 
 	@Inject TypeReferences typeReferences
+
+	@Inject
+	private CommonTypeComputationServices services;
 
 	@Inject extension NamingExtensions
 	@Inject extension MetaModelExtensions
@@ -84,14 +90,15 @@ class TDslTypeComputer extends XbaseWithAnnotationsTypeComputer {
 	}
 
 	protected def _computeTypes(OperationCall opCall, ITypeComputationState state) {
+		val typeFactory = new LightweightTypeReferenceFactory(new StandardTypeReferenceOwner(services, opCall))
+		
 		val typeName = opCall.operation?.dataType?.class_FQN?.toString
 		for (expr : opCall.paramAssignment.map[(it as OperationParameterAssignment).value]) {
 			state.withNonVoidExpectation.computeTypes(expr)
 		}
 
 		if (typeName != null) {
-			state.acceptActualType(
-				state.converter.toLightweightReference(typeReferences.getTypeForName(typeName, opCall)))
+			state.acceptActualType(typeFactory.toLightweightReference(typeReferences.getTypeForName(typeName, opCall)))
 		} else
 			state.acceptActualType(getTypeForName(Void::TYPE, state))
 	}
@@ -103,6 +110,8 @@ class TDslTypeComputer extends XbaseWithAnnotationsTypeComputer {
 	}
 
 	protected def _computeTypes(UseCaseBlock block, ITypeComputationState state) {
+		val typeFactory = new LightweightTypeReferenceFactory(new StandardTypeReferenceOwner(services, block))
+		
 		var String nextActivityClass = (block.eContainer as UseCase).returnedActivity?.class_fqn
 		val returnType = if (nextActivityClass != null)
 				typeReferences.getTypeForName(nextActivityClass, block)
@@ -111,46 +120,42 @@ class TDslTypeComputer extends XbaseWithAnnotationsTypeComputer {
 
 		computeBlockExpressionTypes(state, block)
 
-		val assignedType = state.converter.toLightweightReference(returnType)
-		state.acceptActualType(assignedType)
+		state.acceptActualType(typeFactory.toLightweightReference(returnType))
 	}
 
 	protected def _computeTypes(InnerBlock block, ITypeComputationState state) {
-		val returnType = typeReferences.getTypeForName(Void::TYPE, block)
+		val returnType = getTypeForName(Void::TYPE, state)
 
 		computeBlockExpressionTypes(state, block)
 
-		val assignedType = state.converter.toLightweightReference(returnType)
-		state.acceptActualType(assignedType)
+		state.acceptActualType(returnType)
 	}
 
 	protected def _computeTypes(ActivityExpectation actExp, ITypeComputationState state) {
-		val returnType = typeReferences.getTypeForName(Void::TYPE, actExp)
+		val returnType = getTypeForName(Void::TYPE, state)
 
 		state.withNonVoidExpectation.computeTypes(actExp.guard)
 
 		//state.withRootExpectation(state.converter.toLightweightReference(typeReferences.getTypeForName(Boolean, actExp))))
 		computeBlockExpressionTypes(state, actExp.block)
 
-		val assignedType = state.converter.toLightweightReference(returnType)
-		state.acceptActualType(assignedType)
+		state.acceptActualType(returnType)
 	}
 
 	protected def _computeTypes(ActivityOperationBlock block, ITypeComputationState state) {
 		val expectedType = state.expectations.filter[expectedType != null].head.expectedType
-		var returnType = typeReferences.getTypeForName(AbstractActivity, block)
-//		var nextActivityClass = block.activityOperation.returnedActivity?.class_fqn
-//		val returnType = if (nextActivityClass != null)
-//				typeReferences.getTypeForName(nextActivityClass, block)
-//			else
-//				typeReferences.getTypeForName(Void::TYPE, block)
+		var returnType = getTypeForName(AbstractActivity, state)
 
+		//		var nextActivityClass = block.activityOperation.returnedActivity?.class_fqn
+		//		val returnType = if (nextActivityClass != null)
+		//				typeReferences.getTypeForName(nextActivityClass, block)
+		//			else
+		//				typeReferences.getTypeForName(Void::TYPE, block)
 		computeBlockExpressionTypes(state, block)
 
-		var assignedType = state.converter.toLightweightReference(returnType)
 		if (expectedType != null)
-			assignedType = expectedType
-		state.acceptActualType(assignedType)
+			state.acceptActualType(expectedType)
+		state.acceptActualType(returnType)
 	}
 
 	protected def computeBlockExpressionTypes(ITypeComputationState state, XBlockExpression block) {
@@ -172,6 +177,7 @@ class TDslTypeComputer extends XbaseWithAnnotationsTypeComputer {
 	}
 
 	protected def _computeTypes(GeneratedValueExpression expr, ITypeComputationState state) {
+		val typeFactory = new LightweightTypeReferenceFactory(new StandardTypeReferenceOwner(services, expr))
 		val param = expr?.param
 		val dataTypeName = switch param {
 			Parameter:
@@ -187,7 +193,7 @@ class TDslTypeComputer extends XbaseWithAnnotationsTypeComputer {
 		else
 			type = typeReferences.getTypeForName(dataTypeName, expr)
 
-		state.acceptActualType(state.converter.toLightweightReference(type))
+		state.acceptActualType(typeFactory.toLightweightReference(type))
 	}
 
 	protected def _computeTypes(ActivityOperationCall opCall, ITypeComputationState state) {
@@ -209,22 +215,27 @@ class TDslTypeComputer extends XbaseWithAnnotationsTypeComputer {
 		else
 			type = typeReferences.getTypeForName(typeName, opCall)
 
-		state.acceptActualType(state.converter.toLightweightReference(type), ConformanceHint.SUCCESS)
+		val typeFactory = new LightweightTypeReferenceFactory(new StandardTypeReferenceOwner(services, opCall))
+		state.acceptActualType(typeFactory.toLightweightReference(type), ConformanceHint.SUCCESS)
 	}
 
 	protected def _computeTypes(SubUseCaseCall subUseCaseCall, ITypeComputationState state) {
+		val typeFactory = new LightweightTypeReferenceFactory(new StandardTypeReferenceOwner(services, subUseCaseCall))
 		for (paramAssignment : subUseCaseCall.paramAssignment) {
 			val ITypeComputationState subState = state.withNonVoidExpectation
 			subState.withinScope(subUseCaseCall)
 			subState.computeTypes((paramAssignment as ParameterAssignment).value)
-			subState.acceptActualType(subState.converter.toLightweightReference(typeReferences.getTypeForName(Void::TYPE, paramAssignment)))
+			subState.acceptActualType(
+				typeFactory.toLightweightReference(typeReferences.getTypeForName(Void::TYPE, paramAssignment)))
 		}
 
 		state.acceptActualType(
-			state.converter.toLightweightReference(typeReferences.getTypeForName(Void::TYPE, subUseCaseCall)))
+			typeFactory.toLightweightReference(typeReferences.getTypeForName(Void::TYPE, subUseCaseCall)))
 	}
 
 	protected def _computeTypes(GenerationSelektor generationSelektor, ITypeComputationState state) {
+		val typeFactory = new LightweightTypeReferenceFactory(new StandardTypeReferenceOwner(services, generationSelektor))
+		
 		computeTypes(generationSelektor.expression, state.withNonVoidExpectation)
 
 		val container = generationSelektor.eContainer
@@ -241,16 +252,18 @@ class TDslTypeComputer extends XbaseWithAnnotationsTypeComputer {
 					type = typeReferences.getTypeForName(dataType, generationSelektor)
 			}
 		}
-		state.acceptActualType(state.converter.toLightweightReference(type))
+		state.acceptActualType(typeFactory.toLightweightReference(type))
 	}
 
 	protected def _computeTypes(Selector selector, ITypeComputationState state) {
+		val typeFactory = new LightweightTypeReferenceFactory(new StandardTypeReferenceOwner(services, selector))
+		
 		computeTypes(selector.expression, state.withNonVoidExpectation)
 
 		var JvmTypeReference type
 		val dataType = selector.dataType?.class_FQN?.toString
 		if (dataType != null)
 			type = typeReferences.getTypeForName(dataType, selector)
-		state.acceptActualType(state.converter.toLightweightReference(type))
+		state.acceptActualType(typeFactory.toLightweightReference(type))
 	}
 }

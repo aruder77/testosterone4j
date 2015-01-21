@@ -923,7 +923,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 			members += dataType.toMethod("getByValue", dataType.newTypeRef(it.fullyQualifiedName.toString)) [
 				it.setStatic(true)
 				if (dataType.type?.mappedBy != null) {
-					it.parameters += it.toParameter("value", dataType.type.mappedBy)
+					it.parameters += dataType.toParameter("value", dataType.type.mappedBy)
 					it.setBody [
 						it.append(
 							'''
@@ -1261,7 +1261,7 @@ class TDslJvmModelInferrer extends AbstractModelInferrer {
 					superTypes += tags.newTypeRef(typeof(Tag))
 					for (tag : tags.tags) {
 						if (tag.name != null) {
-							val enumLit = toEnumerationLiteral(tag.enumLiteral_SimpleName)
+							val enumLit = tag.toEnumerationLiteral(tag.enumLiteral_SimpleName)
 							enumLit.setStatic(true)
 							members += enumLit
 						}
